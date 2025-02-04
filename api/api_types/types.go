@@ -38,10 +38,13 @@ const (
 // Defines values for AiModelEnum.
 const (
 	Claude35    AiModelEnum = "Claude3.5"
-	GPT4Mini    AiModelEnum = "GPT4Mini"
 	Gemini15Pro AiModelEnum = "Gemini1.5Pro"
 	Gpt35Turbo  AiModelEnum = "Gpt3.5Turbo"
+	Gpt4Mini    AiModelEnum = "Gpt4Mini"
 	Gpt4o       AiModelEnum = "Gpt4o"
+	Gpt4oMini   AiModelEnum = "Gpt4oMini"
+	GptO1       AiModelEnum = "GptO1"
+	GptO3Mini   AiModelEnum = "GptO3Mini"
 	Mistral     AiModelEnum = "Mistral"
 )
 

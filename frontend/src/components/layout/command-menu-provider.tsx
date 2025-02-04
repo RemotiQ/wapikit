@@ -17,11 +17,13 @@ import { Badge } from '../ui/badge'
 import { useRouter } from 'next/navigation'
 import { type CommandItemType } from '~/types'
 import { clsx } from 'clsx'
+import { useAiChatStore } from '~/store/ai-chat-store'
 
 export default function CommandMenuProvider() {
 	const router = useRouter()
-
 	const [input, setInput] = useState('')
+
+	const { writeProperty: writeAiStoreProperty } = useAiChatStore()
 
 	const commandItemsAndGroups: {
 		groupLabel: '' | 'Campaigns' | 'Contacts' | 'Teams'
@@ -198,6 +200,9 @@ export default function CommandMenuProvider() {
 					runAction(item.action, item.slug)
 				} else {
 					if (input) {
+						writeAiStoreProperty({
+							inputValue: input
+						})
 						router.push(`/ai?question=${encodeURIComponent(input)}`)
 					} else {
 						// IMPOSSIBLE CASE

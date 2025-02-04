@@ -1,10 +1,11 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { getBackendUrl } from '~/constants'
 import { useAiChatStore } from '~/store/ai-chat-store'
 import { useAuthState } from './use-auth-state'
 import { ChatBotStateEnum } from '~/types'
 import { AiChatMessageRoleEnum } from 'root/.generated'
 import { errorNotification } from '~/reusable-functions'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const useChat = ({ chatId }: { chatId: string }) => {
 	const {
@@ -17,6 +18,12 @@ const useChat = ({ chatId }: { chatId: string }) => {
 		writeProperty
 	} = useAiChatStore()
 	const { authState } = useAuthState()
+	const params = useSearchParams()
+	const send = params.get('s')
+
+	console.log('send', send)
+
+	const router = useRouter()
 
 	const currentMessageIdInStream = useRef<string | null>(null)
 	const [chatBotState, setChatBotState] = useState<ChatBotStateEnum>(ChatBotStateEnum.Idle)
@@ -120,6 +127,15 @@ const useChat = ({ chatId }: { chatId: string }) => {
 		},
 		[authState, currentChat?.uniqueId, handleDataStream, pushMessage, writeProperty]
 	)
+
+	useEffect(() => {
+		if (!send) return
+
+		if (inputValue) {
+			_sendAiMessage(inputValue).catch(error => console.error(error))
+			router.push('/ai')
+		}
+	}, [send, inputValue, _sendAiMessage, router])
 
 	const handleSubmit = useCallback(async () => {
 		await _sendAiMessage(inputValue)

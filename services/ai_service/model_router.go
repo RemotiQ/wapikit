@@ -13,7 +13,7 @@ import (
 
 // Enhanced model mapping with performance metrics
 var AiModelEnumToLlmModelConfig = map[api_types.AiModelEnum]ModelConfig{
-	api_types.GPT4Mini:    {Name: "gpt-4o-mini", RequiresAPIKey: true},
+	api_types.Gpt4oMini:   {Name: "gpt-4o-mini", RequiresAPIKey: true},
 	api_types.Gpt35Turbo:  {Name: "gpt-3.5-turbo", RequiresAPIKey: true},
 	api_types.Gpt4o:       {Name: "gpt-4o", RequiresAPIKey: true},
 	api_types.Mistral:     {Name: "mistral", RequiresAPIKey: true},
@@ -39,8 +39,6 @@ func NewModelRouter() *ModelRouter {
 	}
 }
 
-// SelectModel returns the appropriate llms.Model based on the provided AiModelEnum and API key.
-// ! TODO: in future for cloud edition we will add a logic to use multiple modal for multiple tasks
 func (mr *ModelRouter) SelectModel(ctx context.Context, model api_types.AiModelEnum, apiKey string) (llms.Model, error) {
 	config, exists := mr.models[model]
 	if !exists {

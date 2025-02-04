@@ -2287,7 +2287,10 @@ components:
     AiModelEnum:
       type: string
       enum:
-        - GPT4Mini
+        - Gpt4Mini
+        - GptO1
+        - GptO3Mini
+        - Gpt4oMini
         - Gpt3.5Turbo
         - Mistral
         - Gpt4o

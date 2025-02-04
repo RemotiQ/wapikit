@@ -34,6 +34,18 @@ export const navItems: NavItem[] = [
 		requiredFeatureFlag: ['isAiIntegrationEnabled']
 	},
 	{
+		title: 'Conversations',
+		href: '/conversations',
+		icon: 'message',
+		label: 'Conversations'
+	},
+	{
+		title: 'Campaigns',
+		href: '/campaigns',
+		icon: 'rocket',
+		label: 'Campaigns'
+	},
+	{
 		title: 'Contacts',
 		href: '/contacts',
 		icon: 'user',
@@ -50,18 +62,6 @@ export const navItems: NavItem[] = [
 		href: '/team',
 		icon: 'laptop',
 		label: 'Teams'
-	},
-	{
-		title: 'Conversations',
-		href: '/conversations',
-		icon: 'message',
-		label: 'Conversations'
-	},
-	{
-		title: 'Campaigns',
-		href: '/campaigns',
-		icon: 'rocket',
-		label: 'Campaigns'
 	},
 	{
 		title: 'Settings',
