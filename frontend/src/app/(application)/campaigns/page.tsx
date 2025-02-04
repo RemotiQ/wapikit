@@ -25,8 +25,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
 import dayjs from 'dayjs'
 import { Icons } from '~/components/icons'
-import { LinkClicks } from '~/components/dashboard/link-clicks'
-import { MessageAggregateAnalytics } from '~/components/dashboard/message-aggregate-stats'
+import { LinkClicks } from '~/components/analytics/link-clicks'
+import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { ScrollArea } from '~/components/ui/scroll-area'
 
 const breadcrumbItems = [{ title: 'campaigns', link: '/campaigns' }]

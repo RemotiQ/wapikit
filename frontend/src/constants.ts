@@ -34,6 +34,12 @@ export const navItems: NavItem[] = [
 		requiredFeatureFlag: ['isAiIntegrationEnabled']
 	},
 	{
+		title: 'Analytics',
+		href: '/analytics',
+		icon: 'analytics',
+		label: 'Analytics'
+	},
+	{
 		title: 'Conversations',
 		href: '/conversations',
 		icon: 'message',

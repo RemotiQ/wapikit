@@ -50,13 +50,17 @@ import {
 	CheckIcon,
 	Pencil2Icon,
 	DownloadIcon,
-	ExitIcon
+	ExitIcon,
+	BarChartIcon,
+	ClockIcon
 } from '@radix-ui/react-icons'
 import { Avatar } from '@radix-ui/react-avatar'
 
 export type Icon = LucideIcon
 
 export const Icons = {
+	clock: ClockIcon,
+	analytics: BarChartIcon,
 	download: DownloadIcon,
 	brain: Brain,
 	bell: BellIcon,
@@ -85,12 +89,13 @@ export const Icons = {
 	employee: Avatar,
 	post: FileTextIcon,
 	page: FileIcon,
-	sparkles: ({ size = 16 }: { size?: number }) => (
+	sparkles: ({ className }: { className: string }) => (
 		<svg
-			height={size}
 			strokeLinejoin="round"
+			height={16}
+			width={16}
 			viewBox="0 0 16 16"
-			width={size}
+			className={className}
 			style={{ color: 'currentcolor' }}
 		>
 			<path

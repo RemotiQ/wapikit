@@ -1,7 +1,7 @@
 'use client'
 
 import BreadCrumb from '~/components/breadcrumb'
-import { OrganizationMembersTableColumns } from '~/components/tables/columns'
+import { invitationColumn, OrganizationMembersTableColumns } from '~/components/tables/columns'
 import { TableComponent } from '~/components/tables/table'
 import { Button, buttonVariants } from '~/components/ui/button'
 import { Heading } from '~/components/ui/heading'
@@ -12,11 +12,12 @@ import {
 	useCreateOrganizationInvite,
 	UserPermissionLevelEnum,
 	useUpdateOrganizationMemberRoleById,
-	useGetOrganizationRoles
+	useGetOrganizationRoles,
+	useGetOrganizationInvites
 } from 'root/.generated'
 import { Plus } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Modal } from '~/components/ui/modal'
 import { useEffect, useMemo, useState } from 'react'
 import { errorNotification, materialConfirm, successNotification } from '~/reusable-functions'
@@ -34,15 +35,27 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { NewTeamMemberInviteFormSchema, UpdateOrganizationMemberRolesFormSchema } from '~/schema'
 import type { z } from 'zod'
 import { MultiSelect } from '~/components/multi-select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 
-const breadcrumbItems = [{ title: 'Members', link: '/members' }]
+const tabs = [
+	{
+		label: 'Team Members',
+		slug: 'members'
+	},
+	{
+		label: 'Invitations',
+		slug: 'invites'
+	}
+]
 
 const MembersPage = () => {
 	const searchParams = useSearchParams()
+	const router = useRouter()
 
 	const [isInvitationModalOpen, setIsInvitationModalOpen] = useState(false)
 	const [memberToEditId, setMemberToEditId] = useState<string | null>(null)
 	const [isBusy, setIsBusy] = useState(false)
+	const [activeTab, setActiveTab] = useState(searchParams.get('tab')?.toString() || 'members')
 
 	const page = Number(searchParams.get('page') || 1)
 	const pageLimit = Number(searchParams.get('limit') || 0) || 10
@@ -52,6 +65,11 @@ const MembersPage = () => {
 		page: page || 1,
 		per_page: pageLimit || 10,
 		sortBy: sortBy ? (sortBy as OrderEnum) : undefined
+	})
+
+	const { data: orgInvites } = useGetOrganizationInvites({
+		page: 1,
+		per_page: 50
 	})
 
 	const { data: allRoles } = useGetOrganizationRoles({
@@ -82,12 +100,18 @@ const MembersPage = () => {
 		return membersResponse?.members || []
 	}, [membersResponse])
 
+	const InvitationsList = useMemo(() => {
+		return orgInvites?.invites || []
+	}, [orgInvites])
+
 	const paginationMeta = useMemo(() => {
 		return membersResponse?.paginationMeta
 	}, [membersResponse])
 
 	const totalUsers = paginationMeta?.total || 0
 	const pageCount = Math.ceil(totalUsers / pageLimit)
+
+	const totalInvitations = orgInvites?.paginationMeta?.total || 0
 
 	const inviteUserMutation = useCreateOrganizationInvite()
 	const updateMemberRolesMutation = useUpdateOrganizationMemberRoleById()
@@ -180,6 +204,13 @@ const MembersPage = () => {
 			)
 		}
 	}, [memberToEditId, memberUpdateForm, membersResponse?.members])
+
+	useEffect(() => {
+		const tab = searchParams.get('tab') || 'members'
+		if (tab) {
+			setActiveTab(() => tab)
+		}
+	}, [searchParams])
 
 	return (
 		<>
@@ -282,38 +313,99 @@ const MembersPage = () => {
 			</Modal>
 
 			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
+				<Tabs value={activeTab}>
+					<TabsList>
+						{tabs.map(tab => {
+							return (
+								<TabsTrigger
+									key={tab.slug}
+									value={tab.slug}
+									onClick={() => {
+										router.push(`/team?tab=${tab.slug}`)
+									}}
+								>
+									{tab.label}
+								</TabsTrigger>
+							)
+						})}
+					</TabsList>
 
-				<div className="flex items-start justify-between">
-					<Heading title={`Team Members (${totalUsers})`} description="Manage members" />
-					<Button
-						onClick={() => {
-							setIsInvitationModalOpen(true)
-						}}
-						className={clsx(buttonVariants({ variant: 'default' }))}
-					>
-						<Plus className="mr-2 h-4 w-4" /> Add New
-					</Button>
-				</div>
-				<Separator />
+					{tabs.map(tab => {
+						return (
+							<TabsContent key={tab.slug} value={tab.slug} className="space-y-4 py-4">
+								{tab.slug === 'members' ? (
+									<>
+										<div className="flex items-start justify-between">
+											<Heading
+												title={`Team Members (${totalUsers})`}
+												description="Manage members"
+											/>
+											<Button
+												onClick={() => {
+													setIsInvitationModalOpen(true)
+												}}
+												className={clsx(
+													buttonVariants({ variant: 'default' })
+												)}
+											>
+												<Plus className="mr-2 h-4 w-4" /> Invite New
+											</Button>
+										</div>
+										<Separator />
 
-				<TableComponent
-					searchKey="name"
-					pageNo={page}
-					columns={OrganizationMembersTableColumns}
-					totalUsers={totalUsers}
-					data={organizationMembersList}
-					pageCount={pageCount}
-					actions={[
-						{
-							icon: 'edit',
-							label: 'Update Roles',
-							onClick: (memberId: string) => {
-								setMemberToEditId(() => memberId)
-							}
-						}
-					]}
-				/>
+										<TableComponent
+											searchKey="name"
+											pageNo={page}
+											columns={OrganizationMembersTableColumns}
+											totalUsers={totalUsers}
+											data={organizationMembersList}
+											pageCount={pageCount}
+											actions={[
+												{
+													icon: 'edit',
+													label: 'Update Roles',
+													onClick: (memberId: string) => {
+														setMemberToEditId(() => memberId)
+													}
+												}
+											]}
+										/>
+									</>
+								) : (
+									<>
+										<div className="flex items-start justify-between">
+											<Heading
+												title={`Invitations (${totalUsers})`}
+												description="Manage members"
+											/>
+											<Button
+												onClick={() => {
+													setIsInvitationModalOpen(true)
+												}}
+												className={clsx(
+													buttonVariants({ variant: 'default' })
+												)}
+											>
+												<Plus className="mr-2 h-4 w-4" /> Add New
+											</Button>
+										</div>
+										<Separator />
+
+										<TableComponent
+											searchKey="email"
+											pageNo={page}
+											columns={invitationColumn}
+											totalUsers={totalInvitations}
+											data={InvitationsList}
+											pageCount={pageCount}
+											actions={[]}
+										/>
+									</>
+								)}
+							</TabsContent>
+						)
+					})}
+				</Tabs>
 			</div>
 		</>
 	)

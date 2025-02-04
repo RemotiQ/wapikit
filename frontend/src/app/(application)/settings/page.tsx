@@ -76,7 +76,7 @@ export default function SettingsPage() {
 		Account = 'account',
 		Organization = 'organization',
 		WhatsAppBusinessAccount = 'whatsapp-business-account',
-		ApiKey = 'api-key',
+		ApiKey = 'api-access',
 		Rbac = 'rbac',
 		Notifications = 'notifications',
 		AiSettings = 'ai-settings',
@@ -96,14 +96,11 @@ export default function SettingsPage() {
 			slug: SettingTabEnum.WhatsAppBusinessAccount,
 			title: 'WhatsApp Settings'
 		},
-		...(featureFlags?.SystemFeatureFlags.isApiAccessEnabled
-			? [
-					{
-						slug: SettingTabEnum.ApiKey,
-						title: 'API Key'
-					}
-				]
-			: []),
+		{
+			slug: SettingTabEnum.ApiKey,
+			title: 'API Key',
+			isLocked: !featureFlags?.SystemFeatureFlags.isApiAccessEnabled
+		},
 		...(featureFlags?.SystemFeatureFlags.isRoleBasedAccessControlEnabled
 			? [
 					{

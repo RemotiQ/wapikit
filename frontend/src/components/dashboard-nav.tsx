@@ -265,17 +265,19 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 				})}
 			</TooltipProvider>
 
-			<Button
-				className="ml-2 mt-2 flex w-[80%] gap-2 text-left"
-				onClick={() => {
-					writeProperty({
-						isCommandMenuOpen: true
-					})
-				}}
-			>
-				Quick Action
-				<div>⌘ K</div>
-			</Button>
+			{isMinimized ? null : (
+				<Button
+					className="ml-2 mt-2 flex w-[80%] gap-2 text-left"
+					onClick={() => {
+						writeProperty({
+							isCommandMenuOpen: true
+						})
+					}}
+				>
+					Quick Action
+					<div>⌘ K</div>
+				</Button>
+			)}
 		</nav>
 	)
 }

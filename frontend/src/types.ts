@@ -42,3 +42,10 @@ export enum ChatBotStateEnum {
 	Streaming = 'Streaming',
 	Thinking = 'Thinking'
 }
+
+export type TipCardPropType = {
+	icon: keyof typeof Icons
+	title: string
+	description: string
+	href: string
+}

@@ -37,6 +37,9 @@ export default function CommandMenuProvider() {
 						icon: 'sparkles',
 						label: 'Ask AI',
 						action: () => {
+							writeAiStoreProperty({
+								inputValue: input
+							})
 							router.push(`/ai?s=true`)
 						},
 						slug: 'ask-ai'
@@ -200,10 +203,11 @@ export default function CommandMenuProvider() {
 					runAction(item.action, item.slug)
 				} else {
 					if (input) {
+						setCurrentSelected('ask-ai')
 						writeAiStoreProperty({
 							inputValue: input
 						})
-						router.push(`/ai?question=${encodeURIComponent(input)}`)
+						router.push(`/ai?s=true`)
 					} else {
 						// IMPOSSIBLE CASE
 					}
@@ -305,7 +309,7 @@ export default function CommandMenuProvider() {
 									<div className="items-star mb-auto flex h-fit flex-1 flex-row justify-start gap-3">
 										<Badge className="flex w-20 flex-row gap-1 px-2 py-1 text-xs">
 											Ask AI
-											<Icons.sparkles size={12} />
+											<Icons.sparkles className="size-4" />
 										</Badge>
 										<p className="max-w-sm flex-1 whitespace-normal break-words">
 											{input}

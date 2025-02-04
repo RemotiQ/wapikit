@@ -8,7 +8,9 @@ import type {
 	ContactListSchema,
 	ContactSchema,
 	OrganizationRoleSchema,
-	CampaignStatusEnum
+	CampaignStatusEnum,
+	OrganizationMemberInviteSchema,
+	InviteStatusEnum
 } from 'root/.generated'
 import { Badge } from '../ui/badge'
 import { clsx } from 'clsx'
@@ -421,5 +423,71 @@ export const columns: ColumnDef<Contact>[] = [
 	{
 		accessorKey: 'list',
 		header: 'EMAIL'
+	}
+]
+
+export const invitationColumn: ColumnDef<OrganizationMemberInviteSchema>[] = [
+	{
+		id: 'uniqueId',
+		accessorKey: 'uniqueId',
+		enableHiding: true,
+		size: 0
+	},
+	{
+		id: 'select',
+		header: ({ table }) => (
+			<Checkbox
+				checked={table.getIsAllPageRowsSelected()}
+				onCheckedChange={(value: any) => table.toggleAllPageRowsSelected(!!value)}
+				aria-label="Select all"
+			/>
+		),
+		cell: ({ row }) => (
+			<Checkbox
+				checked={row.getIsSelected()}
+				onCheckedChange={(value: any) => row.toggleSelected(!!value)}
+				aria-label="Select row"
+			/>
+		),
+		enableSorting: false,
+		enableHiding: false
+	},
+	{
+		accessorKey: 'accessLevel',
+		header: 'Access Level'
+	},
+	{
+		accessorKey: 'email',
+		header: 'Email'
+	},
+	{
+		accessorKey: 'created_at',
+		header: 'Created At',
+		accessorFn: (originalRow: OrganizationMemberInviteSchema) => {
+			return dayjs(originalRow.createdAt).format('DD MMM, YYYY')
+		}
+	},
+	{
+		accessorKey: 'status',
+		header: 'STATUS',
+		cell(props) {
+			const status: InviteStatusEnum = props.getValue() as InviteStatusEnum
+
+			return (
+				<div className="flex flex-wrap items-center justify-center gap-2 truncate">
+					<Badge
+						variant={'default'}
+						className={clsx(status === 'Pending' ? 'bg-yellow-500' : '')}
+					>
+						{status}
+					</Badge>
+					{status === 'Redeemed' ? (
+						<div className="flex h-full w-fit items-center justify-center">
+							<div className="rotate h-4 w-4 animate-spin rounded-full border-4 border-solid  border-l-primary" />
+						</div>
+					) : null}
+				</div>
+			)
+		}
 	}
 ]
