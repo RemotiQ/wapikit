@@ -3423,6 +3423,8 @@ components:
             $ref: "#/components/schemas/TagSchema"
         templateComponentParameters:
           type: object
+        stats:
+          $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
       required:
         - uniqueId
         - name
@@ -3939,6 +3941,12 @@ components:
           type: integer
         conversationInitiated:
           type: integer
+        responseRate:
+          type: integer
+        openRate:
+          type: integer
+        engagementRate:
+          type: integer
         totalLinkClicks:
           type: integer
         linkClicksData:
@@ -3955,6 +3963,9 @@ components:
         - totalLinkClicks
         - conversationInitiated
         - linkClicksData
+        - responseRate
+        - openRate
+        - engagementRate
 
     GetIntegrationResponseSchema:
       type: object

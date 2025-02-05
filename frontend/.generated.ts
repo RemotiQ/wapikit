@@ -713,12 +713,15 @@ export interface GetIntegrationResponseSchema {
 
 export interface CampaignAnalyticsResponseSchema {
 	conversationInitiated: number
+	engagementRate: number
 	linkClicksData: LinkClicksGraphDataPointSchema[]
 	messagesDelivered: number
 	messagesFailed: number
 	messagesRead: number
 	messagesSent: number
 	messagesUndelivered: number
+	openRate: number
+	responseRate: number
 	totalLinkClicks: number
 	totalMessages: number
 }
@@ -939,6 +942,7 @@ export interface CampaignSchema {
 	phoneNumberInUse?: string
 	scheduledAt?: string
 	sentAt?: string
+	stats?: CampaignAnalyticsResponseSchema
 	status: CampaignStatusEnum
 	tags: TagSchema[]
 	templateComponentParameters?: CampaignSchemaTemplateComponentParameters

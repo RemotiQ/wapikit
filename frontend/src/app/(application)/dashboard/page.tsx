@@ -106,12 +106,12 @@ export default function Page() {
 	return (
 		<ScrollArea className="h-full">
 			<Toaster />
-			<div className="flex-1 space-y-4 p-4 pt-6 md:p-4">
+			<div className="h-[94%] flex-1 space-y-4 p-4 pb-10 pt-6 md:p-4">
 				<div className="flex items-center justify-between space-y-2">
 					<h2 className="ml-2 text-3xl font-bold tracking-tight">Dashboard</h2>
 				</div>
-				<div className="flex h-full flex-1 flex-col gap-2">
-					<div className="grid gap-4 rounded-lg bg-accent p-3 px-4 md:grid-cols-2 lg:grid-cols-4">
+				<div className="flex h-full flex-1 flex-col gap-4 rounded-lg bg-accent/60 p-4">
+					<div className="grid gap-4 rounded-lg md:grid-cols-2 lg:grid-cols-4">
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
@@ -274,7 +274,12 @@ export default function Page() {
 							</CardContent>
 						</Card>
 					</div>
-					<div className="grid h-full flex-1 gap-6 rounded-lg bg-accent p-4 md:grid-cols-1 lg:grid-cols-2">
+					<div className="flex h-full w-full flex-1 gap-4 overflow-x-scroll">
+						{campaigns?.campaigns.map((campaign, index) => {
+							return <DashboardCampaignCard campaign={campaign} key={index} />
+						})}
+					</div>
+					<div className="grid gap-4 rounded-lg md:grid-cols-2 lg:grid-cols-4">
 						{tips.map((tip, index) => {
 							return <TipCard key={index} tip={tip} />
 						})}

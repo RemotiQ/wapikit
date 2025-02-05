@@ -364,31 +364,35 @@ type BulkImportSchema struct {
 // CampaignAnalyticsResponseSchema defines model for CampaignAnalyticsResponseSchema.
 type CampaignAnalyticsResponseSchema struct {
 	ConversationInitiated int                              `json:"conversationInitiated"`
+	EngagementRate        int                              `json:"engagementRate"`
 	LinkClicksData        []LinkClicksGraphDataPointSchema `json:"linkClicksData"`
 	MessagesDelivered     int                              `json:"messagesDelivered"`
 	MessagesFailed        int                              `json:"messagesFailed"`
 	MessagesRead          int                              `json:"messagesRead"`
 	MessagesSent          int                              `json:"messagesSent"`
 	MessagesUndelivered   int                              `json:"messagesUndelivered"`
+	OpenRate              int                              `json:"openRate"`
+	ResponseRate          int                              `json:"responseRate"`
 	TotalLinkClicks       int                              `json:"totalLinkClicks"`
 	TotalMessages         int                              `json:"totalMessages"`
 }
 
 // CampaignSchema defines model for CampaignSchema.
 type CampaignSchema struct {
-	CreatedAt                   time.Time               `json:"createdAt"`
-	Description                 *string                 `json:"description,omitempty"`
-	IsLinkTrackingEnabled       bool                    `json:"isLinkTrackingEnabled"`
-	Lists                       []ContactListSchema     `json:"lists"`
-	Name                        string                  `json:"name"`
-	PhoneNumberInUse            *string                 `json:"phoneNumberInUse,omitempty"`
-	ScheduledAt                 *time.Time              `json:"scheduledAt,omitempty"`
-	SentAt                      *time.Time              `json:"sentAt,omitempty"`
-	Status                      CampaignStatusEnum      `json:"status"`
-	Tags                        []TagSchema             `json:"tags"`
-	TemplateComponentParameters *map[string]interface{} `json:"templateComponentParameters,omitempty"`
-	TemplateMessageId           *string                 `json:"templateMessageId,omitempty"`
-	UniqueId                    string                  `json:"uniqueId"`
+	CreatedAt                   time.Time                        `json:"createdAt"`
+	Description                 *string                          `json:"description,omitempty"`
+	IsLinkTrackingEnabled       bool                             `json:"isLinkTrackingEnabled"`
+	Lists                       []ContactListSchema              `json:"lists"`
+	Name                        string                           `json:"name"`
+	PhoneNumberInUse            *string                          `json:"phoneNumberInUse,omitempty"`
+	ScheduledAt                 *time.Time                       `json:"scheduledAt,omitempty"`
+	SentAt                      *time.Time                       `json:"sentAt,omitempty"`
+	Stats                       *CampaignAnalyticsResponseSchema `json:"stats,omitempty"`
+	Status                      CampaignStatusEnum               `json:"status"`
+	Tags                        []TagSchema                      `json:"tags"`
+	TemplateComponentParameters *map[string]interface{}          `json:"templateComponentParameters,omitempty"`
+	TemplateMessageId           *string                          `json:"templateMessageId,omitempty"`
+	UniqueId                    string                           `json:"uniqueId"`
 }
 
 // CampaignStatusEnum defines model for CampaignStatusEnum.
