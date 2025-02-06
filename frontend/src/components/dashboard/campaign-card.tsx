@@ -106,7 +106,7 @@ export function DashboardCampaignCard({
 
 				<div className="flex w-full flex-col gap-2">
 					<Separator className="w-full opacity-65" />
-					<Link href={`/campaigns/${campaign.uniqueId}`}>
+					<Link href={`/campaigns?id=${campaign.uniqueId}`}>
 						<Button
 							variant={'secondary'}
 							className="my-2 flex w-full items-center gap-2"

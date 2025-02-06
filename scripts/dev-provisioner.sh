@@ -5,9 +5,9 @@
 set -e
 
 sudo apt-get -y update
-sudo apt-get install -y make
-sudo apt install -y wget
+sudo apt install -y wget build-essential
 sudo apt-get -y update
+sudo apt-get install
 
 # install golang
 wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz
