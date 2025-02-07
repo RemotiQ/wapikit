@@ -2,6 +2,7 @@ package cache_service
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"strings"
 	"time"
@@ -17,15 +18,40 @@ type RedisClient struct {
 	RateLimitPrefix string
 }
 
-func NewRedisClient(url string) *RedisClient {
+func NewRedisClient(
+	url string,
+	password *string,
+	IsProduction,
+	IsCloudEdition bool,
+) *RedisClient {
 	fmt.Println("Connecting to Redis...")
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: url,
-		OnConnect: func(ctx context.Context, cn *redis.Conn) error {
-			fmt.Println("Connected to Redis successfully!!!")
+	var redisClient *redis.Client
+	if IsCloudEdition && IsProduction {
+		if password == nil {
+			fmt.Println("Redis password not provided")
 			return nil
-		},
-	})
+		}
+		redisClient = redis.NewClient(&redis.Options{
+			Addr:     url,
+			Password: *password,
+			TLSConfig: &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			},
+			OnConnect: func(ctx context.Context, cn *redis.Conn) error {
+				fmt.Println("Connected to Redis successfully!!!")
+				return nil
+			},
+		})
+	} else {
+		redisClient = redis.NewClient(&redis.Options{
+			Addr: url,
+			OnConnect: func(ctx context.Context, cn *redis.Conn) error {
+				fmt.Println("Connected to Redis successfully!!!")
+				return nil
+			},
+		})
+	}
+
 	_, err := redisClient.Ping(context.Background()).Result()
 	if err != nil {
 		fmt.Println("Error connecting to Redis: ", err)

@@ -18,6 +18,9 @@ export PATH=$PATH:/usr/local/go/bin
 curl -L https://bit.ly/n-install | bash
 n i lts
 
+# pnpm install
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+
 git clone https://github.com/wapikit/wapikit
 
 # this will ensure that all the other dependencies are installed and the binary is built with static files

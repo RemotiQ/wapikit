@@ -96,15 +96,16 @@ func init() {
 func main() {
 	logger.Info("Starting the application")
 	redisUrl := koa.String("redis.url")
+	redisPassword := koa.String("redis.password") // this will be defined in case of cloud edition
 	if redisUrl == "" {
 		logger.Error("Redis URL not provided")
 		os.Exit(1)
 	}
 
-	redisClient := cache_service.NewRedisClient(redisUrl)
-	dbInstance := database.GetDbInstance(koa.String("database.url"))
-
 	constants := initConstants()
+
+	redisClient := cache_service.NewRedisClient(redisUrl, &redisPassword, constants.IsProduction, constants.IsCloudEdition)
+	dbInstance := database.GetDbInstance(koa.String("database.url"))
 
 	app := &interfaces.App{
 		Logger:    *logger,
