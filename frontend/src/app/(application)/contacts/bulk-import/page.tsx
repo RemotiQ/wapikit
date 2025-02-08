@@ -25,20 +25,61 @@ import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
 import Progress from '~/components/progress'
 import { useScrollToBottom } from '~/hooks/use-scroll-to-bottom'
+import { Card } from '@tremor/react'
+import { CardContent, CardTitle } from '~/components/ui/card'
+import { Icons } from '~/components/icons'
+import { clsx } from 'clsx'
+
+const Logs = (props: {
+	logs: {
+		log: string
+		type: 'error' | 'success'
+	}[]
+}) => {
+	const { logs } = props
+
+	const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>()
+
+	return (
+		<div className="mb-4 h-64 overflow-y-auto rounded border p-2" ref={messagesContainerRef}>
+			{logs.map((log, i) => (
+				<div
+					key={i}
+					className={clsx(
+						'flex w-fit gap-2 font-mono text-sm',
+						log.type === 'error' ? 'text-red-500' : ''
+					)}
+				>
+					{log.type === 'error' ? (
+						<Icons.info className="size-4 text-red-500" />
+					) : (
+						<Icons.check className="size-4 text-primary" />
+					)}
+					{log.log}
+				</div>
+			))}
+			<div ref={messagesEndRef} className="min-h-[24px] min-w-[24px] shrink-0" />
+		</div>
+	)
+}
 
 const BulkImportContactPage = () => {
 	const bulkImportForm = useForm<z.infer<typeof BulkImportContactsFormSchema>>({
 		resolver: zodResolver(BulkImportContactsFormSchema)
 	})
 
-	const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>()
 	const [abortController, setAbortController] = useState<AbortController | null>(null)
 	const [importState, setImportState] = useState<'importing' | 'done' | 'idle' | 'error'>('idle')
 
 	const [isBusy, setIsBusy] = useState(false)
 	const [file, setFile] = useState<File | null>(null)
 	const [progress, setProgress] = useState({ current: 0, total: 0 })
-	const [logs, setLogs] = useState<string[]>([])
+	const [logs, setLogs] = useState<
+		{
+			log: string
+			type: 'error' | 'success'
+		}[]
+	>([])
 
 	const listsResponse = useGetContactLists({
 		order: 'asc',
@@ -67,22 +108,46 @@ const BulkImportContactPage = () => {
 				switch (data.type) {
 					case 'importing':
 						setImportState(() => 'importing')
-						setLogs(l => [...l, data.message])
+						setLogs(l => [
+							...l,
+							{
+								log: `${data.message}`,
+								type: 'success'
+							}
+						])
 						break
 					case 'progress':
 						setProgress(p => ({
 							current: data.current,
 							total: data.total || p.total
 						}))
-						setLogs(l => [...l, data.message])
+						setLogs(l => [
+							...l,
+							{
+								log: `${data.message}`,
+								type: 'success'
+							}
+						])
 						break
 					case 'error':
-						setLogs(l => [...l, `Error: ${data.message}`])
+						setLogs(l => [
+							...l,
+							{
+								log: `Error: ${data.message}`,
+								type: 'error'
+							}
+						])
 						setImportState(() => 'error')
 						setIsBusy(false)
 						break
 					case 'complete':
-						setLogs(l => [...l, `Complete: ${data.message}`])
+						setLogs(l => [
+							...l,
+							{
+								log: `Complete: ${data.message}`,
+								type: 'success'
+							}
+						])
 						setIsBusy(false)
 						setImportState(() => 'done')
 						successNotification({ message: data.message })
@@ -159,6 +224,35 @@ const BulkImportContactPage = () => {
 				<Separator />
 
 				<div className="flex flex-row gap-10">
+					{importState === 'done' ? (
+						<Card className="flex flex-col gap-4">
+							<CardTitle>
+								<div className="flex w-fit flex-row items-center justify-start gap-2">
+									<Icons.doubleCheck className="mx-auto size-6 text-primary" />
+									<p className="text-lg font-semibold">Import Complete</p>
+								</div>
+							</CardTitle>
+
+							<CardContent className="flex flex-col gap-4">
+								<div className="flex flex-col gap-4">
+									<p className="text-sm text-primary">
+										{progress.total} contacts have been imported successfully
+									</p>
+								</div>
+								{/* Logs container */}
+								<Logs logs={logs} />
+							</CardContent>
+							<Button
+								onClick={() => {
+									setIsBusy(false)
+									setImportState('idle')
+								}}
+							>
+								Return to Import
+							</Button>
+						</Card>
+					) : null}
+
 					{importState === 'idle' ? (
 						<div className="flex w-full items-center justify-end space-x-2">
 							<Form {...bulkImportForm}>
@@ -261,21 +355,7 @@ const BulkImportContactPage = () => {
 							</div>
 
 							{/* Logs container */}
-							<div className="mb-4 h-64 overflow-y-auto rounded border p-2">
-								{logs.map((log, i) => (
-									<div
-										key={i}
-										className="font-mono text-sm"
-										ref={messagesContainerRef}
-									>
-										{log}
-										<div
-											ref={messagesEndRef}
-											className="min-h-[24px] min-w-[24px] shrink-0"
-										/>
-									</div>
-								))}
-							</div>
+							<Logs logs={logs} />
 
 							{/* Cancel button */}
 							<Button

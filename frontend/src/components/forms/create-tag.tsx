@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useCreateOrganizationTag } from 'root/.generated'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { errorNotification } from '~/reusable-functions'
 import { useLayoutStore } from '~/store/layout.store'
 
@@ -17,6 +17,7 @@ const CreateTagModal = () => {
 	const { isCreateTagModalOpen, writeProperty, tags: existingTags } = useLayoutStore()
 
 	const [isBusy, setIsBusy] = useState(false)
+	const buttonRef = useRef<HTMLButtonElement | null>(null)
 
 	const createTagForm = useForm<z.infer<typeof CreateTagFormSchema>>({
 		resolver: zodResolver(CreateTagFormSchema),
@@ -55,6 +56,19 @@ const CreateTagModal = () => {
 		}
 	}
 
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Enter') {
+				if (buttonRef.current) {
+					buttonRef.current.click()
+				}
+			}
+		}
+
+		document.addEventListener('keydown', handleKeyDown)
+		return () => document.removeEventListener('keydown', handleKeyDown)
+	}, [])
+
 	return (
 		<Modal
 			title="Create a new tag"
@@ -92,7 +106,12 @@ const CreateTagModal = () => {
 								)}
 							/>
 						</div>
-						<Button disabled={isBusy} className="ml-auto mr-0 w-full" type="submit">
+						<Button
+							disabled={isBusy}
+							ref={buttonRef}
+							className="ml-auto mr-0 w-full"
+							type="submit"
+						>
 							Create Tag
 						</Button>
 					</form>

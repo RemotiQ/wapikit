@@ -105,7 +105,8 @@ func (importer *ImporterService) InsertBatch(ctx context.Context, batch []model.
 		INSERT(table.Contact.MutableColumns).
 		MODELS(batch).
 		ON_CONFLICT(table.Contact.PhoneNumber, table.Contact.OrganizationId).
-		DO_NOTHING()
+		DO_NOTHING().
+		RETURNING(table.Contact.AllColumns)
 
 	var insertedContacts []model.Contact
 	if err := insertQuery.QueryContext(ctx, db, &insertedContacts); err != nil {

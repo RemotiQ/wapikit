@@ -790,7 +790,7 @@ func bulkImport(context interfaces.ContextWithSession) error {
 	// * GET THE DELIMITER
 	payloadDelimiter := context.Request().FormValue("delimiter")
 	delimeter := ','
-	if payloadDelimiter == "" && len(payloadDelimiter) != 1 {
+	if len(payloadDelimiter) != 1 {
 		logger.Error("Invalid delimiter:", payloadDelimiter, nil)
 		return context.JSON(http.StatusBadRequest, "Delimiter must be a single character")
 	}
@@ -832,122 +832,161 @@ func bulkImport(context interfaces.ContextWithSession) error {
 
 	logger.Info("List UUIDs:", listUuids, nil)
 
+	ctx := context.Request().Context()
+	total := 0
+	success := 0
+	errors := make(map[int]string)
+
+	// CSV processing logic
+	reader := csv.NewReader(file)
+	reader.Comma = delimeter
+
+	total, _ = utils.CountCSVLines(file)
+	fmt.Println("Total lines:", total)
+
 	importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
 		Type:    "importing",
-		Message: fmt.Sprintf("Started importing contacts"),
+		Message: "Started importing contacts",
 		Current: 0,
-		Total:   0,
+		Total:   total,
 	})
 
-	// Process CSV in goroutine
-	go func() {
-		ctx := context.Request().Context()
-		total := 0
-		success := 0
-		errors := make(map[int]string)
+	file.Seek(0, io.SeekStart)
+	reader = csv.NewReader(file)
 
-		// CSV processing logic
-		reader := csv.NewReader(file)
-		reader.Comma = delimeter
+	if _, err := reader.Read(); err != nil {
+		// skip the first row
+	}
 
-		if _, err := reader.Read(); err != nil {
-			return
+	index := 0
+
+	batchSize := 100
+	batch := make([]model.Contact, 0, batchSize)
+
+	for {
+		record, err := reader.Read()
+		index++
+		if err == io.EOF {
+			break
 		}
 
-		total, _ = utils.CountCSVLines(file)
-
-		batchSize := 100
-		batch := make([]model.Contact, 0, batchSize)
-
-		for {
-			record, err := reader.Read()
-			if err == io.EOF {
-				break
-			}
-
-			logger.Info("Processing record", record, nil)
-
-			// Process record
-			contact, err := importerService.ProcessRecord(record, orgUuid)
-			if err != nil {
-				logger.Error("Error processing record", err.Error(), nil)
-				errors[total] = err.Error()
-				err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
-					Type:    "progress",
-					Message: fmt.Sprintf("Error in row %d: %v", total, err),
-					Current: success,
-					Total:   total,
-				})
-				logger.Error("Error sending event in processing record", err.Error(), nil)
-				continue
-			}
-
-			batch = append(batch, contact)
-			if len(batch) >= batchSize {
-				if err := importerService.InsertBatch(ctx, batch, listUuids, context.App.Db); err != nil {
-					// Handle batch error
-					logger.Error("Batch insert error", err.Error(), nil)
-					err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
-						Type:    "error",
-						Message: fmt.Sprintf("Error inserting batch: %v", err),
-						Total:   total,
-						Current: total,
-					})
-
-					if err != nil {
-						logger.Error("Error sending event in batch insert error", err.Error(), nil)
-					}
-				}
-				success += len(batch)
-				batch = make([]model.Contact, 0, batchSize)
-				err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
-					Type:    "progress",
-					Message: fmt.Sprintf("Processed %d contacts", success),
-					Current: success,
-					Total:   total,
-				})
-
-				if err != nil {
-					logger.Error("Error sending event in batch insert success", err.Error(), nil)
-				}
-
-			}
+		// Process record
+		contact, err := importerService.ProcessRecord(record, orgUuid)
+		if err != nil {
+			logger.Error("Error processing record", err.Error(), nil)
+			errors[success+len(errors)+1] = err.Error()
+			err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+				Type:    "progress",
+				Message: fmt.Sprintf("Error in row %d: %v", total, err),
+				Current: success,
+				Total:   total,
+			})
+			logger.Error("Error sending event in processing record", err.Error(), nil)
+			continue
 		}
 
-		if len(batch) > 0 {
+		batch = append(batch, contact)
+		if len(batch) >= batchSize {
 			if err := importerService.InsertBatch(ctx, batch, listUuids, context.App.Db); err != nil {
-				logger.Error("Final batch insert error", err.Error(), nil)
+				// Handle batch error
+				logger.Error("Batch insert error", err.Error(), nil)
 				err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
 					Type:    "error",
-					Message: fmt.Sprintf("Error inserting final batch: %v", err),
-					Current: success,
+					Message: fmt.Sprintf("Error inserting batch: %v", err),
 					Total:   total,
-				})
-				if err != nil {
-					logger.Error("Error sending event in Final batch insert", err.Error(), nil)
-				}
-			} else {
-				success += len(batch)
-				err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
-					Type:    "progress",
-					Message: fmt.Sprintf("Processed %d contacts", success),
-					Current: success,
-					Total:   total,
+					Current: total,
 				})
 
 				if err != nil {
-					logger.Error("Error sending event final batch insert success", err.Error(), nil)
+					logger.Error("Error sending event in batch insert error", err.Error(), nil)
 				}
+			}
+			success += len(batch)
+			batch = make([]model.Contact, 0, batchSize)
+			err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+				Type:    "progress",
+				Message: fmt.Sprintf("Processed %d contacts", success),
+				Current: success,
+				Total:   total,
+			})
+			if err != nil {
+				logger.Error("Error sending event in batch insert success", err.Error(), nil)
 			}
 		}
 
-		importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
-			Type:    "complete",
-			Message: fmt.Sprintf("Completed %d/%d", success, total),
-			Current: success,
-			Total:   total,
-		})
-	}()
+	}
+
+	if len(batch) > 0 {
+		if err := importerService.InsertBatch(ctx, batch, listUuids, context.App.Db); err != nil {
+			logger.Error("Final batch insert error", err.Error(), nil)
+			err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+				Type:    "error",
+				Message: fmt.Sprintf("Error inserting final batch: %v", err),
+				Current: success,
+				Total:   total,
+			})
+			if err != nil {
+				logger.Error("Error sending event in Final batch insert", err.Error(), nil)
+			}
+		} else {
+			success += len(batch)
+			err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+				Type:    "progress",
+				Message: fmt.Sprintf("Processed %d contacts", success),
+				Current: success,
+				Total:   total,
+			})
+
+			if err != nil {
+				logger.Error("Error sending event final batch insert success", err.Error(), nil)
+			}
+		}
+	}
+
+	if err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+		Type:    "complete",
+		Message: fmt.Sprintf("Completed %d/%d", success, total),
+		Current: success,
+		Total:   total,
+	}); err != nil {
+		logger.Error("Error sending completion event", err.Error(), nil)
+	}
+
+	if len(batch) > 0 {
+		if err := importerService.InsertBatch(ctx, batch, listUuids, context.App.Db); err != nil {
+			logger.Error("Final batch insert error", err.Error(), nil)
+			err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+				Type:    "error",
+				Message: fmt.Sprintf("Error inserting final batch: %v", err),
+				Current: success,
+				Total:   total,
+			})
+			if err != nil {
+				logger.Error("Error sending event in Final batch insert", err.Error(), nil)
+			}
+		} else {
+			success += len(batch)
+			err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+				Type:    "progress",
+				Message: fmt.Sprintf("Processed %d contacts", success),
+				Current: success,
+				Total:   total,
+			})
+
+			if err != nil {
+				logger.Error("Error sending event final batch insert success", err.Error(), nil)
+			}
+		}
+	}
+
+	if err := importerService.SendEvent(enc, &context, bulk_importer_service.ImportEvent{
+		Type:    "complete",
+		Message: fmt.Sprintf("Completed %d/%d", success, total),
+		Current: success,
+		Total:   total,
+	}); err != nil {
+		logger.Error("Error sending completion event", err.Error(), nil)
+	}
 
 	return nil
 }

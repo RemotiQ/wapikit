@@ -24,7 +24,7 @@ const multiSelectVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: 'border-foreground/10 text-gray-500 bg-card hover:bg-card/80',
+				default: 'border-foreground/10 text-gray-500 bg-card',
 				secondary:
 					'border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				destructive:
@@ -152,7 +152,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 						{...props}
 						onClick={handleTogglePopover}
 						className={clsx(
-							'flex w-full cursor-pointer items-center justify-between rounded-md border border-input bg-inherit px-3 py-2 text-sm font-medium shadow-sm hover:bg-inherit',
+							'flex w-full cursor-pointer items-center justify-between rounded-md border border-input bg-inherit px-3 py-2 text-sm font-medium shadow-sm',
 							className
 						)}
 					>

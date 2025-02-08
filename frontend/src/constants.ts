@@ -1,20 +1,20 @@
 import { type Icons } from './components/icons'
 import { type NavItem } from './types'
-import { config } from 'dotenv'
 
-config()
-
-export const WEBSITE_URL = 'https://wapikit.com'
-
+export const WEBSITE_URL = 'https://www.wapikit.com'
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
-export const IS_MANAGED_CLOUD_EDITION = process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION
+export const IS_MANAGED_CLOUD_EDITION = process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION === 'true'
 
 export const AUTH_TOKEN_LS = '__auth_token'
 
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
 		return 'http://127.0.0.1:8000/api'
+	}
+
+	if (IS_MANAGED_CLOUD_EDITION) {
+		return process.env.BACKEND_URL
 	} else {
 		return '/api'
 	}

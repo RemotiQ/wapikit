@@ -152,5 +152,4 @@ require (
 	gorm.io/gorm v1.25.12 // indirect
 )
 
-
-replace github.com/wapikit/wapikit-enterprise => 
+replace github.com/wapikit/wapikit-enterprise => ./.enterprise

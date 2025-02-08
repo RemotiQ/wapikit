@@ -208,5 +208,5 @@ func CountCSVLines(file multipart.File) (int, error) {
 		return count, err
 	}
 
-	return count, nil
+	return count - 1, nil
 }
