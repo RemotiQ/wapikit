@@ -118,7 +118,7 @@ export default function CommandMenuProvider() {
 				]
 			}
 		]
-	}, [router])
+	}, [router, input, writeAiStoreProperty])
 
 	const { isCommandMenuOpen, writeProperty } = useLayoutStore()
 
@@ -218,6 +218,7 @@ export default function CommandMenuProvider() {
 		document.addEventListener('keydown', down)
 		return () => document.removeEventListener('keydown', down)
 	}, [
+		writeAiStoreProperty,
 		writeProperty,
 		isCommandMenuOpen,
 		commandItemsAndGroups,

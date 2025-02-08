@@ -52,13 +52,18 @@ import {
 	DownloadIcon,
 	ExitIcon,
 	BarChartIcon,
-	ClockIcon
+	ClockIcon,
+	ReloadIcon,
+	StarIcon,
+	RotateCounterClockwiseIcon
 } from '@radix-ui/react-icons'
 import { Avatar } from '@radix-ui/react-avatar'
 
 export type Icon = LucideIcon
 
 export const Icons = {
+	arrowClockwise: RotateCounterClockwiseIcon,
+	star: StarIcon,
 	clock: ClockIcon,
 	analytics: BarChartIcon,
 	download: DownloadIcon,
@@ -89,6 +94,7 @@ export const Icons = {
 	employee: Avatar,
 	post: FileTextIcon,
 	page: FileIcon,
+	reload: ReloadIcon,
 	sparkles: ({ className }: { className: string }) => (
 		<svg
 			strokeLinejoin="round"

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 
-	model "github.com/wapikit/wapikit/.db-generated/model"
 	"github.com/wapikit/wapikit/api/api_types"
 )
 
@@ -22,30 +21,30 @@ const (
 	ApiServerCampaignProgressEvent   ApiServerEventType = "CampaignProgress"
 )
 
+type EventAuthDetails struct {
+	UserId         *string
+	OrganizationId *string
+}
+
 type ApiServerEventInterface interface {
 	ToJson() []byte
 	GetEventType() ApiServerEventType
 	GetData() interface{}
+	GetAuthDetails() *EventAuthDetails
 }
 
 type ConversationWithAllDetails struct {
-	model.Conversation
-	Contact    model.Contact `json:"contact"`
-	AssignedTo struct {
-		model.OrganizationMember
-		User model.User `json:"user"`
-	} `json:"assignedTo"`
-	WhatsappBusinessAccount struct {
-		model.WhatsappBusinessAccount
-		Organization model.Organization `json:"organization"`
-	} `json:"whatsappBusinessAccount"`
+	api_types.ConversationSchema
+	BusinessAccountId              string                                         `json:"businessAccountId"`
+	OrganizationId                 string                                         `json:"organizationId"`
+	WhatsAppBusinessAccountDetails api_types.WhatsAppBusinessAccountDetailsSchema `json:"whatsAppBusinessAccountDetails"`
 }
 
 type BaseApiServerEvent struct {
 	EventType      ApiServerEventType `json:"event"`
 	Data           interface{}        `json:"data"`
-	UserId         string             `json:"userId"`
-	OrganizationId string             `json:"organizationId"`
+	UserId         *string            `json:"userId"`
+	OrganizationId *string            `json:"organizationId"`
 }
 
 func (event BaseApiServerEvent) ToJson() []byte {
@@ -64,18 +63,27 @@ func (event BaseApiServerEvent) GetData() interface{} {
 	return event.Data
 }
 
+func (event BaseApiServerEvent) GetAuthDetails() *EventAuthDetails {
+	return &EventAuthDetails{
+		UserId:         event.UserId,
+		OrganizationId: event.OrganizationId,
+	}
+}
+
 // Specific event types with properly structured Data
 
-type NewNotificationEvent struct {
+type NotificationEvent struct {
 	BaseApiServerEvent
 }
 
-func NewNewNotificationEvent(notification string) *NewNotificationEvent {
-	return &NewNotificationEvent{
+func NewNewNotificationEvent(notification api_types.NotificationSchema, userId *string) *NotificationEvent {
+	return &NotificationEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
-			EventType: ApiServerNewNotificationEvent,
+			EventType:      ApiServerNewNotificationEvent,
+			UserId:         userId,
+			OrganizationId: notification.OrganizationId,
 			Data: struct {
-				Notification string `json:"notification"`
+				Notification api_types.NotificationSchema `json:"notification"`
 			}{
 				Notification: notification,
 			},
@@ -87,7 +95,7 @@ type NewMessageEvent struct {
 	BaseApiServerEvent
 }
 
-func NewNewMessageEvent(conv ConversationWithAllDetails, msg api_types.MessageSchema, userId, orgId string) *NewMessageEvent {
+func NewNewMessageEvent(conv ConversationWithAllDetails, msg api_types.MessageSchema, userId, orgId *string) *NewMessageEvent {
 	return &NewMessageEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
 			EventType: ApiServerNewMessageEvent,
@@ -108,18 +116,14 @@ type ChatAssignmentEvent struct {
 	BaseApiServerEvent
 }
 
-func NewChatAssignmentEvent(conv ConversationWithAllDetails, chatId, userId string, orgId string) *ChatAssignmentEvent {
+func NewChatAssignmentEvent(conversationId string, userId, orgId *string) *ChatAssignmentEvent {
 	return &ChatAssignmentEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
 			EventType: ApiServerChatAssignmentEvent,
 			Data: struct {
-				Conversation ConversationWithAllDetails `json:"conversation"`
-				ChatId       string                     `json:"chatId"`
-				UserId       string                     `json:"userId"`
+				ConversationId string `json:"conversationId"`
 			}{
-				Conversation: conv,
-				ChatId:       chatId,
-				UserId:       userId,
+				ConversationId: conversationId,
 			},
 			UserId:         userId,
 			OrganizationId: orgId,
@@ -131,16 +135,16 @@ type ChatUnAssignmentEvent struct {
 	BaseApiServerEvent
 }
 
-func NewChatUnAssignmentEvent(chatId, userId string) *ChatUnAssignmentEvent {
+func NewChatUnAssignmentEvent(conversationId string, userId, orgId *string) *ChatUnAssignmentEvent {
 	return &ChatUnAssignmentEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
-			EventType: ApiServerChatUnAssignmentEvent,
+			EventType:      ApiServerChatUnAssignmentEvent,
+			UserId:         userId,
+			OrganizationId: orgId,
 			Data: struct {
-				ChatId string `json:"chatId"`
-				UserId string `json:"userId"`
+				ConversationId string `json:"conversationId"`
 			}{
-				ChatId: chatId,
-				UserId: userId,
+				ConversationId: conversationId,
 			},
 		},
 	}
@@ -150,10 +154,12 @@ type ErrorEvent struct {
 	BaseApiServerEvent
 }
 
-func NewErrorEvent(errorMsg string) *ErrorEvent {
+func NewErrorEvent(errorMsg string, userId, orgId *string) *ErrorEvent {
 	return &ErrorEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
-			EventType: ApiServerErrorEvent,
+			EventType:      ApiServerErrorEvent,
+			UserId:         userId,
+			OrganizationId: orgId,
 			Data: struct {
 				Error string `json:"error"`
 			}{
@@ -167,10 +173,12 @@ type ReloadRequiredEvent struct {
 	BaseApiServerEvent
 }
 
-func NewReloadRequiredEvent(isReloadRequired bool) *ReloadRequiredEvent {
+func NewReloadRequiredEvent(isReloadRequired bool, userId, orgId *string) *ReloadRequiredEvent {
 	return &ReloadRequiredEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
-			EventType: ApiServerReloadRequiredEvent,
+			EventType:      ApiServerReloadRequiredEvent,
+			UserId:         userId,
+			OrganizationId: orgId,
 			Data: struct {
 				IsReloadRequired bool `json:"isReloadRequired"`
 			}{
@@ -184,12 +192,14 @@ type ConversationClosedEvent struct {
 	BaseApiServerEvent
 }
 
-func NewConversationClosedEvent(conversationId string) *ConversationClosedEvent {
+func NewConversationClosedEvent(conversationId string, userId, orgId *string) *ConversationClosedEvent {
 	return &ConversationClosedEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
-			EventType: ApiServerConversationClosedEvent,
+			EventType:      ApiServerConversationClosedEvent,
+			UserId:         userId,
+			OrganizationId: orgId,
 			Data: struct {
-				ConversationId string `json:"chatId"`
+				ConversationId string `json:"conversationId"`
 			}{
 				ConversationId: conversationId,
 			},
@@ -197,14 +207,15 @@ func NewConversationClosedEvent(conversationId string) *ConversationClosedEvent 
 	}
 }
 
-type NewConversationEvent struct {
+type ConversationEvent struct {
 	BaseApiServerEvent
 }
 
-func NewNewConversationEvent(conv ConversationWithAllDetails) *NewConversationEvent {
-	return &NewConversationEvent{
+func NewConversationEvent(conv ConversationWithAllDetails) *ConversationEvent {
+	return &ConversationEvent{
 		BaseApiServerEvent: BaseApiServerEvent{
-			EventType: ApiServerNewConversationEvent,
+			EventType:      ApiServerNewConversationEvent,
+			OrganizationId: &conv.OrganizationId,
 			Data: struct {
 				Conversation ConversationWithAllDetails `json:"conversation"`
 			}{

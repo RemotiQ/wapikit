@@ -1,11 +1,11 @@
 import type { z } from 'zod'
-import type { ApiServerEventDataMap, ApiServerEventEnum } from '../api-server-events'
+import { type ApiServerEventDataMap, type ApiServerEventEnum } from '../api-server-events'
 import { type ConversationInboxStoreType } from '~/store/conversation-inbox.store'
-import { type ConversationSchema } from 'root/.generated'
+import { type MessageSchema, type ConversationSchema } from 'root/.generated'
 
 export function messageEventHandler(params: {
 	conversations: ConversationSchema[]
-	eventData: z.infer<(typeof ApiServerEventDataMap)[ApiServerEventEnum.NewMessageEvent]>
+	eventData: z.infer<(typeof ApiServerEventDataMap)[ApiServerEventEnum.NewMessage]>
 	writeProperty: ConversationInboxStoreType['writeProperty']
 }): boolean {
 	try {
@@ -14,14 +14,15 @@ export function messageEventHandler(params: {
 			convo => convo.uniqueId === eventData.message.conversationId
 		)
 
+		console.log({ conversation })
+
 		if (!conversation) {
 			return false
 		}
 
 		const updatedConversation: ConversationSchema = {
 			...conversation,
-			// @ts-ignore - Will fix these types soon
-			messages: [...conversation.messages, eventData.message]
+			messages: [...conversation.messages, eventData.message as MessageSchema]
 		}
 
 		writeProperty({
@@ -37,11 +38,11 @@ export function messageEventHandler(params: {
 	}
 }
 
-export async function conversationAssignedEventHandler(
+export function conversationAssignedEventHandler(
 	message: z.infer<
-		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ConversationAssignmentEvent]['shape']['data']
+		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ChatAssignment]['shape']['data']
 	>
-): Promise<boolean> {
+): boolean {
 	try {
 		const { conversationId } = message
 		console.log({ conversationId })
@@ -60,14 +61,62 @@ export async function conversationAssignedEventHandler(
 	}
 }
 
-export async function conversationUnassignedEventHandler(
+export function conversationUnassignedEventHandler(
 	message: z.infer<
-		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ConversationClosedEvent]['shape']['data']
+		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ChatUnAssignment]['shape']['data']
 	>
 ) {
 	try {
 		const { conversationId } = message
 		console.log({ conversationId })
+
+		return true
+	} catch (error) {
+		console.error(error)
+		return false
+	}
+}
+
+export function conversationClosedEventHandler(
+	message: z.infer<
+		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ConversationClosed]['shape']['data']
+	>
+) {
+	try {
+		const { conversationId } = message
+		console.log({ conversationId })
+
+		return true
+	} catch (error) {
+		console.error(error)
+		return false
+	}
+}
+
+export function newConversationEventHandler(
+	message: z.infer<
+		(typeof ApiServerEventDataMap)[ApiServerEventEnum.NewConversation]['shape']['data']
+	>
+) {
+	try {
+		const { conversation } = message
+		console.log({ conversation })
+
+		return true
+	} catch (error) {
+		console.error(error)
+		return false
+	}
+}
+
+export function campaignProgressEventHandler(
+	progress: z.infer<
+		(typeof ApiServerEventDataMap)[ApiServerEventEnum.CampaignProgress]['shape']['data']
+	>
+) {
+	try {
+		const { campaignId, messagesErrored, messagesSent, status } = progress
+		console.log({ campaignId, messagesErrored, messagesSent, status })
 
 		return true
 	} catch (error) {

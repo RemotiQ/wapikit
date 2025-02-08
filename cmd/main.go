@@ -104,7 +104,7 @@ func main() {
 
 	constants := initConstants()
 
-	redisClient := cache_service.NewRedisClient(redisUrl, &redisPassword, constants.IsProduction, constants.IsCloudEdition)
+	redisClient := cache_service.NewRedisClient(redisUrl, &redisPassword, constants.IsProduction, constants.IsCloudEdition, constants.RedisEventChannelName)
 	dbInstance := database.GetDbInstance(koa.String("database.url"))
 
 	app := &interfaces.App{

@@ -44,7 +44,7 @@
 		"@tanstack/react-table": "^8.17.3",
 		"@tremor/react": "^3.17.4",
 		"@uploadthing/react": "^6.6.0",
-		"ai": "^4.0.36",
+		"ai": "^4.1.26",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.4",
@@ -58,8 +58,7 @@
 		"next": "15.0.2",
 		"next-themes": "^0.3.0",
 		"nextjs-toploader": "^1.6.12",
-		"postgres": "^3.4.4",
-		"react": "^18",
+		"react": "^18.3.1",
 		"react-day-picker": "^8.10.1",
 		"react-dom": "^18",
 		"react-hook-form": "^7.51.5",
@@ -94,12 +93,12 @@
 		"eslint-nibble": "^8.1.0",
 		"eslint-plugin-import": "^2.29.1",
 		"openapi-zod-client": "^1.18.1",
-		"orval": "^6.29.1",
+		"orval": "^7.5.0",
 		"postcss": "^8",
 		"prettier": "^3.2.5",
 		"prettier-plugin-tailwindcss": "^0.5.14",
 		"tailwindcss": "^3.4.1",
-		"typescript": "^5"
+		"typescript": "^5.7.0"
 	},
 	"packageManager": "pnpm@9.1.0"
 }

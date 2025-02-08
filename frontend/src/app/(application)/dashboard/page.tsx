@@ -110,7 +110,7 @@ export default function Page() {
 				<div className="flex items-center justify-between space-y-2">
 					<h2 className="ml-2 text-3xl font-bold tracking-tight">Dashboard</h2>
 				</div>
-				<div className="flex h-full flex-1 flex-col gap-4 rounded-lg bg-accent/60 p-4">
+				<div className="flex h-full flex-1 flex-col gap-6 rounded-lg bg-accent/60 p-4">
 					<div className="grid gap-4 rounded-lg md:grid-cols-2 lg:grid-cols-4">
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">

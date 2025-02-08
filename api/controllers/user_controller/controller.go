@@ -226,14 +226,28 @@ func getNotifications(context interfaces.ContextWithSession) error {
 	var dest []struct {
 		TotalNotifications int `json:"totalNotifications"`
 		model.Notification
+		NotificationLog *model.NotificationReadLog
 	}
 
 	notificationsQuery := SELECT(
 		table.Notification.AllColumns,
+		table.OrganizationMember.AllColumns,
+		table.NotificationReadLog.AllColumns,
 		COUNT(table.Notification.UniqueId).OVER().AS("totalNotifications"),
 	).
-		FROM(table.Notification).
-		WHERE(table.Notification.UserId.EQ(UUID(uuid.MustParse(context.Session.User.UniqueId)))).
+		FROM(table.Notification.
+			LEFT_JOIN(table.OrganizationMember, table.OrganizationMember.UniqueId.EQ(table.Notification.OrganizationMemberId)).
+			LEFT_JOIN(table.NotificationReadLog, table.NotificationReadLog.NotificationId.EQ(table.Notification.UniqueId)),
+		).
+		WHERE(
+			table.OrganizationMember.UserId.EQ(UUID(uuid.MustParse(context.Session.User.UniqueId))).OR(
+				table.Notification.OrganizationMemberId.IS_NULL().AND(
+					table.Notification.OrganizationId.IS_NULL(),
+				).AND(
+					table.Notification.IsBroadcast.EQ(Bool(true)),
+				),
+			),
+		).
 		ORDER_BY(table.Notification.CreatedAt.DESC()).
 		LIMIT(limit).
 		OFFSET((page - 1) * limit)
@@ -258,10 +272,7 @@ func getNotifications(context interfaces.ContextWithSession) error {
 		}
 	}
 
-	// ! return the notifications to the user
-
 	totalNotifications := 0
-
 	if len(dest) > 0 {
 		totalNotifications = dest[0].TotalNotifications
 	}
@@ -276,13 +287,21 @@ func getNotifications(context interfaces.ContextWithSession) error {
 	}
 
 	for _, notification := range dest {
+		var orgId *string
+		if notification.OrganizationId != nil {
+			id := notification.OrganizationId.String()
+			orgId = &id
+		}
+		isRead := &notification != nil || notification.NotificationLog.NotificationId != uuid.Nil || notification.NotificationLog.UniqueId != uuid.Nil
 		response.Notifications = append(response.Notifications, api_types.NotificationSchema{
-			UniqueId:    notification.UniqueId.String(),
-			CreatedAt:   notification.CreatedAt,
-			Title:       notification.Title,
-			Description: notification.Description,
-			CtaUrl:      notification.CtaUrl,
-			Type:        *notification.Type,
+			UniqueId:       notification.UniqueId.String(),
+			CreatedAt:      notification.CreatedAt,
+			Title:          notification.Title,
+			Description:    notification.Description,
+			CtaUrl:         notification.CtaUrl,
+			Type:           *notification.Type,
+			OrganizationId: orgId,
+			Read:           isRead,
 		})
 	}
 
@@ -295,9 +314,13 @@ func DeleteAccountStepOne(context interfaces.ContextWithSession) error {
 	// ! generate a deletion token here
 	// ! send the link to delete account with token in it to the user email
 	// ! get the user details from the token from the frontend and then check if the account is even deletable or not because if a user owns a organization he/she must need to transfer the ownership to someone else before deleting the account
-	return context.JSON(http.StatusOK, "OK")
+	return context.JSON(http.StatusOK, api_types.BadRequestErrorResponseSchema{
+		Message: "Not implemented",
+	})
 }
 
 func DeleteAccountStetTwo(context interfaces.ContextWithSession) error {
-	return context.JSON(http.StatusOK, "OK")
+	return context.JSON(http.StatusOK, api_types.BadRequestErrorResponseSchema{
+		Message: "Not implemented",
+	})
 }

@@ -31,7 +31,11 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 		}
 	}, [authState.isAuthenticated, pathname, router])
 
-	const { data: userData } = useGetUser({
+	const {
+		data: userData,
+		isError: isGetUserErrored,
+		error
+	} = useGetUser({
 		query: {
 			enabled: !!authState.isAuthenticated
 		}
@@ -61,6 +65,12 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 	const [hasRedirected, setHasRedirected] = useState(false)
 
 	useEffect(() => {
+		console.log({
+			isGetUserErrored,
+			error
+		})
+		// if (isGetUserErrored) return
+
 		if (hasRedirected) return
 
 		if (!authState.isAuthenticated || !userData || (user && currentOrganization)) {
@@ -92,11 +102,13 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 		} else {
 			console.log('userData', userData)
 
-			writeProperty({
-				user: userData.user,
-				currentOrganization: userData.user.organization,
-				isOwner: userData.user.currentOrganizationAccessLevel === 'Owner'
-			})
+			if (userData) {
+				writeProperty({
+					user: userData.user,
+					currentOrganization: userData.user.organization,
+					isOwner: userData.user.currentOrganizationAccessLevel === 'Owner'
+				})
+			}
 
 			if (!userData.user.organization?.whatsappBusinessAccountDetails) {
 				writeProperty({
@@ -132,7 +144,9 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 		user,
 		currentOrganization,
 		hasRedirected,
-		pathname
+		pathname,
+		isGetUserErrored,
+		error
 	])
 
 	if (

@@ -41,6 +41,7 @@ import { useConversationInboxStore } from '~/store/conversation-inbox.store'
 import Image from 'next/image'
 import { useScrollToBottom } from '~/hooks/use-scroll-to-bottom'
 import { SparklesIcon } from '../ai/icons'
+import { clsx } from 'clsx'
 
 const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const [isBusy, setIsBusy] = useState(false)
@@ -440,7 +441,12 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 					<Separator />
 
 					{/* ! TODO: this should always open at the end of scroll container */}
-					<ScrollArea className="h-screen bg-[#ebe5de] !py-4 px-2 !pb-64 dark:bg-[#111b21]">
+					<ScrollArea
+						className={clsx(
+							'h-screen bg-[#ebe5de] !py-4 px-2 dark:bg-[#111b21]',
+							suggestions?.suggestions.length ? '!pb-64' : '!pb-44'
+						)}
+					>
 						<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/chat-canvas-bg.png")] bg-repeat opacity-20' />
 						<div className="flex h-full flex-col gap-1">
 							{currentConversation.messages.map((message, index) => {

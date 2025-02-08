@@ -93,13 +93,19 @@ func addMiddlewares(e *echo.Echo, app *interfaces.App) {
 
 	// compression middleware
 	e.Use(middleware.Gzip())
-
+	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     origins,
 		AllowCredentials: true,
 		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderContentType, echo.HeaderOrigin, echo.HeaderCacheControl, "x-access-token"},
-		AllowMethods:     []string{http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		MaxAge:           5,
+		ExposeHeaders: []string{
+			echo.HeaderContentType,
+			"X-RateLimit-Limit",
+			"X-RateLimit-Remaining",
+			"X-RateLimit-Reset",
+		},
+		AllowMethods: []string{http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		MaxAge:       5,
 	}))
 
 }

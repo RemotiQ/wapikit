@@ -188,9 +188,7 @@ func NewOrganizationController() *OrganizationController {
 							MaxRequests:    60,
 							WindowTimeInMs: 1000 * 60, // 1 minute
 						},
-						RequiredPermission: []api_types.RolePermissionEnum{
-							api_types.CreateOrganizationMember,
-						},
+						RequiredPermission: []api_types.RolePermissionEnum{},
 					},
 				},
 				{
@@ -204,9 +202,7 @@ func NewOrganizationController() *OrganizationController {
 							MaxRequests:    60,
 							WindowTimeInMs: 1000 * 60, // 1 minute
 						},
-						RequiredPermission: []api_types.RolePermissionEnum{
-							api_types.CreateOrganizationMember,
-						},
+						RequiredPermission: []api_types.RolePermissionEnum{},
 					},
 				},
 				{
@@ -447,6 +443,25 @@ func createNewOrganization(context interfaces.ContextWithSession) error {
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
 	}).RETURNING(table.ApiKey.AllColumns).QueryContext(context.Request().Context(), tx, &apiKey)
+
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	aiChatsToCreate := model.AiChat{
+		UniqueId:             uuid.New(),
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
+		Status:               model.AiChatStatusEnum_Active,
+		OrganizationId:       member.OrganizationId,
+		OrganizationMemberId: member.UniqueId,
+		Title:                "Default Chat",
+		Visibility:           model.AiChatVisibilityEnum_Public,
+	}
+
+	_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
+		MODELS(aiChatsToCreate).
+		ExecContext(context.Request().Context(), context.App.Db)
 
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
@@ -1705,6 +1720,26 @@ func acceptOrganizationInvite(context interfaces.ContextWithSession) error {
 
 	if err != nil {
 		logger.Error("Error updating invite status", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	// * create the AI chat for this user
+	aiChatsToCreate := model.AiChat{
+		UniqueId:             uuid.New(),
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
+		Status:               model.AiChatStatusEnum_Active,
+		OrganizationId:       insertedOrgMember.OrganizationId,
+		OrganizationMemberId: insertedOrgMember.UniqueId,
+		Title:                "Default Chat",
+		Visibility:           model.AiChatVisibilityEnum_Public,
+	}
+
+	_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
+		MODELS(aiChatsToCreate).
+		ExecContext(context.Request().Context(), context.App.Db)
+
+	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 

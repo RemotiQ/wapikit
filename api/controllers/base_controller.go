@@ -189,6 +189,8 @@ func authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 								Logger:      &app.Logger,
 								SlackConfig: slackConfig,
 								EmailConfig: emailConfig,
+								Redis:       app.Redis,
+								Db:          app.Db,
 							}
 						}
 					}
@@ -290,7 +292,6 @@ func rateLimiter(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		rateLimitConfig := routeMetaData.RateLimitConfig
-
 		if rateLimitConfig.MaxRequests <= 0 || rateLimitConfig.WindowTimeInMs <= 0 {
 			// Skip rate limiting if configuration is invalid
 			return next(context)
@@ -323,16 +324,19 @@ func rateLimiter(next echo.HandlerFunc) echo.HandlerFunc {
 		allowed, remaining, reset, err := enforceRateLimit(redisService, redisKey, finalMaxRequestsAllowed, windowDuration)
 		if err != nil {
 			app.Logger.Error("Error in rate limiter", "error", err.Error())
-
 			app.NotificationService.SendSlackNotification(notification_service.SlackNotificationParams{
 				Title:   "🚨🚨 Rate limiter error 🚨🚨",
 				Message: fmt.Sprintf("Error in rate limiter: %s", err.Error()),
 			})
 
-			return context.JSON(500, map[string]string{
+			return context.JSON(http.StatusInternalServerError, map[string]string{
 				"error": "Internal server error",
 			})
 		}
+
+		context.Response().Header().Add("X-RateLimit-Limit", fmt.Sprintf("%d", finalMaxRequestsAllowed))
+		context.Response().Header().Add("X-RateLimit-Remaining", fmt.Sprintf("%d", remaining))
+		context.Response().Header().Add("X-RateLimit-Reset", fmt.Sprintf("%d", reset)) // Reset timestamp in UNIX seconds
 
 		if !allowed {
 			app.NotificationService.SendSlackNotification(notification_service.SlackNotificationParams{
@@ -340,7 +344,7 @@ func rateLimiter(next echo.HandlerFunc) echo.HandlerFunc {
 				Message: fmt.Sprintf("Rate limit hit for %s, remaining: %d, reset: %d", redisKey, remaining, reset),
 			})
 
-			return context.JSON(429, map[string]interface{}{
+			return context.JSON(http.StatusTooManyRequests, map[string]interface{}{
 				"error":     "Rate limit exceeded",
 				"remaining": remaining,
 				"reset":     reset,

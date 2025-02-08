@@ -77,10 +77,10 @@ Alpha Version - This application software is not stable right now. It is current
 - [x] Template Message Support Header Media, Copy Code button and other template message configuration while setting up a campaign
 - [x] Feature flag System
 - [x] Notification Configuration System
+- [x] Configure rate limit response headers
 - [ ] Live Team Inbox support for all message type
 - [ ] Cross Platform Integration Marketplace Infra
 - [ ] No Code Chat Flow Configurator
-- [ ] Configure rate limit response headers
 - [ ] Support E-commerce Product Catalog along with Order Management and Payments Support
 - [ ] Support HubSpot Integration (Sync WhatsApp campaigns with HubSpot CRM to manage leads and automate follow-ups)
 - [ ] Support Linear Integration (allowing users to create issues directly from the chat dashboard)

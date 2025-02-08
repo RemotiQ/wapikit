@@ -11,6 +11,8 @@ import { create } from 'zustand'
 import { OnboardingSteps } from '~/constants'
 
 export type LayoutStoreType = {
+	isPricingModalOpen: boolean
+	isReloadRequired: boolean
 	isCommandMenuOpen: boolean
 	playNotificationSound: () => void
 	isCreateTagModalOpen: boolean
@@ -35,6 +37,8 @@ type WritePropertyParamType = {
 }
 
 const useLayoutStore = create<LayoutStoreType>(set => ({
+	isPricingModalOpen: false,
+	isReloadRequired: false,
 	isCommandMenuOpen: false,
 	playNotificationSound() {
 		const audio = new Audio('/assets/notification-sounds/pop.wav')
@@ -53,6 +57,7 @@ const useLayoutStore = create<LayoutStoreType>(set => ({
 	templates: [],
 	featureFlags: null,
 	writeProperty: updates => {
+		console.log('updating layout store:', updates)
 		if (typeof updates === 'object') {
 			set(state => ({
 				...state,

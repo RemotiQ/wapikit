@@ -42,7 +42,7 @@ func handleEventsSubscription(context interfaces.ContextWithoutSession) error {
 	logger := context.App.Logger
 	eventService := context.App.EventService
 
-	isAuthenticated, _, err := authorizeConnectionRequest(context)
+	isAuthenticated, userDetails, err := authorizeConnectionRequest(context)
 	if !isAuthenticated || err != nil {
 		context.Response().WriteHeader(http.StatusUnauthorized)
 		fmt.Fprintf(context.Response(), "event: error\ndata: Authorization failed\n\n")
@@ -71,6 +71,36 @@ func handleEventsSubscription(context interfaces.ContextWithoutSession) error {
 
 			eventType := event.GetEventType()
 			data := event.GetData()
+			authDetails := event.GetAuthDetails()
+
+			logger.Info("Received event: %s", eventType)
+			logger.Info("Event data: %v", data)
+			logger.Info("Auth details: %v", authDetails)
+
+			if authDetails == nil {
+				logger.Error("Error getting auth details from event")
+				continue
+			}
+
+			fmt.Println("userDetails.Organization.UniqueId.String()", userDetails.Organization.UniqueId.String())
+
+			if authDetails.OrganizationId != nil {
+				// * organization id is defined, so check if the same organization, else if not organizationId means to be sent to every user of that organization
+				if *authDetails.OrganizationId != userDetails.Organization.UniqueId.String() {
+					// this event is not for this user
+					logger.Info("Organization id not matching")
+					continue
+				}
+			}
+
+			if authDetails.UserId != nil {
+				// * user id is defined, so check if the same user, else if not userId means to be sent to every user of that organization
+				if *authDetails.UserId != userDetails.User.UniqueId.String() {
+					logger.Info("User id not matching")
+					// this event is not for this user
+					continue
+				}
+			}
 
 			message, err := json.Marshal(data)
 			if err != nil {

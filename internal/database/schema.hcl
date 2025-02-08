@@ -1501,8 +1501,13 @@ table "Notification" {
     null    = false
   }
 
-  // if the above broadcast is true then the user id can be null, because the notification has been sent to all platform users
-  column "UserId" {
+  // if the above broadcast is true then the org id and org member id can be null, because the notification has been sent to all platform users
+  column "OrganizationMemberId" {
+    type = uuid
+    null = true
+  }
+
+  column "OrganizationId" {
     type = uuid
     null = true
   }
@@ -1511,15 +1516,26 @@ table "Notification" {
     columns = [column.UniqueId]
   }
 
-  foreign_key "NotificationToUserForeignKey" {
-    columns     = [column.UserId]
-    ref_columns = [table.User.column.UniqueId]
+  foreign_key "NotificationToOrganizationMemberForeignKey" {
+    columns     = [column.OrganizationMemberId]
+    ref_columns = [table.OrganizationMember.column.UniqueId]
     on_delete   = NO_ACTION
     on_update   = NO_ACTION
   }
 
-  index "NotificationUserIdIndex" {
-    columns = [column.UserId]
+  foreign_key "NotificationToOrganizationForeignKey" {
+    columns     = [column.OrganizationId]
+    ref_columns = [table.Organization.column.UniqueId]
+    on_delete   = NO_ACTION
+    on_update   = NO_ACTION
+  }
+
+  index "NotificationOrganizationMemberIdIndex" {
+    columns = [column.OrganizationMemberId]
+  }
+
+  index "NotificationOrganizationIdIndex" {
+    columns = [column.OrganizationId]
   }
 
   index "NotificationTypeIndex" {

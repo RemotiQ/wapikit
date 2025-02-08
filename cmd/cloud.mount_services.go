@@ -35,6 +35,8 @@ func MountServices(app *interfaces.App) {
 			Password: koa.String("email.password"),
 			Username: koa.String("email.username"),
 		},
+		Redis: redis,
+		Db:    db,
 	}
 
 	app.CampaignManager.NotificationService = app.NotificationService

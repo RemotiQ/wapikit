@@ -1,6 +1,5 @@
 'use client'
 
-import BreadCrumb from '~/components/breadcrumb'
 import { invitationColumn, OrganizationMembersTableColumns } from '~/components/tables/columns'
 import { TableComponent } from '~/components/tables/table'
 import { Button, buttonVariants } from '~/components/ui/button'

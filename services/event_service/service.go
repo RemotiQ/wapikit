@@ -76,6 +76,68 @@ func (service *EventService) HandleApiServerEvents(ctx context.Context) <-chan A
 					}
 					streamChannel <- campaignProgressEvent
 
+				case ApiServerNewConversationEvent:
+					var newConversationEvent ConversationEvent
+					err := json.Unmarshal(apiServerEventData, &newConversationEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal new conversation event", err.Error(), nil)
+						continue
+					}
+					streamChannel <- newConversationEvent
+
+				case ApiServerChatAssignmentEvent:
+					var chatAssignmentEvent ChatAssignmentEvent
+					err := json.Unmarshal(apiServerEventData, &chatAssignmentEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal chat assignment event", err.Error(), nil)
+						continue
+					}
+					streamChannel <- chatAssignmentEvent
+
+				case ApiServerChatUnAssignmentEvent:
+					var chatUnAssignmentEvent ChatUnAssignmentEvent
+					err := json.Unmarshal(apiServerEventData, &chatUnAssignmentEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal chat unassignment event", err.Error(), nil)
+						continue
+					}
+					streamChannel <- chatUnAssignmentEvent
+
+				case ApiServerConversationClosedEvent:
+					var conversationClosedEvent ConversationClosedEvent
+					err := json.Unmarshal(apiServerEventData, &conversationClosedEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal conversation closed event", err.Error(), nil)
+						continue
+					}
+					streamChannel <- conversationClosedEvent
+
+				case ApiServerErrorEvent:
+					var errorEvent ErrorEvent
+					err := json.Unmarshal(apiServerEventData, &errorEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal error event", err.Error(), nil)
+						continue
+					}
+					streamChannel <- errorEvent
+
+				case ApiServerReloadRequiredEvent:
+					var userStatusEvent ReloadRequiredEvent
+					err := json.Unmarshal(apiServerEventData, &userStatusEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal user status event", err.Error(), nil)
+						continue
+					}
+					streamChannel <- userStatusEvent
+
+				case ApiServerNewNotificationEvent:
+					var newNotificationEvent NotificationEvent
+					err := json.Unmarshal(apiServerEventData, &newNotificationEvent)
+					if err != nil {
+						service.Logger.Error("Unable to unmarshal new notification event", err.Error(), nil)
+						continue
+					}
+
 				default:
 					service.Logger.Info("Unknown event type received")
 				}

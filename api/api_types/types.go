@@ -350,6 +350,11 @@ type AssignConversationSchema struct {
 	OrganizationMemberId string `json:"organizationMemberId"`
 }
 
+// BadRequestErrorResponseSchema defines model for BadRequestErrorResponseSchema.
+type BadRequestErrorResponseSchema struct {
+	Message string `json:"message"`
+}
+
 // BulkImportResponseSchema defines model for BulkImportResponseSchema.
 type BulkImportResponseSchema struct {
 	Message string `json:"message"`
@@ -916,15 +921,21 @@ type NewOrganizationTagSchema struct {
 	Label string `json:"label"`
 }
 
+// NotFoundErrorResponseSchema defines model for NotFoundErrorResponseSchema.
+type NotFoundErrorResponseSchema struct {
+	Message string `json:"message"`
+}
+
 // NotificationSchema defines model for NotificationSchema.
 type NotificationSchema struct {
-	CreatedAt   time.Time `json:"createdAt"`
-	CtaUrl      *string   `json:"ctaUrl,omitempty"`
-	Description string    `json:"description"`
-	Read        bool      `json:"read"`
-	Title       string    `json:"title"`
-	Type        string    `json:"type"`
-	UniqueId    string    `json:"uniqueId"`
+	CreatedAt      time.Time `json:"createdAt"`
+	CtaUrl         *string   `json:"ctaUrl,omitempty"`
+	Description    string    `json:"description"`
+	OrganizationId *string   `json:"organizationId,omitempty"`
+	Read           bool      `json:"read"`
+	Title          string    `json:"title"`
+	Type           string    `json:"type"`
+	UniqueId       string    `json:"uniqueId"`
 }
 
 // OrderEnum defines model for OrderEnum.
@@ -998,6 +1009,13 @@ type PrimaryAnalyticsResponseSchema struct {
 	AggregateAnalytics AggregateAnalyticsSchema              `json:"aggregateAnalytics"`
 	LinkClickAnalytics []LinkClicksGraphDataPointSchema      `json:"linkClickAnalytics"`
 	MessageAnalytics   []MessageAnalyticGraphDataPointSchema `json:"messageAnalytics"`
+}
+
+// RateLimitErrorResponseSchema defines model for RateLimitErrorResponseSchema.
+type RateLimitErrorResponseSchema struct {
+	Message   string `json:"message"`
+	Remaining int    `json:"remaining"`
+	Reset     int    `json:"reset"`
 }
 
 // RegenerateApiKeyResponseSchema defines model for RegenerateApiKeyResponseSchema.
@@ -1131,6 +1149,11 @@ type UnassignConversationResponseSchema struct {
 // UnassignConversationSchema defines model for UnassignConversationSchema.
 type UnassignConversationSchema struct {
 	UserId string `json:"userId"`
+}
+
+// UnauthorizedErrorResponseSchema defines model for UnauthorizedErrorResponseSchema.
+type UnauthorizedErrorResponseSchema struct {
+	Message string `json:"message"`
 }
 
 // UpdateAIConfigurationDetailsSchema defines model for UpdateAIConfigurationDetailsSchema.

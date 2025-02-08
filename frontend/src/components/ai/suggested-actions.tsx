@@ -24,7 +24,7 @@ function PureSuggestedActions({ selectSuggestedAction }: SuggestedActionsProps) 
 					className={index > 1 ? 'hidden sm:block' : 'block'}
 				>
 					<Button
-						variant="ghost"
+						variant="outline"
 						onClick={() => {
 							selectSuggestedAction(suggestedAction.action)
 						}}

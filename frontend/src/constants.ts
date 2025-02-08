@@ -4,8 +4,11 @@ import { config } from 'dotenv'
 
 config()
 
+export const WEBSITE_URL = 'https://wapikit.com'
+
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
+export const IS_MANAGED_CLOUD_EDITION = process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION
 
 export const AUTH_TOKEN_LS = '__auth_token'
 

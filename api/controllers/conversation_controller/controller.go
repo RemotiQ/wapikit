@@ -822,7 +822,10 @@ func handleAssignConversation(context interfaces.ContextWithSession) error {
 		Assignment model.ConversationAssignment
 	}
 
-	var organizationMember model.OrganizationMember
+	var organizationMember struct {
+		model.OrganizationMember
+		User model.User
+	}
 
 	conversationFetchQuery := SELECT(
 		table.Conversation.AllColumns,
@@ -839,8 +842,11 @@ func handleAssignConversation(context interfaces.ContextWithSession) error {
 
 	organizationMemberQuery := SELECT(
 		table.OrganizationMember.AllColumns,
+		table.User.AllColumns,
 	).FROM(
-		table.OrganizationMember,
+		table.OrganizationMember.LEFT_JOIN(
+			table.User, table.OrganizationMember.UserId.EQ(table.User.UniqueId),
+		),
 	).WHERE(
 		table.OrganizationMember.UniqueId.EQ(UUID(orgMemberUuid)),
 	).LIMIT(1)
@@ -911,9 +917,14 @@ func handleAssignConversation(context interfaces.ContextWithSession) error {
 		}
 	}
 
-	// ! send assignment notification to the user
+	userId := organizationMember.User.UniqueId.String()
 
-	event := event_service.ChatAssignmentEvent{}
+	// * send assignment notification to the user
+	event := event_service.NewChatAssignmentEvent(
+		conversationId,
+		&userId,
+		&context.Session.User.OrganizationId,
+	)
 
 	context.App.Redis.PublishMessageToRedisChannel(context.App.Constants.RedisEventChannelName, event.ToJson())
 
@@ -936,17 +947,29 @@ func handleUnassignConversation(context interfaces.ContextWithSession) error {
 
 	var conversation struct {
 		model.Conversation
-		Assignment model.ConversationAssignment
+		Assignment struct {
+			model.ConversationAssignment
+			OrganizationMember struct {
+				model.OrganizationMember
+				User model.User
+			}
+		}
 	}
 
 	conversationFetchQuery := SELECT(
 		table.Conversation.AllColumns,
 		table.ConversationAssignment.AllColumns,
+		table.OrganizationMember.AllColumns,
+		table.User.AllColumns,
 	).FROM(
 		table.Conversation.
 			LEFT_JOIN(table.ConversationAssignment, table.Conversation.UniqueId.EQ(table.ConversationAssignment.ConversationId).AND(
 				table.ConversationAssignment.Status.EQ(utils.EnumExpression(model.ConversationAssignmentStatus_Assigned.String())),
-			)),
+			)).LEFT_JOIN(
+			table.OrganizationMember, table.ConversationAssignment.AssignedToOrganizationMemberId.EQ(table.OrganizationMember.UniqueId),
+		).LEFT_JOIN(
+			table.User, table.OrganizationMember.UserId.EQ(table.User.UniqueId),
+		),
 	).
 		WHERE(
 			table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
@@ -977,14 +1000,14 @@ func handleUnassignConversation(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	// ! send un-assignment notification to the user
+	userId := conversation.Assignment.OrganizationMember.User.UniqueId.String()
+	// * send un-assignment notification to the user
 	redis := context.App.Redis
-
-	event := event_service.ChatUnAssignmentEvent{
-		BaseApiServerEvent: event_service.BaseApiServerEvent{
-			EventType: event_service.ApiServerChatUnAssignmentEvent,
-		},
-	}
+	event := event_service.NewChatUnAssignmentEvent(
+		conversationId,
+		&userId,
+		&context.Session.User.OrganizationId,
+	)
 
 	redis.PublishMessageToRedisChannel(context.App.Constants.RedisEventChannelName, event.ToJson())
 
