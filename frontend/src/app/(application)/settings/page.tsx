@@ -65,16 +65,20 @@ import LoadingSpinner from '~/components/loader'
 import { Textarea } from '~/components/ui/textarea'
 import DocumentationPitch from '~/components/forms/documentation-pitch'
 import { Switch } from '~/components/ui/switch'
+import { Icons } from '~/components/icons'
+import * as React from 'react'
+import SubscriptionSettings from '~/components/settings/subscription'
 
 export default function SettingsPage() {
+	console.log('REACT VERSION PUBLIC', React.version)
 	const { user, isOwner, currentOrganization, writeProperty, phoneNumbers, featureFlags } =
 		useLayoutStore()
 
 	enum SettingTabEnum {
-		Account = 'account',
+		AccountAndBilling = 'account-and-billing',
 		Organization = 'organization',
 		WhatsAppBusinessAccount = 'whatsapp-business-account',
-		ApiKey = 'api-key',
+		ApiKey = 'api-access',
 		Rbac = 'rbac',
 		Notifications = 'notifications',
 		AiSettings = 'ai-settings'
@@ -82,8 +86,8 @@ export default function SettingsPage() {
 
 	const tabs = [
 		{
-			slug: SettingTabEnum.Account,
-			title: 'Account'
+			slug: SettingTabEnum.AccountAndBilling,
+			title: featureFlags?.SystemFeatureFlags.isCloudEdition ? 'Account & Billing' : 'Account'
 		},
 		{
 			slug: SettingTabEnum.Organization,
@@ -93,14 +97,11 @@ export default function SettingsPage() {
 			slug: SettingTabEnum.WhatsAppBusinessAccount,
 			title: 'WhatsApp Settings'
 		},
-		...(featureFlags?.SystemFeatureFlags.isApiAccessEnabled
-			? [
-					{
-						slug: SettingTabEnum.ApiKey,
-						title: 'API Key'
-					}
-				]
-			: []),
+		{
+			slug: SettingTabEnum.ApiKey,
+			title: 'API Key',
+			isLocked: !featureFlags?.SystemFeatureFlags.isApiAccessEnabled
+		},
 		...(featureFlags?.SystemFeatureFlags.isRoleBasedAccessControlEnabled
 			? [
 					{
@@ -109,7 +110,8 @@ export default function SettingsPage() {
 					}
 				]
 			: []),
-		...(featureFlags?.SystemFeatureFlags.isAiIntegrationEnabled
+		...(featureFlags?.SystemFeatureFlags.isAiIntegrationEnabled &&
+		!featureFlags.SystemFeatureFlags.isCloudEdition
 			? [
 					{
 						slug: SettingTabEnum.AiSettings,
@@ -117,12 +119,23 @@ export default function SettingsPage() {
 					}
 				]
 			: []),
-		// this tab will be be only visible in self hosted version
-		{
-			slug: SettingTabEnum.Notifications,
-			title: 'Notifications'
-		}
+		...(!featureFlags?.SystemFeatureFlags.isCloudEdition
+			? [
+					{
+						slug: SettingTabEnum.Notifications,
+						title: 'Notifications'
+					}
+				]
+			: [])
 	]
+
+	// const SubscriptionSettings = dynamic(
+	// 	() =>
+	// 		process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION === 'true'
+	// 			? import('~/enterprise/components/settings/subscription')
+	// 			: Promise.resolve(() => null),
+	// 	{ ssr: false }
+	// )
 
 	const searchParams = useSearchParams()
 	const router = useRouter()
@@ -146,7 +159,7 @@ export default function SettingsPage() {
 	const [isRoleCreationModelOpen, setIsRoleCreationModelOpen] = useState(false)
 	const [roleIdToEdit, setRoleIdToEdit] = useState<string | null>(null)
 	const [activeTab, setActiveTab] = useState(
-		searchParams.get('tab')?.toString() || SettingTabEnum.Account
+		searchParams.get('tab')?.toString() || SettingTabEnum.AccountAndBilling
 	)
 	const [isBusy, setIsBusy] = useState(false)
 
@@ -325,11 +338,11 @@ export default function SettingsPage() {
 	}, [roleData, newRoleForm])
 
 	useEffect(() => {
-		const tab = searchParams.get('tab') || 'account'
+		const tab = searchParams.get('tab') || SettingTabEnum.AccountAndBilling
 		if (tab) {
 			setActiveTab(() => tab)
 		}
-	}, [searchParams])
+	}, [SettingTabEnum.AccountAndBilling, searchParams])
 
 	useEffect(() => {
 		if (roleIdToEdit) {
@@ -1132,35 +1145,11 @@ export default function SettingsPage() {
 											</CardContent>
 										</Card>
 									</div>
-								) : tab.slug === SettingTabEnum.Account ? (
+								) : tab.slug === SettingTabEnum.AccountAndBilling ? (
 									<div className="mr-auto flex max-w-4xl flex-col gap-5">
 										{authState.isAuthenticated ? (
 											<>
-												{/* <Card>
-													<CardHeader>
-														<CardTitle>Profile Picture</CardTitle>
-													</CardHeader>
-													<CardContent className="flex h-fit w-full items-center justify-center pb-0">
-														<Image
-															src={
-																'https://www.creatorlens.co/assets/empty-pfp.png'
-															}
-															width={500}
-															height={500}
-															alt="profile"
-															className="h-40 w-40 rounded-full"
-														/>
-														<div className="flex-1">
-															<FileUploaderComponent
-																descriptionString="JPG / JPEG / PNG"
-																onFileUpload={() => {
-																	console.log('file uploaded')
-																}}
-															/>
-														</div>
-													</CardContent>
-												</Card> */}
-
+												{/* ACCOUNT SETTINGS */}
 												<Form {...userUpdateForm}>
 													<form
 														onSubmit={userUpdateForm.handleSubmit(
@@ -1252,6 +1241,10 @@ export default function SettingsPage() {
 													</form>
 												</Form>
 
+												{featureFlags?.SystemFeatureFlags.isCloudEdition ? (
+													<SubscriptionSettings />
+												) : null}
+
 												<Card className="flex flex-1 items-center justify-between">
 													<CardHeader>
 														<CardTitle>Delete Account</CardTitle>
@@ -1264,7 +1257,9 @@ export default function SettingsPage() {
 																		variant={'destructive'}
 																		onClick={() => {}}
 																		disabled={isBusy}
+																		className="flex gap-2"
 																	>
+																		<Icons.trash />
 																		Delete Account
 																	</Button>
 																</TooltipTrigger>
@@ -1636,7 +1631,9 @@ export default function SettingsPage() {
 																				console.error(error)
 																		)
 																	}}
+																	className="flex gap-2"
 																>
+																	<Icons.trash />
 																	Delete
 																</Button>
 															</TooltipTrigger>

@@ -1,17 +1,20 @@
 import { type Icons } from './components/icons'
 import { type NavItem } from './types'
-import { config } from 'dotenv'
 
-config()
-
+export const WEBSITE_URL = 'https://www.wapikit.com'
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
+export const IS_MANAGED_CLOUD_EDITION = process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION === 'true'
 
 export const AUTH_TOKEN_LS = '__auth_token'
 
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
 		return 'http://127.0.0.1:8000/api'
+	}
+
+	if (IS_MANAGED_CLOUD_EDITION) {
+		return process.env.BACKEND_URL
 	} else {
 		return '/api'
 	}
@@ -27,22 +30,17 @@ export const navItems: NavItem[] = [
 		label: 'Dashboard'
 	},
 	{
-		title: 'Contacts',
-		href: '/contacts',
-		icon: 'user',
-		label: 'profile'
+		title: 'WapiKit AI',
+		href: '/ai',
+		icon: 'brain',
+		label: 'WapiKit AI',
+		requiredFeatureFlag: ['isAiIntegrationEnabled']
 	},
 	{
-		title: 'Lists',
-		href: '/lists',
-		icon: 'billing',
-		label: 'employee'
-	},
-	{
-		title: 'Members',
-		href: '/members',
-		icon: 'laptop',
-		label: 'Members'
+		title: 'Analytics',
+		href: '/analytics',
+		icon: 'analytics',
+		label: 'Analytics'
 	},
 	{
 		title: 'Conversations',
@@ -55,6 +53,24 @@ export const navItems: NavItem[] = [
 		href: '/campaigns',
 		icon: 'rocket',
 		label: 'Campaigns'
+	},
+	{
+		title: 'Contacts',
+		href: '/contacts',
+		icon: 'user',
+		label: 'profile'
+	},
+	{
+		title: 'Lists',
+		href: '/lists',
+		icon: 'rows',
+		label: 'employee'
+	},
+	{
+		title: 'Team',
+		href: '/team',
+		icon: 'laptop',
+		label: 'Teams'
 	},
 	{
 		title: 'Settings',

@@ -17,15 +17,16 @@ type notificationTable struct {
 	postgres.Table
 
 	// Columns
-	UniqueId    postgres.ColumnString
-	CreatedAt   postgres.ColumnTimestampz
-	UpdatedAt   postgres.ColumnTimestampz
-	CtaUrl      postgres.ColumnString
-	Title       postgres.ColumnString
-	Description postgres.ColumnString
-	Type        postgres.ColumnString
-	IsBroadcast postgres.ColumnBool
-	UserId      postgres.ColumnString
+	UniqueId             postgres.ColumnString
+	CreatedAt            postgres.ColumnTimestampz
+	UpdatedAt            postgres.ColumnTimestampz
+	CtaUrl               postgres.ColumnString
+	Title                postgres.ColumnString
+	Description          postgres.ColumnString
+	Type                 postgres.ColumnString
+	IsBroadcast          postgres.ColumnBool
+	OrganizationMemberId postgres.ColumnString
+	OrganizationId       postgres.ColumnString
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -66,32 +67,34 @@ func newNotificationTable(schemaName, tableName, alias string) *NotificationTabl
 
 func newNotificationTableImpl(schemaName, tableName, alias string) notificationTable {
 	var (
-		UniqueIdColumn    = postgres.StringColumn("UniqueId")
-		CreatedAtColumn   = postgres.TimestampzColumn("CreatedAt")
-		UpdatedAtColumn   = postgres.TimestampzColumn("UpdatedAt")
-		CtaUrlColumn      = postgres.StringColumn("ctaUrl")
-		TitleColumn       = postgres.StringColumn("title")
-		DescriptionColumn = postgres.StringColumn("description")
-		TypeColumn        = postgres.StringColumn("type")
-		IsBroadcastColumn = postgres.BoolColumn("isBroadcast")
-		UserIdColumn      = postgres.StringColumn("UserId")
-		allColumns        = postgres.ColumnList{UniqueIdColumn, CreatedAtColumn, UpdatedAtColumn, CtaUrlColumn, TitleColumn, DescriptionColumn, TypeColumn, IsBroadcastColumn, UserIdColumn}
-		mutableColumns    = postgres.ColumnList{CreatedAtColumn, UpdatedAtColumn, CtaUrlColumn, TitleColumn, DescriptionColumn, TypeColumn, IsBroadcastColumn, UserIdColumn}
+		UniqueIdColumn             = postgres.StringColumn("UniqueId")
+		CreatedAtColumn            = postgres.TimestampzColumn("CreatedAt")
+		UpdatedAtColumn            = postgres.TimestampzColumn("UpdatedAt")
+		CtaUrlColumn               = postgres.StringColumn("ctaUrl")
+		TitleColumn                = postgres.StringColumn("title")
+		DescriptionColumn          = postgres.StringColumn("description")
+		TypeColumn                 = postgres.StringColumn("type")
+		IsBroadcastColumn          = postgres.BoolColumn("isBroadcast")
+		OrganizationMemberIdColumn = postgres.StringColumn("OrganizationMemberId")
+		OrganizationIdColumn       = postgres.StringColumn("OrganizationId")
+		allColumns                 = postgres.ColumnList{UniqueIdColumn, CreatedAtColumn, UpdatedAtColumn, CtaUrlColumn, TitleColumn, DescriptionColumn, TypeColumn, IsBroadcastColumn, OrganizationMemberIdColumn, OrganizationIdColumn}
+		mutableColumns             = postgres.ColumnList{CreatedAtColumn, UpdatedAtColumn, CtaUrlColumn, TitleColumn, DescriptionColumn, TypeColumn, IsBroadcastColumn, OrganizationMemberIdColumn, OrganizationIdColumn}
 	)
 
 	return notificationTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		UniqueId:    UniqueIdColumn,
-		CreatedAt:   CreatedAtColumn,
-		UpdatedAt:   UpdatedAtColumn,
-		CtaUrl:      CtaUrlColumn,
-		Title:       TitleColumn,
-		Description: DescriptionColumn,
-		Type:        TypeColumn,
-		IsBroadcast: IsBroadcastColumn,
-		UserId:      UserIdColumn,
+		UniqueId:             UniqueIdColumn,
+		CreatedAt:            CreatedAtColumn,
+		UpdatedAt:            UpdatedAtColumn,
+		CtaUrl:               CtaUrlColumn,
+		Title:                TitleColumn,
+		Description:          DescriptionColumn,
+		Type:                 TypeColumn,
+		IsBroadcast:          IsBroadcastColumn,
+		OrganizationMemberId: OrganizationMemberIdColumn,
+		OrganizationId:       OrganizationIdColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

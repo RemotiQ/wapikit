@@ -4,14 +4,20 @@ import {
 	type GetUserResponseSchema,
 	type GetAllPhoneNumbersResponseSchema,
 	type GetAllMessageTemplatesResponseSchema,
-	type ContactSchema,
-	type GetFeatureFlagsResponseSchema
+	type GetFeatureFlagsResponseSchema,
+	type GetOrganizationTagsResponseSchema
 } from 'root/.generated'
 import { create } from 'zustand'
 import { OnboardingSteps } from '~/constants'
 
 export type LayoutStoreType = {
+	isPricingModalOpen: boolean
+	isReloadRequired: boolean
+	isCommandMenuOpen: boolean
+	playNotificationSound: () => void
+	isCreateTagModalOpen: boolean
 	featureFlags: GetFeatureFlagsResponseSchema['featureFlags'] | null
+	tags: GetOrganizationTagsResponseSchema['tags']
 	onboardingSteps: typeof OnboardingSteps
 	notifications: string[]
 	isOwner: boolean
@@ -19,7 +25,7 @@ export type LayoutStoreType = {
 	currentOrganization: GetUserResponseSchema['user']['organization'] | null
 	phoneNumbers: GetAllPhoneNumbersResponseSchema
 	templates: GetAllMessageTemplatesResponseSchema
-	contactSheetData: ContactSchema | null
+	contactSheetContactId: string | null
 	writeProperty: (
 		updates: WritePropertyParamType | ((state?: LayoutStoreType | undefined) => LayoutStoreType)
 	) => void
@@ -31,8 +37,17 @@ type WritePropertyParamType = {
 }
 
 const useLayoutStore = create<LayoutStoreType>(set => ({
+	isPricingModalOpen: false,
+	isReloadRequired: false,
+	isCommandMenuOpen: false,
+	playNotificationSound() {
+		const audio = new Audio('/assets/notification-sounds/pop.wav')
+		audio.play().catch(error => console.error(error))
+	},
+	tags: [],
+	isCreateTagModalOpen: false,
 	isAiChatBoxOpen: false,
-	contactSheetData: null,
+	contactSheetContactId: null,
 	onboardingSteps: OnboardingSteps,
 	notifications: [],
 	isOwner: false,
@@ -42,6 +57,7 @@ const useLayoutStore = create<LayoutStoreType>(set => ({
 	templates: [],
 	featureFlags: null,
 	writeProperty: updates => {
+		console.log('updating layout store:', updates)
 		if (typeof updates === 'object') {
 			set(state => ({
 				...state,

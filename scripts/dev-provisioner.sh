@@ -5,9 +5,9 @@
 set -e
 
 sudo apt-get -y update
-sudo apt-get install -y make
-sudo apt install -y wget
+sudo apt install -y wget build-essential
 sudo apt-get -y update
+sudo apt-get install
 
 # install golang
 wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz
@@ -17,6 +17,9 @@ export PATH=$PATH:/usr/local/go/bin
 # install n and node
 curl -L https://bit.ly/n-install | bash
 n i lts
+
+# pnpm install
+curl -fsSL https://get.pnpm.io/install.sh | sh -
 
 git clone https://github.com/wapikit/wapikit
 

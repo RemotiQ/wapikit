@@ -15,7 +15,6 @@ import {
 	useUpdateCampaignById,
 	type CampaignSchema
 } from 'root/.generated'
-import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { clsx } from 'clsx'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -26,8 +25,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
 import dayjs from 'dayjs'
 import { Icons } from '~/components/icons'
-import { LinkClicks } from '~/components/dashboard/link-clicks'
-import { MessageAggregateAnalytics } from '~/components/dashboard/message-aggregate-stats'
+import { LinkClicks } from '~/components/analytics/link-clicks'
+import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { ScrollArea } from '~/components/ui/scroll-area'
 
 const breadcrumbItems = [{ title: 'campaigns', link: '/campaigns' }]
@@ -378,7 +377,7 @@ const CampaignsPage = () => {
 													{campaignData.campaign.tags.map(tag => {
 														return (
 															<Badge key={tag.uniqueId}>
-																{tag.name}
+																{tag.label}
 															</Badge>
 														)
 													})}
@@ -486,7 +485,7 @@ const CampaignsPage = () => {
 								href={'/campaigns/new-or-edit'}
 								className={clsx(buttonVariants({ variant: 'default' }))}
 							>
-								<Plus className="mr-2 h-4 w-4" /> Add New
+								<Icons.add className="mr-2 h-4 w-4" /> Add New
 							</Link>
 						</div>
 						<Separator />

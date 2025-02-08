@@ -128,6 +128,11 @@ enum "MessageTypeEnum" {
   ]
 }
 
+enum "WhatsAppBusinessAccountVerificationStatus" {
+  schema = schema.public
+  values = ["Verified", "Unverified"]
+}
+
 enum "AiChatStatusEnum" {
   schema = schema.public
   values = ["Active", "Inactive"]
@@ -145,7 +150,7 @@ enum "AiChatMessageVoteEnum" {
 
 enum "AiModelEnum" {
   schema = schema.public
-  values = ["Mistral", "Gpt4o", "Gemini1.5Pro", "GPT4Mini", "Gpt3.5Turbo"]
+  values = ["Mistral", "Gpt4o", "Gemini1.5Pro", "GPT4Mini", "Gpt3.5Turbo", "Claude3.5"]
 }
 
 enum "AiChatMessageRoleEnum" {
@@ -683,9 +688,18 @@ table "WhatsappBusinessAccount" {
     null = false
   }
 
-
   column "OrganizationId" {
     type = uuid
+    null = false
+  }
+
+  column "PhoneNumberId" {
+    type = text
+    null = false
+  }
+
+  column "Status" {
+    type = enum.WhatsAppBusinessAccountVerificationStatus
     null = false
   }
 
@@ -722,6 +736,7 @@ table "Contact" {
     null    = false
     default = sql("now()")
   }
+
   column "UpdatedAt" {
     type = timestamptz
     null = false
@@ -795,6 +810,11 @@ table "ContactList" {
   column "Name" {
     type = text
     null = false
+  }
+
+  column "Description" {
+    type = text
+    null = true
   }
   primary_key {
     columns = [column.UniqueId]
@@ -882,6 +902,11 @@ table "Campaign" {
     null = true
   }
 
+  column "ScheduledAt" {
+    type = timestamptz
+    null = true
+  }
+
   primary_key {
     columns = [column.UniqueId]
   }
@@ -906,6 +931,14 @@ table "Campaign" {
 
   index "CampaignMessageTemplateIndex" {
     columns = [column.MessageTemplateId]
+  }
+
+  index "CampaignOrganizationIdIndex" {
+    columns = [column.OrganizationId]
+  }
+
+  index "CampaignPhoneNumberIndex" {
+    columns = [column.PhoneNumber]
   }
 }
 
@@ -980,6 +1013,17 @@ table "Conversation" {
     columns = [column.ContactId]
   }
 
+  index "ConversationOrganizationIdIndex" {
+    columns = [column.OrganizationId]
+  }
+
+  index "ConversationPhoneNumberUsedIndex" {
+    columns = [column.PhoneNumberUsed]
+  }
+
+  index "ConversationInitiatedByCampaignIdIndex" {
+    columns = [column.InitiatedByCampaignId]
+  }
 }
 
 table "ConversationAssignment" {
@@ -1034,6 +1078,11 @@ table "ConversationAssignment" {
   index "ConversationAssignmentAssignedToUserIdIndex" {
     columns = [column.AssignedToOrganizationMemberId]
   }
+
+  index "ConversationAssignmentStatusIndex" {
+    columns = [column.Status]
+  }
+
 }
 
 table "Message" {
@@ -1166,7 +1215,17 @@ table "Message" {
     columns = [column.ContactId]
   }
 
+  index "MessageConversationIdIndex" {
+    columns = [column.ConversationId]
+  }
 
+  index "MessageOrganizationIdIndex" {
+    columns = [column.OrganizationId]
+  }
+
+  index "MessagePhoneNumberUsedIndex" {
+    columns = [column.PhoneNumberUsed]
+  }
 }
 
 table "TrackLink" {
@@ -1226,7 +1285,15 @@ table "TrackLink" {
 
   index "TrackLinkCampaignIdIndex" {
     columns = [column.CampaignId]
+  }
 
+  index "TrackLinkSlugIndex" {
+    columns = [column.Slug]
+    unique  = true
+  }
+
+  index "TrackLinkOrganizationIdIndex" {
+    columns = [column.OrganizationId]
   }
 }
 
@@ -1282,6 +1349,11 @@ table "TrackLinkClick" {
   index "TrackLinkClickContactIdIndex" {
     columns = [column.ContactId]
   }
+
+  index "TrackLinkClickUniqueIndex" {
+    columns = [column.TrackLinkId, column.ContactId]
+    unique  = true
+  }
 }
 
 table "Tag" {
@@ -1306,11 +1378,6 @@ table "Tag" {
     null = false
   }
 
-  column "Slug" {
-    type = text
-    null = false
-  }
-
   column "OrganizationId" {
     type = uuid
     null = false
@@ -1320,13 +1387,10 @@ table "Tag" {
     columns = [column.UniqueId]
   }
 
-  unique "UniqueSlug" {
-    columns = [column.Slug]
+  unique "UniqueLabel" {
+    columns = [column.Label]
   }
 
-  index "slugIndex" {
-    columns = [column.Slug]
-  }
 
   foreign_key "TagToOrganizationForeignKey" {
     columns     = [column.OrganizationId]
@@ -1437,14 +1501,45 @@ table "Notification" {
     null    = false
   }
 
-  // if the above broadcast is true then the user id can be null, because the notification has been sent to all platform users
-  column "UserId" {
+  // if the above broadcast is true then the org id and org member id can be null, because the notification has been sent to all platform users
+  column "OrganizationMemberId" {
+    type = uuid
+    null = true
+  }
+
+  column "OrganizationId" {
     type = uuid
     null = true
   }
 
   primary_key {
     columns = [column.UniqueId]
+  }
+
+  foreign_key "NotificationToOrganizationMemberForeignKey" {
+    columns     = [column.OrganizationMemberId]
+    ref_columns = [table.OrganizationMember.column.UniqueId]
+    on_delete   = NO_ACTION
+    on_update   = NO_ACTION
+  }
+
+  foreign_key "NotificationToOrganizationForeignKey" {
+    columns     = [column.OrganizationId]
+    ref_columns = [table.Organization.column.UniqueId]
+    on_delete   = NO_ACTION
+    on_update   = NO_ACTION
+  }
+
+  index "NotificationOrganizationMemberIdIndex" {
+    columns = [column.OrganizationMemberId]
+  }
+
+  index "NotificationOrganizationIdIndex" {
+    columns = [column.OrganizationId]
+  }
+
+  index "NotificationTypeIndex" {
+    columns = [column.type]
   }
 }
 
@@ -1571,6 +1666,14 @@ table "AiChat" {
     ref_columns = [table.OrganizationMember.column.UniqueId]
     on_delete   = NO_ACTION
     on_update   = NO_ACTION
+  }
+
+  index "AiChatOrganizationIdIndex" {
+    columns = [column.OrganizationId]
+  }
+
+  index "AiChatOrganizationMemberIdIndex" {
+    columns = [column.OrganizationMemberId]
   }
 }
 
@@ -1759,18 +1862,13 @@ table "AiApiCallLogs" {
     null = false
   }
 
-  column "AiChatId" {
-    type = uuid
-    null = false
-  }
-
   column "Request" {
-    type = jsonb
+    type = text
     null = false
   }
 
   column "Response" {
-    type = jsonb
+    type = text
     null = false
   }
 
@@ -1784,6 +1882,11 @@ table "AiApiCallLogs" {
     null = false
   }
 
+  column "OrganizationId" {
+    type = uuid
+    null = false
+  }
+
   column "Model" {
     type = enum.AiModelEnum
     null = false
@@ -1793,16 +1896,13 @@ table "AiApiCallLogs" {
     columns = [column.UniqueId]
   }
 
-  foreign_key "AiApiCallLogsToAiChatForeignKey" {
-    columns     = [column.AiChatId]
-    ref_columns = [table.AiChat.column.UniqueId]
+  foreign_key "AiApiCallLogsToOrganizationForeignKey" {
+    columns     = [column.OrganizationId]
+    ref_columns = [table.Organization.column.UniqueId]
     on_delete   = NO_ACTION
     on_update   = NO_ACTION
   }
 
-  index "AiApiCallLogsAiChatIdIndex" {
-    columns = [column.AiChatId]
-  }
 }
 
 // ==== JOIN TABLES ======

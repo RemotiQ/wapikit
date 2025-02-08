@@ -24,7 +24,7 @@ const RenderConversations = ({
 }) => {
 	const router = useRouter()
 	return (
-		<>
+		<div key={tab}>
 			{conversations.length === 0 && (
 				<div className="flex h-full flex-col items-center justify-center">
 					<Icons.message className="size-6 font-normal text-muted-foreground" />
@@ -72,7 +72,7 @@ const RenderConversations = ({
 					</>
 				)
 			})}
-		</>
+		</div>
 	)
 }
 

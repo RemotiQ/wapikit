@@ -26,4 +26,5 @@ type Campaign struct {
 	MessageTemplateId                  *string
 	PhoneNumber                        string
 	TemplateMessageComponentParameters *string
+	ScheduledAt                        *time.Time
 }

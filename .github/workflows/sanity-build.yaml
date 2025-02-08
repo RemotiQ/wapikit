@@ -45,6 +45,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Remove enterprise dependencies
+        run: |
+          sed -i '/wapikit-enterprise/d' go.mod
+          sed -i '/replace.*enterprise/d' go.mod
+
       - name: Build
         run: make dist
 

@@ -6,13 +6,12 @@ import (
 	"github.com/go-jet/jet/qrm"
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/wapikit/wapikit/.db-generated/model"
 	table "github.com/wapikit/wapikit/.db-generated/table"
+	"github.com/wapikit/wapikit/api/api_types"
 	controller "github.com/wapikit/wapikit/api/controllers"
-	"github.com/wapikit/wapikit/internal/api_types"
-	"github.com/wapikit/wapikit/internal/core/utils"
-	"github.com/wapikit/wapikit/internal/interfaces"
+	"github.com/wapikit/wapikit/interfaces"
+	"github.com/wapikit/wapikit/utils"
 )
 
 type UserController struct {
@@ -33,7 +32,7 @@ func NewUserController() *UserController {
 					MetaData: interfaces.RouteMetaData{
 						PermissionRoleLevel: api_types.Member,
 						RateLimitConfig: interfaces.RateLimitConfig{
-							MaxRequests:    10,
+							MaxRequests:    120,
 							WindowTimeInMs: 1000 * 60 * 60,
 						},
 					},
@@ -46,7 +45,7 @@ func NewUserController() *UserController {
 					MetaData: interfaces.RouteMetaData{
 						PermissionRoleLevel: api_types.Member,
 						RateLimitConfig: interfaces.RateLimitConfig{
-							MaxRequests:    10,
+							MaxRequests:    60,
 							WindowTimeInMs: 1000 * 60 * 60,
 						},
 					},
@@ -59,20 +58,7 @@ func NewUserController() *UserController {
 					MetaData: interfaces.RouteMetaData{
 						PermissionRoleLevel: api_types.Member,
 						RateLimitConfig: interfaces.RateLimitConfig{
-							MaxRequests:    10,
-							WindowTimeInMs: 1000 * 60 * 60,
-						},
-					},
-				},
-				{
-					Path:                    "/api/user/feature-flags",
-					Method:                  http.MethodGet,
-					Handler:                 interfaces.HandlerWithSession(getFeatureFlags),
-					IsAuthorizationRequired: true,
-					MetaData: interfaces.RouteMetaData{
-						PermissionRoleLevel: api_types.Member,
-						RateLimitConfig: interfaces.RateLimitConfig{
-							MaxRequests:    10,
+							MaxRequests:    100,
 							WindowTimeInMs: 1000 * 60 * 60,
 						},
 					},
@@ -85,7 +71,7 @@ func NewUserController() *UserController {
 func getUser(context interfaces.ContextWithSession) error {
 	userUuid, err := uuid.Parse(context.Session.User.UniqueId)
 	if err != nil {
-		return context.String(http.StatusInternalServerError, "Error parsing user UUID")
+		return context.JSON(http.StatusInternalServerError, "Error parsing user UUID")
 	}
 
 	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
@@ -201,7 +187,7 @@ func updateUser(context interfaces.ContextWithSession) error {
 	userUuid, err := uuid.Parse(context.Session.User.UniqueId)
 
 	if err != nil {
-		return context.String(http.StatusInternalServerError, "Error parsing user UUID")
+		return context.JSON(http.StatusInternalServerError, "Error parsing user UUID")
 	}
 
 	payload := new(api_types.UpdateUserSchema)
@@ -214,7 +200,7 @@ func updateUser(context interfaces.ContextWithSession) error {
 	err = updateUserQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
 
 	if err != nil {
-		return context.String(http.StatusInternalServerError, "Error updating user")
+		return context.JSON(http.StatusInternalServerError, "Error updating user")
 	}
 
 	isUpdated := false
@@ -231,7 +217,7 @@ func getNotifications(context interfaces.ContextWithSession) error {
 
 	err := utils.BindQueryParams(context, params)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return context.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	page := params.Page
@@ -240,14 +226,28 @@ func getNotifications(context interfaces.ContextWithSession) error {
 	var dest []struct {
 		TotalNotifications int `json:"totalNotifications"`
 		model.Notification
+		NotificationLog *model.NotificationReadLog
 	}
 
 	notificationsQuery := SELECT(
 		table.Notification.AllColumns,
+		table.OrganizationMember.AllColumns,
+		table.NotificationReadLog.AllColumns,
 		COUNT(table.Notification.UniqueId).OVER().AS("totalNotifications"),
 	).
-		FROM(table.Notification).
-		WHERE(table.Notification.UserId.EQ(UUID(uuid.MustParse(context.Session.User.UniqueId)))).
+		FROM(table.Notification.
+			LEFT_JOIN(table.OrganizationMember, table.OrganizationMember.UniqueId.EQ(table.Notification.OrganizationMemberId)).
+			LEFT_JOIN(table.NotificationReadLog, table.NotificationReadLog.NotificationId.EQ(table.Notification.UniqueId)),
+		).
+		WHERE(
+			table.OrganizationMember.UserId.EQ(UUID(uuid.MustParse(context.Session.User.UniqueId))).OR(
+				table.Notification.OrganizationMemberId.IS_NULL().AND(
+					table.Notification.OrganizationId.IS_NULL(),
+				).AND(
+					table.Notification.IsBroadcast.EQ(Bool(true)),
+				),
+			),
+		).
 		ORDER_BY(table.Notification.CreatedAt.DESC()).
 		LIMIT(limit).
 		OFFSET((page - 1) * limit)
@@ -268,14 +268,11 @@ func getNotifications(context interfaces.ContextWithSession) error {
 				},
 			})
 		} else {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			return context.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	// ! return the notifications to the user
-
 	totalNotifications := 0
-
 	if len(dest) > 0 {
 		totalNotifications = dest[0].TotalNotifications
 	}
@@ -290,13 +287,21 @@ func getNotifications(context interfaces.ContextWithSession) error {
 	}
 
 	for _, notification := range dest {
+		var orgId *string
+		if notification.OrganizationId != nil {
+			id := notification.OrganizationId.String()
+			orgId = &id
+		}
+		isRead := &notification != nil || notification.NotificationLog.NotificationId != uuid.Nil || notification.NotificationLog.UniqueId != uuid.Nil
 		response.Notifications = append(response.Notifications, api_types.NotificationSchema{
-			UniqueId:    notification.UniqueId.String(),
-			CreatedAt:   notification.CreatedAt,
-			Title:       notification.Title,
-			Description: notification.Description,
-			CtaUrl:      notification.CtaUrl,
-			Type:        *notification.Type,
+			UniqueId:       notification.UniqueId.String(),
+			CreatedAt:      notification.CreatedAt,
+			Title:          notification.Title,
+			Description:    notification.Description,
+			CtaUrl:         notification.CtaUrl,
+			Type:           *notification.Type,
+			OrganizationId: orgId,
+			Read:           isRead,
 		})
 	}
 
@@ -305,28 +310,17 @@ func getNotifications(context interfaces.ContextWithSession) error {
 	return context.JSON(http.StatusOK, response)
 }
 
-func getFeatureFlags(context interfaces.ContextWithSession) error {
-	responseToReturn := api_types.GetFeatureFlagsResponseSchema{
-		FeatureFlags: api_types.FeatureFlags{
-			SystemFeatureFlags: api_types.SystemFeatureFlags{
-				IsAiIntegrationEnabled:          true,
-				IsApiAccessEnabled:              true,
-				IsMultiOrganizationEnabled:      true,
-				IsRoleBasedAccessControlEnabled: true,
-			},
-		},
-	}
-
-	return context.JSON(http.StatusOK, responseToReturn)
-}
-
 func DeleteAccountStepOne(context interfaces.ContextWithSession) error {
 	// ! generate a deletion token here
 	// ! send the link to delete account with token in it to the user email
 	// ! get the user details from the token from the frontend and then check if the account is even deletable or not because if a user owns a organization he/she must need to transfer the ownership to someone else before deleting the account
-	return context.String(http.StatusOK, "OK")
+	return context.JSON(http.StatusOK, api_types.BadRequestErrorResponseSchema{
+		Message: "Not implemented",
+	})
 }
 
 func DeleteAccountStetTwo(context interfaces.ContextWithSession) error {
-	return context.String(http.StatusOK, "OK")
+	return context.JSON(http.StatusOK, api_types.BadRequestErrorResponseSchema{
+		Message: "Not implemented",
+	})
 }

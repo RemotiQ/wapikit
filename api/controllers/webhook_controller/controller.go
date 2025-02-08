@@ -12,11 +12,12 @@ import (
 	"github.com/google/uuid"
 	wapi "github.com/wapikit/wapi.go/pkg/client"
 	"github.com/wapikit/wapi.go/pkg/events"
+	"github.com/wapikit/wapikit/api/api_types"
 	controller "github.com/wapikit/wapikit/api/controllers"
-	"github.com/wapikit/wapikit/internal/api_types"
-	"github.com/wapikit/wapikit/internal/core/api_server_events"
-	"github.com/wapikit/wapikit/internal/core/utils"
-	"github.com/wapikit/wapikit/internal/interfaces"
+	"github.com/wapikit/wapikit/interfaces"
+	"github.com/wapikit/wapikit/services/event_service"
+	"github.com/wapikit/wapikit/services/notification_service"
+	"github.com/wapikit/wapikit/utils"
 
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
@@ -98,17 +99,21 @@ func NewWhatsappWebhookWebhookController(wapiClient *wapi.Client) *WebhookContro
 
 func (service *WebhookController) handleWebhookGetRequest(context interfaces.ContextWithoutSession) error {
 
+	decrypter := context.App.EncryptionService
 	logger := context.App.Logger
 	webhookVerificationToken := context.QueryParam("hub.verify_token")
 	logger.Info("webhook verification token", webhookVerificationToken, nil)
-	decryptedDetails, err := utils.DecryptWebhookSecret(webhookVerificationToken, context.App.Koa.String("app.encryption_key"))
+
+	var decryptedDetails utils.WebhookSecretData
+
+	err := decrypter.DecryptData(webhookVerificationToken, &decryptedDetails)
 	logger.Info("decrypted details", decryptedDetails, nil)
 	if err != nil {
 		logger.Error("error decrypting webhook verification token", err.Error(), nil)
 		return context.JSON(http.StatusBadRequest, "Invalid verification token")
 	}
 
-	if decryptedDetails == nil {
+	if &decryptedDetails == nil {
 		logger.Error("decrypted details are nil", "", nil)
 		return context.JSON(http.StatusBadRequest, "Invalid verification token")
 	}
@@ -158,17 +163,33 @@ func (service *WebhookController) handleWebhookGetRequest(context interfaces.Con
 }
 
 type ContactWithAllDetails struct {
-	model.Contact
-	Organization model.Organization
+	Contact        api_types.ContactWithoutConversationSchema
+	OrganizationId string `json:"organizationId"`
 }
 
 type BusinessAccountDetails struct {
-	model.WhatsappBusinessAccount
-	Organization model.Organization `json:"organization"`
+	api_types.WhatsAppBusinessAccountDetailsSchema
+	OrganizationId string `json:"organizationId"`
 }
 
 func fetchBusinessAccountDetails(businessAccountId string, app interfaces.App) (*BusinessAccountDetails, error) {
-	var businessAccountDetails BusinessAccountDetails
+	var dest struct {
+		model.WhatsappBusinessAccount
+		model.Organization
+	}
+
+	// check for cache here
+	cacheKey := app.Redis.ComputeCacheKey("business_account_details", businessAccountId, "businessAccountData")
+	cachedData, err := app.Redis.GetCachedData(cacheKey)
+	if err != nil {
+		// ! skip this
+	}
+
+	if cachedData != "" {
+		var businessAccountDetails BusinessAccountDetails
+		json.Unmarshal([]byte(cachedData), &businessAccountDetails)
+		return &businessAccountDetails, nil
+	}
 
 	businessAccountQuery := SELECT(
 		table.WhatsappBusinessAccount.AllColumns,
@@ -180,20 +201,38 @@ func fetchBusinessAccountDetails(businessAccountId string, app interfaces.App) (
 		table.WhatsappBusinessAccount.AccountId.EQ(String(businessAccountId)),
 	).LIMIT(1)
 
-	err := businessAccountQuery.Query(app.Db, &businessAccountDetails)
+	err = businessAccountQuery.Query(app.Db, &dest)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// ! TODO: add caching here for 30 minutes
+	businessAccountDetails := BusinessAccountDetails{
+		OrganizationId: dest.Organization.UniqueId.String(),
+		WhatsAppBusinessAccountDetailsSchema: api_types.WhatsAppBusinessAccountDetailsSchema{
+			AccessToken:       dest.WhatsappBusinessAccount.AccessToken,
+			BusinessAccountId: dest.WhatsappBusinessAccount.AccountId,
+			WebhookSecret:     dest.WhatsappBusinessAccount.WebhookSecret,
+		},
+	}
+
+	// cache here the data
+	app.Redis.CacheData(
+		cacheKey,
+		businessAccountDetails,
+		12*time.Hour,
+	)
 
 	return &businessAccountDetails, nil
 
 }
 
 func fetchContact(sentByContactNumber, businessAccountId string, app interfaces.App) (*ContactWithAllDetails, error) {
-	var contact ContactWithAllDetails
+	var contact struct {
+		Contact                 model.Contact
+		Organization            model.Organization
+		WhatsappBusinessAccount model.WhatsappBusinessAccount
+	}
 
 	contactQuery := SELECT(
 		table.Contact.AllColumns,
@@ -216,11 +255,45 @@ func fetchContact(sentByContactNumber, businessAccountId string, app interfaces.
 		return nil, err
 	}
 
-	return &contact, nil
+	attr := map[string]interface{}{}
+	json.Unmarshal([]byte(*contact.Contact.Attributes), &attr)
+
+	contactWithAllDetails := ContactWithAllDetails{
+		Contact: api_types.ContactWithoutConversationSchema{
+			Attributes: attr,
+			CreatedAt:  contact.Contact.CreatedAt,
+			Name:       contact.Contact.Name,
+			Phone:      contact.Contact.PhoneNumber,
+			Status:     api_types.ContactStatusEnum(contact.Contact.Status),
+			UniqueId:   contact.Contact.UniqueId.String(),
+		},
+		OrganizationId: contact.Organization.UniqueId.String(),
+	}
+
+	return &contactWithAllDetails, nil
 }
 
-func fetchConversation(businessAccountId, sentByContactNumber string, app interfaces.App) (*api_server_events.ConversationWithAllDetails, error) {
-	var dest api_server_events.ConversationWithAllDetails
+func fetchConversation(businessAccountId, sentByContactNumber string, app interfaces.App) (*event_service.ConversationWithAllDetails, error) {
+	var conversation struct {
+		model.Conversation
+		Contact struct {
+			model.Contact
+			ContactLists []struct {
+				model.ContactList
+			} `json:"contactLists"`
+		} `json:"contact"`
+		Tags       []model.Tag     `json:"tags"`
+		Messages   []model.Message `json:"messages"`
+		AssignedTo *struct {
+			model.OrganizationMember
+			User model.User `json:"user"`
+		} `json:"assignedTo"`
+		WhatsappBusinessAccount struct {
+			model.WhatsappBusinessAccount
+			Organization model.Organization `json:"organization"`
+		} `json:"whatsappBusinessAccount"`
+		NumberOfUnreadMessages int `json:"numberOfUnreadMessages"`
+	}
 
 	conversationQuery := SELECT(
 		table.Conversation.AllColumns,
@@ -244,19 +317,136 @@ func fetchConversation(businessAccountId, sentByContactNumber string, app interf
 			AND(table.Contact.PhoneNumber.EQ(String(sentByContactNumber))),
 	).LIMIT(1)
 
-	err := conversationQuery.Query(app.Db, &dest)
+	err := conversationQuery.Query(app.Db, &conversation)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &dest, nil
+	attr := map[string]interface{}{}
+	json.Unmarshal([]byte(*conversation.Contact.Attributes), &attr)
+	campaignId := ""
+
+	if conversation.InitiatedByCampaignId != nil {
+		campaignId = string(conversation.InitiatedByCampaignId.String())
+	}
+
+	lists := []api_types.ContactListSchema{}
+
+	for _, contactList := range conversation.Contact.ContactLists {
+		stringUniqueId := contactList.UniqueId.String()
+		listToAppend := api_types.ContactListSchema{
+			UniqueId: stringUniqueId,
+			Name:     contactList.Name,
+		}
+		lists = append(lists, listToAppend)
+	}
+
+	conversationDetails := event_service.ConversationWithAllDetails{
+		ConversationSchema: api_types.ConversationSchema{
+			UniqueId:               conversation.UniqueId.String(),
+			ContactId:              conversation.ContactId.String(),
+			OrganizationId:         conversation.OrganizationId.String(),
+			InitiatedBy:            api_types.ConversationInitiatedByEnum(conversation.InitiatedBy.String()),
+			CampaignId:             &campaignId,
+			CreatedAt:              conversation.CreatedAt,
+			Status:                 api_types.ConversationStatusEnum(conversation.Status.String()),
+			Messages:               []api_types.MessageSchema{},
+			NumberOfUnreadMessages: conversation.NumberOfUnreadMessages,
+			Contact: api_types.ContactWithoutConversationSchema{
+				UniqueId:   conversation.Contact.UniqueId.String(),
+				Name:       conversation.Contact.Name,
+				Phone:      conversation.Contact.PhoneNumber,
+				Attributes: attr,
+				CreatedAt:  conversation.Contact.CreatedAt,
+				Status:     api_types.ContactStatusEnum(conversation.Contact.Status.String()),
+			},
+			Tags: []api_types.TagSchema{},
+		},
+		BusinessAccountId: conversation.WhatsappBusinessAccount.AccountId,
+		OrganizationId:    conversation.WhatsappBusinessAccount.OrganizationId.String(),
+		WhatsAppBusinessAccountDetails: api_types.WhatsAppBusinessAccountDetailsSchema{
+			AccessToken:       conversation.WhatsappBusinessAccount.AccessToken,
+			BusinessAccountId: conversation.WhatsappBusinessAccount.AccountId,
+			WebhookSecret:     conversation.WhatsappBusinessAccount.WebhookSecret,
+		},
+	}
+
+	if conversation.AssignedTo != nil {
+		member := conversation.AssignedTo
+		accessLevel := api_types.UserPermissionLevelEnum(member.AccessLevel)
+		assignedToOrgMember := api_types.OrganizationMemberSchema{
+			CreatedAt:   conversation.AssignedTo.CreatedAt,
+			AccessLevel: accessLevel,
+			UniqueId:    member.UniqueId.String(),
+			Email:       member.User.Email,
+			Name:        member.User.Name,
+			Roles:       []api_types.OrganizationRoleSchema{},
+		}
+
+		conversationDetails.AssignedTo = &assignedToOrgMember
+	}
+
+	for _, tag := range conversation.Tags {
+		tagToAppend := api_types.TagSchema{
+			UniqueId: tag.UniqueId.String(),
+			Label:    tag.Label,
+		}
+		conversationDetails.Tags = append(conversationDetails.Tags, tagToAppend)
+	}
+
+	for _, message := range conversation.Messages {
+		messageData := map[string]interface{}{}
+		json.Unmarshal([]byte(*message.MessageData), &messageData)
+		message := api_types.MessageSchema{
+			UniqueId:       message.UniqueId.String(),
+			ConversationId: message.ConversationId.String(),
+			CreatedAt:      message.CreatedAt,
+			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
+			MessageData:    &messageData,
+			MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
+			Status:         api_types.MessageStatusEnum(message.Status.String()),
+		}
+
+		conversationDetails.Messages = append(conversationDetails.Messages, message)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &conversationDetails, nil
+}
+
+func checkIfInitiatedByCampaign(contactId, orgId string, app interfaces.App) (*uuid.UUID, error) {
+	var lastMessage model.Message
+
+	lastMessageQuery := SELECT(
+		table.Message.AllColumns,
+	).FROM(
+		table.Message,
+	).WHERE(
+		table.Message.ContactId.EQ(UUID(uuid.MustParse(contactId))).AND(
+			table.Message.OrganizationId.EQ(UUID(uuid.MustParse(orgId))),
+		),
+	).ORDER_BY(
+		table.Message.CreatedAt.DESC(),
+	).LIMIT(1)
+
+	err := lastMessageQuery.Query(app.Db, &lastMessage)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if lastMessage.CampaignId != nil {
+		return lastMessage.CampaignId, nil
+	}
+
+	return nil, nil
 }
 
 func (service *WebhookController) handleWebhookPostRequest(context interfaces.ContextWithoutSession) error {
-
-	// ! GET THE BUSINESS ACCOUNT ID HERE
-
 	logger := context.App.Logger
 
 	// * Read the request body so we can parse out the businessAccountId.
@@ -276,7 +466,9 @@ func (service *WebhookController) handleWebhookPostRequest(context interfaces.Co
 	var businessAccountId string
 	if entryList, ok := raw["entry"].([]interface{}); ok && len(entryList) > 0 {
 		if firstEntry, ok := entryList[0].(map[string]interface{}); ok {
+			logger.Info("firstEntry", firstEntry, nil)
 			if id, ok := firstEntry["id"].(string); ok {
+
 				businessAccountId = id
 			}
 		}
@@ -295,6 +487,7 @@ func (service *WebhookController) handleWebhookPostRequest(context interfaces.Co
 	err = whatsappBusinessAccountDetails.Query(context.App.Db, &businessAccount)
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
+			logger.Error("business account not found", err.Error(), nil)
 			return context.JSON(http.StatusNotFound, "Business account not found")
 		}
 		return context.JSON(http.StatusInternalServerError, "Internal server error")
@@ -327,10 +520,9 @@ func (service *WebhookController) handleWebhookPostRequest(context interfaces.Co
 	return context.JSON(http.StatusOK, "Success")
 }
 
-func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber events.BusinessPhoneNumber, sentByContactNumber string) (*api_server_events.ConversationWithAllDetails, error) {
-	conversationDetailsToReturn := &api_server_events.ConversationWithAllDetails{}
+func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber events.BusinessPhoneNumber, sentByContactNumber string) (*event_service.ConversationWithAllDetails, error) {
+	conversationDetailsToReturn := &event_service.ConversationWithAllDetails{}
 	businessAccount, err := fetchBusinessAccountDetails(businessAccountId, app)
-
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
 			// ! it must be in rare case, because th webhook should not be get to the application, if somebody has a account or running instance and added the webhook details in the whatsapp business account, then it should be in the database
@@ -343,24 +535,22 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 
 	} else {
 		// * business account found, add it to the response object
-		conversationDetailsToReturn.WhatsappBusinessAccount = *businessAccount
+		conversationDetailsToReturn.BusinessAccountId = businessAccountId
 	}
 
-	contact, err := fetchContact(sentByContactNumber, businessAccountId, app)
+	var contactWithAllDetails ContactWithAllDetails
 
-	var contactId uuid.UUID
+	contact, err := fetchContact(sentByContactNumber, businessAccountId, app)
 
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
 			app.Logger.Info("No contact found adding this person to the contacts", err.Error(), nil)
-
 			emptyAttributes := "{}"
-
 			contactToAdd := model.Contact{
 				PhoneNumber:    sentByContactNumber,
 				CreatedAt:      time.Now(),
 				UpdatedAt:      time.Now(),
-				OrganizationId: businessAccount.OrganizationId,
+				OrganizationId: uuid.MustParse(businessAccount.OrganizationId),
 				Status:         model.ContactStatusEnum_Active,
 				// ! TODO: add this to wapi.go and then use here
 				Name:       "",
@@ -368,99 +558,106 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 			}
 
 			var insertedContact model.Contact
-
 			insertQuery := table.Contact.INSERT(table.Contact.MutableColumns).
 				MODEL(contactToAdd).
 				RETURNING(table.Contact.AllColumns)
-
 			err = insertQuery.Query(app.Db, &insertedContact)
-
 			if err != nil {
 				return nil, fmt.Errorf("error inserting contact in the database")
 			}
 
-			contactId = insertedContact.UniqueId
-			conversationDetailsToReturn.Contact = insertedContact
+			attr := map[string]interface{}{}
+			json.Unmarshal([]byte(*insertedContact.Attributes), &attr)
+
+			contactWithAllDetails = ContactWithAllDetails{
+				Contact: api_types.ContactWithoutConversationSchema{
+					Attributes: attr,
+					CreatedAt:  insertedContact.CreatedAt,
+					Name:       insertedContact.Name,
+					Phone:      insertedContact.PhoneNumber,
+					Status:     api_types.ContactStatusEnum(insertedContact.Status),
+					UniqueId:   insertedContact.UniqueId.String(),
+				},
+				OrganizationId: contact.OrganizationId,
+			}
 		} else {
 			// ! TODO: send notification to the team
+			app.NotificationService.SendSlackNotification(notification_service.SlackNotificationParams{
+				Title:   "🚨🚨  Error inserting contact in webhook pre-handler 🚨🚨",
+				Message: fmt.Sprintf("Error fetching contact with phone number %s", sentByContactNumber),
+			})
+
 			return nil, fmt.Errorf("error inserting contact in the database")
 		}
 	} else {
 		// * contact found, add it to the response object
-		conversationDetailsToReturn.Contact = model.Contact{
-			UniqueId:       contact.UniqueId,
-			PhoneNumber:    contact.PhoneNumber,
-			Name:           contact.Name,
-			OrganizationId: contact.OrganizationId,
-			Status:         contact.Status,
-			CreatedAt:      contact.CreatedAt,
-			UpdatedAt:      contact.UpdatedAt,
-			Attributes:     contact.Attributes,
-		}
-
-		contactId = contact.UniqueId
+		contactWithAllDetails = *contact
 	}
 
 	fetchedConversation, err := fetchConversation(businessAccountId, sentByContactNumber, app)
 
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
+			app.Logger.Info("No conversation found, creating a new conversation", err.Error(), nil)
+			// * here we need to get the last message from this contact and if possibly a campaign Id exists for that contact, because then this message will be considered to be as initiated by that campaign
+			initiatedByCampaignId, _ := checkIfInitiatedByCampaign(contactWithAllDetails.Contact.UniqueId, contactWithAllDetails.OrganizationId, app)
+
 			// * this is a new message from the user, so we need to create a new conversation
 			conversationToInsert := model.Conversation{
-				CreatedAt:       time.Now(),
-				UpdatedAt:       time.Now(),
-				ContactId:       contactId,
-				OrganizationId:  businessAccount.OrganizationId,
-				PhoneNumberUsed: phoneNumber.Id,
-				InitiatedBy:     model.ConversationInitiatedEnum_Contact,
-				Status:          model.ConversationStatusEnum_Active,
+				CreatedAt:             time.Now(),
+				UpdatedAt:             time.Now(),
+				ContactId:             uuid.MustParse(contactWithAllDetails.Contact.UniqueId),
+				OrganizationId:        uuid.MustParse(businessAccount.OrganizationId),
+				PhoneNumberUsed:       phoneNumber.Id,
+				InitiatedByCampaignId: initiatedByCampaignId,
+				InitiatedBy:           model.ConversationInitiatedEnum_Contact,
+				Status:                model.ConversationStatusEnum_Active,
 			}
 
 			var insertedConversation model.Conversation
-
 			insertQuery := table.Conversation.INSERT(table.Conversation.MutableColumns).
 				MODEL(conversationToInsert).
 				RETURNING(table.Conversation.AllColumns)
-
 			err = insertQuery.Query(app.Db, &insertedConversation)
-
 			if err != nil {
 				return nil, fmt.Errorf("error inserting conversation in the database")
 			}
 
-			conversationDetailsToReturn.Conversation = model.Conversation{
-				UniqueId:              insertedConversation.UniqueId,
-				CreatedAt:             insertedConversation.CreatedAt,
-				UpdatedAt:             insertedConversation.UpdatedAt,
-				ContactId:             insertedConversation.ContactId,
-				OrganizationId:        insertedConversation.OrganizationId,
-				Status:                insertedConversation.Status,
-				PhoneNumberUsed:       insertedConversation.PhoneNumberUsed,
-				InitiatedBy:           insertedConversation.InitiatedBy,
-				InitiatedByCampaignId: insertedConversation.InitiatedByCampaignId,
+			campaignId := ""
+			if insertedConversation.InitiatedByCampaignId != nil {
+				campaignId = string(insertedConversation.InitiatedByCampaignId.String())
 			}
 
+			conversationDetailsToReturn.ConversationSchema = api_types.ConversationSchema{
+				UniqueId:               insertedConversation.UniqueId.String(),
+				CreatedAt:              insertedConversation.CreatedAt,
+				ContactId:              insertedConversation.ContactId.String(),
+				OrganizationId:         insertedConversation.OrganizationId.String(),
+				Status:                 api_types.ConversationStatusEnum(insertedConversation.Status.String()),
+				InitiatedBy:            api_types.ConversationInitiatedByEnum(insertedConversation.InitiatedBy.String()),
+				CampaignId:             &campaignId,
+				Contact:                contactWithAllDetails.Contact,
+				AssignedTo:             nil,
+				Messages:               []api_types.MessageSchema{},
+				NumberOfUnreadMessages: 0,
+				Tags:                   []api_types.TagSchema{},
+			}
+
+			fmt.Println("EVENT TO BE SENT HERE")
+
+			conversationDetailsToReturn.OrganizationId = businessAccount.OrganizationId
+
+			// * send an event to the client for creating new conversation
+			newConversationEvent := event_service.NewConversationEvent(*conversationDetailsToReturn)
+			app.Redis.PublishMessageToRedisChannel(app.Constants.RedisEventChannelName, newConversationEvent.ToJson())
+
+			return conversationDetailsToReturn, nil
 		} else {
 			return nil, fmt.Errorf("error fetching conversation from the database")
 		}
-	} else {
-		// * conversation found, add it to the response object
-		conversationDetailsToReturn.Conversation = model.Conversation{
-			UniqueId:              fetchedConversation.UniqueId,
-			CreatedAt:             fetchedConversation.CreatedAt,
-			UpdatedAt:             fetchedConversation.UpdatedAt,
-			ContactId:             fetchedConversation.ContactId,
-			OrganizationId:        fetchedConversation.OrganizationId,
-			Status:                fetchedConversation.Status,
-			PhoneNumberUsed:       fetchedConversation.PhoneNumberUsed,
-			InitiatedBy:           fetchedConversation.InitiatedBy,
-			InitiatedByCampaignId: fetchedConversation.InitiatedByCampaignId,
-		}
-
-		// ! TODO: handle other properties like assigned to etc etc
 	}
 
-	return conversationDetailsToReturn, nil
+	return fetchedConversation, nil
 }
 
 func handleTextMessage(event events.BaseEvent, app interfaces.App) {
@@ -499,17 +696,25 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 
 	var insertedMessage model.Message
 
+	conversationUuid := uuid.MustParse(conversationDetails.UniqueId)
+	contactUuid := uuid.MustParse(conversationDetails.Contact.UniqueId)
+
+	fmt.Println("conversationDetails", conversationDetails)
+
+	// ! TODO: handle the reply to message here
+
 	messageToInsert := model.Message{
 		WhatsAppMessageId:         &textMessageEvent.MessageId,
 		WhatsappBusinessAccountId: &businessAccountId,
-		ConversationId:            &conversationDetails.UniqueId,
-		CampaignId:                conversationDetails.InitiatedByCampaignId,
-		ContactId:                 conversationDetails.ContactId,
+		ConversationId:            &conversationUuid,
+		CampaignId:                nil, // this will be only defined in case of outgoing campaign messages
+		ContactId:                 contactUuid,
 		MessageType:               model.MessageTypeEnum_Text,
 		Status:                    model.MessageStatusEnum_Sent,
 		Direction:                 model.MessageDirectionEnum_InBound,
 		MessageData:               &stringMessageData,
-		OrganizationId:            conversationDetails.OrganizationId,
+		OrganizationId:            uuid.MustParse(conversationDetails.OrganizationId),
+		PhoneNumberUsed:           phoneNumber.Id,
 		CreatedAt:                 sentAtTime,
 		UpdatedAt:                 time.Now(),
 	}
@@ -527,7 +732,7 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	}
 
 	message := api_types.MessageSchema{
-		ConversationId: conversationDetails.UniqueId.String(),
+		ConversationId: conversationDetails.UniqueId,
 		Direction:      api_types.InBound,
 		MessageType:    api_types.Text,
 		Status:         api_types.MessageStatusEnumSent,
@@ -536,17 +741,10 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 		CreatedAt:      sentAtTime,
 	}
 
-	apiServerEvent := api_server_events.NewMessageEvent{
-		BaseApiServerEvent: api_server_events.BaseApiServerEvent{
-			EventType:    api_server_events.ApiServerNewMessageEvent,
-			Conversation: *conversationDetails,
-		},
-		EventType: api_server_events.ApiServerNewMessageEvent,
-		Message:   message,
-	}
+	fmt.Println("conversationDetails", conversationDetails)
 
-	fmt.Println("apiServerEvent is", string(apiServerEvent.ToJson()))
-	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisEventChannelName, apiServerEvent.ToJson())
+	messageEvent := event_service.NewNewMessageEvent(*conversationDetails, message, nil, &conversationDetails.OrganizationId)
+	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisEventChannelName, messageEvent.ToJson())
 
 	if err != nil {
 		fmt.Println("error sending api server event", err)

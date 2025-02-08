@@ -30,6 +30,7 @@ type campaignTable struct {
 	MessageTemplateId                  postgres.ColumnString
 	PhoneNumber                        postgres.ColumnString
 	TemplateMessageComponentParameters postgres.ColumnString
+	ScheduledAt                        postgres.ColumnTimestampz
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -83,8 +84,9 @@ func newCampaignTableImpl(schemaName, tableName, alias string) campaignTable {
 		MessageTemplateIdColumn                  = postgres.StringColumn("MessageTemplateId")
 		PhoneNumberColumn                        = postgres.StringColumn("PhoneNumber")
 		TemplateMessageComponentParametersColumn = postgres.StringColumn("TemplateMessageComponentParameters")
-		allColumns                               = postgres.ColumnList{UniqueIdColumn, CreatedAtColumn, UpdatedAtColumn, DescriptionColumn, NameColumn, StatusColumn, LastContactSentColumn, IsLinkTrackingEnabledColumn, CreatedByOrganizationMemberIdColumn, OrganizationIdColumn, MessageTemplateIdColumn, PhoneNumberColumn, TemplateMessageComponentParametersColumn}
-		mutableColumns                           = postgres.ColumnList{CreatedAtColumn, UpdatedAtColumn, DescriptionColumn, NameColumn, StatusColumn, LastContactSentColumn, IsLinkTrackingEnabledColumn, CreatedByOrganizationMemberIdColumn, OrganizationIdColumn, MessageTemplateIdColumn, PhoneNumberColumn, TemplateMessageComponentParametersColumn}
+		ScheduledAtColumn                        = postgres.TimestampzColumn("ScheduledAt")
+		allColumns                               = postgres.ColumnList{UniqueIdColumn, CreatedAtColumn, UpdatedAtColumn, DescriptionColumn, NameColumn, StatusColumn, LastContactSentColumn, IsLinkTrackingEnabledColumn, CreatedByOrganizationMemberIdColumn, OrganizationIdColumn, MessageTemplateIdColumn, PhoneNumberColumn, TemplateMessageComponentParametersColumn, ScheduledAtColumn}
+		mutableColumns                           = postgres.ColumnList{CreatedAtColumn, UpdatedAtColumn, DescriptionColumn, NameColumn, StatusColumn, LastContactSentColumn, IsLinkTrackingEnabledColumn, CreatedByOrganizationMemberIdColumn, OrganizationIdColumn, MessageTemplateIdColumn, PhoneNumberColumn, TemplateMessageComponentParametersColumn, ScheduledAtColumn}
 	)
 
 	return campaignTable{
@@ -104,6 +106,7 @@ func newCampaignTableImpl(schemaName, tableName, alias string) campaignTable {
 		MessageTemplateId:                  MessageTemplateIdColumn,
 		PhoneNumber:                        PhoneNumberColumn,
 		TemplateMessageComponentParameters: TemplateMessageComponentParametersColumn,
+		ScheduledAt:                        ScheduledAtColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

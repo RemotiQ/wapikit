@@ -11,6 +11,11 @@ info:
   license:
     name: AGPL-3.0
     url: https://github.com/wapikit/wapikit/blob/master/LICENSE
+  contact:
+    email: contact@softlancer.co
+    name: Sarthak
+    url: https://wapikit.com/contact-us
+  termsOfService: https://wapikit.com/terms-and-conditions
 
 tags:
   - name: Auth
@@ -21,7 +26,6 @@ tags:
 
   - name: Organization
     description: Organization API
-
   - name: Contacts
     description: Contacts API
 
@@ -45,6 +49,9 @@ tags:
 
   - name: RBAC
     description: Role based access control API
+
+  - name: AI
+    description: AI API
 
 paths:
   /health-check:
@@ -78,6 +85,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetMetaDataResponseSchema"
 
+  /events:
+    get:
+      summary: Subscribe to real-time events
+      description: |
+        Opens a persistent connection for real-time updates using Server-Sent Events (SSE).
+        The client should listen to events and process incoming messages.
+      operationId: getSSEUpdates
+      tags:
+        - Events
+      responses:
+        "200":
+          description: Stream of real-time events
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
   /auth/login:
     post:
       tags:
@@ -97,26 +121,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginResponseBodySchema"
-
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
 
   /auth/register:
     post:
@@ -138,16 +142,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/RegisterRequestResponseBodySchema"
 
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
   /auth/verify-email:
     post:
       tags:
@@ -168,16 +162,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/VerifyOtpResponseBodySchema"
 
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
   /auth/api-keys/regenerate:
     get:
       tags:
@@ -191,13 +175,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RegenerateApiKeyResponseSchema"
-
-        "400":
-          description: api key not found response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
 
   /auth/join-organization:
     post:
@@ -218,16 +195,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JoinOrganizationResponseBodySchema"
-
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /user:
     get:
@@ -242,6 +233,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetUserResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -262,6 +277,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateUserResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /user/notifications:
     get:
@@ -296,8 +335,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetUserNotificationsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
-  /user/feature-flags:
+  /system/feature-flags:
     get:
       tags:
         - User
@@ -310,6 +373,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetFeatureFlagsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /auth/api-keys:
     get:
@@ -324,6 +411,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetApiKeysResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /auth/switch:
     post:
@@ -347,6 +458,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SwitchOrganizationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization:
     post:
@@ -368,6 +503,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateNewOrganizationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     get:
       tags:
@@ -401,6 +560,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/{id}:
     get:
@@ -422,6 +605,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -449,6 +656,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateOrganizationByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/ai-configuration:
     get:
@@ -463,6 +694,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAiConfigurationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /rbac/roles:
     get:
@@ -497,6 +752,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationRolesResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -517,6 +796,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateNewRoleResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /rbac/roles/{id}:
     get:
@@ -538,6 +841,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetRoleByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -565,6 +892,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateRoleByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     delete:
       tags:
@@ -585,6 +936,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeleteRoleByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/tags:
     get:
@@ -619,6 +994,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationTagsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -639,6 +1038,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateNewOrganizationTagResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/invites:
     get:
@@ -673,6 +1096,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationMemberInvitesResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -693,6 +1140,120 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateInviteResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /organization/invite/{slug}:
+    get:
+      tags:
+        - Organization
+      description: returns a single organization invite
+      operationId: getOrganizationInviteBySlug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          description: The slug value of the invite you want to get.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: organization invite object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetOrganizationInviteBySlugResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /organization/invite/{slug}/accept:
+    post:
+      tags:
+        - Organization
+      description: accept an organization invite
+      operationId: acceptOrganizationInvite
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          description: The slug value of the invite you want to accept.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: invite object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptOrganizationInviteResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/members:
     get:
@@ -727,6 +1288,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationMembersResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/members/{id}:
     get:
@@ -748,6 +1333,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetOrganizationMemberByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -778,6 +1387,30 @@ paths:
                 properties:
                   data:
                     $ref: "#/components/schemas/UpdateOrganizationMemberByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     delete:
       tags:
@@ -798,6 +1431,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeleteOrganizationMemberByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/members/{id}/role:
     post:
@@ -826,6 +1483,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateOrganizationMemberRoleByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/{id}/transfer:
     post:
@@ -853,6 +1534,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransferOrganizationOwnershipResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/templates:
     get:
@@ -867,6 +1572,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAllMessageTemplatesResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/templates/{id}:
     get:
@@ -888,6 +1617,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetTemplateByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/phone-numbers:
     get:
@@ -923,6 +1676,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPhoneNumberByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /organization/whatsappBusinessAccount:
     post:
@@ -944,6 +1721,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WhatsAppBusinessAccountDetailsSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /contacts:
     get:
@@ -989,6 +1790,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetContactsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     post:
       description: handles creation of new contacts
       operationId: createContacts
@@ -1010,16 +1836,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateNewContactResponseSchema"
-
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     delete:
       description: handles contact deletion
       operationId: deleteContactsByList
@@ -1042,15 +1883,30 @@ paths:
                 properties:
                   data:
                     type: boolean
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /contacts/bulk-import:
     post:
@@ -1080,16 +1936,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BulkImportResponseSchema"
-
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   "/contacts/{id}":
     get:
@@ -1116,10 +1986,26 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     post:
       description: modify contact data
       operationId: updateContactById
@@ -1145,25 +2031,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateContactByIdResponseSchema"
-
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "404":
           description: Not Found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     delete:
       description: handles contact deletion based on id
       operationId: deleteContactById
@@ -1184,24 +2076,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeleteContactByIdResponseSchema"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "404":
           description: Not Found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /lists:
     get:
@@ -1237,6 +2135,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetContactListResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     post:
       description: handles creation of new list
       operationId: createList
@@ -1256,16 +2179,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateNewListResponseSchema"
-
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   "/lists/{id}":
     get:
@@ -1293,10 +2230,25 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       description: modify list data
@@ -1323,24 +2275,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateListByIdResponseSchema"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "404":
           description: Not Found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     delete:
       description: handles list deletion based on id
@@ -1364,24 +2322,30 @@ paths:
                 properties:
                   data:
                     type: boolean
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "404":
           description: Not Found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /campaigns:
     get:
@@ -1423,6 +2387,30 @@ paths:
               schema:
                 type: object
                 $ref: "#/components/schemas/GetCampaignResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       description: handles creation of new campaign
@@ -1443,15 +2431,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateNewCampaignResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   "/campaigns/{id}":
     get:
@@ -1479,10 +2482,26 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     post:
       description: modify campaign data
       operationId: updateCampaignById
@@ -1508,24 +2527,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateCampaignByIdResponseSchema"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "404":
           description: Not Found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
     delete:
       description: handles campaign deletion based on id
       operationId: deleteCampaignById
@@ -1548,24 +2574,30 @@ paths:
                 properties:
                   data:
                     type: boolean
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "404":
           description: Not Found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /conversations:
     get:
@@ -1627,6 +2659,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetConversationsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /conversation/{id}:
     get:
@@ -1648,6 +2704,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetConversationByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -1675,6 +2755,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateConversationByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     delete:
       tags:
@@ -1695,6 +2799,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeleteConversationByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /conversation/{id}/assign:
     post:
@@ -1723,6 +2851,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AssignConversationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /conversation/{id}/unassign:
     post:
@@ -1750,6 +2902,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnassignConversationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /conversation/{id}/messages:
     get:
@@ -1791,6 +2967,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetConversationMessagesResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -1818,6 +3018,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SendMessageInConversationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /messages:
     get:
@@ -1893,6 +3117,30 @@ paths:
                       $ref: "#/components/schemas/MessageSchema"
                   paginationMeta:
                     $ref: "#/components/schemas/PaginationMeta"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /integrations:
     get:
@@ -1931,6 +3179,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetIntegrationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /analytics/primary:
     get:
@@ -1960,6 +3232,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PrimaryAnalyticsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /analytics/secondary:
     get:
@@ -1988,6 +3284,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SecondaryAnalyticsDashboardResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /analytics/campaign/{campaignId}:
     get:
@@ -2010,6 +3330,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /analytics/campaigns:
     get:
@@ -2038,11 +3382,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /ai/chats:
     get:
       tags:
-        - Ai Chats
+        - AI
       description: returns all ai chats.
       operationId: getAiChats
       parameters:
@@ -2081,11 +3449,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAiChatsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /ai/chat/{id}:
     get:
       tags:
-        - Ai Chats
+        - AI
       description: returns a single ai chat
       operationId: getAiChatById
       parameters:
@@ -2102,11 +3494,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAiChatByIdResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /ai/chat/{id}/messages:
     get:
       tags:
-        - Ai Chats
+        - AI
       description: returns all messages in a ai chat.
       operationId: getAiChatMessages
       parameters:
@@ -2138,6 +3554,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAiChatMessagesResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
@@ -2165,6 +3605,30 @@ paths:
               schema:
                 type: string
                 format: binary
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
   /ai/chat/{id}/vote:
     get:
@@ -2201,10 +3665,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAiChatVotesResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
     post:
       tags:
-        - Ai Chats
+        - AI
       description: vote on a message in a ai chat
       operationId: voteOnAiChatMessage
       parameters:
@@ -2228,6 +3716,126 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateAiChatMessageVoteResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /ai/segment-recommendations:
+    get:
+      tags:
+        - AI
+      description: returns all ai chat segment recommendations.
+      operationId: getAiChatSegmentRecommendations
+      parameters:
+        - in: query
+          name: conversationId
+          description: number of records to skip
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: contactId
+          description: max number of records to return per page
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: list of ai chat segment recommentdations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSegmentationRecommendationsResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /ai/response-suggestions:
+    get:
+      tags:
+        - AI
+      description: returns all ai chat response suggestions.
+      operationId: getConversationResponseSuggestions
+      parameters:
+        - in: query
+          name: conversationId
+          description: number of records to skip
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: list of ai chat response suggestions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetResponseSuggestionsResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
 components:
   schemas:
@@ -2388,11 +3996,15 @@ components:
     AiModelEnum:
       type: string
       enum:
-        - GPT4Mini
+        - Gpt4Mini
+        - GptO1
+        - GptO3Mini
+        - Gpt4oMini
         - Gpt3.5Turbo
         - Mistral
         - Gpt4o
         - Gemini1.5Pro
+        - Claude3.5
 
     IntegrationSchema:
       type: object
@@ -2445,6 +4057,10 @@ components:
     SystemFeatureFlags:
       type: object
       properties:
+        isCloudEdition:
+          type: boolean
+        isEnterpriseEdition:
+          type: boolean
         isRoleBasedAccessControlEnabled:
           type: boolean
         isMultiOrganizationEnabled:
@@ -2453,11 +4069,16 @@ components:
           type: boolean
         isAiIntegrationEnabled:
           type: boolean
+        isPluginIntegrationMarketplaceEnabled:
+          type: boolean
       required:
         - isRoleBasedAccessControlEnabled
         - isMultiOrganizationEnabled
         - isApiAccessEnabled
         - isAiIntegrationEnabled
+        - isPluginIntegrationMarketplaceEnabled
+        - isCloudEdition
+        - isEnterpriseEdition
 
     FeatureFlags:
       type: object
@@ -2705,12 +4326,15 @@ components:
           format: date-time
         status:
           $ref: "#/components/schemas/InviteStatusEnum"
+        organizationName:
+          type: string
       required:
         - uniqueId
         - email
         - accessLevel
         - createdAt
         - status
+        - organizationName
 
     CreateNewOrganizationInviteSchema:
       type: object
@@ -2878,10 +4502,10 @@ components:
     NewOrganizationTagSchema:
       type: object
       properties:
-        name:
+        label:
           type: string
       required:
-        - name
+        - label
 
     UpdateOrganizationMemberRoleSchema:
       type: object
@@ -3180,6 +4804,37 @@ components:
       required:
         - data
 
+    ConversationWithoutContactSchema:
+      type: object
+      properties:
+        uniqueId:
+          type: string
+        contactId:
+          type: string
+        campaignId:
+          type: string
+        organizationId:
+          type: string
+        initiatedBy:
+          $ref: "#/components/schemas/ConversationInitiatedByEnum"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageSchema"
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/ConversationStatusEnum"
+      required:
+        - uniqueId
+        - contactId
+        - initiatedBy
+        - organizationId
+        - messages
+        - status
+        - createdAt
+
     ContactSchema:
       type: object
       properties:
@@ -3198,6 +4853,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ContactListSchema"
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationWithoutContactSchema"
         status:
           $ref: "#/components/schemas/ContactStatusEnum"
       required:
@@ -3208,6 +4867,7 @@ components:
         - createdAt
         - lists
         - status
+        - tags
 
     NewContactSchema:
       type: object
@@ -3297,12 +4957,12 @@ components:
     TagSchema:
       type: object
       properties:
-        name:
+        label:
           type: string
         uniqueId:
           type: string
       required:
-        - name
+        - label
         - uniqueId
 
     ContactListSchema:
@@ -3472,6 +5132,8 @@ components:
             $ref: "#/components/schemas/TagSchema"
         templateComponentParameters:
           type: object
+        stats:
+          $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
       required:
         - uniqueId
         - name
@@ -3498,6 +5160,9 @@ components:
           type: string
         isLinkTrackingEnabled:
           type: boolean
+        scheduledAt:
+          type: string
+          format: date-time
         tags:
           type: array
           items:
@@ -3535,17 +5200,44 @@ components:
           type: string
         templateComponentParameters:
           type: object
+        scheduledAt:
+          type: string
+          format: date-time
       required:
         - name
         - listIds
         - enableLinkTracking
         - tags
 
+    ContactWithoutConversationSchema:
+      type: object
+      properties:
+        uniqueId:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        attributes:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/ContactStatusEnum"
+      required:
+        - uniqueId
+        - name
+        - phone
+        - attributes
+        - createdAt
+        - status
+
     ConversationSchema:
       type: object
       properties:
         contact:
-          $ref: "#/components/schemas/ContactSchema"
+          $ref: "#/components/schemas/ContactWithoutConversationSchema"
         uniqueId:
           type: string
         contactId:
@@ -3698,7 +5390,7 @@ components:
       required:
         - message
 
-    NotFoundErrorResponseSchema:
+    ErrorSchema:
       type: object
       properties:
         message:
@@ -3958,6 +5650,12 @@ components:
           type: integer
         conversationInitiated:
           type: integer
+        responseRate:
+          type: integer
+        openRate:
+          type: integer
+        engagementRate:
+          type: integer
         totalLinkClicks:
           type: integer
         linkClicksData:
@@ -3974,6 +5672,9 @@ components:
         - totalLinkClicks
         - conversationInitiated
         - linkClicksData
+        - responseRate
+        - openRate
+        - engagementRate
 
     GetIntegrationResponseSchema:
       type: object
@@ -4255,6 +5956,8 @@ components:
           format: date-time
         read:
           type: boolean
+        organizationId:
+          type: string
       required:
         - uniqueId
         - title
@@ -4262,6 +5965,7 @@ components:
         - type
         - createdAt
         - read
+        - organiztionId
 
     GetUserNotificationsResponseSchema:
       type: object
@@ -4458,3 +6162,100 @@ components:
           $ref: "#/components/schemas/FullAiConfiguration"
       required:
         - aiConfiguration
+
+    SegmentationRecommendation:
+      type: object
+      properties:
+        lists:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactListSchema"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/TagSchema"
+      required:
+        - lists
+        - tags
+
+    GetSegmentationRecommendationsResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SegmentationRecommendation"
+      required:
+        - recommendations
+
+    GetResponseSuggestionsResponse:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            type: string
+      required:
+        - suggestions
+
+    GetOrganizationInviteBySlugResponseSchema:
+      type: object
+      properties:
+        invite:
+          $ref: "#/components/schemas/OrganizationMemberInviteSchema"
+      required:
+        - invite
+
+    AcceptOrganizationInviteResponseSchema:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+
+    NotFoundErrorResponseSchema:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    InternalServerErrorResponseSchema:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    RateLimitErrorResponseSchema:
+      type: object
+      properties:
+        message:
+          type: string
+        remaining:
+          type: integer
+        reset:
+          type: integer
+      required:
+        - message
+        - remaining
+        - reset
+
+    BadRequestErrorResponseSchema:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    UnauthorizedErrorResponseSchema:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
