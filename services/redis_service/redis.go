@@ -27,28 +27,12 @@ func NewRedisClient(
 ) *RedisClient {
 	fmt.Println("Connecting to Redis...")
 	var redisClient *redis.Client
-	if IsCloudEdition && IsProduction {
-		if password == nil {
-			fmt.Println("Redis password not provided")
-			return nil
-		}
-		opts, err := redis.ParseURL(url)
-		fmt.Println("Redis opts: ", opts)
-		if err != nil {
-			panic(err)
-		}
-		redisClient = redis.NewClient(opts)
-	} else {
-		redisClient = redis.NewClient(&redis.Options{
-			Addr: url,
-			OnConnect: func(ctx context.Context, cn *redis.Conn) error {
-				fmt.Println("Connected to Redis successfully!!!")
-				return nil
-			},
-		})
+	opts, err := redis.ParseURL(url)
+	if err != nil {
+		fmt.Println("Error parsing Redis URL: ", err)
 	}
-
-	_, err := redisClient.Ping(context.Background()).Result()
+	redisClient = redis.NewClient(opts)
+	_, err = redisClient.Ping(context.Background()).Result()
 	if err != nil {
 		fmt.Println("Error connecting to Redis: ", err)
 		return nil
