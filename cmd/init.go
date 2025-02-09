@@ -57,6 +57,7 @@ func initFlags() {
 	f.Bool("yes", false, "assume 'yes' to prompts during --install/upgrade")
 	f.Bool("server", false, "starts the API server")
 	f.Bool("cm", false, "starts the campaign manager")
+	f.Bool("enterprise", false, "starts the enterprise edition / cloud edition")
 
 	// ! TODO: implement and enable the below flags
 	// f.Bool("upgrade", false, "upgrade database to the current version")

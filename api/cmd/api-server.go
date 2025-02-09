@@ -29,7 +29,7 @@ func InitHTTPServer(app *interfaces.App) *echo.Echo {
 
 	isFrontendHostedSeparately := app.Koa.Bool("app.is_frontend_separately_hosted")
 
-	if !isFrontendHostedSeparately && app.Constants.IsProduction {
+	if !isFrontendHostedSeparately && app.Constants.IsProduction && app.Constants.IsCommunityEdition {
 		// we want to mount the next.js output to "/" , i.e, / -> "index.html" , /about -> "about.html"
 		fileServer := app.Fs.FileServer()
 		server.GET("/*", echo.WrapHandler(fileServer))

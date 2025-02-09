@@ -3,8 +3,6 @@ package database
 import (
 	"database/sql"
 
-	_ "ariga.io/atlas-go-sdk/atlasexec"
-	_ "ariga.io/atlas-provider-gorm/gormschema"
 	_ "github.com/go-jet/jet/v2"
 	_ "github.com/lib/pq"
 )
