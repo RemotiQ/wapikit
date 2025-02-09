@@ -1,0 +1,32 @@
+name: Trigger Enterprise Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-and-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Commit Contains [deploy]
+        id: check_commit
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          echo "Commit Message: $COMMIT_MSG"
+          if [[ "$COMMIT_MSG" == *"[deploy]"* ]]; then
+            echo "Triggering deployment..."
+            echo "should_trigger=true" >> $GITHUB_ENV
+          else
+            echo "No [deploy] tag found. Skipping trigger."
+            echo "should_trigger=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger Workflow in wapikit-enterprise
+        if: env.should_trigger == 'true'
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: your-org/wapikit-enterprise
+          event-type: deploy-enterprise
+          client-payload: '{"commit_message": "${{ github.event.head_commit.message }}"}'

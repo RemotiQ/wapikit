@@ -28,7 +28,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={clsx(inter.className, '!font-sans antialiased')}>
 				<NextTopLoader />
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
 					<ApiQueryClientProvider>
 						<Toaster />
 						<AuthProvisioner>
