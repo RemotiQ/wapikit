@@ -40,6 +40,27 @@ var (
 	isDebugModeEnabled bool
 )
 
+func loadEnvVariables() {
+	// load environment variables, configs can also be loaded using the environment variables, using prefix WAPIKIT_
+	// for example, WAPIKIT_redis__url is equivalent of redis.url as in config.toml
+	if err := koa.Load(env.Provider("WAPIKIT_", ".", func(s string) string {
+		return strings.Replace(strings.ToLower(
+			strings.TrimPrefix(s, "WAPIKIT_")), "__", ".", -1)
+	}), nil); err != nil {
+		logger.Error("error loading config from env: %v", err, nil)
+	}
+}
+
+func generateNewConfigFile() {
+	path := koa.Strings("config")[0]
+	if err := newConfigFile(path); err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	logger.Debug("generated %s. Edit and run --install", path, nil)
+	os.Exit(0)
+}
+
 func init() {
 	initFlags()
 
@@ -54,43 +75,26 @@ func init() {
 		}))
 	}
 
-	// Generate new config.
-	if koa.Bool("new-config") {
-		path := koa.Strings("config")[0]
-		if err := newConfigFile(path); err != nil {
-			logger.Error(err.Error())
-			os.Exit(1)
+	if koa.Bool("enterprise") {
+		logger.Info("Starting the enterprise edition......")
+		loadEnvVariables()
+		loadConfigFiles(koa.Strings("config"), koa)
+	} else {
+		fs = initFS(appDir, "")
+		loadConfigFiles(koa.Strings("config"), koa)
+		loadEnvVariables()
+
+		// Generate new config.
+		if koa.Bool("new-config") {
+			generateNewConfigFile()
 		}
-		logger.Debug("generated %s. Edit and run --install", path, nil)
-		os.Exit(0)
+
+		if koa.Bool("install") {
+			logger.Info("Installing the application")
+			installApp(database.GetDbInstance(koa.String("database.url")), fs, !koa.Bool("yes"), koa.Bool("idempotent"))
+			os.Exit(0)
+		}
 	}
-
-	// ! TODO: find a fix because this is not going to work in the single binary mode
-	fs = initFS(appDir, "")
-	loadConfigFiles(koa.Strings("config"), koa)
-
-	// load environment variables, configs can also be loaded using the environment variables, using prefix WAPIKIT_
-	// for example, WAPIKIT_redis__url is equivalent of redis.url as in config.toml
-	if err := koa.Load(env.Provider("WAPIKIT_", ".", func(s string) string {
-		return strings.Replace(strings.ToLower(
-			strings.TrimPrefix(s, "WAPIKIT_")), "__", ".", -1)
-	}), nil); err != nil {
-		logger.Error("error loading config from env: %v", err, nil)
-	}
-
-	if koa.Bool("install") {
-		logger.Info("Installing the application")
-		installApp(database.GetDbInstance(koa.String("database.url")), fs, !koa.Bool("yes"), koa.Bool("idempotent"))
-		os.Exit(0)
-	}
-
-	if koa.Bool("upgrade") {
-		logger.Info("Upgrading the application")
-		// ! should not upgrade without asking for thr permission, because database migration can be destructive
-		// ! TODO: upgrade handler
-	}
-
-	// ** NOTE: if no flag is provided, then let the app move to the main function and start the server
 }
 
 func main() {

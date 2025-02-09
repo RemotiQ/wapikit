@@ -21,6 +21,7 @@ func MountServices(app *interfaces.App) {
 		db,
 		koa.String("ai.api_key"),
 		api_types.Gpt4o,
+		koa.String("ai.azure_endpoint"),
 	)
 
 	app.NotificationService = &notification_service.NotificationService{

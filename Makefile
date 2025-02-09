@@ -112,17 +112,6 @@ $(BIN_MANAGED): $(shell find . -type f -name "*.go") go.mod go.sum
 .PHONY: build-backend
 build-backend: $(BIN)
 
-.PHONY: build-cloud-edition-backend
-build-cloud-edition-backend: $(BIN_MANAGED)
-
-.PHONY: build-cloud-edition-frontend
-build-cloud-edition-frontend: $(FRONTEND_DEPS)
-	cd frontend && $(PNPM) run build:cloud
-	touch -c $(FRONTEND_BUILD_DIR)
-
-.PHONY: build-cloud-edition	
-build-cloud-edition: build-cloud-edition-backend build-cloud-edition-frontend
-
 .PHONY: dist
 dist: build-frontend $(BIN) $(STUFFBIN)
 	$(STUFFBIN) -a stuff -in $(BIN) -out ${BIN} ${STATIC}
@@ -137,26 +126,13 @@ run_frontend: frontend-codegen
 .PHONY: db-migrate
 db-migrate: check-db-url $(ATLAS)
 	$(ATLAS) migrate diff --env global --var DB_URL=$$DB_URL
-
-.PHONY: cloud-db-migrate
-cloud-db-migrate: check-db-url $(ATLAS)
-	$(ATLAS) migrate diff --env managed_cloud --var DB_URL=$$DB_URL 
-
 .PHONY: db-apply
 db-apply: check-db-url $(ATLAS)
 	$(ATLAS) migrate apply --env global --var DB_URL=$$DB_URL
 
-.PHONY: cloud-db-apply
-cloud-db-apply: check-db-url $(ATLAS)
-	$(ATLAS) migrate apply --env managed_cloud --var DB_URL=$$DB_URL
-
 .PHONY: db-gen
 db-gen: check-db-url $(JET)
 	$(JET) -dsn=$$DB_URL -path=./.db-generated && rm -rf ./.db-generated/model ./.db-generated/table ./.db-generated/enum && mv ./.db-generated/wapikit/public/** ./.db-generated && rm -rf ./.db-generated/wapikit
-
-.PHONY: cloud-db-gen
-cloud-db-gen: check-db-url $(JET)
-	$(JET) -dsn=$$DB_URL -path=./.enterprise/.db-generated && rm -rf ./.enterprise/.db-generated/model ./.enterprise/.db-generated/table ./.enterprise/.db-generated/enum && mv ./.enterprise/.db-generated/wapikit/public/** ./.enterprise/.db-generated && rm -rf ./.enterprise/.db-generated/wapikit
 
 .PHONY: db-init
 db-init: db-apply
@@ -174,3 +150,19 @@ lint: $(JET) $(GOLANGCI_LINT) $(PNPM)
 api-doc: $(PNPM)
 	pnpm dlx @mintlify/scraping@latest openapi-file ./spec.openapi.yaml -o docs.wapikit.com/api-reference
 
+# ENTERPRISE BUILD
+.PHONY: build-enterprise-backend
+build-enterprise-backend: 
+	make -C .enterprise build-backend
+
+.PHONY: build-enterprise-frontend
+build-enterprise-frontend: 
+	make -C .enterprise/ build-frontend
+
+.PHONY: build-enterprise	
+build-enterprise:
+	make -C .enterprise/ build-frontend
+
+.PHONY: deploy-enterprise
+deploy-enterprise:
+	make -C .enterprise/ deploy

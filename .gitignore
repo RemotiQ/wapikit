@@ -52,3 +52,4 @@ dist/*
 
 config.toml
 config-dev.toml
+prod.config.toml
