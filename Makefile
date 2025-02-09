@@ -161,8 +161,12 @@ build-enterprise-frontend:
 
 .PHONY: build-enterprise	
 build-enterprise:
-	make -C .enterprise/ build-frontend
+	make -C .enterprise/ build
 
 .PHONY: deploy-enterprise
 deploy-enterprise:
 	make -C .enterprise/ deploy
+
+.PHONY: db-apply-enterprise
+db-apply-enterprise:
+	$(ATLAS) migrate apply --env managed_cloud --var DB_URL=$$DB_URL

@@ -150,7 +150,7 @@ enum "AiChatMessageVoteEnum" {
 
 enum "AiModelEnum" {
   schema = schema.public
-  values = ["Mistral", "Gpt4o", "Gemini1.5Pro", "GPT4Mini", "Gpt3.5Turbo", "Claude3.5"]
+  values = ["Mistral", "Gpt4o", "Gemini1.5Pro", "Gpt4oMini", "Gpt4", "Claude3.5", "GptO1", "GptO3Mini"]
 }
 
 enum "AiChatMessageRoleEnum" {

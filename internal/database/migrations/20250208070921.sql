@@ -9,7 +9,7 @@ CREATE TYPE "public"."OauthProviderEnum" AS ENUM ('Google');
 -- Create enum type "ConversationAssignmentStatus"
 CREATE TYPE "public"."ConversationAssignmentStatus" AS ENUM ('Assigned', 'Unassigned');
 -- Create enum type "AiModelEnum"
-CREATE TYPE "public"."AiModelEnum" AS ENUM ('Mistral', 'Gpt4o', 'Gemini1.5Pro', 'GPT4Mini', 'Gpt3.5Turbo', 'Claude3.5');
+CREATE TYPE "public"."AiModelEnum" AS ENUM ('Mistral', 'Gpt4o', 'Gemini1.5Pro', 'Gpt4oMini', 'Gpt4', 'Claude3.5', 'GptO1', 'GptO3Mini');
 -- Create enum type "AiChatMessageVoteEnum"
 CREATE TYPE "public"."AiChatMessageVoteEnum" AS ENUM ('Upvote', 'Downvote');
 -- Create enum type "AiChatVisibilityEnum"

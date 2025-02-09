@@ -4,6 +4,8 @@
 package main
 
 import (
+	"fmt"
+
 	ai_service "github.com/wapikit/wapikit-enterprise/services/ai"
 	"github.com/wapikit/wapikit/api/api_types"
 	"github.com/wapikit/wapikit/interfaces"
@@ -11,6 +13,9 @@ import (
 )
 
 func MountServices(app *interfaces.App) {
+
+	fmt.Println("Mounting services")
+
 	logger := app.Logger
 	redis := app.Redis
 	db := app.Db

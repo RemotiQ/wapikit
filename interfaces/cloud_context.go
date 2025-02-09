@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"log/slog"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/knadh/koanf/v2"
 	"github.com/knadh/stuffbin"
 	"github.com/labstack/echo/v4"
@@ -22,6 +23,10 @@ import (
 	"github.com/wapikit/wapikit/services/event_service"
 	"github.com/wapikit/wapikit/services/notification_service"
 	cache_service "github.com/wapikit/wapikit/services/redis_service"
+
+	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/wapikit/wapikit-enterprise/.db-generated/model"
+	"github.com/wapikit/wapikit-enterprise/.db-generated/table"
 )
 
 type App struct {
@@ -96,8 +101,112 @@ type ContextWithoutSession struct {
 	UserCountry  string `json:"user_country,omitempty"`
 }
 
-func (ctx *ContextWithoutSession) GetSessionDetailsIfAuthenticated() (ContextSession, bool) {
-	return ContextSession{}, false
+func (ctx *ContextWithoutSession) GetSessionDetailsIfAuthenticated(jwtSecret string, db *sql.DB) (*ContextSession, bool) {
+	authToken := ctx.Request().Header.Get("x-access-token")
+
+	if authToken == "" {
+		return nil, false
+	}
+
+	parsedPayload, err := jwt.Parse(authToken, func(token *jwt.Token) (interface{}, error) {
+		if jwtSecret == "" {
+			return "", nil
+		}
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return "", nil
+		}
+		return []byte(jwtSecret), nil
+	})
+
+	if err != nil {
+		return nil, false
+	}
+
+	if parsedPayload.Valid {
+		castedPayload := parsedPayload.Claims.(jwt.MapClaims)
+		type UserWithOrgDetails struct {
+			model.User
+			Organizations []struct {
+				model.Organization
+				WhatsappBusinessAccount *model.WhatsappBusinessAccount
+				MemberDetails           struct {
+					model.OrganizationMember
+					AssignedRoles []struct {
+						model.RoleAssignment
+						role model.OrganizationRole
+					}
+				}
+			}
+		}
+
+		email := castedPayload["email"].(string)
+		uniqueId := castedPayload["unique_id"].(string)
+		organizationId := castedPayload["organization_id"].(string)
+
+		if email == "" || uniqueId == "" {
+			return nil, false
+		}
+
+		user := UserWithOrgDetails{}
+		userQuery := SELECT(
+			table.User.AllColumns,
+			table.OrganizationMember.AllColumns,
+			table.Organization.AllColumns,
+			table.WhatsappBusinessAccount.AllColumns,
+			table.RoleAssignment.AllColumns,
+			table.OrganizationRole.AllColumns,
+		).FROM(
+			table.User.
+				LEFT_JOIN(table.OrganizationMember, table.User.UniqueId.EQ(table.OrganizationMember.UserId)).
+				LEFT_JOIN(table.Organization, table.Organization.UniqueId.EQ(table.OrganizationMember.OrganizationId)).
+				LEFT_JOIN(table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Organization.UniqueId)).
+				LEFT_JOIN(table.RoleAssignment, table.OrganizationMember.UniqueId.EQ(table.RoleAssignment.OrganizationMemberId)).
+				LEFT_JOIN(table.OrganizationRole, table.RoleAssignment.OrganizationRoleId.EQ(table.OrganizationRole.UniqueId)),
+		).WHERE(
+			table.User.Email.EQ(String(email)),
+		)
+
+		userQuery.QueryContext(ctx.Request().Context(), db, &user)
+
+		if user.User.UniqueId.String() == "" || user.User.Status != model.UserAccountStatusEnum_Active {
+			return nil, false
+		}
+
+		if organizationId == "" {
+			session := ContextSession{
+				Token: authToken,
+				User: ContextUser{
+					UniqueId: user.User.UniqueId.String(),
+					Username: user.User.Username,
+					Email:    user.User.Email,
+					Name:     user.User.Name,
+				},
+			}
+
+			return &session, true
+		}
+
+		for _, org := range user.Organizations {
+			if org.Organization.UniqueId.String() == organizationId {
+				session := ContextSession{
+					Token: authToken,
+					User: ContextUser{
+						UniqueId:       user.User.UniqueId.String(),
+						Username:       user.User.Username,
+						Email:          user.User.Email,
+						Role:           api_types.UserPermissionLevelEnum(org.MemberDetails.AccessLevel),
+						Name:           user.User.Name,
+						OrganizationId: org.Organization.UniqueId.String(),
+					},
+				}
+				return &session, true
+			}
+		}
+
+		return nil, false
+	}
+
+	return nil, false
 }
 
 func BuildContextWithoutSession(ctx echo.Context, app App, userIp, userCountry string) ContextWithoutSession {

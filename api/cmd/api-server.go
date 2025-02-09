@@ -93,7 +93,11 @@ func addMiddlewares(e *echo.Echo, app *interfaces.App) {
 
 	// compression middleware
 	e.Use(middleware.Gzip())
-	e.Use(middleware.Recover())
+
+	if constants.IsProduction {
+		e.Use(middleware.Recover())
+	}
+
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     origins,
 		AllowCredentials: true,

@@ -198,7 +198,7 @@ func acceptOrganizationInvite(context interfaces.ContextWithSession) error {
 	}
 
 	_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
-		MODELS(aiChatsToCreate).
+		MODEL(aiChatsToCreate).
 		ExecContext(context.Request().Context(), context.App.Db)
 
 	if err != nil {
@@ -525,7 +525,7 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 		}
 
 		_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
-			MODELS(aiChatsToCreate).
+			MODEL(aiChatsToCreate).
 			ExecContext(context.Request().Context(), context.App.Db)
 
 		if err != nil {

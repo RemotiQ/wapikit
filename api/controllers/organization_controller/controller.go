@@ -401,13 +401,14 @@ func createNewOrganization(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	// 2. Insert Organization Member
-	err = table.OrganizationMember.INSERT(table.OrganizationMember.MutableColumns).MODEL(model.OrganizationMember{
-		AccessLevel:    model.UserPermissionLevelEnum_Owner,
-		OrganizationId: newOrg.UniqueId,
-		UserId:         userUuid,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
-	}).RETURNING(table.OrganizationMember.AllColumns).QueryContext(context.Request().Context(), tx, &member)
+	err = table.OrganizationMember.INSERT(table.OrganizationMember.MutableColumns).
+		MODEL(model.OrganizationMember{
+			AccessLevel:    model.UserPermissionLevelEnum_Owner,
+			OrganizationId: newOrg.UniqueId,
+			UserId:         userUuid,
+			CreatedAt:      time.Now(),
+			UpdatedAt:      time.Now(),
+		}).RETURNING(table.OrganizationMember.AllColumns).QueryContext(context.Request().Context(), tx, &member)
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -460,8 +461,8 @@ func createNewOrganization(context interfaces.ContextWithSession) error {
 	}
 
 	_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
-		MODELS(aiChatsToCreate).
-		ExecContext(context.Request().Context(), context.App.Db)
+		MODEL(aiChatsToCreate).
+		ExecContext(context.Request().Context(), tx)
 
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
@@ -818,7 +819,7 @@ func updateOrganizationById(context interfaces.ContextWithSession) error {
 
 		if len(aiChatsToCreate) > 0 {
 			_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
-				MODELS(aiChatsToCreate).
+				MODEL(aiChatsToCreate).
 				ExecContext(context.Request().Context(), context.App.Db)
 
 			if err != nil {
@@ -1736,7 +1737,7 @@ func acceptOrganizationInvite(context interfaces.ContextWithSession) error {
 	}
 
 	_, err = table.AiChat.INSERT(table.AiChat.AllColumns).
-		MODELS(aiChatsToCreate).
+		MODEL(aiChatsToCreate).
 		ExecContext(context.Request().Context(), context.App.Db)
 
 	if err != nil {
