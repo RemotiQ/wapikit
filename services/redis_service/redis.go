@@ -2,7 +2,6 @@ package cache_service
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"strings"
 	"time"
@@ -33,17 +32,12 @@ func NewRedisClient(
 			fmt.Println("Redis password not provided")
 			return nil
 		}
-		redisClient = redis.NewClient(&redis.Options{
-			Addr:     url,
-			Password: *password,
-			TLSConfig: &tls.Config{
-				MinVersion: tls.VersionTLS12,
-			},
-			OnConnect: func(ctx context.Context, cn *redis.Conn) error {
-				fmt.Println("Connected to Redis successfully!!!")
-				return nil
-			},
-		})
+		opts, err := redis.ParseURL(url)
+		fmt.Println("Redis opts: ", opts)
+		if err != nil {
+			panic(err)
+		}
+		redisClient = redis.NewClient(opts)
 	} else {
 		redisClient = redis.NewClient(&redis.Options{
 			Addr: url,
