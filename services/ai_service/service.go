@@ -155,7 +155,7 @@ func (ai *AiService) DetectIntent(query string, organizationId uuid.UUID) (*Dete
 		userPrompt,
 	}
 
-	intentResponse, err := ai.QueryAiModel(context.Background(), api_types.Gpt4, inputPrompt)
+	intentResponse, err := ai.QueryAiModel(context.Background(), ai.DefaultAiModel, inputPrompt)
 
 	fmt.Println("Intent response", intentResponse.Content)
 
@@ -171,7 +171,7 @@ func (ai *AiService) DetectIntent(query string, organizationId uuid.UUID) (*Dete
 	}
 
 	// * log the API call
-	ai.LogApiCall(organizationId, ai.Db, query, intentResponse.Content, model.AiModelEnum(api_types.Gpt35Turbo), intentResponse.InputTokenUsed, intentResponse.OutputTokenUsed)
+	ai.LogApiCall(organizationId, ai.Db, query, intentResponse.Content, model.AiModelEnum(ai.DefaultAiModel), intentResponse.InputTokenUsed, intentResponse.OutputTokenUsed)
 	return &detectIntentResponse, nil
 }
 
@@ -207,7 +207,7 @@ func (ai *AiService) GetResponseSuggestions(ctx context.Context, messages []mode
 
 	inputPrompt = append(inputPrompt, userPrompt)
 
-	aiResponse, err := ai.QueryAiModel(ctx, api_types.Gpt35Turbo, inputPrompt)
+	aiResponse, err := ai.QueryAiModel(ctx, ai.DefaultAiModel, inputPrompt)
 
 	if err != nil {
 		return []string{}, err
