@@ -124,3 +124,18 @@ export const OnboardingSteps: {
 ] as const
 
 export const pathAtWhichSidebarShouldBeCollapsedByDefault = ['/conversations']
+
+export const APP_BASE_DOMAIN = 'app.wapikit.com'
+
+export const APP_URL = `https://${APP_BASE_DOMAIN}`
+
+export const ProductDescription =
+	'WapiKit is an AI-powered WhatsApp marketing & customer engagement platform that automates campaigns, enhances conversations, and drives business growth effortlessly with automation.'
+
+export const MetaTitle = 'Wapikit - AI Automated WhatsApp Marketing & Customer Engagement Platform'
+
+export const META_CATEGORY = ['Whatsapp Marketing', '']
+
+export const META_KEYWORDS = ['Whatsapp Marketing', '']
+
+export const META_CLASSIFICATION = ['Whatsapp Marketing']

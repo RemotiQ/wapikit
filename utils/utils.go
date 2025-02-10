@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	. "github.com/go-jet/jet/v2/postgres"
@@ -19,6 +20,7 @@ import (
 	"github.com/nyaruka/phonenumbers"
 	binder "github.com/oapi-codegen/runtime"
 	"github.com/oklog/ulid"
+	"github.com/oschwald/maxminddb-golang"
 )
 
 func GenerateUniqueId() string {
@@ -139,23 +141,70 @@ func GetUserCountryFromRequest(r *http.Request) string {
 	// Example: Using a fictional `GetCountryFromIP` function that uses a GeoIP database
 	country, err := GetCountryFromIP(userIP)
 	if err != nil {
-		return "Unknown" // Return "Unknown" if the country cannot be determined
+		return "Local" // Return "Unknown" if the country cannot be determined
 	}
 	return country
 }
 
-// GetCountryFromIP is a placeholder for a GeoIP lookup function.
-// Replace this with an actual GeoIP database query (e.g., MaxMind, IP2Location).
+var (
+	geoipDB     *maxminddb.Reader
+	geoipDBOnce sync.Once
+	geoipErr    error
+)
+
+// GetCountryFromIP returns the country name for a given IP address
+// using MaxMind GeoLite2 database. Handles local/private IPs specially.
 func GetCountryFromIP(ip string) (string, error) {
-	// Here you can integrate an external library or API for IP to country mapping
-	// Example: Using MaxMind GeoIP2 reader
-	// Replace the below logic with actual GeoIP implementation
-	if ip == "127.0.0.1" || strings.HasPrefix(ip, "192.168.") {
-		return "Local", nil // Local addresses are not mapped to a country
+	// Check for local/private IPs first
+	if isLocalIP(ip) {
+		return "Local", nil
 	}
 
-	// Simulated response for demonstration purposes
-	return "United States", nil
+	// Initialize GeoIP database once
+	geoipDBOnce.Do(func() {
+		geoipDB, geoipErr = maxminddb.Open("GeoLite2-Country.mmdb")
+	})
+
+	if geoipErr != nil {
+		return "", fmt.Errorf("geoip database error: %w", geoipErr)
+	}
+
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return "", fmt.Errorf("invalid IP address format: %s", ip)
+	}
+
+	var record struct {
+		Country struct {
+			ISOCode string            `maxminddb:"iso_code"`
+			Names   map[string]string `maxminddb:"names"`
+		} `maxminddb:"country"`
+	}
+
+	err := geoipDB.Lookup(parsedIP, &record)
+	if err != nil {
+		return "", fmt.Errorf("geoip lookup failed: %w", err)
+	}
+
+	if record.Country.ISOCode == "" {
+		return "", fmt.Errorf("no country found for IP: %s", ip)
+	}
+
+	countryName, ok := record.Country.Names["en"]
+	if !ok || countryName == "" {
+		return "", fmt.Errorf("english country name not found for IP: %s", ip)
+	}
+
+	return countryName, nil
+}
+
+// isLocalIP checks if an IP is private or loopback
+func isLocalIP(ipStr string) bool {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return false
+	}
+	return ip.IsLoopback() || ip.IsPrivate()
 }
 
 func GetCurrentTimeAndDateInUTCString() string {

@@ -72,6 +72,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/onsi/gomega v1.36.2 // indirect
+	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.7 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

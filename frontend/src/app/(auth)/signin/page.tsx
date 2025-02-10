@@ -8,6 +8,8 @@ import Image from 'next/image'
 import { useAuthState } from '~/hooks/use-auth-state'
 import { redirect } from 'next/navigation'
 import LoadingSpinner from '~/components/loader'
+import { createHref } from '~/reusable-functions'
+import { WEBSITE_URL } from '~/constants'
 
 export default function AuthenticationPage() {
 	const { authState } = useAuthState()
@@ -34,12 +36,12 @@ export default function AuthenticationPage() {
 
 					<div className="relative z-20 mt-auto text-left text-2xl font-bold leading-relaxed  md:text-3xl">
 						<span className="text-4xl font-semibold">
-							Manage your WhatsApp Business Comms.
+							Do AI Automated WhatsApp Marketing
 						</span>{' '}
 						<br />
-						<span className="text-lg italic">AI-Driven.</span>
-						<span className="text-lg italic"> Data Privacy.</span>
-						<span className="text-lg italic"> 100% Control.</span>
+						<span className="text-lg italic">Smarter.</span>
+						<span className="text-lg italic">Faster.</span>
+						<span className="text-lg italic">Better.</span>
 					</div>
 
 					<div className="relative z-20 mt-auto">
@@ -69,14 +71,30 @@ export default function AuthenticationPage() {
 						<p className="text-left text-sm text-muted-foreground">
 							By clicking continue, you agree to our{' '}
 							<Link
-								href="/terms-of-service"
+								href={createHref({
+									href: '/terms-and-conditions',
+									domain: WEBSITE_URL,
+									utmParams: {
+										utm_medium: 'auth',
+										utm_content: 'terms-and-conditions',
+										utm_source: 'application-login-page'
+									}
+								})}
 								className="underline underline-offset-4 hover:text-primary"
 							>
-								Terms of Service
+								Terms & Conditions
 							</Link>{' '}
 							and{' '}
 							<Link
-								href="/privacy-policy"
+								href={createHref({
+									href: '/privacy-policy',
+									domain: WEBSITE_URL,
+									utmParams: {
+										utm_medium: 'auth',
+										utm_content: 'privacy-policy',
+										utm_source: 'application-login-page'
+									}
+								})}
 								className="underline underline-offset-4 hover:text-primary"
 							>
 								Privacy Policy

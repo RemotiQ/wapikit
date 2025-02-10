@@ -15,6 +15,7 @@ interface ModalProps {
 	onClose: () => void
 	children?: React.ReactNode
 	fullWidth?: boolean
+	className?: string
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -23,7 +24,8 @@ export const Modal: React.FC<ModalProps> = ({
 	isOpen,
 	onClose,
 	children,
-	isDismissible = true
+	isDismissible = true,
+	className
 }) => {
 	const onChange = (open: boolean) => {
 		if (!open) {
@@ -39,6 +41,7 @@ export const Modal: React.FC<ModalProps> = ({
 						e.preventDefault()
 					}
 				}}
+				className={className}
 			>
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>

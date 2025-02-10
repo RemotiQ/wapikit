@@ -49,3 +49,12 @@ export type TipCardPropType = {
 	description: string
 	href: string
 }
+
+export const UtmTags = [
+	'utm_source',
+	'utm_medium',
+	'utm_campaign',
+	'utm_term',
+	'utm_content',
+	'ref'
+] as const
