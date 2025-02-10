@@ -52,7 +52,6 @@ services:
     environment:
       - WAPIKIT_environment=production
       - WAPIKIT_app__address=0.0.0.0:8000
-      - WAPIKIT_app__cors_allowed_origins = ["http://localhost:8000"]
       - WAPIKIT_app__encryption_key=
       - WAPIKIT_app__default_user_email=
       - WAPIKIT_app__default_user_password=

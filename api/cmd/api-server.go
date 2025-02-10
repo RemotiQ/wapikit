@@ -1,11 +1,8 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -64,27 +61,6 @@ func InitHTTPServer(app *interfaces.App) *echo.Echo {
 
 func addMiddlewares(e *echo.Echo, app *interfaces.App) {
 	constants := app.Constants
-	logger := app.Logger
-	koa := app.Koa
-
-	var origins []string
-
-	corsAllowedOrigins := koa.String("app.cors_allowed_origins")
-	if err := json.Unmarshal([]byte(corsAllowedOrigins), &origins); err != nil {
-		// If unmarshalling fails, try to parse it as a TOML array
-		if strings.HasPrefix(corsAllowedOrigins, "[") && strings.HasSuffix(corsAllowedOrigins, "]") {
-			corsAllowedOrigins = strings.TrimPrefix(corsAllowedOrigins, "[")
-			corsAllowedOrigins = strings.TrimSuffix(corsAllowedOrigins, "]")
-			origins = strings.Split(corsAllowedOrigins, " ")
-			for i, origin := range origins {
-				logger.Debug("allowing origin", origin, nil)
-				origins[i] = strings.TrimSpace(strings.Trim(origins[i], `"`))
-			}
-		} else {
-			fmt.Println("Error parsing CORS allowed origins:", err)
-			return
-		}
-	}
 
 	// logger middleware
 	if constants.IsDebugModeEnabled {
@@ -99,7 +75,7 @@ func addMiddlewares(e *echo.Echo, app *interfaces.App) {
 	}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     origins,
+		AllowOrigins:     []string{"*"}, // because it has to be a public accessible API
 		AllowCredentials: true,
 		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderContentType, echo.HeaderOrigin, echo.HeaderCacheControl, "x-access-token"},
 		ExposeHeaders: []string{
