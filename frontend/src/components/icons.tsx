@@ -56,13 +56,17 @@ import {
 	ReloadIcon,
 	StarIcon,
 	RotateCounterClockwiseIcon,
-	CheckCircledIcon
+	CheckCircledIcon,
+	ArrowUpIcon,
+	LightningBoltIcon
 } from '@radix-ui/react-icons'
 import { Avatar } from '@radix-ui/react-avatar'
 
 export type Icon = LucideIcon
 
 export const Icons = {
+	bolt: LightningBoltIcon,
+	arrowUp: ArrowUpIcon,
 	checkCircle: CheckCircledIcon,
 	arrowClockwise: RotateCounterClockwiseIcon,
 	star: StarIcon,

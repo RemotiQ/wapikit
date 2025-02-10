@@ -13,6 +13,7 @@ import dynamic from 'next/dynamic'
 import CommandMenuProvider from '~/components/layout/command-menu-provider'
 import { clsx } from 'clsx'
 import { PricingModal } from '~/components/modal/pricing'
+import SubscriptionProvider from '~/components/layout/subscription-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -38,7 +39,7 @@ export default function RootLayout({
 									<AiChatProvider>
 										<CommandMenuProvider />
 										<PricingModal />
-										{children}
+										<SubscriptionProvider>{children}</SubscriptionProvider>
 									</AiChatProvider>
 								</SseConnectionProvider>
 							</MetaProvider>

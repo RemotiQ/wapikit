@@ -158,6 +158,10 @@ export function PricingModal() {
 
 	async function checkoutInit(planId: string) {
 		try {
+			writeProperty({
+				isPricingModalOpen: false
+			})
+
 			successNotification({
 				message: 'Please wait while we process your payment...',
 				duration: '10s'
@@ -215,7 +219,7 @@ export function PricingModal() {
 			isOpen={isPricingModalOpen}
 			className="!max-w-[75%]"
 		>
-			<div className="bg-grid-small-black/[0.2] relative flex h-full w-full flex-col items-center justify-center  gap-4">
+			<div className="relative flex h-full w-full flex-col items-center justify-center gap-4  bg-grid-small-black/[0.2]">
 				<Beam />
 				<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
 				<div className="relative z-10 flex flex-col items-center justify-center gap-2 text-center">
@@ -245,7 +249,7 @@ export function PricingModal() {
 							>
 								Pay {planDuration}{' '}
 								{planDuration === 'Yearly' && (
-									<span className="text-[10px[ ml-1.5 rounded-3xl bg-black px-1.5 py-0.5 text-white">
+									<span className="ml-1.5 rounded-3xl bg-black px-1.5 py-0.5 text-[10px] text-white">
 										Save 15%
 									</span>
 								)}

@@ -39,8 +39,7 @@ const (
 const (
 	Claude35    AiModelEnum = "Claude3.5"
 	Gemini15Pro AiModelEnum = "Gemini1.5Pro"
-	Gpt35Turbo  AiModelEnum = "Gpt3.5Turbo"
-	Gpt4Mini    AiModelEnum = "Gpt4Mini"
+	Gpt4        AiModelEnum = "Gpt4"
 	Gpt4o       AiModelEnum = "Gpt4o"
 	Gpt4oMini   AiModelEnum = "Gpt4oMini"
 	GptO1       AiModelEnum = "GptO1"

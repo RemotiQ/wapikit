@@ -14,7 +14,6 @@ import (
 // Enhanced model mapping with performance metrics
 var AiModelEnumToLlmModelConfig = map[api_types.AiModelEnum]ModelConfig{
 	api_types.Gpt4oMini:   {Name: "gpt-4o-mini", RequiresAPIKey: true},
-	api_types.Gpt35Turbo:  {Name: "gpt-3.5-turbo", RequiresAPIKey: true},
 	api_types.Gpt4o:       {Name: "gpt-4o", RequiresAPIKey: true},
 	api_types.Mistral:     {Name: "mistral", RequiresAPIKey: true},
 	api_types.Gemini15Pro: {Name: "gemini-15-pro", RequiresAPIKey: true},

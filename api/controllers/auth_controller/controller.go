@@ -7,7 +7,6 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/wapikit/wapikit/api/api_types"
 	controller "github.com/wapikit/wapikit/api/controllers"
 	"github.com/wapikit/wapikit/interfaces"
@@ -79,12 +78,6 @@ func NewAuthController() *AuthController {
 							api_types.RegenerateApiKey,
 						},
 					},
-				},
-				{
-					Path:                    "/api/auth/oauth",
-					Method:                  http.MethodPost,
-					Handler:                 interfaces.HandlerWithoutSession(handleLoginWithOAuth),
-					IsAuthorizationRequired: false,
 				},
 				{
 					Path:                    "/api/auth/switch",
@@ -232,14 +225,19 @@ func acceptOrganizationInvite(context interfaces.ContextWithSession) error {
 }
 
 func handleSignIn(context interfaces.ContextWithoutSession) error {
+
+	logger := context.App.Logger
+
 	payload := new(api_types.LoginRequestBodySchema)
 
 	if err := context.Bind(payload); err != nil {
+		logger.Error("error binding payload", err.Error(), nil)
 		return context.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	if payload.Username == "" || payload.Password == "" {
-		return context.JSON(echo.ErrBadRequest.Code, "Username / password is required")
+		logger.Error("username / password is required", "", nil)
+		return context.JSON(http.StatusBadRequest, "Username / password is required")
 	}
 
 	type UserWithOrgDetails struct {
@@ -362,10 +360,6 @@ func handleSignIn(context interfaces.ContextWithoutSession) error {
 		IsOnboardingCompleted: isOnboardingCompleted,
 		Token:                 token,
 	})
-}
-
-func handleLoginWithOAuth(context interfaces.ContextWithoutSession) error {
-	return context.JSON(http.StatusInternalServerError, "Not implemented")
 }
 
 // this handler would validate the email and send an otp to it

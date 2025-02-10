@@ -27,62 +27,72 @@ export const navItems: NavItem[] = [
 		title: 'Dashboard',
 		href: '/dashboard',
 		icon: 'dashboard',
-		label: 'Dashboard'
+		label: 'Dashboard',
+		status: 'default'
 	},
 	{
 		title: 'WapiKit AI',
 		href: '/ai',
-		icon: 'brain',
+		icon: 'sparkles',
 		label: 'WapiKit AI',
-		requiredFeatureFlag: ['isAiIntegrationEnabled']
+		requiredFeatureFlag: ['isAiIntegrationEnabled'],
+		status: 'beta'
 	},
 	{
 		title: 'Analytics',
 		href: '/analytics',
 		icon: 'analytics',
-		label: 'Analytics'
+		label: 'Analytics',
+		status: 'default'
 	},
 	{
 		title: 'Conversations',
 		href: '/conversations',
 		icon: 'message',
-		label: 'Conversations'
+		label: 'Conversations',
+		status: 'default'
 	},
 	{
 		title: 'Campaigns',
 		href: '/campaigns',
 		icon: 'rocket',
-		label: 'Campaigns'
+		label: 'Campaigns',
+		status: 'default'
 	},
 	{
 		title: 'Contacts',
 		href: '/contacts',
 		icon: 'user',
-		label: 'profile'
+		label: 'profile',
+		status: 'default'
 	},
 	{
 		title: 'Lists',
 		href: '/lists',
 		icon: 'rows',
-		label: 'employee'
+		label: 'employee',
+		status: 'default'
 	},
 	{
 		title: 'Team',
 		href: '/team',
 		icon: 'laptop',
-		label: 'Teams'
+		label: 'Teams',
+		status: 'default'
 	},
 	{
 		title: 'Settings',
 		href: '/settings',
 		icon: 'settings',
-		label: 'kanban'
+		label: 'kanban',
+		status: 'default'
 	},
 	{
 		title: 'Integrations',
 		href: '/integrations',
 		icon: 'link',
-		label: 'Integrations'
+		label: 'Integrations',
+		status: 'coming-soon'
 	}
 ]
 

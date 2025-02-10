@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -74,18 +75,32 @@ func addMiddlewares(e *echo.Echo, app *interfaces.App) {
 		e.Use(middleware.Recover())
 	}
 
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		fmt.Println("Middleware 1")
+		return func(c echo.Context) error {
+			origin := c.Request().Header.Get("Origin")
+			if origin != "" {
+				c.Response().Header().Set("Access-Control-Allow-Origin", origin)
+				c.Response().Header().Set("Vary", "Origin")
+			}
+			c.Response().Header().Set("Access-Control-Allow-Credentials", "true")
+			return next(c)
+		}
+	})
+
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"*"}, // because it has to be a public accessible API
+		AllowOrigins:     []string{"*"},
 		AllowCredentials: true,
-		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderContentType, echo.HeaderOrigin, echo.HeaderCacheControl, "x-access-token"},
+		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderContentType, echo.HeaderOrigin, echo.HeaderCacheControl, "x-access-token", "x-razorpay-signature"},
 		ExposeHeaders: []string{
 			echo.HeaderContentType,
 			"X-RateLimit-Limit",
 			"X-RateLimit-Remaining",
 			"X-RateLimit-Reset",
 		},
-		AllowMethods: []string{http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		MaxAge:       5,
+		UnsafeWildcardOriginWithAllowCredentials: true,
+		AllowMethods:                             []string{http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		MaxAge:                                   5,
 	}))
 
 }

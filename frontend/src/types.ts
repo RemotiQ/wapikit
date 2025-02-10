@@ -8,6 +8,8 @@ export interface NavItem {
 	icon?: keyof typeof Icons
 	label?: string
 	description?: string
+	status: 'coming-soon' | 'beta' | 'new' | 'default'
+	shouldBeLocked?: boolean
 	requiredFeatureFlag?: string[]
 }
 

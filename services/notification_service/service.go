@@ -130,11 +130,9 @@ type InAppNotificationParams struct {
 	OrganizationId       *string
 	CtaUrl               *string
 	IsBroadcast          bool // if broadcast, then this
-
 }
 
-func (ns *NotificationService) sendInAppNotification(params InAppNotificationParams) {
-
+func (ns *NotificationService) SendInAppNotification(params InAppNotificationParams) {
 	var orgUuid *uuid.UUID
 
 	if params.OrganizationId != nil {

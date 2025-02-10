@@ -216,11 +216,10 @@ export type AiModelEnum = (typeof AiModelEnum)[keyof typeof AiModelEnum]
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const AiModelEnum = {
-	Gpt4Mini: 'Gpt4Mini',
+	Gpt4: 'Gpt4',
 	GptO1: 'GptO1',
 	GptO3Mini: 'GptO3Mini',
 	Gpt4oMini: 'Gpt4oMini',
-	Gpt35Turbo: 'Gpt3.5Turbo',
 	Mistral: 'Mistral',
 	Gpt4o: 'Gpt4o',
 	Gemini15Pro: 'Gemini1.5Pro',

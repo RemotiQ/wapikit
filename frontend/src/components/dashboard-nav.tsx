@@ -28,6 +28,7 @@ import { Input } from './ui/input'
 import { Button } from '~/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useLayoutStore } from '~/store/layout.store'
+import { Badge } from './ui/badge'
 
 interface DashboardNavProps {
 	items: NavItem[]
@@ -245,7 +246,18 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 										<Icon className={`ml-3 size-4`} />
 
 										{isMobileNav || (!isMinimized && !isMobileNav) ? (
-											<span className="mr-2 truncate">{item.title}</span>
+											<div className="mr-2 flex flex-row gap-4 truncate">
+												{item.title}
+												{item.status === 'beta' ? (
+													<Badge variant={'highlighted'}>Beta</Badge>
+												) : item.status === 'new' ? (
+													<Badge variant={'highlighted'}>
+														New Launch
+													</Badge>
+												) : item.status === 'coming-soon' ? (
+													<Badge variant={'secondary'}>Coming Soon</Badge>
+												) : null}
+											</div>
 										) : (
 											''
 										)}

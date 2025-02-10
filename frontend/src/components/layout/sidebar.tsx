@@ -7,6 +7,9 @@ import { clsx as cn } from 'clsx'
 import { ChevronLeft } from 'lucide-react'
 import { useSidebar } from '~/hooks/use-sidebar'
 import { usePathname } from 'next/navigation'
+import { Button } from '../ui/button'
+import { useLayoutStore } from '~/store/layout.store'
+import { Icons } from '../icons'
 
 type SidebarProps = {
 	className?: string
@@ -15,6 +18,7 @@ type SidebarProps = {
 export default function Sidebar({ className }: SidebarProps) {
 	const { isMinimized, toggle } = useSidebar()
 	const [status, setStatus] = useState(false)
+	const { writeProperty, subscriptionDetails } = useLayoutStore()
 
 	const isNavbarCollapsedOnce = useRef(false)
 
@@ -73,10 +77,24 @@ export default function Sidebar({ className }: SidebarProps) {
 				)}
 				onClick={handleToggle}
 			/>
-			<div className="space-y-4 py-4">
-				<div className="px-3 py-2">
-					<div className="mt-3 space-y-1">
+			<div className="h-full space-y-4 py-4">
+				<div className="h-full px-3 py-2">
+					<div className="mt-3 flex h-full flex-col justify-between space-y-1">
 						<DashboardNav items={navItems} />
+
+						{!subscriptionDetails ? (
+							<Button
+								className="mt-2 flex w-full flex-row justify-evenly gap-2 !bg-black"
+								onClick={() => {
+									writeProperty({
+										isPricingModalOpen: true
+									})
+								}}
+							>
+								<Icons.bolt className="size-4 font-bold text-white" />
+								<span className="flex-1 text-center font-bold">Upgrade to Pro</span>
+							</Button>
+						) : null}
 					</div>
 				</div>
 			</div>

@@ -1,9 +1,6 @@
-/** @type {import('next').NextConfig} */
-
 const isCloudEdition = process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION === 'true'
 
-console.log('isCloudEdition', isCloudEdition)
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
 	env: {
 		NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION: process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION,
@@ -11,6 +8,9 @@ const nextConfig = {
 		RAZORPAY_KEY_ID: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
 	},
 	output: !isCloudEdition ? 'export' : undefined,
+	compiler: {
+		removeConsole: process.NODE_ENV === 'production'
+	},
 	images: {
 		unoptimized: true,
 		remotePatterns: [

@@ -233,36 +233,36 @@ func BuildContextWithSession(ctx echo.Context, app App, session ContextSession, 
 }
 
 func (ctx *ContextWithSession) IsAiLimitReached() bool {
-	subscriptionService := quota_service.GetQuotaServiceInstance()
-	return subscriptionService.IsAiLimitReached(ctx.SubscriptionDetails)
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
+	return quotaInstance.IsAiLimitReached(ctx.SubscriptionDetails, ctx.Session.User.OrganizationId)
 }
 
 func (ctx *ContextWithSession) IsContactCreationLimitReached() bool {
-	quotaInstance := quota_service.GetQuotaServiceInstance()
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
 	return quotaInstance.IsContactCreationLimitReached(ctx.Request().Context(), ctx.Session.User.OrganizationId, ctx.App.Db, ctx.SubscriptionDetails)
 }
 
 func (ctx *ContextWithSession) IsOrganizationMemberLimitReached() bool {
-	quotaInstance := quota_service.GetQuotaServiceInstance()
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
 	return quotaInstance.IsOrganizationMemberLimitReached(ctx.Request().Context(), ctx.Session.User.OrganizationId, ctx.App.Db, ctx.SubscriptionDetails)
 }
 
 func (ctx *ContextWithSession) IsActiveCampaignLimitReached() bool {
-	quotaInstance := quota_service.GetQuotaServiceInstance()
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
 	return quotaInstance.IsActiveCampaignLimitReached(ctx.Request().Context(), ctx.Session.User.OrganizationId, ctx.App.Db, ctx.SubscriptionDetails)
 }
 
 func (ctx *ContextWithSession) CanUseLinkTracking() bool {
-	quotaInstance := quota_service.GetQuotaServiceInstance()
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
 	return quotaInstance.CanUseLinkTracking()
 }
 
 func (ctx *ContextWithSession) CanAccessApi() bool {
-	quotaInstance := quota_service.GetQuotaServiceInstance()
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
 	return quotaInstance.CanAccessApi()
 }
 
 func (ctx *ContextWithSession) CanUseLiveTeamInbox() bool {
-	quotaInstance := quota_service.GetQuotaServiceInstance()
+	quotaInstance := quota_service.GetQuotaServiceInstance(ctx.App.Db)
 	return quotaInstance.CanUseLiveTeamInbox()
 }

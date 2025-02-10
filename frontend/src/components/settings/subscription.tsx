@@ -1,34 +1,40 @@
 'use client'
 
 import { useState } from 'react'
-import { successNotification, errorNotification } from '~/reusable-functions'
-import { Button } from '~/components/ui/button'
 import {
-	useCancelSubscription,
-	useGetSubscriptionDetails,
-	useRefundPayment
-} from '~/cloud_generated'
-import { useAuthState } from '~/hooks/use-auth-state'
+	successNotification,
+	errorNotification,
+	materialConfirm,
+	createHref
+} from '~/reusable-functions'
+import { Button } from '~/components/ui/button'
+import { useCancelSubscription } from '~/cloud_generated'
 import { Card, CardTitle, CardContent } from '~/components/ui/card'
 import { Icons } from '../icons'
 import dayjs from 'dayjs'
+import { useLayoutStore } from '~/store/layout.store'
+import Link from 'next/link'
+import { WEBSITE_URL } from '~/constants'
 
 const SubscriptionSettings = () => {
-	const { authState } = useAuthState()
 	const [isBusy, setIsBusy] = useState(false)
-
-	const { data: subscriptionDetails } = useGetSubscriptionDetails({
-		query: {
-			enabled: !!authState.isAuthenticated
-		}
-	})
+	const { writeProperty, subscriptionDetails } = useLayoutStore()
 
 	const cancelSubscriptionMutation = useCancelSubscription()
-	const initRefundMutation = useRefundPayment()
 
 	async function cancelSubscription() {
 		try {
-			if (subscriptionDetails?.subscriptionDetails.willBeCancelledAtEndOfPeriod) {
+			const confirmed = await materialConfirm({
+				title: 'Are you sure?',
+				description:
+					'Do you really want to cancel your subscription? Once you cancel your subscription your subscription remains active till the end of the period. You won’t be charged again.'
+			})
+
+			if (!confirmed) {
+				return
+			}
+
+			if (subscriptionDetails?.willBeCancelledAtEndOfPeriod) {
 				errorNotification({
 					message:
 						'You subscription is already set to be cancelled at the end of the period'
@@ -36,7 +42,7 @@ const SubscriptionSettings = () => {
 				return
 			}
 
-			const subscriptionId = subscriptionDetails?.subscriptionDetails.uniqueId
+			const subscriptionId = subscriptionDetails?.uniqueId
 
 			if (!subscriptionId) {
 				errorNotification({
@@ -69,125 +75,99 @@ const SubscriptionSettings = () => {
 		}
 	}
 
-	async function initRefund() {
-		try {
-			if (!subscriptionDetails?.subscriptionDetails.isRefundAllowed) {
-				errorNotification({
-					message: 'Refund is not allowed for this subscription'
-				})
-			}
-
-			const subscriptionId = subscriptionDetails?.subscriptionDetails.uniqueId
-
-			if (!subscriptionId) {
-				errorNotification({
-					message: 'Subscription ID not found'
-				})
-				return
-			}
-
-			setIsBusy(true)
-
-			const response = await initRefundMutation.mutateAsync({
-				params: {
-					paymentId: subscriptionId
-				}
-			})
-
-			if (response.isRefundedInitiated) {
-				successNotification({
-					message: 'Refund initiated successfully'
-				})
-			} else {
-				errorNotification({
-					message: 'Failed to initiate refund'
-				})
-			}
-		} catch (error) {
-			console.error(error)
-		} finally {
-			setIsBusy(false)
-		}
-	}
-
 	return (
 		<Card className="flex flex-col gap-4 p-4">
-			<CardTitle>Subscription Settings</CardTitle>
+			<CardTitle className="ml-6">Subscription</CardTitle>
 			<CardContent className="flex flex-col gap-4">
-				{subscriptionDetails?.subscriptionDetails ? (
-					<div>
-						<p>
-							You are on {subscriptionDetails?.subscriptionDetails?.tier || 'Free'}{' '}
-							Plan
+				{subscriptionDetails ? (
+					<div className="flex flex-col gap-3">
+						<p className="text-base">
+							Plan:{' '}
+							<span className="text-base font-semibold">
+								{subscriptionDetails?.tier || 'Free'}{' '}
+							</span>
 						</p>
-						<div className="text-sm text-muted-foreground">Subscription Valid Till</div>
-						<div className="text-lg font-semibold">
-							{dayjs(subscriptionDetails.subscriptionDetails.validTill).format(
-								'DD MMM, YYYY'
-							)}
-						</div>
-						<div>
-							<p>
-								Next Billing Date:{' '}
-								{dayjs(subscriptionDetails.subscriptionDetails.validTill)
-									.add(
-										1,
-										subscriptionDetails.subscriptionDetails
-											?.validityDuration === 'Monthly'
-											? 'month'
-											: 'year'
-									)
-									.format('DD MMM, YYYY')}
+						<div className="flex flex-row items-center gap-2">
+							<p className="text-sm">
+								Valid Till:{' '}
+								<span className="text-base font-bold">
+									{dayjs(subscriptionDetails.validTill).format('DD MMM, YYYY')}
+								</span>
 							</p>
 						</div>
+
+						{subscriptionDetails.willBeCancelledAtEndOfPeriod ? (
+							<div className="text-sm text-muted-foreground">
+								<p>Subscription will be cancelled at the end of the period.</p>
+							</div>
+						) : (
+							<div className="text-sm text-muted-foreground">
+								<p>
+									Next Billing Date:{' '}
+									{dayjs(subscriptionDetails.validTill)
+										.add(
+											1,
+											subscriptionDetails?.validityDuration === 'Monthly'
+												? 'month'
+												: 'year'
+										)
+										.format('DD MMM, YYYY')}
+								</p>
+							</div>
+						)}
+
 						<div className="flex flex-row justify-between gap-3">
 							<Button
 								onClick={() => {
-									// show pricing plan modal
+									writeProperty({
+										isPricingModalOpen: true
+									})
 								}}
+								className="flex flex-1 flex-row gap-2"
 								disabled={isBusy}
 							>
+								<Icons.arrowUp className="size-4" />
 								Upgrade Plan
 							</Button>
-							<Button
-								onClick={() => {
-									initRefund().catch(error => console.error(error))
-								}}
-								disabled={isBusy}
-							>
-								<Icons.arrowClockwise className="size-4" />
-								Refund
-							</Button>
 
-							{/* Cancel Button */}
+							<Link
+								href={createHref({
+									href: '/contacts-us',
+									domain: WEBSITE_URL,
+									utmParams: {
+										utm_content: 'Contact Support',
+										utm_source: 'application',
+										utm_medium: 'Subscription Settings'
+									}
+								})}
+								className="flex-1"
+							>
+								<Button
+									disabled={isBusy}
+									variant={'secondary'}
+									className="flex w-full flex-row gap-2"
+								>
+									<Icons.user className="size-4" />
+									Contact Support
+								</Button>
+							</Link>
+
 							<Button
 								onClick={() => {
 									cancelSubscription().catch(error => console.error(error))
 								}}
 								disabled={isBusy}
 								variant={'destructive'}
+								className="flex flex-row gap-2"
 							>
 								<Icons.xCircle className="size-4" />
 								Cancel
-							</Button>
-							<Button
-								onClick={() => {
-									cancelSubscription().catch(error => console.error(error))
-								}}
-								disabled={isBusy}
-								variant={'destructive'}
-							>
-								<Icons.user className="size-4" />
-								Contact Support
 							</Button>
 						</div>
 					</div>
 				) : (
 					<div className="flex flex-row justify-between gap-3">
-						<p>
-							You are on {subscriptionDetails?.subscriptionDetails?.tier || 'Free'}{' '}
-							Plan
-						</p>
+						<p>You are on Free Plan</p>
 						<Button
 							onClick={() => {
 								// show pricing plan modal

@@ -7,10 +7,12 @@ import {
 	type GetFeatureFlagsResponseSchema,
 	type GetOrganizationTagsResponseSchema
 } from 'root/.generated'
+import { type SubscriptionDetails } from 'root/cloud_generated'
 import { create } from 'zustand'
 import { OnboardingSteps } from '~/constants'
 
 export type LayoutStoreType = {
+	subscriptionDetails: SubscriptionDetails | null
 	isPricingModalOpen: boolean
 	isReloadRequired: boolean
 	isCommandMenuOpen: boolean
@@ -37,6 +39,7 @@ type WritePropertyParamType = {
 }
 
 const useLayoutStore = create<LayoutStoreType>(set => ({
+	subscriptionDetails: null,
 	isPricingModalOpen: false,
 	isReloadRequired: false,
 	isCommandMenuOpen: false,

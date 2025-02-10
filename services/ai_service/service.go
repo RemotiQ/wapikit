@@ -155,7 +155,7 @@ func (ai *AiService) DetectIntent(query string, organizationId uuid.UUID) (*Dete
 		userPrompt,
 	}
 
-	intentResponse, err := ai.QueryAiModel(context.Background(), api_types.Gpt35Turbo, inputPrompt)
+	intentResponse, err := ai.QueryAiModel(context.Background(), api_types.Gpt4, inputPrompt)
 
 	fmt.Println("Intent response", intentResponse.Content)
 
