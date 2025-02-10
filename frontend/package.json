@@ -9,7 +9,7 @@
 		"lint": "next lint",
 		"codegen": "orval --config ./orval.config.ts",
 		"pretty": "pnpm prettier --write \"src/**/*.{ts,tsx,css}\"",
-		"build:cloud": "NODE_ENV=production NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION=true NEXT_PUBLIC_BACKEND_URL=https://api.wapikit.com next build",
+		"build:cloud": "NODE_ENV=production NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION=true NEXT_PUBLIC_BACKEND_URL=https://api.wapikit.com/api next build",
 		"start:cloud": "NODE_ENV=production NEXT_PUBLIC_IS_MANAGED_CLOUD_EDITION=true next start"
 	},
 	"dependencies": {
