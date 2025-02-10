@@ -224,7 +224,7 @@ export async function displayRazorpayCheckoutModal(params: {
 			email: userDetails.email,
 			contact: userDetails.phone
 		},
-		image: '/assets/logo/brand-logo.png',
+		image: '/logo/brand-logo.png',
 		allow_rotation: true,
 		recurring: true,
 		description: description,
