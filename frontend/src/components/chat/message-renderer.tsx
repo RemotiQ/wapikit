@@ -74,7 +74,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 										'text-bold h-5 w-5',
 										message.direction === MessageDirectionEnum.InBound
 											? ''
-											: ' text-primary-foreground'
+											: ' text-secondary-foreground'
 									)}
 								/>
 							</DropdownMenuTrigger>
@@ -107,7 +107,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 							'ml-auto text-[10px]',
 							message.direction === MessageDirectionEnum.InBound
 								? ''
-								: 'text-primary-foreground'
+								: 'text-secondary-foreground'
 						)}
 					>
 						{dayjs(message.createdAt).format('hh:mm A')}

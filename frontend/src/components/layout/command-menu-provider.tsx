@@ -194,7 +194,7 @@ export default function CommandMenuProvider() {
 				})
 			}
 
-			if (e.key === 'Enter') {
+			if (e.key === 'Enter' && isCommandMenuOpen) {
 				const item = commandItemsAndGroups
 					.map(group => group.items)
 					.flat()
