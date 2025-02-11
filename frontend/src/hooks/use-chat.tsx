@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { getBackendUrl } from '~/constants'
 import { useAiChatStore } from '~/store/ai-chat-store'
 import { useAuthState } from './use-auth-state'
@@ -14,7 +14,8 @@ const useChat = ({ chatId }: { chatId: string }) => {
 		currentChatMessages,
 		updateUserMessageId,
 		inputValue,
-		writeProperty
+		writeProperty,
+		sendAiMessage
 	} = useAiChatStore()
 	const { authState } = useAuthState()
 	const currentMessageIdInStream = useRef<string | null>(null)
@@ -52,6 +53,10 @@ const useChat = ({ chatId }: { chatId: string }) => {
 					} else if (parsedChunk.type === 'messageDetails') {
 						const userMessage = parsedChunk.userMessage
 						const aiMessage = parsedChunk.aiMessage
+						console.log({
+							userMessage,
+							aiMessage
+						})
 						updateUserMessageId(userMessage.uniqueId)
 						pushMessage({
 							content: aiMessage.content,
@@ -59,7 +64,6 @@ const useChat = ({ chatId }: { chatId: string }) => {
 							createdAt: aiMessage.createdAt,
 							role: aiMessage.role
 						})
-
 						currentMessageIdInStream.current = parsedChunk.aiMessage.uniqueId
 					}
 				}
@@ -74,7 +78,7 @@ const useChat = ({ chatId }: { chatId: string }) => {
 	const _sendAiMessage = useCallback(
 		async (message: string) => {
 			try {
-				if (!authState.isAuthenticated) return
+				if (!authState.isAuthenticated || !message) return
 				// push the message before hand in the UI array, after that update the UI
 				pushMessage({
 					content: message,
@@ -130,6 +134,14 @@ const useChat = ({ chatId }: { chatId: string }) => {
 	const selectSuggestedAction = (action: string) => {
 		_sendAiMessage(action).catch(error => console.error(error))
 	}
+
+	useEffect(() => {
+		if (!authState.isAuthenticated) return
+		if (sendAiMessage) {
+			writeProperty({ sendAiMessage: false })
+			_sendAiMessage(inputValue).catch(error => console.error(error))
+		}
+	}, [authState, sendAiMessage, inputValue, _sendAiMessage, writeProperty])
 
 	return {
 		currentChat,

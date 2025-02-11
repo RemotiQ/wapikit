@@ -20,6 +20,7 @@ export type AiChatStoreType = {
 		label: string
 		action: string
 	}[]
+	sendAiMessage: boolean
 }
 
 type WritePropertyParamType = {
@@ -27,6 +28,7 @@ type WritePropertyParamType = {
 }
 
 const useAiChatStore = create<AiChatStoreType>(set => ({
+	sendAiMessage: false,
 	inputValue: '',
 	writeProperty: updates => {
 		if (typeof updates === 'object') {
@@ -42,16 +44,22 @@ const useAiChatStore = create<AiChatStoreType>(set => ({
 		set(() => ({}))
 	},
 	pushMessage(message: AiChatMessageSchema) {
-		set(state => ({
-			...state,
-			currentChatMessages: [...state.currentChatMessages, message]
-		}))
+		set(state => {
+			console.log({ pushMessage: message })
+			return {
+				...state,
+				currentChatMessages: [...state.currentChatMessages, message]
+			}
+		})
 	},
 	updateChatMessage(messageId: string, content: string) {
 		set(state => {
 			const message = state.currentChatMessages.find(
 				message => message.uniqueId === messageId
 			)
+
+			console.log({ updateChatMessage: message })
+
 			if (!message) return state
 
 			const updatedMessage = {
@@ -113,6 +121,8 @@ const useAiChatStore = create<AiChatStoreType>(set => ({
 
 		set(state => {
 			const lastMessage = state.currentChatMessages[state.currentChatMessages.length - 1]
+
+			console.log({ lastMessage })
 
 			if (!lastMessage) return state
 

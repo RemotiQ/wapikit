@@ -60,7 +60,6 @@ const useLayoutStore = create<LayoutStoreType>(set => ({
 	templates: [],
 	featureFlags: null,
 	writeProperty: updates => {
-		console.log('updating layout store:', updates)
 		if (typeof updates === 'object') {
 			set(state => ({
 				...state,

@@ -22,7 +22,6 @@ import { useAiChatStore } from '~/store/ai-chat-store'
 export default function CommandMenuProvider() {
 	const router = useRouter()
 	const [input, setInput] = useState('')
-
 	const { writeProperty: writeAiStoreProperty } = useAiChatStore()
 
 	const commandItemsAndGroups: {
@@ -38,9 +37,11 @@ export default function CommandMenuProvider() {
 						label: 'Ask AI',
 						action: () => {
 							writeAiStoreProperty({
-								inputValue: input
+								inputValue: input,
+								sendAiMessage: true
 							})
-							router.push(`/ai?s=true`)
+							setInput('')
+							router.push(`/ai`)
 						},
 						slug: 'ask-ai'
 					},
@@ -205,9 +206,11 @@ export default function CommandMenuProvider() {
 					if (input) {
 						setCurrentSelected('ask-ai')
 						writeAiStoreProperty({
-							inputValue: input
+							inputValue: input,
+							sendAiMessage: true
 						})
-						router.push(`/ai?s=true`)
+						setInput('')
+						router.push(`/ai`)
 					} else {
 						// IMPOSSIBLE CASE
 					}

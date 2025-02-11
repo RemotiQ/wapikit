@@ -97,7 +97,7 @@ const PreviewMessage = ({
 						{message.content && mode === 'view' && (
 							<div
 								className={clsx(
-									'flex flex-row items-center gap-2',
+									'flex flex-row items-center gap-2 text-left',
 									message.role === AiChatMessageRoleEnum.User && 'justify-end'
 								)}
 							>
@@ -122,7 +122,7 @@ const PreviewMessage = ({
 
 								<div
 									className={clsx(
-										'flex max-w-lg flex-col items-center justify-start gap-4 px-3 py-1 text-sm',
+										'flex max-w-lg flex-col items-center justify-start px-3 py-1 text-left text-sm',
 										message.role === AiChatMessageRoleEnum.User
 											? 'rounded-md bg-primary text-primary-foreground'
 											: ''

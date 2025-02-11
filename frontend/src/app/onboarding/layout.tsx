@@ -90,7 +90,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 										>
 											<span className="flex h-9 items-center">
 												<span className="relative z-10 flex items-center justify-center rounded-md border border-primary-foreground p-2 backdrop-blur-md">
-													<IconToRender className={`size-5`} />
+													<IconToRender className={`size-5 text-white`} />
 												</span>
 											</span>
 											<span className="ml-4 flex min-w-0 flex-col">
