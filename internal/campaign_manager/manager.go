@@ -3,6 +3,8 @@ package campaign_manager
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
@@ -39,7 +41,6 @@ var (
 type businessWorker struct {
 	messageQueue chan *CampaignMessage
 	rateLimiter  *ratecounter.RateCounter
-	wg           sync.WaitGroup
 	stopChan     chan struct{}
 }
 
@@ -47,8 +48,9 @@ type CampaignManager struct {
 	Db     *sql.DB
 	Logger slog.Logger
 
-	Redis                 *cache_service.RedisClient
-	RedisEventChannelName string
+	Redis                           *cache_service.RedisClient
+	RedisApiServerEventChannelName  string
+	RedisCampaignManagerChannelName string
 
 	runningCampaigns      map[string]*runningCampaign
 	runningCampaignsMutex sync.RWMutex
@@ -61,7 +63,7 @@ type CampaignManager struct {
 	NotificationService *notification_service.NotificationService
 }
 
-func NewCampaignManager(db *sql.DB, logger slog.Logger, redis *cache_service.RedisClient, notificationService *notification_service.NotificationService, redisEventChannelName string) *CampaignManager {
+func NewCampaignManager(db *sql.DB, logger slog.Logger, redis *cache_service.RedisClient, notificationService *notification_service.NotificationService, RedisApiServerEventChannelName, RedisCampaignManagerChannelName string) *CampaignManager {
 	return &CampaignManager{
 		Db:     db,
 		Logger: logger,
@@ -74,10 +76,11 @@ func NewCampaignManager(db *sql.DB, logger slog.Logger, redis *cache_service.Red
 
 		businessWorkers: make(map[string]*businessWorker),
 
-		businessWorkersMutex:  sync.RWMutex{},
-		Redis:                 redis,
-		RedisEventChannelName: redisEventChannelName,
-		NotificationService:   notificationService,
+		businessWorkersMutex:            sync.RWMutex{},
+		Redis:                           redis,
+		RedisApiServerEventChannelName:  RedisApiServerEventChannelName,
+		RedisCampaignManagerChannelName: RedisCampaignManagerChannelName,
+		NotificationService:             notificationService,
 	}
 }
 
@@ -122,7 +125,7 @@ func (cm *CampaignManager) messageQueueProcessor(businessAccountId string, worke
 			cm.sendMessage(message)
 
 			campaignProgressEvent := event_service.NewCampaignProgressEvent(message.Campaign.UniqueId.String(), message.Campaign.Sent.Load(), message.Campaign.ErrorCount.Load(), api_types.Running)
-			cm.Redis.PublishMessageToRedisChannel(cm.RedisEventChannelName, campaignProgressEvent.ToJson())
+			cm.Redis.PublishMessageToRedisChannel(cm.RedisApiServerEventChannelName, campaignProgressEvent.ToJson())
 		}
 	}
 }
@@ -212,6 +215,61 @@ func (cm *CampaignManager) Run() {
 			campaign.wg.Done()
 		}
 	}
+}
+
+func (cm *CampaignManager) ListenToApiServerCommands() {
+	logger := cm.Logger
+	logger.Info("Campaign Manager is listening for API server commands...")
+
+	ctx := context.Background()
+
+	redisClient := cm.Redis
+	pubsub := redisClient.Subscribe(ctx, cm.RedisCampaignManagerChannelName)
+	redisEventChannel := pubsub.Channel()
+
+	// Goroutine to listen for Redis events
+	go func() {
+		defer pubsub.Close()
+		for {
+			select {
+			case apiServerCommand, ok := <-redisEventChannel:
+				fmt.Println("API SERVER EVENT RECEIVED")
+				if !ok {
+					logger.Error("Redis event channel closed, stopping event listener.")
+					return
+				}
+
+				commandData := []byte(apiServerCommand.Payload)
+				var command BaseCommand
+				err := json.Unmarshal(commandData, &command)
+				if err != nil {
+					logger.Error("Unable to unmarshal API server command and determine type", err.Error(), nil)
+					continue
+				}
+
+				logger.Info("API SERVER COMMAND OF TYPE", string(command.CommandType), nil)
+
+				switch command.CommandType {
+				case StopCampaignCommandType:
+					var stopCommand StopCampaignCommand
+					err := json.Unmarshal(commandData, &stopCommand)
+					if err != nil {
+						logger.Error("Unable to unmarshal new message event", err.Error(), nil)
+						continue
+					}
+
+					cm.StopCampaign(stopCommand.CampaignId)
+				default:
+					logger.Info("Unknown event type received")
+				}
+
+			case <-ctx.Done():
+				logger.Info("Context done, stopping event listener.")
+				return
+			}
+
+		}
+	}()
 }
 
 func (cm *CampaignManager) updatedCampaignStatus(campaignId uuid.UUID, status model.CampaignStatusEnum) (bool, error) {
@@ -375,4 +433,14 @@ func (cm *CampaignManager) Stop() {
 		close(worker.messageQueue)
 		delete(cm.businessWorkers, businessAccountId)
 	}
+}
+
+func (cm *CampaignManager) GetRunningCampaignStatusById(campaignId string) (sent int, errored int) {
+	cm.runningCampaignsMutex.RLock()
+	defer cm.runningCampaignsMutex.RUnlock()
+	if campaign, ok := cm.runningCampaigns[campaignId]; ok {
+		return int(campaign.Sent.Load()), int(campaign.ErrorCount.Load())
+	}
+
+	return 0, 0
 }

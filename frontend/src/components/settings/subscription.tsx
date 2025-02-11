@@ -170,7 +170,9 @@ const SubscriptionSettings = () => {
 						<p>You are on Free Plan</p>
 						<Button
 							onClick={() => {
-								// show pricing plan modal
+								writeProperty({
+									isPricingModalOpen: true
+								})
 							}}
 							disabled={isBusy}
 							className="flex flex-row gap-2"

@@ -41,7 +41,7 @@ interface DataTableProps<TData, TValue> {
 	data: TData[]
 	searchKey: string
 	pageNo: number
-	totalUsers: number
+	totalRecords: number
 	pageSizeOptions?: number[]
 	pageCount: number
 	searchParams?: {
@@ -54,6 +54,7 @@ interface DataTableProps<TData, TValue> {
 		confirmationDescription: string
 		bulkDeleteMethod: (ids: string[]) => Promise<void>
 	}
+	isFetching: boolean
 }
 
 export function TableComponent<TData, TValue>({
@@ -63,7 +64,8 @@ export function TableComponent<TData, TValue>({
 	pageCount,
 	pageSizeOptions = [10, 20, 30, 40, 50],
 	actions,
-	bulkDeleteConfig
+	bulkDeleteConfig,
+	isFetching
 }: DataTableProps<TData, TValue>) {
 	const router = useRouter()
 	const pathname = usePathname()
@@ -218,63 +220,80 @@ export function TableComponent<TData, TValue>({
 				)}
 			</div>
 			<ScrollArea className="h-[calc(80vh-220px)] rounded-md border">
-				<Table className="relative">
-					<TableHeader>
-						{table.getHeaderGroups().map(headerGroup => (
-							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map(header => {
-									return (
-										<TableHead key={header.id}>
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext()
-													)}
-										</TableHead>
-									)
-								})}
-							</TableRow>
+				{isFetching ? (
+					<div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4">
+						{Array.from({ length: 9 }).map((_, index) => (
+							<div key={index} className="w-full animate-pulse">
+								<div key={'column_actions'} className="w-full">
+									<div className="h-10 rounded-md bg-gray-200"></div>
+								</div>
+							</div>
 						))}
-					</TableHeader>
-					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map(row => {
-								return (
-									<TableRow
-										key={row.id}
-										data-state={row.getIsSelected() && 'selected'}
-									>
-										{row.getVisibleCells().map(cell => (
-											<TableCell key={cell.id}>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext()
-												)}
+					</div>
+				) : (
+					<Table className="relative">
+						<TableHeader>
+							{table.getHeaderGroups().map(headerGroup => (
+								<TableRow key={headerGroup.id}>
+									{headerGroup.headers.map(header => {
+										return (
+											<TableHead key={header.id}>
+												{header.isPlaceholder
+													? null
+													: flexRender(
+															header.column.columnDef.header,
+															header.getContext()
+														)}
+											</TableHead>
+										)
+									})}
+								</TableRow>
+							))}
+						</TableHeader>
+
+						<TableBody>
+							{table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map(row => {
+									return (
+										<TableRow
+											key={row.id}
+											data-state={row.getIsSelected() && 'selected'}
+										>
+											{row.getVisibleCells().map(cell => (
+												<TableCell key={cell.id}>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext()
+													)}
+												</TableCell>
+											))}
+											<TableCell key={'column_actions'}>
+												<CellAction
+													actions={
+														typeof actions === 'function'
+															? actions(row.original)
+															: actions
+													}
+													data={row.id}
+												/>
 											</TableCell>
-										))}
-										<TableCell key={'column_actions'}>
-											<CellAction
-												actions={
-													typeof actions === 'function'
-														? actions(row.original)
-														: actions
-												}
-												data={row.id}
-											/>
-										</TableCell>
-									</TableRow>
-								)
-							})
-						) : (
-							<TableRow>
-								<TableCell colSpan={columns.length} className="h-24 text-center">
-									No results.
-								</TableCell>
-							</TableRow>
-						)}
-					</TableBody>
-				</Table>
+										</TableRow>
+									)
+								})
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className="h-24 text-center text-lg font-semibold"
+									>
+										No records
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				)}
+
 				<ScrollBar orientation="horizontal" />
 			</ScrollArea>
 

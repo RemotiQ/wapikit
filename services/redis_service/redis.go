@@ -13,9 +13,10 @@ import (
 
 type RedisClient struct {
 	*redis.Client
-	RedSync               *redsync.Redsync
-	RateLimitPrefix       string
-	RedisEventChannelName string
+	RedSync                         *redsync.Redsync
+	RateLimitPrefix                 string
+	RedisApiServerEventChannelName  string
+	RedisCampaignManagerChannelName string
 }
 
 func NewRedisClient(
@@ -23,7 +24,8 @@ func NewRedisClient(
 	password *string,
 	IsProduction,
 	IsCloudEdition bool,
-	RedisEventChannelName string,
+	RedisApiServerEventChannelName string,
+	RedisCampaignManagerChannelName string,
 ) *RedisClient {
 	fmt.Println("Connecting to Redis...")
 	var redisClient *redis.Client
@@ -45,7 +47,8 @@ func NewRedisClient(
 		redisClient,
 		redSync,
 		"wapikit-dev:rate_limit",
-		RedisEventChannelName,
+		RedisApiServerEventChannelName,
+		RedisCampaignManagerChannelName,
 	}
 }
 

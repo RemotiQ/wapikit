@@ -49,7 +49,11 @@ const ContactsPage = () => {
 
 	const updateContactMutation = useUpdateContactById()
 
-	const { data: contactResponse, refetch: refetchContacts } = useGetContacts({
+	const {
+		data: contactResponse,
+		refetch: refetchContacts,
+		isFetching: isFetchingContacts
+	} = useGetContacts({
 		...(listId ? { list_id: listId } : {}),
 		...(status ? { status: status } : {}),
 		page: page || 1,
@@ -247,7 +251,10 @@ const ContactsPage = () => {
 				<BreadCrumb items={breadcrumbItems} />
 
 				<div className="flex items-start justify-between">
-					<Heading title={`Contacts (${totalUsers})`} description="Manage contacts" />
+					<Heading
+						title={totalUsers ? `Contacts (${totalUsers})` : 'Contacts'}
+						description="Manage contacts"
+					/>
 					<div className="flex gap-2">
 						<Button
 							className={clsx(buttonVariants({ variant: 'default' }))}
@@ -271,8 +278,9 @@ const ContactsPage = () => {
 					searchKey="phone"
 					pageNo={page}
 					columns={ContactTableColumns}
-					totalUsers={totalUsers}
+					totalRecords={totalUsers}
 					data={contacts}
+					isFetching={isFetchingContacts}
 					pageCount={pageCount}
 					actions={[
 						{

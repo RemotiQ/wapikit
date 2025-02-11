@@ -11,18 +11,18 @@ import (
 )
 
 type EventService struct {
-	Db                    *sql.DB
-	Logger                *slog.Logger
-	Redis                 *cache_service.RedisClient
-	RedisEventChannelName string
+	Db                             *sql.DB
+	Logger                         *slog.Logger
+	Redis                          *cache_service.RedisClient
+	RedisApiServerEventChannelName string
 }
 
 func NewEventService(db *sql.DB, logger *slog.Logger, redis *cache_service.RedisClient, channelName string) *EventService {
 	return &EventService{
-		Db:                    db,
-		Logger:                logger,
-		Redis:                 redis,
-		RedisEventChannelName: channelName,
+		Db:                             db,
+		Logger:                         logger,
+		Redis:                          redis,
+		RedisApiServerEventChannelName: channelName,
 	}
 }
 
@@ -31,7 +31,7 @@ func (service *EventService) HandleApiServerEvents(ctx context.Context) <-chan A
 	streamChannel := make(chan ApiServerEventInterface, 1000)
 
 	redisClient := service.Redis
-	pubsub := redisClient.Subscribe(ctx, service.RedisEventChannelName)
+	pubsub := redisClient.Subscribe(ctx, service.RedisApiServerEventChannelName)
 	redisEventChannel := pubsub.Channel()
 
 	// Goroutine to listen for Redis events

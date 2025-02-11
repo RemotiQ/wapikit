@@ -28,7 +28,11 @@ const ListsPage = () => {
 	const page = Number(searchParams.get('page') || 1)
 	const pageLimit = Number(searchParams.get('limit') || 0) || 10
 
-	const { data: contactListResponse, refetch } = useGetContactLists({
+	const {
+		data: contactListResponse,
+		refetch,
+		isFetching: isFetchingLists
+	} = useGetContactLists({
 		page: page || 1,
 		per_page: pageLimit || 10
 	})
@@ -87,9 +91,10 @@ const ListsPage = () => {
 				<Separator />
 				<TableComponent
 					searchKey="name"
+					isFetching={isFetchingLists}
 					pageNo={page}
 					columns={ContactListTableColumns}
-					totalUsers={totalLists}
+					totalRecords={totalLists}
 					data={lists}
 					pageCount={pageCount}
 					actions={[

@@ -202,5 +202,5 @@ func (rc *runningCampaign) cleanUp() {
 	}
 
 	campaignProgressEvent := event_service.NewCampaignProgressEvent(rc.UniqueId.String(), rc.Sent.Load(), rc.ErrorCount.Load(), api_types.Finished)
-	err = rc.Manager.Redis.PublishMessageToRedisChannel(rc.Manager.RedisEventChannelName, campaignProgressEvent.ToJson())
+	err = rc.Manager.Redis.PublishMessageToRedisChannel(rc.Manager.RedisApiServerEventChannelName, campaignProgressEvent.ToJson())
 }

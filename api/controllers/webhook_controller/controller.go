@@ -649,7 +649,7 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 
 			// * send an event to the client for creating new conversation
 			newConversationEvent := event_service.NewConversationEvent(*conversationDetailsToReturn)
-			app.Redis.PublishMessageToRedisChannel(app.Constants.RedisEventChannelName, newConversationEvent.ToJson())
+			app.Redis.PublishMessageToRedisChannel(app.Constants.RedisApiServerEventChannelName, newConversationEvent.ToJson())
 
 			return conversationDetailsToReturn, nil
 		} else {
@@ -744,7 +744,7 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	fmt.Println("conversationDetails", conversationDetails)
 
 	messageEvent := event_service.NewNewMessageEvent(*conversationDetails, message, nil, &conversationDetails.OrganizationId)
-	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisEventChannelName, messageEvent.ToJson())
+	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisApiServerEventChannelName, messageEvent.ToJson())
 
 	if err != nil {
 		fmt.Println("error sending api server event", err)

@@ -108,7 +108,7 @@ func main() {
 
 	constants := initConstants()
 
-	redisClient := cache_service.NewRedisClient(redisUrl, &redisPassword, constants.IsProduction, constants.IsCloudEdition, constants.RedisEventChannelName)
+	redisClient := cache_service.NewRedisClient(redisUrl, &redisPassword, constants.IsProduction, constants.IsCloudEdition, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
 	dbInstance := database.GetDbInstance(koa.String("database.url"))
 
 	app := &interfaces.App{
@@ -125,9 +125,9 @@ func main() {
 		koa.String("app.encryption_key"),
 	)
 
-	app.EventService = event_service.NewEventService(dbInstance, logger, redisClient, app.Constants.RedisEventChannelName)
+	app.EventService = event_service.NewEventService(dbInstance, logger, redisClient, app.Constants.RedisApiServerEventChannelName)
 
-	app.CampaignManager = campaign_manager.NewCampaignManager(dbInstance, *logger, redisClient, nil, constants.RedisEventChannelName)
+	app.CampaignManager = campaign_manager.NewCampaignManager(dbInstance, *logger, redisClient, nil, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
 
 	MountServices(app)
 

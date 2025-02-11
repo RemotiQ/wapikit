@@ -60,13 +60,17 @@ const MembersPage = () => {
 	const pageLimit = Number(searchParams.get('limit') || 0) || 10
 	const sortBy = searchParams.get('sortOrder')
 
-	const { data: membersResponse, refetch: refetchMembers } = useGetOrganizationMembers({
+	const {
+		data: membersResponse,
+		refetch: refetchMembers,
+		isFetching: isFetchingOrgMembers
+	} = useGetOrganizationMembers({
 		page: page || 1,
 		per_page: pageLimit || 10,
 		sortBy: sortBy ? (sortBy as OrderEnum) : undefined
 	})
 
-	const { data: orgInvites } = useGetOrganizationInvites({
+	const { data: orgInvites, isFetching: isFetchingInvites } = useGetOrganizationInvites({
 		page: 1,
 		per_page: 50
 	})
@@ -353,10 +357,11 @@ const MembersPage = () => {
 										<Separator />
 
 										<TableComponent
+											isFetching={isFetchingOrgMembers}
 											searchKey="name"
 											pageNo={page}
 											columns={OrganizationMembersTableColumns}
-											totalUsers={totalUsers}
+											totalRecords={totalUsers}
 											data={organizationMembersList}
 											pageCount={pageCount}
 											actions={[
@@ -391,10 +396,11 @@ const MembersPage = () => {
 										<Separator />
 
 										<TableComponent
+											isFetching={isFetchingInvites}
 											searchKey="email"
 											pageNo={page}
 											columns={invitationColumn}
-											totalUsers={totalInvitations}
+											totalRecords={totalInvitations}
 											data={InvitationsList}
 											pageCount={pageCount}
 											actions={[]}

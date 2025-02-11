@@ -68,6 +68,7 @@ import { Switch } from '~/components/ui/switch'
 import { Icons } from '~/components/icons'
 import * as React from 'react'
 import SubscriptionSettings from '~/components/settings/subscription'
+import { PRODUCTION_WEBHOOK_URL } from '~/constants'
 
 export default function SettingsPage() {
 	console.log('REACT VERSION PUBLIC', React.version)
@@ -176,7 +177,11 @@ export default function SettingsPage() {
 			enabled: !!roleIdToEdit
 		}
 	})
-	const { data: rolesResponse, refetch: refetchRoles } = useGetOrganizationRoles({
+	const {
+		data: rolesResponse,
+		refetch: refetchRoles,
+		isFetching: isFetchingRoles
+	} = useGetOrganizationRoles({
 		page: page || 1,
 		per_page: pageLimit || 10
 	})
@@ -856,6 +861,7 @@ export default function SettingsPage() {
 									onClick={() => {
 										router.push(`/settings?tab=${tab.slug}`)
 									}}
+									className='hover:bg-muted'
 								>
 									{tab.title}
 								</TabsTrigger>
@@ -989,7 +995,7 @@ export default function SettingsPage() {
 											</form>
 										</Form>
 
-										<Card className="min-w-4xl flex-1 border-none ">
+										<Card className="min-w-4xl flex-1">
 											<CardHeader>
 												<CardTitle>Your Unique Webhook Secret</CardTitle>
 												<CardDescription>
@@ -1051,6 +1057,53 @@ export default function SettingsPage() {
 														Show
 													</Button>
 												</span>
+											</CardContent>
+										</Card>
+
+										<Card className="min-w-4xl flex-1 !px-2">
+											<CardHeader>
+												<CardTitle>Webhook URL</CardTitle>
+												<CardDescription>
+													Use this webhook url to subscribe webhook
+													endpoint in the meta developer dashboard.
+												</CardDescription>
+											</CardHeader>
+											<CardContent className="!m-2 flex w-full flex-row items-center gap-1 rounded-lg !p-2 text-sm">
+												<p
+													className="w-fit flex-1 !cursor-copy truncate rounded-lg border px-6 py-2"
+													onClick={() => {
+														copyToClipboard(
+															PRODUCTION_WEBHOOK_URL
+														).catch(error => console.error(error))
+
+														successNotification({
+															message: 'Secret copied to clipboard'
+														})
+													}}
+												>
+													{' '}
+													{PRODUCTION_WEBHOOK_URL}
+												</p>
+												<span>
+													<Button
+														onClick={() => {
+															copyToClipboard(
+																PRODUCTION_WEBHOOK_URL
+															).catch(error => console.error(error))
+
+															successNotification({
+																message:
+																	'Secret copied to clipboard'
+															})
+														}}
+														className="ml-2 flex w-fit gap-1"
+														variant={'secondary'}
+														disabled={isBusy}
+													>
+														<Clipboard className="size-5" />
+														Copy
+													</Button>
+												</span>{' '}
 											</CardContent>
 										</Card>
 
@@ -1489,6 +1542,7 @@ export default function SettingsPage() {
 										<RolesTable
 											setRoleToEditId={setRoleIdToEdit}
 											rolesResponse={rolesResponse}
+											isFetching={isFetchingRoles}
 										/>
 									</div>
 								) : tab.slug === SettingTabEnum.Organization ? (

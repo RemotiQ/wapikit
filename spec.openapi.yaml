@@ -5133,6 +5133,13 @@ components:
           type: object
         stats:
           $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
+        progress:
+          type: object
+          properties:
+            totalMessages:
+              type: number
+            sent:
+              type: number
       required:
         - uniqueId
         - name

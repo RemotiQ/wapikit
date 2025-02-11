@@ -64,7 +64,11 @@ const CampaignsPage = () => {
 		}
 	})
 
-	const { data: campaignResponse, refetch: refetchCampaigns } = useGetCampaigns(
+	const {
+		data: campaignResponse,
+		refetch: refetchCampaigns,
+		isFetching: isFetchingCampaigns
+	} = useGetCampaigns(
 		{
 			per_page: pageLimit || 10,
 			page: page || 1,
@@ -492,9 +496,10 @@ const CampaignsPage = () => {
 
 						<TableComponent
 							searchKey="name"
+							isFetching={isFetchingCampaigns}
 							pageNo={page}
 							columns={CampaignTableColumns}
-							totalUsers={totalCampaigns}
+							totalRecords={totalCampaigns}
 							data={campaigns}
 							pageCount={pageCount}
 							actions={(campaign: CampaignSchema) => {

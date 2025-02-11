@@ -15,6 +15,9 @@ import { TipCard } from '~/components/dashboard/tip-card'
 import { type TipCardPropType } from '~/types'
 import { useLayoutStore } from '~/store/layout.store'
 import { DashboardCampaignCard } from '~/components/dashboard/campaign-card'
+import { Button } from '~/components/ui/button'
+import { Icons } from '~/components/icons'
+import Link from 'next/link'
 
 export default function Page() {
 	const { currentOrganization } = useLayoutStore()
@@ -94,13 +97,18 @@ export default function Page() {
 			href: '/settings?tab=api-access',
 			icon: 'code'
 		},
-		{
-			title: 'Check documentation',
-			description:
-				'Get started with our documentation to understand how to use the platform.',
-			href: '/docs',
-			icon: 'page'
-		}
+		...(primaryAnalyticsData?.aggregateAnalytics &&
+		primaryAnalyticsData.aggregateAnalytics.contactStats.totalContacts > 0
+			? ([
+					{
+						title: 'Check documentation',
+						description:
+							'Get started with our documentation to understand how to use the platform.',
+						href: '/docs',
+						icon: 'page'
+					}
+				] as TipCardPropType[])
+			: [])
 	]
 
 	return (
@@ -274,10 +282,31 @@ export default function Page() {
 							</CardContent>
 						</Card>
 					</div>
+
 					<div className="flex h-full w-full flex-1 gap-4 overflow-x-scroll">
 						{campaigns?.campaigns.map((campaign, index) => {
 							return <DashboardCampaignCard campaign={campaign} key={index} />
 						})}
+
+						{campaigns?.campaigns.length && campaigns?.campaigns.length < 3 ? (
+							<Card
+								key={'send_more_cta'}
+								className="min-w-md flex w-full max-w-lg flex-col items-center justify-center gap-6 p-4"
+							>
+								<p className="max-w-xs text-center text-lg text-muted-foreground">
+									Send more campaigns to your contacts to keep them engaged.
+								</p>
+								<Link href={'/campaigns/new-or-edit'}>
+									<Button
+										variant={'secondary'}
+										className="flex items-center gap-2"
+									>
+										<Icons.rocket className="size-4" />
+										Send Campaign
+									</Button>
+								</Link>
+							</Card>
+						) : null}
 					</div>
 					<div className="grid gap-4 rounded-lg md:grid-cols-2 lg:grid-cols-4">
 						{tips.map((tip, index) => {

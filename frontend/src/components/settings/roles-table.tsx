@@ -14,7 +14,8 @@ import { type Dispatch, type SetStateAction } from 'react'
 const RolesTable: React.FC<{
 	setRoleToEditId: Dispatch<SetStateAction<string | null>>
 	rolesResponse?: GetOrganizationRolesResponseSchema
-}> = ({ setRoleToEditId, rolesResponse }) => {
+	isFetching: boolean
+}> = ({ setRoleToEditId, rolesResponse, isFetching }) => {
 	const searchParams = useSearchParams()
 	const deleteRoleMutation = useDeleteOrganizationRoleById()
 	const page = Number(searchParams.get('page') || 1)
@@ -58,10 +59,11 @@ const RolesTable: React.FC<{
 
 	return (
 		<TableComponent
+			isFetching={isFetching}
 			searchKey="name"
 			pageNo={page}
 			columns={RolesTableColumns}
-			totalUsers={totalUsers}
+			totalRecords={totalUsers}
 			data={roles}
 			pageCount={pageCount}
 			actions={[

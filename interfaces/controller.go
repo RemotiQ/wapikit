@@ -25,11 +25,12 @@ type JwtPayload struct {
 }
 
 type Constants struct {
-	IsDevelopment         bool
-	IsProduction          bool
-	RedisEventChannelName string `koanf:"redis_event_channel_name"`
-	IsDebugModeEnabled    bool
-	IsCommunityEdition    bool
-	IsCloudEdition        bool
-	IsSingleBinaryMode    bool
+	IsDevelopment                   bool
+	IsProduction                    bool
+	RedisApiServerEventChannelName  string `koanf:"redis_event_channel_name"`
+	RedisCampaignManagerChannelName string `koanf:"redis_campaign_manager_channel_name"`
+	IsDebugModeEnabled              bool
+	IsCommunityEdition              bool
+	IsCloudEdition                  bool
+	IsSingleBinaryMode              bool
 }

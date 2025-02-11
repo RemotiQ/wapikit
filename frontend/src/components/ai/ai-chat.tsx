@@ -8,6 +8,7 @@ import { type AiChatSchema, useGetAiChatMessages, useGetAiChatMessageVotes } fro
 import useChat from '~/hooks/use-chat'
 import { ChatBotStateEnum } from '~/types'
 import { useAiChatStore } from '~/store/ai-chat-store'
+import LoadingSpinner from '../loader'
 
 export function AiChat({ chat }: { chat: AiChatSchema }) {
 	const { handleSubmit, chatBotState, selectSuggestedAction, currentMessageIdInStream } = useChat(
@@ -24,7 +25,7 @@ export function AiChat({ chat }: { chat: AiChatSchema }) {
 		per_page: 100
 	})
 
-	const { data: messages } = useGetAiChatMessages(chat.uniqueId, {
+	const { data: messages, isFetching: isFetchingMessages } = useGetAiChatMessages(chat.uniqueId, {
 		page: 1,
 		per_page: 50
 	})
@@ -39,15 +40,20 @@ export function AiChat({ chat }: { chat: AiChatSchema }) {
 
 	return (
 		<div className="flex h-dvh w-full min-w-0 flex-col bg-background px-4 md:px-6">
-			{/* <ChatHeader chatTitle={chat.title} chatBotState={chatBotState} /> */}
-			<Messages
-				chatId={chat.uniqueId}
-				isLoading={chatBotState === ChatBotStateEnum.Streaming}
-				votes={votes?.votes}
-				isReadonly={false}
-				chatBotState={chatBotState}
-				currentMessageIdInStream={currentMessageIdInStream.current}
-			/>
+			{isFetchingMessages ? (
+				<div className="flex h-full w-full items-center justify-center">
+					<LoadingSpinner />
+				</div>
+			) : (
+				<Messages
+					chatId={chat.uniqueId}
+					isLoading={chatBotState === ChatBotStateEnum.Streaming}
+					votes={votes?.votes}
+					isReadonly={false}
+					chatBotState={chatBotState}
+					currentMessageIdInStream={currentMessageIdInStream.current}
+				/>
+			)}
 
 			<form className="bottom-0 mx-auto flex w-full gap-2 bg-background pb-20">
 				<AiChatInput

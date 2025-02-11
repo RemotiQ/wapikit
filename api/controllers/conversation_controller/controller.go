@@ -926,7 +926,7 @@ func handleAssignConversation(context interfaces.ContextWithSession) error {
 		&context.Session.User.OrganizationId,
 	)
 
-	context.App.Redis.PublishMessageToRedisChannel(context.App.Constants.RedisEventChannelName, event.ToJson())
+	context.App.Redis.PublishMessageToRedisChannel(context.App.Constants.RedisApiServerEventChannelName, event.ToJson())
 
 	responseToReturn := api_types.AssignConversationResponseSchema{
 		Data: true,
@@ -1009,7 +1009,7 @@ func handleUnassignConversation(context interfaces.ContextWithSession) error {
 		&context.Session.User.OrganizationId,
 	)
 
-	redis.PublishMessageToRedisChannel(context.App.Constants.RedisEventChannelName, event.ToJson())
+	redis.PublishMessageToRedisChannel(context.App.Constants.RedisApiServerEventChannelName, event.ToJson())
 
 	responseToReturn := api_types.UnassignConversationResponseSchema{
 		Data: true,

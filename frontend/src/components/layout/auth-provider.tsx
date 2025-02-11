@@ -155,7 +155,7 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 		pathname !== '/'
 	) {
 		return (
-			<div className="flex h-full w-full items-center justify-center">
+			<div className="flex h-screen w-full items-center justify-center">
 				<LoadingSpinner />
 			</div>
 		)

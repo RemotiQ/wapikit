@@ -203,5 +203,5 @@ func (ns *NotificationService) SendInAppNotification(params InAppNotificationPar
 		nil,
 	)
 
-	ns.Redis.PublishMessageToRedisChannel(ns.Redis.RedisEventChannelName, event.ToJson())
+	ns.Redis.PublishMessageToRedisChannel(ns.Redis.RedisApiServerEventChannelName, event.ToJson())
 }

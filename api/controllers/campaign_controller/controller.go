@@ -10,6 +10,7 @@ import (
 	"github.com/wapikit/wapikit/api/api_types"
 	controller "github.com/wapikit/wapikit/api/controllers"
 	"github.com/wapikit/wapikit/interfaces"
+	"github.com/wapikit/wapikit/internal/campaign_manager"
 	"github.com/wapikit/wapikit/utils"
 
 	"github.com/go-jet/jet/qrm"
@@ -598,6 +599,9 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 			}
 
 			context.App.CampaignManager.StopCampaign(campaign.UniqueId.String())
+
+			cmCommand := campaign_manager.NewStopCampaignCommand(campaign.UniqueId.String())
+			context.App.Redis.PublishMessageToRedisChannel(context.App.Constants.RedisCampaignManagerChannelName, cmCommand.ToJson())
 		}
 
 		return context.JSON(http.StatusOK, api_types.UpdateCampaignByIdResponseSchema{

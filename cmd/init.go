@@ -31,7 +31,8 @@ func initConstants() *interfaces.Constants {
 		c.IsDevelopment = false
 	}
 
-	c.RedisEventChannelName = "ApiServerEvents"
+	c.RedisApiServerEventChannelName = "ApiServerEvents"
+	c.RedisCampaignManagerChannelName = "CampaignManagerEvents"
 	c.IsDebugModeEnabled = isDebugModeEnabled
 	c.IsCloudEdition = koa.Bool("is_cloud_edition")
 	c.IsSingleBinaryMode = koa.Bool("is_single_binary_mode")

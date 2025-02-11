@@ -149,3 +149,5 @@ export const META_CATEGORY = ['Whatsapp Marketing', '']
 export const META_KEYWORDS = ['Whatsapp Marketing', '']
 
 export const META_CLASSIFICATION = ['Whatsapp Marketing']
+
+export const PRODUCTION_WEBHOOK_URL = "https://api.wapikit.com/api/webhook/whatsapp"

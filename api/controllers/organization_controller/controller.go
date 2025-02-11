@@ -2108,6 +2108,11 @@ func handleUpdateWhatsappBusinessAccountDetails(context interfaces.ContextWithSe
 
 			webhookSecret, err := context.App.EncryptionService.EncryptData(secretData)
 
+			if err != nil {
+				context.App.Logger.Error("Error encrypting webhook secret", err.Error(), nil)
+				return context.JSON(http.StatusInternalServerError, "Something went wrong")
+			}
+
 			insertQuery := table.WhatsappBusinessAccount.
 				INSERT(table.WhatsappBusinessAccount.MutableColumns).
 				MODEL(model.WhatsappBusinessAccount{
