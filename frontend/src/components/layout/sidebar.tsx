@@ -82,7 +82,7 @@ export default function Sidebar({ className }: SidebarProps) {
 					<div className="mt-3 flex h-full flex-col justify-between space-y-1">
 						<DashboardNav items={navItems} />
 
-						{!subscriptionDetails ? (
+						{!subscriptionDetails && !isMinimized ? (
 							<Button
 								className="mt-2 flex w-full flex-row justify-evenly gap-2 !bg-black"
 								onClick={() => {

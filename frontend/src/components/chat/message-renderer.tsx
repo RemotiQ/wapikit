@@ -57,7 +57,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 				'flex  w-fit max-w-md gap-1  rounded-md p-1 px-3',
 				message.direction === MessageDirectionEnum.InBound
 					? 'mr-auto bg-white dark:bg-[#202c33]'
-					: 'ml-auto bg-primary  text-primary-foreground dark:bg-[#005c4b]'
+					: 'ml-auto bg-[#d9fdd3]  text-secondary-foreground dark:bg-[#005c4b]'
 			)}
 		>
 			{message.message_type === 'Text' ? (

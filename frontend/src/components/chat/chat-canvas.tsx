@@ -42,6 +42,7 @@ import Image from 'next/image'
 import { useScrollToBottom } from '~/hooks/use-scroll-to-bottom'
 import { SparklesIcon } from '../ai/icons'
 import { clsx } from 'clsx'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 
 const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const [isBusy, setIsBusy] = useState(false)
@@ -376,7 +377,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 
 			{currentConversation ? (
 				<>
-					<CardHeader className="item-center flex !flex-row justify-between rounded-t-md  bg-primary p-3 py-2 dark:bg-[#202c33]">
+					<CardHeader className="item-center flex !flex-row justify-between rounded-t-md  bg-[#f0f2f5] p-3 py-2 ">
 						<div className="flex flex-row items-center gap-3">
 							<Image
 								src={'/assets/empty-pfp.png'}
@@ -390,13 +391,13 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									})
 								}}
 							/>
-							<p className="align-middle text-base text-primary-foreground">
+							<p className="font-semi-bold align-middle text-base text-secondary-foreground">
 								{currentConversation.contact.name}
 							</p>
 						</div>
 
 						<div className="ml-auto flex flex-row items-center gap-4">
-							<div className="flex flex-row items-center gap-2 text-sm text-secondary">
+							<div className="flex flex-row items-center gap-2 text-sm text-secondary-foreground">
 								Assigned To:
 								{currentConversation.assignedTo ? (
 									// ! TODO: show tippy on hover with user details
@@ -414,7 +415,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 							</div>
 							<DropdownMenu modal={false}>
 								<DropdownMenuTrigger asChild>
-									<MoreVerticalIcon className="text-bold h-5 w-5  text-secondary" />
+									<MoreVerticalIcon className="text-bold h-5 w-5  text-secondary-foreground" />
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
 									{chatActions.map((action, index) => {
@@ -483,27 +484,41 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									{suggestions?.suggestions.map((response, index) => {
 										if (index > 3) return null
 										return (
-											<div
-												key={index}
-												className="h-auto w-fit cursor-pointer justify-start  whitespace-normal rounded-md bg-primary p-1 px-4 py-2 text-left text-sm font-medium text-primary-foreground "
-												onClick={() => {
-													setMessageContent(() => response)
-													sendMessage(response).catch(error =>
-														console.error(error)
-													)
-												}}
-											>
-												{response}
-											</div>
+											<TooltipProvider key={index} delayDuration={200}>
+												<Tooltip>
+													<TooltipTrigger>
+														<p
+															key={index}
+															className="h-auto w-fit cursor-pointer justify-start whitespace-normal rounded-md bg-[#f0f2f5] p-1 px-4 py-2 text-left text-sm font-medium text-secondary-foreground"
+															onClick={() => {
+																setMessageContent(() => response)
+																sendMessage(response).catch(error =>
+																	console.error(error)
+																)
+															}}
+														>
+															{response.length > 40
+																? `${response.slice(0, 40)}...`
+																: response}
+														</p>
+													</TooltipTrigger>
+													<TooltipContent
+														className="max-w-xs"
+														sideOffset={0}
+													>
+														{response}
+													</TooltipContent>
+												</Tooltip>
+											</TooltipProvider>
 										)
 									})}
 								</div>
 							</motion.div>
 						) : null}
-						<CardFooter className="flex w-full flex-col gap-2 bg-white dark:bg-[#202c33]">
+						<CardFooter className="flex w-full flex-col items-center gap-2 bg-white dark:bg-[#202c33]">
 							<Separator />
 							<form
-								className="flex h-full w-full gap-2 "
+								className="flex h-full w-full items-center gap-2"
 								onSubmit={e => {
 									e.preventDefault()
 									sendMessage(messageContent || '').catch(error =>
@@ -526,7 +541,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 								/>
 
 								{isFetchingSuggestions || isRefetchingSuggestions ? (
-									<div className="rotate size-6 animate-spin rounded-full border-4 border-solid  border-l-primary" />
+									<div className="rotate my-auto h-5 w-5 animate-spin rounded-full border-4 border-solid  border-l-primary" />
 								) : (
 									<div
 										className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-background ring-1 ring-border"
@@ -536,13 +551,13 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 											)
 										}}
 									>
-										<div className="translate-y-px">
+										<div className="my-auto translate-y-px">
 											<SparklesIcon size={12} />
 										</div>
 									</div>
 								)}
 
-								<Button type="submit" className="rounded-full" disabled={isBusy}>
+								<Button type="submit" className="rounded-lg" disabled={isBusy}>
 									<SendIcon className="size-4" />
 								</Button>
 							</form>
