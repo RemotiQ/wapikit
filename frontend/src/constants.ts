@@ -12,7 +12,7 @@ export const REDIRECT_URL_LS = '__redirect_url'
 
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
-		return 'http://127.0.0.1:8000/api'
+		return 'http://192.168.29.20:8000/api'
 	}
 
 	if (IS_MANAGED_CLOUD_EDITION) {
@@ -116,14 +116,14 @@ export const OnboardingSteps: {
 		description: 'Create an organization to get started',
 		slug: OnboardingStepsEnum.CreateOrganization,
 		status: 'current',
-		icon: 'profile'
+		icon: 'globe'
 	},
 	{
 		title: 'Whatsapp Business Account Details',
 		description: 'Enter your Whatsapp Business Account details to get started',
 		slug: OnboardingStepsEnum.WhatsappBusinessAccountDetails,
 		status: 'incomplete',
-		icon: 'settings'
+		icon: 'whatsapp'
 	},
 	{
 		title: 'Invite Team Members',
@@ -131,7 +131,7 @@ export const OnboardingSteps: {
 			'Enter the email addresses of your team members to invite them to your organization',
 		slug: OnboardingStepsEnum.InviteTeamMembers,
 		status: 'incomplete',
-		icon: 'link'
+		icon: 'inviteTeamMember'
 	}
 ] as const
 
@@ -152,4 +152,4 @@ export const META_KEYWORDS = ['Whatsapp Marketing', '']
 
 export const META_CLASSIFICATION = ['Whatsapp Marketing']
 
-export const PRODUCTION_WEBHOOK_URL = "https://api.wapikit.com/api/webhook/whatsapp"
+export const PRODUCTION_WEBHOOK_URL = 'https://api.wapikit.com/api/webhook/whatsapp'

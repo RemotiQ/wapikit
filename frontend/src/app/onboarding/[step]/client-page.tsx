@@ -32,9 +32,11 @@ import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { AUTH_TOKEN_LS, OnboardingStepsEnum } from '~/constants'
+import { useAuthState } from '~/hooks/use-auth-state'
 
 const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 	const router = useRouter()
+	const { authState } = useAuthState()
 
 	const createOrganizationMutation = useCreateOrganization()
 	const inviteUserMutation = useCreateOrganizationInvite()
@@ -82,6 +84,20 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 
 	useEffect(() => {
 		const step = onboardingSteps.find(step => step.slug === (stepSlug as OnboardingStepsEnum))
+
+		console.log('IN DECISION MAKER')
+
+		if (stepSlug === OnboardingStepsEnum.CreateOrganization) {
+			// if organization already created
+			if (
+				currentOrganization &&
+				currentOrganization.whatsappBusinessAccountDetails?.businessAccountId
+			) {
+				router.push(`/onboarding/${OnboardingStepsEnum.InviteTeamMembers}`)
+			} else if (currentOrganization) {
+				router.push(`/onboarding/${OnboardingStepsEnum.WhatsappBusinessAccountDetails}`)
+			}
+		}
 
 		if (step?.status === 'complete') {
 			const nextStep = onboardingSteps.find(
@@ -145,8 +161,8 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 		try {
 			const response = await createOrganizationMutation.mutateAsync({
 				data: {
-					name: data.name
-					// description: data.description || undefined
+					name: data.name,
+					description: data.description || undefined
 				}
 			})
 
