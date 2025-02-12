@@ -22,7 +22,6 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 	if (!currentStep) {
 		return <>{props.children}</>
 	}
-	
 
 	return (
 		<div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
@@ -35,7 +34,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 			>
 				Login
 			</Link>
-			<div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
+			<div className="relative hidden  h-full flex-col justify-between bg-muted p-10 text-white dark:border-r lg:flex">
 				<div className="absolute inset-0 bg-gradient-to-br from-[rgb(2,105,67)] via-[rgb(0,3,2)] to-[rgb(28,68,72)]" />
 				<div className="relative z-20 flex items-center text-lg font-medium">
 					<Image src={'/logo/dark.svg'} width={100} height={40} alt="logo" />
@@ -137,16 +136,15 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 						)
 					})}
 				</ol>
-
 				<Link
 					href={'https://github.com/wapikit/wapikit'}
 					target="_blank"
-					className="group relative z-20 mt-auto w-fit rounded-lg border border-gray-500 px-2.5 py-1.5"
+					className="group z-10 relative mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
 				>
 					<blockquote className=" flex items-center gap-2">
 						<GitHubLogoIcon className="text-gray-400" />
 						<p className="text-sm font-bold text-gray-400">Star us on Github</p>
-						<StarFilledIcon className="size-4 text-gray-400 group-hover:text-yellow-400" />
+						<StarFilledIcon className="size-4  text-yellow-400" />
 					</blockquote>
 				</Link>
 			</div>
