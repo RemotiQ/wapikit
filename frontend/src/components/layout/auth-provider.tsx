@@ -43,13 +43,13 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 	const { data: phoneNumbersResponse } = useGetAllPhoneNumbers({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
 	const { data: templatesResponse } = useGetAllTemplates({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
