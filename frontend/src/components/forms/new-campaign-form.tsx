@@ -84,21 +84,28 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 
 	const { data: phoneNumbersResponse, refetch: refetchPhoneNumbers } = useGetAllPhoneNumbers({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
 	const { data: templatesResponse, refetch: refetchMessageTemplates } = useGetAllTemplates({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
-	const { data: tags } = useGetOrganizationTags({
-		page: 1,
-		per_page: 50,
-		sortBy: 'asc'
-	})
+	const { data: tags } = useGetOrganizationTags(
+		{
+			page: 1,
+			per_page: 50,
+			sortBy: 'asc'
+		},
+		{
+			query: {
+				enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
+			}
+		}
+	)
 
 	const createNewCampaign = useCreateCampaign()
 	const deleteCampaignById = useDeleteCampaignById()

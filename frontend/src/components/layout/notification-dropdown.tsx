@@ -20,7 +20,7 @@ export function Notifications() {
 		},
 		{
 			query: {
-				enabled: !!authState.isAuthenticated
+				enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 			}
 		}
 	)

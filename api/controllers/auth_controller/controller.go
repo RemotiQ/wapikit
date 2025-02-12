@@ -10,6 +10,7 @@ import (
 	"github.com/wapikit/wapikit/api/api_types"
 	controller "github.com/wapikit/wapikit/api/controllers"
 	"github.com/wapikit/wapikit/interfaces"
+	"github.com/wapikit/wapikit/services/notification_service"
 	"github.com/wapikit/wapikit/utils"
 	"golang.org/x/crypto/bcrypt"
 
@@ -345,13 +346,17 @@ func handleSignIn(context interfaces.ContextWithoutSession) error {
 		return context.JSON(http.StatusInternalServerError, "Error generating token")
 	}
 
-	// Set the cookie in the response
-	cookie := new(http.Cookie)
-	cookie.Name = "__auth_token"
-	cookie.Value = token
-	cookie.Secure = true
-	cookie.Domain = "wapikit.com"
-	cookie.Expires = time.Now().Add(time.Hour * 24 * 60) // 60-day expiration
+	cookie := &http.Cookie{
+		Name:     "__auth_token",
+		Value:    token,
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+		Domain:   ".wapikit.com",
+		SameSite: http.SameSiteNoneMode,
+		Expires:  time.Now().Add(24 * 60 * time.Hour),
+	}
+
 	context.SetCookie(cookie)
 
 	return context.JSON(http.StatusOK, api_types.LoginResponseBodySchema{
@@ -489,7 +494,7 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 	}
 
 	if invite.UniqueId.String() != "" {
-		err = table.OrganizationMember.INSERT(
+		table.OrganizationMember.INSERT(
 			table.OrganizationMember.MutableColumns,
 		).MODEL(model.OrganizationMember{
 			AccessLevel:    invite.AccessLevel,
@@ -552,16 +557,24 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 		return context.JSON(http.StatusInternalServerError, "Error generating token")
 	}
 
-	// Set the cookie in the response
-	cookie := new(http.Cookie)
-	cookie.Name = "__auth_token"
-	cookie.Value = token
-	cookie.Path = "/"
-	cookie.HttpOnly = true
-	cookie.Secure = true                                 // Set this to true in production for HTTPS
-	cookie.Domain = ".wapikit.com"                       // Ensure the domain matches your app
-	cookie.Expires = time.Now().Add(time.Hour * 24 * 60) // 60-day expiration
+	cookie := &http.Cookie{
+		Name:     "__auth_token",
+		Value:    token,
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+		Domain:   ".wapikit.com",
+		SameSite: http.SameSiteNoneMode,
+		Expires:  time.Now().Add(24 * 60 * time.Hour),
+	}
+
 	context.SetCookie(cookie)
+
+	// ! send slack notification for new user registration
+	context.App.NotificationService.SendSlackNotification(notification_service.SlackNotificationParams{
+		Title:   "🎊 New User Registration",
+		Message: fmt.Sprintf("New user registered with name %s, uniqueId %s", insertedUser.Name, insertedUser.UniqueId.String()),
+	})
 
 	return context.JSON(http.StatusOK, api_types.VerifyOtpResponseBodySchema{
 		Token: token,

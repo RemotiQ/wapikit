@@ -46,7 +46,7 @@ export default function UserSignupForm() {
 	useEffect(() => {
 		const redirectUrl = searchParams.get('redirectUri')
 		if (redirectUrl) {
-			setRedirectUrl('redirectUri')
+			setRedirectUrl(redirectUrl)
 		}
 	}, [searchParams, setRedirectUrl])
 
@@ -262,7 +262,7 @@ export default function UserSignupForm() {
 							)}
 						/>
 
-						<Button disabled={isBusy} className="ml-auto w-full mt-2" type="submit">
+						<Button disabled={isBusy} className="ml-auto mt-2 w-full" type="submit">
 							Confirm Email
 						</Button>
 					</form>

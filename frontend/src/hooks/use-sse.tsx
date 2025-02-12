@@ -42,7 +42,7 @@ const useServerSideEvents = () => {
 		if (
 			!authState?.isAuthenticated ||
 			!authState?.data?.token ||
-			!authState.data.user.organizationId
+			!authState?.data?.user?.organizationId
 		) {
 			return
 		}
