@@ -29,7 +29,7 @@ export default function Page() {
 		to: dayjs().endOf('day').toISOString()
 	})
 
-	const { data: campaigns } = useGetCampaigns({
+	const { data: campaigns, isFetching: isFetchingCampaigns } = useGetCampaigns({
 		page: 1,
 		per_page: 4
 	})
@@ -283,18 +283,27 @@ export default function Page() {
 						</Card>
 					</div>
 
-					<div className="flex h-full w-full flex-1 gap-4 overflow-x-scroll">
-						{campaigns?.campaigns.map((campaign, index) => {
-							return <DashboardCampaignCard campaign={campaign} key={index} />
-						})}
+					{isFetchingCampaigns ? (
+						<div className="grid h-full w-full flex-1 animate-pulse grid-cols-2 gap-4 lg:grid-cols-3">
+							{Array.from({ length: 3 }).map((_, index) => {
+								return (
+									<div
+										key={index}
+										className="h-72 w-full flex-1 rounded-lg bg-gray-200 "
+									/>
+								)
+							})}
+						</div>
+					) : null}
 
-						{campaigns?.campaigns.length && campaigns?.campaigns.length < 3 ? (
+					{!isFetchingCampaigns && campaigns?.campaigns.length === 0 ? (
+						<div className="min-w-lg grid h-full min-h-72 w-full flex-1 grid-cols-1 gap-4 md:grid-cols-2">
 							<Card
 								key={'send_more_cta'}
 								className="min-w-md flex w-full max-w-lg flex-col items-center justify-center gap-6 p-4"
 							>
 								<p className="max-w-xs text-center text-lg text-muted-foreground">
-									Send more campaigns to your contacts to keep them engaged.
+									Send your first campaign to your contacts.
 								</p>
 								<Link href={'/campaigns/new-or-edit'}>
 									<Button
@@ -306,8 +315,35 @@ export default function Page() {
 									</Button>
 								</Link>
 							</Card>
-						) : null}
-					</div>
+						</div>
+					) : (
+						<div className="grid h-full w-full flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+							{campaigns?.campaigns.map((campaign, index) => {
+								return <DashboardCampaignCard campaign={campaign} key={index} />
+							})}
+
+							{campaigns?.campaigns.length && campaigns?.campaigns.length < 3 ? (
+								<Card
+									key={'send_more_cta'}
+									className="min-w-md flex w-full max-w-lg flex-col items-center justify-center gap-6 p-4"
+								>
+									<p className="max-w-xs text-center text-lg text-muted-foreground">
+										Send more campaigns to your contacts to keep them engaged.
+									</p>
+									<Link href={'/campaigns/new-or-edit'}>
+										<Button
+											variant={'secondary'}
+											className="flex items-center gap-2"
+										>
+											<Icons.rocket className="size-4" />
+											Send Campaign
+										</Button>
+									</Link>
+								</Card>
+							) : null}
+						</div>
+					)}
+
 					<div className="grid gap-4 rounded-lg md:grid-cols-2 lg:grid-cols-4">
 						{tips.map((tip, index) => {
 							return <TipCard key={index} tip={tip} />

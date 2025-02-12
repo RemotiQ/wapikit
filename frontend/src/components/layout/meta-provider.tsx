@@ -10,7 +10,7 @@ const MetaProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const { data: featureFlags } = useGetUserFeatureFlags({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
@@ -21,7 +21,7 @@ const MetaProvider = ({ children }: { children: React.ReactNode }) => {
 		},
 		{
 			query: {
-				enabled: !!authState.isAuthenticated
+				enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 			}
 		}
 	)

@@ -10,13 +10,14 @@ import {
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useRegister, useVerifyOtp } from '~/generated'
 import { useLocalStorage } from '~/hooks/use-local-storage'
-import { AUTH_TOKEN_LS } from '~/constants'
+import { AUTH_TOKEN_LS, REDIRECT_URL_LS } from '~/constants'
 import { errorNotification } from '~/reusable-functions'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 const otpFormSchema = z.object({
 	otp: z.string().length(6, { message: 'OTP must be 6 characters' })
@@ -27,8 +28,7 @@ const SignUpFormSchema = z.object({
 	password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 	confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 	name: z.string().min(6, { message: 'Name must be at least 6 characters' }),
-	username: z.string().min(6, { message: 'Username must be at least 6 characters' }),
-	orgInviteSlug: z.string().optional()
+	username: z.string().min(6, { message: 'Username must be at least 6 characters' })
 })
 
 type SingUpFormValue = z.infer<typeof SignUpFormSchema>
@@ -36,6 +36,19 @@ type OtpFormValue = z.infer<typeof otpFormSchema>
 
 export default function UserSignupForm() {
 	const setAuthToken = useLocalStorage<string | undefined>(AUTH_TOKEN_LS, undefined)[1]
+	const [redirectUrl, setRedirectUrl] = useLocalStorage<string | undefined>(
+		REDIRECT_URL_LS,
+		undefined
+	)
+	const searchParams = useSearchParams()
+	const router = useRouter()
+
+	useEffect(() => {
+		const redirectUrl = searchParams.get('redirectUri')
+		if (redirectUrl) {
+			setRedirectUrl('redirectUri')
+		}
+	}, [searchParams, setRedirectUrl])
 
 	const [isBusy, setIsBusy] = useState(false)
 	const [activeForm, setActiveForm] = useState<'registrationDetailsForm' | 'otpForm'>(
@@ -46,8 +59,7 @@ export default function UserSignupForm() {
 		email: '',
 		password: '',
 		confirmPassword: '',
-		name: '',
-		orgInviteSlug: ''
+		name: ''
 	}
 
 	const signUpForm = useForm<SingUpFormValue>({
@@ -84,8 +96,7 @@ export default function UserSignupForm() {
 					password: data.password,
 					username: data.email,
 					email: data.email,
-					name: data.name,
-					organizationInviteSlug: data.orgInviteSlug || undefined
+					name: data.name
 				}
 			})
 
@@ -120,14 +131,19 @@ export default function UserSignupForm() {
 					username: userData.username,
 					email: userData.email,
 					name: userData.name,
-					organizationInviteSlug: userData.orgInviteSlug || undefined,
 					otp: data.otp
 				}
 			})
 
 			if (response.token) {
 				setAuthToken(response.token)
-				window.location.href = '/dashboard'
+
+				if (redirectUrl) {
+					router.push(redirectUrl)
+					return
+				} else {
+					window.location.href = '/dashboard'
+				}
 			} else {
 				// something went wrong show error token not found
 				errorNotification({
@@ -237,24 +253,6 @@ export default function UserSignupForm() {
 										<Input
 											type="password"
 											placeholder="Confirm your password"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={signUpForm.control}
-							name="orgInviteSlug"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Organization Invitation Id (Optional)</FormLabel>
-									<FormControl>
-										<Input
-											placeholder="#########"
 											disabled={isBusy}
 											{...field}
 										/>

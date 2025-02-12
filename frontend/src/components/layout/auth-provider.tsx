@@ -43,13 +43,13 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 	const { data: phoneNumbersResponse } = useGetAllPhoneNumbers({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
 	const { data: templatesResponse } = useGetAllTemplates({
 		query: {
-			enabled: !!authState.isAuthenticated
+			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
@@ -97,8 +97,11 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 				})
 			})
 
-			router.push(`/onboarding/${OnboardingStepsEnum.CreateOrganization}`)
-			setHasRedirected(() => true)
+			// * check if the page is not the invite page
+			if (pathname !== '/invite') {
+				router.push(`/onboarding/${OnboardingStepsEnum.CreateOrganization}`)
+				setHasRedirected(() => true)
+			}
 		} else {
 			console.log('userData', userData)
 

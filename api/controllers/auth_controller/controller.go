@@ -493,7 +493,7 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 	}
 
 	if invite.UniqueId.String() != "" {
-		err = table.OrganizationMember.INSERT(
+		table.OrganizationMember.INSERT(
 			table.OrganizationMember.MutableColumns,
 		).MODEL(model.OrganizationMember{
 			AccessLevel:    invite.AccessLevel,
