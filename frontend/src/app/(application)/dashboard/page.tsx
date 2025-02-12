@@ -70,19 +70,6 @@ export default function Page() {
 			href: '/team',
 			icon: 'user'
 		},
-
-		// ! TODO: not all members has permission to update the organization description
-		...(currentOrganization?.description && currentOrganization.description.length < 50
-			? ([
-					{
-						title: 'Update Your Organization Description',
-						description:
-							'The AI Automation would perform at its best if you provide a detailed description of your organization. This would help the AI to understand your organization better and what you do.',
-						href: '/settings?tab=organization-settings',
-						icon: 'user'
-					}
-				] as TipCardPropType[])
-			: []),
 		{
 			title: 'Ask AI',
 			description:

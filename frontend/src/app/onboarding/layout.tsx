@@ -22,6 +22,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 	if (!currentStep) {
 		return <>{props.children}</>
 	}
+	
 
 	return (
 		<div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">

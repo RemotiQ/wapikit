@@ -14,14 +14,16 @@ const LogoutPage = () => {
 		setAuthToken(null)
 
 		setTimeout(() => {
-			router.replace('/')
+			router.replace('/signin')
 		}, 500)
 	}, [router, setAuthToken])
 
 	return (
-		<div className="flex h-[100vh] w-full flex-col items-center justify-center gap-4">
+		<div className="flex h-[100vh] w-full flex-col items-center justify-center gap-4 font-bold">
 			<div className="text-sm">Logging you out, please wait....</div>
-			<LoadingSpinner />
+			<div className="h-fit">
+				<LoadingSpinner />
+			</div>
 		</div>
 	)
 }
