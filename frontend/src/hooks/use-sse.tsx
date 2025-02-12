@@ -39,7 +39,11 @@ const useServerSideEvents = () => {
 	useEffect(() => {
 		if (eventSourceRef.current) return
 
-		if (!authState?.isAuthenticated || !authState?.data?.token) {
+		if (
+			!authState?.isAuthenticated ||
+			!authState?.data?.token ||
+			!authState?.data?.user?.organizationId
+		) {
 			return
 		}
 

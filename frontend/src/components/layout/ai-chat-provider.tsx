@@ -21,7 +21,7 @@ const AiChatProvider = ({ children }: { children: React.ReactNode }) => {
 		{
 			query: {
 				enabled:
-					!!authState.isAuthenticated &&
+					!!(authState.isAuthenticated && authState.data.user.organizationId) &&
 					featureFlags?.SystemFeatureFlags.isAiIntegrationEnabled
 			}
 		}
