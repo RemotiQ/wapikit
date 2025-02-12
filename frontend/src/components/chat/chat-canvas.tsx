@@ -409,7 +409,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 											setIsConversationAssignModalOpen(() => true)
 										}}
 									>
-										<Icons.add className="size-4 text-secondary-foreground" />
+										<Icons.plus className="size-4 text-secondary-foreground" />
 									</span>
 								)}
 							</div>
