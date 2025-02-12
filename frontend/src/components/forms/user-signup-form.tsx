@@ -46,7 +46,7 @@ export default function UserSignupForm() {
 	useEffect(() => {
 		const redirectUrl = searchParams.get('redirectUri')
 		if (redirectUrl) {
-			setRedirectUrl('redirectUri')
+			setRedirectUrl(redirectUrl)
 		}
 	}, [searchParams, setRedirectUrl])
 
