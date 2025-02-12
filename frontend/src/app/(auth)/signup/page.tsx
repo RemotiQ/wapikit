@@ -10,6 +10,7 @@ import LoadingSpinner from '~/components/loader'
 import UserSignupForm from '~/components/forms/user-signup-form'
 import { createHref } from '~/reusable-functions'
 import { WEBSITE_URL } from '~/constants'
+import { GitHubLogoIcon, StarFilledIcon } from '@radix-ui/react-icons'
 
 export default function AuthenticationPage() {
 	const { authState } = useAuthState()
@@ -29,36 +30,34 @@ export default function AuthenticationPage() {
 					Login
 				</Link>
 				<div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-					<div className="absolute inset-0 bg-gradient-to-br from-[rgb(2,105,67)] via-[rgb(0,3,2)] to-[rgb(28,68,72)]" />
+					<div className="bg-primary-gradient absolute inset-0" />
 					<div className="relative z-20 flex items-center text-lg font-medium">
 						<Image src={'/logo/dark.svg'} width={100} height={40} alt="logo" />
 					</div>
 
-					<div className="relative z-20 mt-auto text-left text-2xl font-bold leading-relaxed  md:text-3xl">
-						<span className="text-4xl font-semibold">
-							Do AI Automated WhatsApp Marketing
+					<div className="relative z-20 mt-auto flex max-w-lg flex-col items-start justify-start gap-3 text-left leading-relaxed">
+						<span className="font-sans text-5xl font-light">
+							Do <span className="font-semibold">AI Automated</span> WhatsApp
+							Marketing
 						</span>{' '}
-						<br />
-						<span className="text-lg italic">Faster.</span>
-						<span className="text-lg italic">Smarter.</span>
-						<span className="text-lg italic">Better.</span>
+						<div className="flex flex-row items-start justify-start gap-1">
+							<span className="text-2xl font-light italic">Faster.</span>
+							<span className="text-2xl font-light italic">Smarter.</span>
+							<span className="text-2xl font-light italic">Better.</span>
+						</div>
 					</div>
 
-					<div className="relative z-20 mt-auto">
-						<blockquote className="space-y-2">
-							<p className="text-sm">
-								⭐️ Star us on{' '}
-								<Link
-									href={'https://github.com/wapikit/wapikit'}
-									className="underline"
-									target="_blank"
-								>
-									Github
-								</Link>
-								.
-							</p>
+					<Link
+						href={'https://github.com/wapikit/wapikit'}
+						target="_blank"
+						className="group relative z-20 mt-auto w-fit rounded-lg border border-gray-500 px-2.5 py-1.5"
+					>
+						<blockquote className=" flex items-center gap-2">
+							<GitHubLogoIcon className="text-gray-400" />
+							<p className="text-sm font-bold text-gray-400">Star us on Github</p>
+							<StarFilledIcon className="size-4 text-gray-400 group-hover:text-yellow-400" />
 						</blockquote>
-					</div>
+					</Link>
 				</div>
 				<div className="flex h-full items-center p-4 lg:p-8">
 					<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
