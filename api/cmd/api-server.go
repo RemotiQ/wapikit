@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -76,7 +75,6 @@ func addMiddlewares(e *echo.Echo, app *interfaces.App) {
 	}
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		fmt.Println("Middleware 1")
 		return func(c echo.Context) error {
 			origin := c.Request().Header.Get("Origin")
 			if origin != "" {

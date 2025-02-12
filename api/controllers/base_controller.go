@@ -45,7 +45,7 @@ func _noAuthContextInjectionMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		app := ctx.Get("app").(*interfaces.App)
 		userIp := utils.GetUserIpFromRequest(ctx.Request())
-		userCountry, _ := utils.GetCountryFromIP(userIp)
+		userCountry := utils.GetUserCountryFromRequest(ctx.Request())
 		context := interfaces.BuildContextWithoutSession(ctx, *app, userIp, userCountry)
 		return next(context)
 	}
@@ -139,7 +139,7 @@ func authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 			userIp := utils.GetUserIpFromRequest(ctx.Request())
-			userCountry, _ := utils.GetCountryFromIP(userIp)
+			userCountry := utils.GetUserCountryFromRequest(ctx.Request())
 
 			// ! TODO: fetch the integrations and enabled integration for the users and feed the booleans flags to the context
 			if organizationId == "" {
