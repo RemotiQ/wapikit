@@ -26,7 +26,6 @@ import { Modal } from './ui/modal'
 import { errorNotification } from '~/reusable-functions'
 import { Input } from './ui/input'
 import { Button } from '~/components/ui/button'
-import { Plus } from 'lucide-react'
 import { useLayoutStore } from '~/store/layout.store'
 import { Badge } from './ui/badge'
 
@@ -216,7 +215,8 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 									variant={'secondary'}
 									className="my-2 w-full"
 								>
-									<Plus className="size-5" /> Create New Organization
+									<Icons.plusCircle className="mr-2 size-4" /> Create New
+									Organization
 								</Button>
 							</>
 						)}

@@ -67,7 +67,7 @@ export default function CommandMenuProvider() {
 				groupLabel: 'Campaigns',
 				items: [
 					{
-						icon: 'add',
+						icon: 'plus',
 						label: 'Create Campaign',
 						action: () => {
 							router.push('/campaigns/new-or-edit')
@@ -80,7 +80,7 @@ export default function CommandMenuProvider() {
 				groupLabel: 'Contacts',
 				items: [
 					{
-						icon: 'add',
+						icon: 'plus',
 						label: 'Create List',
 						action: () => {
 							router.push('/lists/new-or-edit')
@@ -96,7 +96,7 @@ export default function CommandMenuProvider() {
 						slug: 'bulk-import-contacts'
 					},
 					{
-						icon: 'add',
+						icon: 'plus',
 						label: 'Create Contact',
 						action: () => {
 							router.push('/contacts/new-or-edit')

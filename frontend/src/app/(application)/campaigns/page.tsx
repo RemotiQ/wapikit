@@ -489,7 +489,7 @@ const CampaignsPage = () => {
 								href={'/campaigns/new-or-edit'}
 								className={clsx(buttonVariants({ variant: 'default' }))}
 							>
-								<Icons.add className="mr-2 h-4 w-4" /> Add New
+								<Icons.plus className="mr-2 h-4 w-4" /> Add New
 							</Link>
 						</div>
 						<Separator />

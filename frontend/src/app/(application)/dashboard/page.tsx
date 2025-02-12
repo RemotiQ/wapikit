@@ -2,8 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { ScrollArea } from '~/components/ui/scroll-area'
-import { ChatBubbleIcon, RocketIcon } from '@radix-ui/react-icons'
-import { Phone } from 'lucide-react'
 import { Divider } from '@tremor/react'
 import { Toaster } from '~/components/ui/sonner'
 import { useGetCampaigns, useGetPrimaryAnalytics } from 'root/.generated'
@@ -107,7 +105,8 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<RocketIcon className={`mx-auto size-6`} />
+									{/* <RocketIcon /> */}
+									<Icons.rocket className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Campaigns</Divider>
 							</CardHeader>
@@ -149,7 +148,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<ChatBubbleIcon className={`mx-auto size-6`} />
+									<Icons.messageChatSquare className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Conversations</Divider>
 							</CardHeader>
@@ -191,7 +190,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<ChatBubbleIcon className={`mx-auto size-6`} />
+									<Icons.messageTextSquare className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Messages</Divider>
 							</CardHeader>
@@ -233,7 +232,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<Phone className={`mx-auto size-6`} />
+									<Icons.contacts className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Contacts</Divider>
 							</CardHeader>

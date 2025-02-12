@@ -299,7 +299,7 @@ const ContactsPage = () => {
 							}
 						},
 						{
-							icon: 'add',
+							icon: 'plus',
 							label: 'Add to lists',
 							onClick: (contactId: string) => {
 								setContactToEditListsFor(() => contactId)
