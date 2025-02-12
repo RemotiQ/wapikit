@@ -166,7 +166,7 @@ export default function UserSignupForm() {
 				<Form {...signUpForm}>
 					<form
 						onSubmit={signUpForm.handleSubmit(initiateRegistration)}
-						className="flex w-full flex-col gap-2 space-y-2"
+						className="flex w-full flex-col gap-1"
 						id="registration-details-form"
 					>
 						<FormField
@@ -178,7 +178,7 @@ export default function UserSignupForm() {
 									<FormControl>
 										<Input
 											type="email"
-											placeholder="Enter your email..."
+											placeholder="Enter your email"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -233,7 +233,7 @@ export default function UserSignupForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="Enter your password..."
+											placeholder="Enter your password"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -262,7 +262,7 @@ export default function UserSignupForm() {
 							)}
 						/>
 
-						<Button disabled={isBusy} className="ml-auto w-full" type="submit">
+						<Button disabled={isBusy} className="ml-auto w-full mt-2" type="submit">
 							Confirm Email
 						</Button>
 					</form>

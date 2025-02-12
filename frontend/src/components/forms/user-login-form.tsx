@@ -80,7 +80,7 @@ export default function UserLoginForm() {
 								<FormControl>
 									<Input
 										type="email"
-										placeholder="Enter your email..."
+										placeholder="Enter your email"
 										disabled={loading}
 										{...field}
 									/>
@@ -99,7 +99,7 @@ export default function UserLoginForm() {
 								<FormControl>
 									<Input
 										type="password"
-										placeholder="Enter your password..."
+										placeholder="Enter your password"
 										disabled={loading}
 										{...field}
 									/>

@@ -59,11 +59,11 @@ export default function AuthenticationPage() {
 						</blockquote>
 					</Link>
 				</div>
-				<div className="flex h-full items-center p-4 lg:p-8">
-					<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-						<div className="flex flex-col space-y-2 text-left">
-							<h1 className="text-2xl font-semibold tracking-tight">
-								Sign up in to WapiKit
+				<div className="flex h-full items-center p-4 lg:p-8 ">
+					<div className="mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[350px]">
+						<div className="flex flex-col text-left">
+							<h1 className="text-2xl font-bold tracking-tight font-sans">
+								Create an account
 							</h1>
 						</div>
 						<UserSignupForm />
