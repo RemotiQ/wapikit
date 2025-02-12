@@ -349,10 +349,8 @@ func handleSignIn(context interfaces.ContextWithoutSession) error {
 	cookie := new(http.Cookie)
 	cookie.Name = "__auth_token"
 	cookie.Value = token
-	cookie.Path = "/"
-	cookie.HttpOnly = true
-	cookie.Secure = true                                 // Set this to true in production for HTTPS
-	cookie.Domain = ".wapikit.com"                       // Ensure the domain matches your app
+	cookie.Secure = true
+	cookie.Domain = "wapikit.com"
 	cookie.Expires = time.Now().Add(time.Hour * 24 * 60) // 60-day expiration
 	context.SetCookie(cookie)
 
