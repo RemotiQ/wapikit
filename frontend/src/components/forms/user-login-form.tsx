@@ -27,7 +27,7 @@ type UserFormValue = z.infer<typeof formSchema>
 export default function UserLoginForm() {
 	const setAuthToken = useLocalStorage<string | undefined>(AUTH_TOKEN_LS, undefined)[1]
 
-	const [loading] = useState(false)
+	const [isBusy, setIsBusy] = useState(false)
 
 	const defaultValues = {
 		email: '',
@@ -41,27 +41,31 @@ export default function UserLoginForm() {
 	const mutation = useLogin()
 
 	const onSubmit = async (data: UserFormValue) => {
-		await mutation.mutateAsync(
-			{
-				data: {
-					password: data.password,
-					username: data.email
-				}
-			},
-			{
-				onSuccess: data => {
-					if (data.token) {
-						setAuthToken(data.token)
-						window.location.href = '/dashboard'
-					} else {
-						// something went wrong show error token not found
+		try {
+			setIsBusy(true)
+			await mutation.mutateAsync(
+				{
+					data: {
+						password: data.password,
+						username: data.email
 					}
 				},
-				onError: error => {
-					console.error(error)
+				{
+					onSuccess: data => {
+						if (data.token) {
+							setAuthToken(data.token)
+							window.location.href = '/dashboard'
+						} else {
+							// something went wrong show error token not found
+						}
+					}
 				}
-			}
-		)
+			)
+		} catch (error) {
+			console.error({ error })
+		} finally {
+			setIsBusy(false)
+		}
 	}
 
 	return (
@@ -81,7 +85,7 @@ export default function UserLoginForm() {
 									<Input
 										type="email"
 										placeholder="Enter your email"
-										disabled={loading}
+										disabled={isBusy}
 										{...field}
 									/>
 								</FormControl>
@@ -100,7 +104,7 @@ export default function UserLoginForm() {
 									<Input
 										type="password"
 										placeholder="Enter your password"
-										disabled={loading}
+										disabled={isBusy}
 										{...field}
 									/>
 								</FormControl>
@@ -109,7 +113,7 @@ export default function UserLoginForm() {
 						)}
 					/>
 
-					<Button disabled={loading} className="ml-auto w-full" type="submit">
+					<Button disabled={isBusy} className="ml-auto w-full" type="submit">
 						Sign in
 					</Button>
 				</form>

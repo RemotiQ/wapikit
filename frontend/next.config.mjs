@@ -9,7 +9,7 @@ const nextConfig = {
 	},
 	output: !isCloudEdition ? 'export' : undefined,
 	compiler: {
-		removeConsole: process.NODE_ENV === 'production'
+		removeConsole: process.env.NODE_ENV === 'production'
 	},
 	images: {
 		unoptimized: true,
