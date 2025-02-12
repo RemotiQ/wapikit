@@ -274,6 +274,10 @@ export type CheckoutPaymentParams = {
    * The plan uniqueId to checkout for
    */
   planId: string;
+  /**
+ * The currency to fetch plans in
+ */
+  currency: CurrencyEnum;
 };
 
 export type GetPaymentPlansParams = {

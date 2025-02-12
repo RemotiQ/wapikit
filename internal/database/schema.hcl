@@ -128,6 +128,18 @@ enum "MessageTypeEnum" {
   ]
 }
 
+enum "CountryEnum" {
+  schema = schema.public
+  values = [
+    "United States", "European Union", "Japan", "United Kingdom", "Australia", "Canada", "Switzerland", "China",
+    "Sweden", "New Zealand", "India", "Russia", "Brazil", "South Africa", "Mexico", "Singapore", "Hong Kong",
+    "Norway", "South Korea", "Turkey", "Indonesia", "Thailand", "Malaysia", "Philippines", "Poland", "Denmark",
+    "Hungary", "Czech Republic", "Israel", "Chile", "Pakistan", "United Arab Emirates", "Colombia", "Saudi Arabia",
+    "Taiwan", "Vietnam", "Nigeria", "Bangladesh", "Egypt", "Kazakhstan", "Qatar", "Kenya", "Sri Lanka", "Peru",
+    "Ukraine", "Romania", "Zambia", "Oman", "Local"
+  ]
+}
+
 enum "WhatsAppBusinessAccountVerificationStatus" {
   schema = schema.public
   values = ["Verified", "Unverified"]

@@ -6,13 +6,11 @@ import (
 	"io"
 	mathRandom "math/rand"
 	"mime/multipart"
-	"net"
 	"net/http"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	. "github.com/go-jet/jet/v2/postgres"
@@ -20,7 +18,7 @@ import (
 	"github.com/nyaruka/phonenumbers"
 	binder "github.com/oapi-codegen/runtime"
 	"github.com/oklog/ulid"
-	"github.com/oschwald/maxminddb-golang"
+	"github.com/pariz/gountries"
 )
 
 func GenerateUniqueId() string {
@@ -110,101 +108,15 @@ type WebhookSecretData struct {
 	OrganizationId            string `json:"organization_id"`
 }
 
-// GetUserIpFromRequest extracts the user's IP address from an HTTP request.
 func GetUserIpFromRequest(r *http.Request) string {
-	// Check X-Forwarded-For header (common in reverse proxies and load balancers)
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		ips := strings.Split(xff, ",")
-		// Take the first IP (original client IP)
-		if len(ips) > 0 {
-			return strings.TrimSpace(ips[0])
-		}
-	}
-
-	// Check X-Real-IP header (another common header for client IP)
-	if xRealIP := r.Header.Get("X-Real-IP"); xRealIP != "" {
-		return xRealIP
-	}
-
-	// Fallback to RemoteAddr (from the TCP connection)
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr // Use the raw address if splitting fails
-	}
-	return ip
+	return r.Header.Get("X-Real-IP")
 }
 
-// GetUserCountryFromRequest determines the user's country based on their IP address.
-// This function assumes the existence of a GeoIP database/service (e.g., MaxMind or IP2Location).
 func GetUserCountryFromRequest(r *http.Request) string {
-	userIP := GetUserIpFromRequest(r)
-	// Example: Using a fictional `GetCountryFromIP` function that uses a GeoIP database
-	country, err := GetCountryFromIP(userIP)
-	if err != nil {
-		return "Local" // Return "Unknown" if the country cannot be determined
-	}
-	return country
-}
-
-var (
-	geoipDB     *maxminddb.Reader
-	geoipDBOnce sync.Once
-	geoipErr    error
-)
-
-// GetCountryFromIP returns the country name for a given IP address
-// using MaxMind GeoLite2 database. Handles local/private IPs specially.
-func GetCountryFromIP(ip string) (string, error) {
-	// Check for local/private IPs first
-	if isLocalIP(ip) {
-		return "Local", nil
-	}
-
-	// Initialize GeoIP database once
-	geoipDBOnce.Do(func() {
-		geoipDB, geoipErr = maxminddb.Open("GeoLite2-Country.mmdb")
-	})
-
-	if geoipErr != nil {
-		return "", fmt.Errorf("geoip database error: %w", geoipErr)
-	}
-
-	parsedIP := net.ParseIP(ip)
-	if parsedIP == nil {
-		return "", fmt.Errorf("invalid IP address format: %s", ip)
-	}
-
-	var record struct {
-		Country struct {
-			ISOCode string            `maxminddb:"iso_code"`
-			Names   map[string]string `maxminddb:"names"`
-		} `maxminddb:"country"`
-	}
-
-	err := geoipDB.Lookup(parsedIP, &record)
-	if err != nil {
-		return "", fmt.Errorf("geoip lookup failed: %w", err)
-	}
-
-	if record.Country.ISOCode == "" {
-		return "", fmt.Errorf("no country found for IP: %s", ip)
-	}
-
-	countryName, ok := record.Country.Names["en"]
-	if !ok || countryName == "" {
-		return "", fmt.Errorf("english country name not found for IP: %s", ip)
-	}
-
-	return countryName, nil
-}
-
-// isLocalIP checks if an IP is private or loopback
-func isLocalIP(ipStr string) bool {
-	ip := net.ParseIP(ipStr)
-	if ip == nil {
-		return false
-	}
-	return ip.IsLoopback() || ip.IsPrivate()
+	countryCode := r.Header.Get("CF-IPCountry")
+	query := gountries.New()
+	country, _ := query.FindCountryByAlpha(countryCode)
+	return country.Name.Common
 }
 
 func GetCurrentTimeAndDateInUTCString() string {

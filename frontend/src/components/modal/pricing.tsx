@@ -14,7 +14,8 @@ import {
 	PricingPlanTierEnum,
 	type PricingPlan,
 	useGetPaymentPlans,
-	useCheckoutPayment
+	useCheckoutPayment,
+	type CurrencyEnum
 } from '~/cloud_generated'
 import { Modal } from '~/components/ui/modal'
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
@@ -156,7 +157,7 @@ export function PricingModal() {
 		router.push(`/verify-payment?token=${token}`)
 	}
 
-	async function checkoutInit(planId: string) {
+	async function checkoutInit(planId: string, currency: CurrencyEnum) {
 		try {
 			writeProperty({
 				isPricingModalOpen: false
@@ -169,7 +170,8 @@ export function PricingModal() {
 
 			const response = await checkout.mutateAsync({
 				params: {
-					planId
+					planId,
+					currency
 				}
 			})
 
@@ -365,8 +367,8 @@ export function PricingModal() {
 											variant={plan.isPopular ? 'default' : 'secondary'}
 											disabled={plan.shouldCtaBeDisabled}
 											onClick={() => {
-												checkoutInit(plan.uniqueId).catch(error =>
-													console.error(error)
+												checkoutInit(plan.uniqueId, plan.currency).catch(
+													error => console.error(error)
 												)
 											}}
 										>
