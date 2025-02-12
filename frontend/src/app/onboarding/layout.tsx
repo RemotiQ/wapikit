@@ -139,7 +139,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 				<Link
 					href={'https://github.com/wapikit/wapikit'}
 					target="_blank"
-					className="group z-10 relative mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
+					className="group relative z-10 mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
 				>
 					<blockquote className=" flex items-center gap-2">
 						<GitHubLogoIcon className="text-gray-400" />

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	useCreateOrganization,
@@ -32,11 +32,9 @@ import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { AUTH_TOKEN_LS, OnboardingStepsEnum } from '~/constants'
-import { useAuthState } from '~/hooks/use-auth-state'
 
 const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 	const router = useRouter()
-	const { authState } = useAuthState()
 
 	const createOrganizationMutation = useCreateOrganization()
 	const inviteUserMutation = useCreateOrganizationInvite()
@@ -84,7 +82,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 
 	const currentStep = useMemo(() => {
 		return onboardingSteps.find(step => step.slug === (stepSlug as OnboardingStepsEnum))
-	}, [stepSlug])
+	}, [stepSlug, onboardingSteps])
 
 	const nextStep = useMemo(() => {
 		return onboardingSteps.find(
@@ -150,7 +148,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 			default:
 				break
 		}
-	}, [])
+	}, [onboardingSteps, currentStep?.slug, writeProperty])
 
 	useEffect(() => {
 		if (
@@ -163,7 +161,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 		} else {
 			router.push(`/onboarding/${OnboardingStepsEnum.CreateOrganization}`)
 		}
-	}, [onboardingSteps, router, nextStep, currentStep])
+	}, [onboardingSteps, currentOrganization, router, nextStep, currentStep])
 
 	if (!currentStep) {
 		return <div>Step not found</div>

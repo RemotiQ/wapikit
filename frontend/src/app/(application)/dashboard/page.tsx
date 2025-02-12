@@ -13,15 +13,12 @@ import { useAuthState } from '~/hooks/use-auth-state'
 import LoadingSpinner from '~/components/loader'
 import { TipCard } from '~/components/dashboard/tip-card'
 import { type TipCardPropType } from '~/types'
-import { useLayoutStore } from '~/store/layout.store'
 import { DashboardCampaignCard } from '~/components/dashboard/campaign-card'
 import { Button } from '~/components/ui/button'
 import { Icons } from '~/components/icons'
 import Link from 'next/link'
 
 export default function Page() {
-	const { currentOrganization } = useLayoutStore()
-
 	const { authState } = useAuthState()
 
 	const { data: primaryAnalyticsData } = useGetPrimaryAnalytics({

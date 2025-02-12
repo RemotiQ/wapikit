@@ -17,7 +17,7 @@ export function DashboardCampaignCard({
 	const { status, createdAt, name, description, scheduledAt, sentAt, stats } = campaign
 
 	return (
-		<Card className="flex h-full min-h- max-w-md flex-1 flex-col">
+		<Card className="min-h- flex h-full max-w-md flex-1 flex-col">
 			<CardHeader className="flex !flex-row !items-center justify-between p-2 !pb-2 !pt-4 ">
 				<div className="flex flex-col gap-2">
 					<CardTitle className="truncate text-base !font-semibold">{name}</CardTitle>
