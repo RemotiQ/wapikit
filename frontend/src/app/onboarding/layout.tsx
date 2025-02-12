@@ -1,7 +1,9 @@
 'use client'
 
+import { DotFilledIcon, GitHubLogoIcon } from '@radix-ui/react-icons'
 import { clsx } from 'clsx'
-import { CheckIcon } from 'lucide-react'
+import { CheckIcon } from '@radix-ui/react-icons'
+import { StarFilledIcon } from '@radix-ui/react-icons'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -32,7 +34,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 			>
 				Login
 			</Link>
-			<div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
+			<div className="relative hidden  h-full flex-col justify-between bg-muted p-10 text-white dark:border-r lg:flex">
 				<div className="absolute inset-0 bg-gradient-to-br from-[rgb(2,105,67)] via-[rgb(0,3,2)] to-[rgb(28,68,72)]" />
 				<div className="relative z-20 flex items-center text-lg font-medium">
 					<Image src={'/logo/dark.svg'} width={100} height={40} alt="logo" />
@@ -60,14 +62,14 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 										) : null}
 										<div className="group relative flex items-start">
 											<span className="flex h-9 items-center">
-												<span className="relative z-10 flex items-center justify-center rounded-md border border-[#25d366] p-2 backdrop-blur-md">
+												<span className="relative z-10 flex items-center justify-center rounded-full border-2 border-[#25d366] p-2 backdrop-blur-md">
 													<CheckIcon
-														className={`size-5 text-[#25d366]`}
+														className={`size-4 text-[#25d366]`}
 													/>
 												</span>
 											</span>
 											<span className="ml-4 flex min-w-0 flex-col">
-												<span className="text-xs font-semibold uppercase tracking-wide text-[#25d366]">
+												<span className="text-sm font-semibold tracking-wide text-[#25d366]">
 													{step.title}
 												</span>
 												<span className="text-sm opacity-55">
@@ -89,12 +91,14 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 											aria-current="step"
 										>
 											<span className="flex h-9 items-center">
-												<span className="relative z-10 flex items-center justify-center rounded-md border border-primary-foreground p-2 backdrop-blur-md">
-													<IconToRender className={`size-5 text-white`} />
+												<span className="relative z-10 flex items-center justify-center rounded-full border-2 border-primary-foreground p-2 backdrop-blur-md">
+													<DotFilledIcon
+														className={`size-4 text-white`}
+													/>
 												</span>
 											</span>
 											<span className="ml-4 flex min-w-0 flex-col">
-												<span className="text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+												<span className="text-sm font-semibold tracking-wide text-primary">
 													{step.title}
 												</span>
 												<span className="text-sm opacity-55">
@@ -113,12 +117,12 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 										) : null}
 										<div className="group relative flex items-start">
 											<span className="flex h-9 items-center">
-												<span className="relative z-10 flex items-center justify-center rounded-md border border-primary-foreground p-2 backdrop-blur-lg">
-													<IconToRender className={`size-5`} />
+												<span className="relative z-10 flex items-center justify-center rounded-full border-2 border-primary-foreground p-2 backdrop-blur-lg">
+													<IconToRender className={`size-4`} />
 												</span>
 											</span>
 											<span className="ml-4 flex min-w-0 flex-col">
-												<span className="text-xs font-semibold uppercase tracking-wide ">
+												<span className="text-sm font-semibold tracking-wide ">
 													{step.title}
 												</span>
 												<span className="text-sm opacity-55">
@@ -132,22 +136,17 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 						)
 					})}
 				</ol>
-
-				<div className="relative z-20 mt-auto">
-					<blockquote className="space-y-2">
-						<p className="text-sm">
-							⭐️ Star us on{' '}
-							<Link
-								href={'https://github.com/wapikit/wapikit'}
-								className="underline"
-								target="_blank"
-							>
-								Github
-							</Link>
-							.
-						</p>
+				<Link
+					href={'https://github.com/wapikit/wapikit'}
+					target="_blank"
+					className="group relative z-10 mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
+				>
+					<blockquote className=" flex items-center gap-2">
+						<GitHubLogoIcon className="text-gray-400" />
+						<p className="text-sm font-bold text-gray-400">Star us on Github</p>
+						<StarFilledIcon className="size-4  text-yellow-400" />
 					</blockquote>
-				</div>
+				</Link>
 			</div>
 			<div className="flex h-full items-center p-4 lg:p-8">
 				<div className="mx-auto flex w-full max-w-xl flex-col justify-center space-y-6">

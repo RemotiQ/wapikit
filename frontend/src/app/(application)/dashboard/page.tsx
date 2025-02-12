@@ -2,8 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { ScrollArea } from '~/components/ui/scroll-area'
-import { ChatBubbleIcon, RocketIcon } from '@radix-ui/react-icons'
-import { Phone } from 'lucide-react'
 import { Divider } from '@tremor/react'
 import { Toaster } from '~/components/ui/sonner'
 import { useGetCampaigns, useGetPrimaryAnalytics } from 'root/.generated'
@@ -13,15 +11,12 @@ import { useAuthState } from '~/hooks/use-auth-state'
 import LoadingSpinner from '~/components/loader'
 import { TipCard } from '~/components/dashboard/tip-card'
 import { type TipCardPropType } from '~/types'
-import { useLayoutStore } from '~/store/layout.store'
 import { DashboardCampaignCard } from '~/components/dashboard/campaign-card'
 import { Button } from '~/components/ui/button'
 import { Icons } from '~/components/icons'
 import Link from 'next/link'
 
 export default function Page() {
-	const { currentOrganization } = useLayoutStore()
-
 	const { authState } = useAuthState()
 
 	const { data: primaryAnalyticsData } = useGetPrimaryAnalytics({
@@ -70,19 +65,6 @@ export default function Page() {
 			href: '/team',
 			icon: 'user'
 		},
-
-		// ! TODO: not all members has permission to update the organization description
-		...(currentOrganization?.description && currentOrganization.description.length < 50
-			? ([
-					{
-						title: 'Update Your Organization Description',
-						description:
-							'The AI Automation would perform at its best if you provide a detailed description of your organization. This would help the AI to understand your organization better and what you do.',
-						href: '/settings?tab=organization-settings',
-						icon: 'user'
-					}
-				] as TipCardPropType[])
-			: []),
 		{
 			title: 'Ask AI',
 			description:
@@ -123,7 +105,8 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<RocketIcon className={`mx-auto size-6`} />
+									{/* <RocketIcon /> */}
+									<Icons.rocket className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Campaigns</Divider>
 							</CardHeader>
@@ -165,7 +148,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<ChatBubbleIcon className={`mx-auto size-6`} />
+									<Icons.messageChatSquare className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Conversations</Divider>
 							</CardHeader>
@@ -207,7 +190,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<ChatBubbleIcon className={`mx-auto size-6`} />
+									<Icons.messageTextSquare className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Messages</Divider>
 							</CardHeader>
@@ -249,7 +232,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									<Phone className={`mx-auto size-6`} />
+									<Icons.contacts className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Contacts</Divider>
 							</CardHeader>

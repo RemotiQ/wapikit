@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	useCreateOrganization,
@@ -80,27 +80,90 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 			webhookSecret: false
 		})
 
+	const currentStep = useMemo(() => {
+		return onboardingSteps.find(step => step.slug === (stepSlug as OnboardingStepsEnum))
+	}, [stepSlug, onboardingSteps])
+
+	const nextStep = useMemo(() => {
+		return onboardingSteps.find(
+			(_, index) =>
+				index ===
+				onboardingSteps.findIndex(s => s.slug === (stepSlug as OnboardingStepsEnum)) + 1
+		)
+	}, [stepSlug, onboardingSteps])
+
 	useEffect(() => {
-		const step = onboardingSteps.find(step => step.slug === (stepSlug as OnboardingStepsEnum))
+		// set the current step and all data
 
-		if (step?.status === 'complete') {
-			const nextStep = onboardingSteps.find(
-				(_, index) =>
-					index ===
-					onboardingSteps.findIndex(s => s.slug === (stepSlug as OnboardingStepsEnum)) + 1
-			)
-
-			if (nextStep) {
-				router.push(`/onboarding/${nextStep.slug}`)
-			} else {
-				router.push('/dashboard')
+		switch (currentStep?.slug) {
+			case OnboardingStepsEnum.CreateOrganization: {
+				// keep default
+				break
 			}
+
+			case OnboardingStepsEnum.WhatsappBusinessAccountDetails: {
+				writeProperty({
+					onboardingSteps: onboardingSteps.map(step => {
+						if (step.slug === OnboardingStepsEnum.CreateOrganization) {
+							return {
+								...step,
+								status: 'complete'
+							}
+						} else if (step.slug === OnboardingStepsEnum.InviteTeamMembers) {
+							return {
+								...step,
+								status: 'incomplete'
+							}
+						} else {
+							return {
+								...step,
+								status: 'current'
+							}
+						}
+					})
+				})
+
+				break
+			}
+
+			case OnboardingStepsEnum.InviteTeamMembers: {
+				writeProperty({
+					onboardingSteps: onboardingSteps.map(step => {
+						if (step.slug === OnboardingStepsEnum.InviteTeamMembers) {
+							return {
+								...step,
+								status: 'current'
+							}
+						} else {
+							return {
+								...step,
+								status: 'complete'
+							}
+						}
+					})
+				})
+				break
+			}
+
+			default:
+				break
 		}
-	}, [onboardingSteps, router, stepSlug])
+	}, [onboardingSteps, currentStep?.slug, writeProperty])
 
-	const step = onboardingSteps.find(step => step.slug === (stepSlug as OnboardingStepsEnum))
+	useEffect(() => {
+		if (
+			currentOrganization &&
+			currentOrganization.whatsappBusinessAccountDetails?.businessAccountId
+		) {
+			router.push(`/onboarding/${OnboardingStepsEnum.InviteTeamMembers}`)
+		} else if (currentOrganization) {
+			router.push(`/onboarding/${OnboardingStepsEnum.WhatsappBusinessAccountDetails}`)
+		} else {
+			router.push(`/onboarding/${OnboardingStepsEnum.CreateOrganization}`)
+		}
+	}, [onboardingSteps, currentOrganization, router, nextStep, currentStep])
 
-	if (!step) {
+	if (!currentStep) {
 		return <div>Step not found</div>
 	}
 
@@ -145,8 +208,8 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 		try {
 			const response = await createOrganizationMutation.mutateAsync({
 				data: {
-					name: data.name
-					// description: data.description || undefined
+					name: data.name,
+					description: data.description || undefined
 				}
 			})
 
@@ -216,7 +279,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 		}
 	}
 
-	switch (step.slug) {
+	switch (currentStep.slug) {
 		case OnboardingStepsEnum.CreateOrganization: {
 			return (
 				<div className="flex w-full items-center justify-end space-x-2">

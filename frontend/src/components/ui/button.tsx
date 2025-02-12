@@ -5,11 +5,12 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { clsx as cn } from 'clsx'
 
 const buttonVariants = cva(
-	'inline-flex min-w-max items-center justify-center flex-shrink-0 border font-normal focus:outline-none disabled:shadow-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer',
+	'inline-flex min-w-max items-center justify-center flex-shrink-0 border font-semibold focus:outline-none disabled:shadow-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer',
 	{
 		variants: {
 			variant: {
-				default: 'bg-primary border text-primary-foreground shadow hover:bg-primary/90',
+				default:
+					'bg-primary border border-primaryShades-600 font-semibold text-primary-foreground shadow hover:bg-primary/90',
 				destructive:
 					'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
 				outline:

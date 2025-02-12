@@ -176,7 +176,7 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 										actionButtonConfig={{
 											label: (
 												<span className="flex items-center gap-2">
-													<Icons.add className="h-4 w-4" />
+													<Icons.plus className="h-4 w-4" />
 													Create Tag
 												</span>
 											),

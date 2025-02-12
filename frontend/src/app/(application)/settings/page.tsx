@@ -861,7 +861,7 @@ export default function SettingsPage() {
 									onClick={() => {
 										router.push(`/settings?tab=${tab.slug}`)
 									}}
-									className='hover:bg-muted'
+									className="hover:bg-muted"
 								>
 									{tab.title}
 								</TabsTrigger>
