@@ -9,8 +9,7 @@ import { ConversationStatusChart } from '~/components/analytics/conversation-dat
 import { MessageTypeBifurcation } from '~/components/analytics/message-type-distribution'
 import { OrganizationMembers } from '~/components/analytics/org-members'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
-import { ExclamationTriangleIcon, InfoCircledIcon } from '@radix-ui/react-icons'
-import { Callout } from '@tremor/react'
+import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Toaster } from '~/components/ui/sonner'
 import { useGetPrimaryAnalytics, useGetSecondaryAnalytics } from 'root/.generated'
 import { type DateRange } from 'react-day-picker'
@@ -19,6 +18,12 @@ import dayjs from 'dayjs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 import { useAuthState } from '~/hooks/use-auth-state'
 import LoadingSpinner from '~/components/loader'
+import { EngagementTrends } from '~/components/analytics/engagement'
+
+enum AnalyticsTabEnum {
+	Campaigns = 'campaigns',
+	Conversations = 'conversations'
+}
 
 export default function Page() {
 	const { authState } = useAuthState()
@@ -27,6 +32,7 @@ export default function Page() {
 		from: dayjs().subtract(20, 'day').toDate(),
 		to: dayjs().toDate()
 	})
+
 	const { data: primaryAnalyticsData } = useGetPrimaryAnalytics({
 		from: date.from?.toISOString() || dayjs().subtract(20, 'day').toISOString(),
 		to: date.to?.toISOString() || dayjs().toISOString()
@@ -74,78 +80,221 @@ export default function Page() {
 						</TooltipProvider>
 					</div>
 				</div>
-				<Tabs defaultValue="overview" className="space-y-4">
+				<Tabs defaultValue={AnalyticsTabEnum.Campaigns} className="space-y-4">
 					<TabsList>
-						<TabsTrigger value="overview">Overview</TabsTrigger>
-						<TabsTrigger value="conversations">Conversations</TabsTrigger>
+						{[AnalyticsTabEnum.Campaigns, AnalyticsTabEnum.Conversations].map(
+							(tab, index) => {
+								return (
+									<TabsTrigger key={index} value={tab}>
+										{tab}
+									</TabsTrigger>
+								)
+							}
+						)}
 					</TabsList>
-					<TabsContent value="overview" className="space-y-4">
-						<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8">
-							<Card className="col-span-2 md:col-span-4">
-								<CardHeader>
-									<CardTitle>Message Analytics</CardTitle>
-								</CardHeader>
-								<CardContent className="pl-2">
-									<MessageAggregateAnalytics
-										data={primaryAnalyticsData?.messageAnalytics || []}
-									/>
-								</CardContent>
-							</Card>
-							<Card className="col-span-4 md:col-span-4">
-								<CardHeader>
-									<CardTitle>Link Clicks</CardTitle>
-								</CardHeader>
-								<CardContent className="pl-2">
-									<LinkClicks
-										data={primaryAnalyticsData?.linkClickAnalytics || []}
-									/>
-								</CardContent>
-							</Card>
-						</div>
-					</TabsContent>
-					<TabsContent value="conversations" className="space-y-4">
-						<Callout title="" icon={ExclamationTriangleIcon}>
-							{' '}
-							These analytics will be available, once the{' '}
-							<a href="/conversations" className="underline">
-								live team inbox conversation
-							</a>{' '}
-							feature will be shipped soon.{' '}
-						</Callout>
-						<div>
-							<Card className="col-span-2 md:col-span-4">
-								<CardHeader>
-									<CardTitle>Message Type Distribution</CardTitle>
-								</CardHeader>
-								<CardContent className="pl-2">
-									<MessageTypeBifurcation
-										data={
-											secondaryAnalyticsData?.messageTypeTrafficDistributionAnalytics ||
-											[]
-										}
-									/>
-								</CardContent>
-							</Card>
-						</div>
-						<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8">
-							<Card className="col-span-3 md:col-span-4">
-								<CardHeader>
-									<CardTitle>Organization Members</CardTitle>
-								</CardHeader>
-								<CardContent className="pl-2">
-									<OrganizationMembers />
-								</CardContent>
-							</Card>
-							<Card className="col-span-3 md:col-span-4">
-								<CardHeader>
-									<CardTitle>Conversation Status</CardTitle>
-								</CardHeader>
-								<CardContent className="pl-2">
-									<ConversationStatusChart />
-								</CardContent>
-							</Card>
-						</div>
-					</TabsContent>
+
+					{[AnalyticsTabEnum.Campaigns, AnalyticsTabEnum.Conversations].map(
+						(tab, index) => {
+							return (
+								<TabsContent key={index} value={tab}>
+									{tab === AnalyticsTabEnum.Campaigns ? (
+										<>
+											<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+												{[
+													{
+														title: 'Campaigns Sent',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsFinished ||
+															0,
+														isPercentage: false
+													},
+													{
+														title: 'Open Rate',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsRunning ||
+															0,
+														isPercentage: true
+													},
+													{
+														title: 'Reply Rate',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsRunning ||
+															0,
+														isPercentage: true
+													},
+													{
+														title: 'Engagement Rate',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsRunning ||
+															0,
+														isPercentage: true
+													}
+												].map((item, index) => {
+													return (
+														<Card key={index} className="">
+															<CardHeader>
+																<CardTitle className="text-sm font-normal text-muted-foreground">
+																	{item.title}
+																</CardTitle>
+															</CardHeader>
+															<CardContent className="pl-5">
+																<div className="flex items-center gap-1 text-3xl font-bold">
+																	{item.value}
+																	<span className="text-xl text-muted-foreground">
+																		{item.isPercentage
+																			? '%'
+																			: ''}
+																	</span>
+																</div>
+															</CardContent>
+														</Card>
+													)
+												})}
+											</div>
+
+											<div className="w-full">
+												<Card className="col-span-2 md:col-span-4">
+													<CardHeader>
+														<CardTitle>Engagement Trends</CardTitle>
+													</CardHeader>
+													<CardContent className="pl-2">
+														<EngagementTrends data={[]} />
+													</CardContent>
+												</Card>
+											</div>
+
+											<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8">
+												<Card className="col-span-2 md:col-span-4">
+													<CardHeader>
+														<CardTitle>Message Analytics</CardTitle>
+													</CardHeader>
+													<CardContent className="pl-2">
+														<MessageAggregateAnalytics
+															data={
+																primaryAnalyticsData?.messageAnalytics ||
+																[]
+															}
+														/>
+													</CardContent>
+												</Card>
+												<Card className="col-span-4 md:col-span-4">
+													<CardHeader>
+														<CardTitle>Link Clicks</CardTitle>
+													</CardHeader>
+													<CardContent className="pl-2">
+														<LinkClicks
+															data={
+																primaryAnalyticsData?.linkClickAnalytics ||
+																[]
+															}
+														/>
+													</CardContent>
+												</Card>
+											</div>
+										</>
+									) : (
+										<>
+											<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+												{[
+													{
+														title: 'Avg. Response Time',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsFinished ||
+															0,
+														isPercentage: false
+													},
+													{
+														title: 'Inbound:Outbound Ratio',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsRunning ||
+															0,
+														isPercentage: false
+													},
+													{
+														title: 'Service Conversations',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsRunning ||
+															0,
+														isPercentage: false
+													},
+													{
+														title: 'Total Active Conversations',
+														value:
+															primaryAnalyticsData?.aggregateAnalytics
+																.campaignStats.campaignsRunning ||
+															0,
+														isPercentage: false
+													}
+												].map((item, index) => {
+													return (
+														<Card key={index} className="">
+															<CardHeader>
+																<CardTitle className="text-sm font-normal text-muted-foreground">
+																	{item.title}
+																</CardTitle>
+															</CardHeader>
+															<CardContent className="pl-5">
+																<div className="flex items-center gap-1 text-3xl font-bold">
+																	{item.value}
+																	<span className="text-xl text-muted-foreground">
+																		{item.isPercentage
+																			? '%'
+																			: ''}
+																	</span>
+																</div>
+															</CardContent>
+														</Card>
+													)
+												})}
+											</div>
+											<div>
+												<Card className="col-span-2 md:col-span-4">
+													<CardHeader>
+														<CardTitle>
+															Message Type Distribution
+														</CardTitle>
+													</CardHeader>
+													<CardContent className="pl-2">
+														<MessageTypeBifurcation
+															data={
+																secondaryAnalyticsData?.messageTypeTrafficDistributionAnalytics ||
+																[]
+															}
+														/>
+													</CardContent>
+												</Card>
+											</div>
+											<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8">
+												<Card className="col-span-3 md:col-span-4">
+													<CardHeader>
+														<CardTitle>Organization Members</CardTitle>
+													</CardHeader>
+													<CardContent className="pl-2">
+														<OrganizationMembers />
+													</CardContent>
+												</Card>
+												<Card className="col-span-3 md:col-span-4">
+													<CardHeader>
+														<CardTitle>Conversation Status</CardTitle>
+													</CardHeader>
+													<CardContent className="pl-2">
+														<ConversationStatusChart />
+													</CardContent>
+												</Card>
+											</div>
+										</>
+									)}
+								</TabsContent>
+							)
+						}
+					)}
 				</Tabs>
 			</div>
 		</ScrollArea>

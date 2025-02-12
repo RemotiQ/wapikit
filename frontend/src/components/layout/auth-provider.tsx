@@ -97,8 +97,11 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 				})
 			})
 
-			router.push(`/onboarding/${OnboardingStepsEnum.CreateOrganization}`)
-			setHasRedirected(() => true)
+			// * check if the page is not the invite page
+			if (pathname !== '/invite') {
+				router.push(`/onboarding/${OnboardingStepsEnum.CreateOrganization}`)
+				setHasRedirected(() => true)
+			}
 		} else {
 			console.log('userData', userData)
 

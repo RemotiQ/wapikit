@@ -27,8 +27,7 @@ const SignUpFormSchema = z.object({
 	password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 	confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 	name: z.string().min(6, { message: 'Name must be at least 6 characters' }),
-	username: z.string().min(6, { message: 'Username must be at least 6 characters' }),
-	orgInviteSlug: z.string().optional()
+	username: z.string().min(6, { message: 'Username must be at least 6 characters' })
 })
 
 type SingUpFormValue = z.infer<typeof SignUpFormSchema>
@@ -46,8 +45,7 @@ export default function UserSignupForm() {
 		email: '',
 		password: '',
 		confirmPassword: '',
-		name: '',
-		orgInviteSlug: ''
+		name: ''
 	}
 
 	const signUpForm = useForm<SingUpFormValue>({
@@ -84,8 +82,7 @@ export default function UserSignupForm() {
 					password: data.password,
 					username: data.email,
 					email: data.email,
-					name: data.name,
-					organizationInviteSlug: data.orgInviteSlug || undefined
+					name: data.name
 				}
 			})
 
@@ -120,7 +117,6 @@ export default function UserSignupForm() {
 					username: userData.username,
 					email: userData.email,
 					name: userData.name,
-					organizationInviteSlug: userData.orgInviteSlug || undefined,
 					otp: data.otp
 				}
 			})
@@ -237,24 +233,6 @@ export default function UserSignupForm() {
 										<Input
 											type="password"
 											placeholder="Confirm your password"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={signUpForm.control}
-							name="orgInviteSlug"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Organization Invitation Id (Optional)</FormLabel>
-									<FormControl>
-										<Input
-											placeholder="#########"
 											disabled={isBusy}
 											{...field}
 										/>
