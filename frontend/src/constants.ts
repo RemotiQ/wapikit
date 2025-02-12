@@ -8,6 +8,8 @@ export const IS_MANAGED_CLOUD_EDITION = process.env.NEXT_PUBLIC_IS_MANAGED_CLOUD
 
 export const AUTH_TOKEN_LS = '__auth_token'
 
+export const REDIRECT_URL_LS = '__redirect_url'
+
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
 		return 'http://127.0.0.1:8000/api'

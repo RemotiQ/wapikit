@@ -10,13 +10,14 @@ import {
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useRegister, useVerifyOtp } from '~/generated'
 import { useLocalStorage } from '~/hooks/use-local-storage'
-import { AUTH_TOKEN_LS } from '~/constants'
+import { AUTH_TOKEN_LS, REDIRECT_URL_LS } from '~/constants'
 import { errorNotification } from '~/reusable-functions'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 const otpFormSchema = z.object({
 	otp: z.string().length(6, { message: 'OTP must be 6 characters' })
@@ -35,6 +36,19 @@ type OtpFormValue = z.infer<typeof otpFormSchema>
 
 export default function UserSignupForm() {
 	const setAuthToken = useLocalStorage<string | undefined>(AUTH_TOKEN_LS, undefined)[1]
+	const [redirectUrl, setRedirectUrl] = useLocalStorage<string | undefined>(
+		REDIRECT_URL_LS,
+		undefined
+	)
+	const searchParams = useSearchParams()
+	const router = useRouter()
+
+	useEffect(() => {
+		const redirectUrl = searchParams.get('redirectUri')
+		if (redirectUrl) {
+			setRedirectUrl('redirectUri')
+		}
+	}, [searchParams, setRedirectUrl])
 
 	const [isBusy, setIsBusy] = useState(false)
 	const [activeForm, setActiveForm] = useState<'registrationDetailsForm' | 'otpForm'>(
@@ -123,7 +137,13 @@ export default function UserSignupForm() {
 
 			if (response.token) {
 				setAuthToken(response.token)
-				window.location.href = '/dashboard'
+
+				if (redirectUrl) {
+					router.push(redirectUrl)
+					return
+				} else {
+					window.location.href = '/dashboard'
+				}
 			} else {
 				// something went wrong show error token not found
 				errorNotification({
