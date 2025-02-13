@@ -18,11 +18,10 @@ export default function AuthenticationPage() {
 	} else if (authState.isAuthenticated === false) {
 		return (
 			<div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-				<div className="relative hidden h-full flex-col bg-primary-gradient p-10 text-white dark:border-r lg:flex">
+				<div className="relative  hidden h-full flex-col overflow-hidden bg-primary-gradient p-10 text-white  dark:border-r lg:flex">
 					<div className="relative z-20 flex items-center text-lg font-medium">
 						<Image src={'/logo/dark.svg'} width={100} height={40} alt="logo" />
 					</div>
-
 					<div className="relative z-20 mt-auto flex max-w-lg flex-col items-start justify-start gap-3 text-left leading-relaxed">
 						<span className="font-sans text-5xl font-light">
 							Do <span className="font-semibold">AI Automated</span> WhatsApp
@@ -34,7 +33,6 @@ export default function AuthenticationPage() {
 							<span className="text-2xl font-light italic">Better.</span>
 						</div>
 					</div>
-
 					<Link
 						href={'https://github.com/wapikit/wapikit'}
 						target="_blank"
@@ -48,12 +46,12 @@ export default function AuthenticationPage() {
 					</Link>
 				</div>
 				<div className="flex h-full items-center p-4 lg:p-8">
-					<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+					<div className="mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[350px]">
 						<div className="flex flex-col space-y-2 text-left">
 							<h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
 						</div>
 						<UserLoginForm />
-						<p className="text-left text-sm text-muted-foreground">
+						<p className="text-left text-sm font-normal text-muted-foreground">
 							By clicking continue, you agree to our{' '}
 							<Link
 								href={createHref({
@@ -65,7 +63,7 @@ export default function AuthenticationPage() {
 										utm_source: 'application-login-page'
 									}
 								})}
-								className="cursor-pointer underline underline-offset-4 hover:text-primary"
+								className="cursor-pointer font-medium text-foreground underline-offset-2 hover:underline"
 							>
 								Terms & Conditions
 							</Link>{' '}
@@ -80,21 +78,17 @@ export default function AuthenticationPage() {
 										utm_source: 'application-login-page'
 									}
 								})}
-								className="cursor-pointer underline underline-offset-4 hover:text-primary"
+								className="cursor-pointer font-medium text-foreground underline-offset-2 hover:underline"
 							>
 								Privacy Policy
 							</Link>
 							.
 						</p>
-						<p className="cursor-pointer text-left text-xs text-muted-foreground">
+						<p className="cursor-pointer text-left text-sm font-normal text-muted-foreground">
 							Don't have an account?{' '}
-							<Link
-								href="/signup"
-								className="underline underline-offset-4 hover:text-primary"
-							>
+							<Link href="/signup" className="font-medium text-foreground hover:underline underline-offset-2">
 								Signup
 							</Link>
-							.
 						</p>
 					</div>
 				</div>

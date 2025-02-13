@@ -23,18 +23,18 @@ const otpFormSchema = z.object({
 	otp: z.string().length(6, { message: 'OTP must be 6 characters' })
 })
 
-const SignUpFormSchema = z.object({
-	email: z.string().email({ message: 'Enter a valid email address' }),
-	password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-	confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-	name: z.string().min(6, { message: 'Name must be at least 6 characters' }),
-	username: z.string().min(6, { message: 'Username must be at least 6 characters' })
+const confirmEmailFormSchema = z.object({
+	email: z.string().email({ message: 'Enter a valid email address' })
 })
-
-type SingUpFormValue = z.infer<typeof SignUpFormSchema>
+const resetPasswordFormSchema = z.object({
+	password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+	confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' })
+})
+type confirmEmailValue = z.infer<typeof confirmEmailFormSchema>
+type resetPasswordFormValue = z.infer<typeof resetPasswordFormSchema>
 type OtpFormValue = z.infer<typeof otpFormSchema>
 
-export default function UserSignupForm() {
+export default function UserResetPasswordForm() {
 	const setAuthToken = useLocalStorage<string | undefined>(AUTH_TOKEN_LS, undefined)[1]
 	const [redirectUrl, setRedirectUrl] = useLocalStorage<string | undefined>(
 		REDIRECT_URL_LS,
@@ -51,19 +51,16 @@ export default function UserSignupForm() {
 	}, [searchParams, setRedirectUrl])
 
 	const [isBusy, setIsBusy] = useState(false)
-	const [activeForm, setActiveForm] = useState<'registrationDetailsForm' | 'otpForm'>(
-		'registrationDetailsForm'
-	)
+	const [activeForm, setActiveForm] = useState<
+		'confirmEmailForm' | 'otpForm' | 'resetpasswordForm'
+	>('confirmEmailForm')
 
 	const defaultValues = {
-		email: '',
-		password: '',
-		confirmPassword: '',
-		name: ''
+		email: ''
 	}
 
-	const signUpForm = useForm<SingUpFormValue>({
-		resolver: zodResolver(SignUpFormSchema),
+	const confirmEmailForm = useForm<confirmEmailValue>({
+		resolver: zodResolver(confirmEmailFormSchema),
 		defaultValues
 	})
 
@@ -74,10 +71,18 @@ export default function UserSignupForm() {
 		}
 	})
 
+	const resetPasswordForm = useForm<resetPasswordFormValue>({
+		resolver: zodResolver(otpFormSchema),
+		defaultValues: {
+			password: '',
+			confirmPassword: ''
+		}
+	})
+
 	const sendEmailConfirmationOtpMutation = useRegister()
 	const createAccountMutation = useVerifyOtp()
 
-	async function initiateRegistration(data: SingUpFormValue) {
+	async function ConfirmEmail(data: confirmEmailValue) {
 		try {
 			if (isBusy) {
 				return
@@ -93,10 +98,7 @@ export default function UserSignupForm() {
 
 			const response = await sendEmailConfirmationOtpMutation.mutateAsync({
 				data: {
-					password: data.password,
-					username: data.email,
-					email: data.email,
-					name: data.name
+					email: data.email
 				}
 			})
 
@@ -109,7 +111,7 @@ export default function UserSignupForm() {
 		} catch (error) {
 			console.error(error)
 			errorNotification({
-				message: 'Something went wrong while creating your account'
+				message: 'Something went wrong'
 			})
 		} finally {
 			setIsBusy(false)
@@ -123,14 +125,13 @@ export default function UserSignupForm() {
 			}
 			setIsBusy(true)
 
-			const userData = signUpForm.getValues()
+			const userData = confirmEmailForm.getValues()
 
 			const response = await createAccountMutation.mutateAsync({
 				data: {
-					password: userData.password,
-					username: userData.username,
+					// password: userData.password,
+					// username: userData.username,
 					email: userData.email,
-					name: userData.name,
 					otp: data.otp
 				}
 			})
@@ -142,133 +143,79 @@ export default function UserSignupForm() {
 					router.push(redirectUrl)
 					return
 				} else {
-					window.location.href = '/dashboard'
+					window.location.href = '/signin'
 				}
 			} else {
 				// something went wrong show error token not found
 				errorNotification({
-					message: 'Something went wrong while creating your account'
+					message: 'Something went wrong'
 				})
 			}
 		} catch (error) {
 			console.error(error)
 			errorNotification({
-				message: 'Something went wrong while creating your account'
+				message: 'Something went wrong'
 			})
 		} finally {
 			setIsBusy(false)
 		}
 	}
 
+	async function resetPassword(data: resetPasswordFormValue) {}
+
 	return (
 		<>
-			{activeForm === 'registrationDetailsForm' ? (
-				<Form {...signUpForm}>
-					<form
-						onSubmit={signUpForm.handleSubmit(initiateRegistration)}
-						className="flex w-full flex-col gap-1"
-						id="registration-details-form"
-					>
-						<FormField
-							control={signUpForm.control}
-							name="email"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Email</FormLabel>
-									<FormControl>
-										<Input
-											type="email"
-											placeholder="you@youremail.com"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+			{activeForm === 'confirmEmailForm' ? (
+				<Form {...confirmEmailForm}>
+					<div className="flex flex-col justify-center space-y-6">
+						<p className="text-sm font-normal text-muted-foreground">
+							We will send an email with verification code.
+						</p>
+						<form
+							onSubmit={confirmEmailForm.handleSubmit(ConfirmEmail)}
+							className="flex w-full flex-col gap-1"
+							id="registration-details-form"
+						>
+							<FormField
+								control={confirmEmailForm.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Email</FormLabel>
+										<FormControl>
+											<Input
+												type="email"
+												placeholder="you@youremail.com"
+												disabled={isBusy}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-						<FormField
-							control={signUpForm.control}
-							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Name</FormLabel>
-									<FormControl>
-										<Input
-											placeholder="your name"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={signUpForm.control}
-							name="username"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Username</FormLabel>
-									<FormControl>
-										<Input
-											placeholder="your username"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={signUpForm.control}
-							name="password"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Password</FormLabel>
-									<FormControl>
-										<Input
-											type="password"
-											placeholder="At least 6 characters"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={signUpForm.control}
-							name="confirmPassword"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Confirm Password</FormLabel>
-									<FormControl>
-										<Input
-											type="password"
-											placeholder="Confirm your password"
-											disabled={isBusy}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<Button disabled={isBusy} className="ml-auto mt-2 w-full" type="submit">
-							Confirm Email
-						</Button>
-					</form>
+							<Button disabled={isBusy} className="ml-auto mt-2 w-full" type="submit">
+								Next
+							</Button>
+							<Button
+								onClick={e => {
+									e.preventDefault()
+									router.push('/signin')
+								}}
+								variant={'link'}
+							>
+								Go Back
+							</Button>
+						</form>
+					</div>
 				</Form>
-			) : (
+			) : activeForm === 'otpForm' ? (
 				<Form {...otpForm}>
+					<p className="text-sm font-normal text-muted-foreground">
+						We send an email with verification code. Please check
+						your spam folder as well.
+					</p>
 					<form
 						onSubmit={otpForm.handleSubmit(submitOtp)}
 						className="flex w-full flex-col gap-2 space-y-2"
@@ -295,7 +242,60 @@ export default function UserSignupForm() {
 						/>
 
 						<Button disabled={isBusy} className="ml-auto w-full" type="submit">
-							Sign Up
+							Next
+						</Button>
+					</form>
+				</Form>
+			) : (
+				<Form {...resetPasswordForm}>
+					<p className="text-sm font-normal text-muted-foreground">
+						Set New password.
+					</p>
+					<form
+						onSubmit={resetPasswordForm.handleSubmit(resetPassword)}
+						className="flex w-full flex-col gap-1"
+						id="registration-details-form"
+					>
+						<FormField
+							control={resetPasswordForm.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password</FormLabel>
+									<FormControl>
+										<Input
+											type="password"
+											placeholder="At least 6 characters"
+											disabled={isBusy}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={resetPasswordForm.control}
+							name="confirmPassword"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Confirm Password</FormLabel>
+									<FormControl>
+										<Input
+											type="password"
+											placeholder="Confirm your password"
+											disabled={isBusy}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<Button disabled={isBusy} className="ml-auto mt-2 w-full" type="submit">
+							Set New Password
 						</Button>
 					</form>
 				</Form>

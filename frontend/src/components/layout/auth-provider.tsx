@@ -18,7 +18,7 @@ const AuthProvisioner: React.FC<{ children: React.ReactNode }> = ({ children }) 
 	useEffect(() => {
 		if (!authState.isAuthenticated) {
 			if (authState.isAuthenticated === false) {
-				if (['/signup', '/signin'].includes(pathname)) {
+				if (['/signup', '/signin', '/reset-password'].includes(pathname)) {
 					return
 				}
 
