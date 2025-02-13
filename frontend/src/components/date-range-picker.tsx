@@ -3,10 +3,10 @@ import { Button } from '~/components/ui/button'
 import { Calendar } from '~/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import { clsx as cn } from 'clsx'
-import { CalendarIcon } from '@radix-ui/react-icons'
 import { format } from 'date-fns'
 import * as React from 'react'
 import { type DateRange } from 'react-day-picker'
+import { Icons } from './icons'
 
 export const CalendarDateRangePicker: React.FC<{
 	dateRange: DateRange
@@ -25,7 +25,7 @@ export const CalendarDateRangePicker: React.FC<{
 							!dateRange && 'bg-transparent'
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
+						<Icons.calendar className="mr-2 h-4 w-4" />
 						{dateRange?.from ? (
 							dateRange.to ? (
 								<>

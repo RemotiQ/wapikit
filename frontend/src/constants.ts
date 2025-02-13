@@ -28,14 +28,14 @@ export const navItems: NavItem[] = [
 	{
 		title: 'Dashboard',
 		href: '/dashboard',
-		icon: 'dashboard',
+		icon: 'grid',
 		label: 'Dashboard',
 		status: 'default'
 	},
 	{
 		title: 'WapiKit AI',
 		href: '/ai',
-		icon: 'sparkles',
+		icon: 'aiStar',
 		label: 'WapiKit AI',
 		requiredFeatureFlag: ['isAiIntegrationEnabled'],
 		status: 'beta'
@@ -50,35 +50,35 @@ export const navItems: NavItem[] = [
 	{
 		title: 'Conversations',
 		href: '/conversations',
-		icon: 'message',
+		icon: 'messageChatSquare',
 		label: 'Conversations',
 		status: 'default'
 	},
 	{
 		title: 'Campaigns',
 		href: '/campaigns',
-		icon: 'rocket',
+		icon: 'announcement',
 		label: 'Campaigns',
 		status: 'default'
 	},
 	{
 		title: 'Contacts',
 		href: '/contacts',
-		icon: 'user',
+		icon: 'contacts',
 		label: 'profile',
 		status: 'default'
 	},
 	{
 		title: 'Lists',
 		href: '/lists',
-		icon: 'rows',
+		icon: 'file',
 		label: 'employee',
 		status: 'default'
 	},
 	{
 		title: 'Team',
 		href: '/team',
-		icon: 'laptop',
+		icon: 'faceIDSqaure',
 		label: 'Teams',
 		status: 'default'
 	},
@@ -92,7 +92,7 @@ export const navItems: NavItem[] = [
 	{
 		title: 'Integrations',
 		href: '/integrations',
-		icon: 'link',
+		icon: 'zapFast',
 		label: 'Integrations',
 		status: 'coming-soon'
 	}

@@ -191,7 +191,7 @@ const ContactDetailsSheet = () => {
 						{contactData?.conversations?.length ? (
 							<Card className="flex w-full flex-col gap-4 py-4">
 								<CardTitle className="flex flex-row items-center justify-start gap-2 px-4">
-									<Icons.message className="size-4" />
+									<Icons.messageChatSquare className="size-4" />
 									Conversations
 								</CardTitle>
 								<CardContent className="flex w-full flex-col gap-2 divide-y">
@@ -214,7 +214,7 @@ const ContactDetailsSheet = () => {
 
 												{/* First Message Snippet */}
 												<div className="flex flex-row items-center gap-2">
-													<Icons.message className="size-4 text-gray-500" />
+													<Icons.messageTextSquare className="size-4 text-gray-500" />
 													<span className="max-w-[300px] truncate text-sm text-gray-700">
 														{conversation.messages?.length
 															? conversation.messages[0]?.messageData
@@ -227,7 +227,7 @@ const ContactDetailsSheet = () => {
 												{/* Show Campaign Name if Exists */}
 												{/* {conversation.campaignId && (
 												<div className="flex flex-row items-center gap-2 text-xs text-gray-600">
-													<Icons.rocket className="size-4 text-gray-500" />
+													<Icons.announcement className="size-4 text-gray-500" />
 													Campaign:{' '}
 													<span className="font-medium">
 														{conversation.campaignId}

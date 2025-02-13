@@ -42,7 +42,7 @@ export default function Page() {
 						title: 'Send your First Campaign',
 						description: 'Create and send your first campaign to your contacts.',
 						href: '/campaigns/new-or-edit',
-						icon: 'rocket'
+						icon: 'announcement'
 					}
 				] as TipCardPropType[])
 			: []),
@@ -54,7 +54,7 @@ export default function Page() {
 						title: 'Bulk Import Contact',
 						description: 'Import your contacts in bulk using a CSV file.',
 						href: '/contacts/bulk-import',
-						icon: 'download'
+						icon: 'contactImport'
 					}
 				] as TipCardPropType[])
 			: []),
@@ -63,21 +63,21 @@ export default function Page() {
 			title: 'Invite Team Member',
 			description: 'Invite your team members to collaborate on your organization.',
 			href: '/team',
-			icon: 'user'
+			icon: 'inviteTeamMember'
 		},
 		{
 			title: 'Ask AI',
 			description:
 				'Ask anything to AI, whether about where to start or how to use the platform.',
 			href: '/ai',
-			icon: 'sparkles'
+			icon: 'aiStar'
 		},
 		{
 			title: 'API Access',
 			description:
 				'Integrate your application using our API. Get started with our API documentation.',
 			href: '/settings?tab=api-access',
-			icon: 'code'
+			icon: 'terminalSquare'
 		},
 		...(primaryAnalyticsData?.aggregateAnalytics &&
 		primaryAnalyticsData.aggregateAnalytics.contactStats.totalContacts > 0
@@ -105,8 +105,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									{/* <RocketIcon /> */}
-									<Icons.rocket className={`mx-auto size-6`} />
+									<Icons.announcement className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Campaigns</Divider>
 							</CardHeader>
@@ -293,7 +292,7 @@ export default function Page() {
 										variant={'secondary'}
 										className="flex items-center gap-2"
 									>
-										<Icons.rocket className="size-4" />
+										<Icons.announcement className="size-4" />
 										Send Campaign
 									</Button>
 								</Link>
@@ -318,7 +317,7 @@ export default function Page() {
 											variant={'secondary'}
 											className="flex items-center gap-2"
 										>
-											<Icons.rocket className="size-4" />
+											<Icons.announcement className="size-4" />
 											Send Campaign
 										</Button>
 									</Link>

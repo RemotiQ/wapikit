@@ -33,7 +33,7 @@ export default function CommandMenuProvider() {
 				groupLabel: '',
 				items: [
 					{
-						icon: 'sparkles',
+						icon: 'aiStar',
 						label: 'Ask AI',
 						action: () => {
 							writeAiStoreProperty({
@@ -54,7 +54,7 @@ export default function CommandMenuProvider() {
 						slug: 'settings'
 					},
 					{
-						icon: 'page',
+						icon: 'documentation',
 						label: 'Documentation',
 						action: () => {
 							router.push('/docs')
@@ -80,7 +80,7 @@ export default function CommandMenuProvider() {
 				groupLabel: 'Contacts',
 				items: [
 					{
-						icon: 'plus',
+						icon: 'filePlus',
 						label: 'Create List',
 						action: () => {
 							router.push('/lists/new-or-edit')
@@ -88,7 +88,7 @@ export default function CommandMenuProvider() {
 						slug: 'create-list'
 					},
 					{
-						icon: 'download',
+						icon: 'contactImport',
 						label: 'Bulk Import Contacts',
 						action: () => {
 							router.push('/contacts/bulk-import')
@@ -96,7 +96,7 @@ export default function CommandMenuProvider() {
 						slug: 'bulk-import-contacts'
 					},
 					{
-						icon: 'plus',
+						icon: 'contactEdit',
 						label: 'Create Contact',
 						action: () => {
 							router.push('/contacts/new-or-edit')
@@ -109,7 +109,7 @@ export default function CommandMenuProvider() {
 				groupLabel: 'Teams',
 				items: [
 					{
-						icon: 'user',
+						icon: 'inviteTeamMember',
 						label: 'Invite team member',
 						action: () => {
 							router.push('/team')
@@ -313,7 +313,7 @@ export default function CommandMenuProvider() {
 									<div className="items-star mb-auto flex h-fit flex-1 flex-row justify-start gap-3">
 										<Badge className="flex w-20 flex-row gap-1 px-2 py-1 text-xs">
 											Ask AI
-											<Icons.sparkles className="size-4" />
+											<Icons.aiStar className="size-4" />
 										</Badge>
 										<p className="max-w-sm flex-1 whitespace-normal break-words">
 											{input}

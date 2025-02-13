@@ -8,7 +8,7 @@ const data = [
 		slug: 'campaign',
 		title: 'Campaigns',
 		description: 'Checkout the documentation for campaigns, how to create and manage them.',
-		Icon: Icons.rocket,
+		Icon: Icons.announcement,
 		ctaText: 'Check Docs',
 		ctaUrl: 'https://docs.wapikit.com/guide/manage-campaigns'
 	},
@@ -16,7 +16,7 @@ const data = [
 		slug: 'contact',
 		title: 'Contacts',
 		description: 'Checkout the documentation for contacts, how to create and manage them.',
-		Icon: Icons.profile,
+		Icon: Icons.contacts,
 		ctaText: 'Check Docs',
 		ctaUrl: 'https://docs.wapikit.com/guide/manage-contacts'
 	},
@@ -24,7 +24,7 @@ const data = [
 		slug: 'lists',
 		title: 'Lists',
 		description: 'Checkout the documentation for lists, how to create and manage them.',
-		Icon: Icons.laptop,
+		Icon: Icons.list,
 		ctaText: 'Check Docs',
 		ctaUrl: 'https://docs.wapikit.com/guide/manage-lists'
 	},
@@ -32,7 +32,7 @@ const data = [
 		slug: 'api-key',
 		title: 'Api Key Usage',
 		description: 'Checkout the documentation for api key usage, how to create and manage them.',
-		Icon: Icons.login,
+		Icon: Icons.puzzleSquare,
 		ctaText: 'Check Docs',
 		ctaUrl: 'https://docs.wapikit.com/guide/manage-api-keys'
 	}

@@ -52,7 +52,7 @@ export default function Page() {
 	return (
 		<ScrollArea className="h-full">
 			<Toaster />
-			<div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+			<div className="flex-1 space-y-4 flex flex-col p-4 pt-6 md:p-8">
 				<div className="flex items-center justify-between space-y-2">
 					<h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
 					<div className="hidden flex-col items-center gap-2 space-x-2 md:flex">
@@ -96,7 +96,7 @@ export default function Page() {
 					{[AnalyticsTabEnum.Campaigns, AnalyticsTabEnum.Conversations].map(
 						(tab, index) => {
 							return (
-								<TabsContent key={index} value={tab}>
+								<TabsContent key={index} value={tab} className='space-y-4'>
 									{tab === AnalyticsTabEnum.Campaigns ? (
 										<>
 											<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
