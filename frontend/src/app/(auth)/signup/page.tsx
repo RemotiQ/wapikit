@@ -89,11 +89,11 @@ export default function AuthenticationPage() {
 							</Link>
 							.
 						</p>
-						<p className="cursor-pointer text-left text-sm font-normal text-muted-foreground">
+						<p className=" text-left text-sm font-normal text-muted-foreground">
 							Already have an account?{' '}
 							<Link
 								href="/signin"
-								className="font-medium text-foreground underline-offset-2 hover:underline"
+								className="cursor-pointer font-medium text-foreground underline-offset-2 hover:underline"
 							>
 								Login
 							</Link>

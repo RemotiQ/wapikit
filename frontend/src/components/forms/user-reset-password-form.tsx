@@ -231,7 +231,7 @@ export default function UserResetPasswordForm() {
 									<FormControl>
 										<Input
 											id="otp"
-											placeholder="Enter OTP"
+											placeholder="enter otp"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -265,7 +265,7 @@ export default function UserResetPasswordForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="At least 6 characters"
+											placeholder="at least 6 characters"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -284,7 +284,7 @@ export default function UserResetPasswordForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="Confirm your password"
+											placeholder="confirm your password"
 											disabled={isBusy}
 											{...field}
 										/>

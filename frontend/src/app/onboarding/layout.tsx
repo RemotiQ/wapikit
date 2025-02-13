@@ -11,6 +11,7 @@ import { Icons } from '~/components/icons'
 import { buttonVariants } from '~/components/ui/button'
 import { OnboardingSteps, type OnboardingStepsEnum } from '~/constants'
 import { useLayoutStore } from '~/store/layout.store'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 
 const OnboardingLayout = (props: { children: React.ReactNode }) => {
 	const { onboardingSteps } = useLayoutStore()
@@ -149,14 +150,25 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 				</Link>
 			</div>
 			<div className="flex h-full items-center p-4 lg:p-8">
-				<div className="mx-auto flex w-full max-w-xl flex-col justify-center space-y-4">
+				<div className="mx-auto flex w-full max-w-xl flex-col justify-center space-y-6">
 					<div className="flex flex-col space-y-1 text-left">
 						<h1 className="text-xl font-semibold tracking-tight text-foreground">
 							{currentStep.title}
 						</h1>
-						<p className="text-sm font-normal text-muted-foreground">{currentStep.description}</p>
+						<p className="text-sm font-normal text-muted-foreground">
+							{currentStep.description}
+						</p>
 					</div>
 					{props.children}
+					<div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+						<Icons.infoCircle className="size-4" />
+						<p>
+							<Link href="" className="cursor-pointer text-blue-500">
+								Click here
+							</Link>{' '}
+							to know how to get your WhatsApp Business ID and API Key.
+						</p>
+					</div>
 				</div>
 			</div>
 		</div>
