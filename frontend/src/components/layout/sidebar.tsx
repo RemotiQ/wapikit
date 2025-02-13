@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { DashboardNav } from '~/components/dashboard-nav'
 import { navItems, pathAtWhichSidebarShouldBeCollapsedByDefault } from '~/constants'
 import { clsx as cn } from 'clsx'
-import { ChevronLeft } from 'lucide-react'
 import { useSidebar } from '~/hooks/use-sidebar'
 import { usePathname } from 'next/navigation'
 import { Button } from '../ui/button'
@@ -70,13 +69,16 @@ export default function Sidebar({ className }: SidebarProps) {
 				className
 			)}
 		>
-			<ChevronLeft
+			<div
 				className={cn(
-					'absolute -right-3 top-16 cursor-pointer rounded-full border bg-background text-3xl text-foreground',
+					'absolute -right-3 top-16 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border bg-background text-3xl text-foreground',
 					isMinimized && 'rotate-180'
 				)}
 				onClick={handleToggle}
-			/>
+			>
+				<Icons.chevronLeft className="size-4" />
+			</div>
+
 			<div className="h-full space-y-4 py-4">
 				<div className="h-full px-3 py-2">
 					<div className="mt-3 flex h-full flex-col justify-between space-y-1">

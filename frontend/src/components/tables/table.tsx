@@ -28,7 +28,6 @@ import {
 	TableRow
 } from '~/components/ui/table'
 import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ScrollArea, ScrollBar } from '~/components/ui/scroll-area'
 import { type TableCellActionProps } from '~/types'
@@ -351,7 +350,7 @@ export function TableComponent<TData, TValue>({
 								onClick={() => table.previousPage()}
 								disabled={!table.getCanPreviousPage()}
 							>
-								<ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
+								<Icons.chevronLeft className="h-4 w-4" aria-hidden="true" />
 							</Button>
 							<Button
 								aria-label="Go to next page"
@@ -360,7 +359,7 @@ export function TableComponent<TData, TValue>({
 								onClick={() => table.nextPage()}
 								disabled={!table.getCanNextPage()}
 							>
-								<ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
+								<Icons.chevronRight className="h-4 w-4" aria-hidden="true" />
 							</Button>
 							<Button
 								aria-label="Go to last page"
