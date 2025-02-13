@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	useCreateOrganization,
@@ -92,9 +92,12 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 		)
 	}, [stepSlug, onboardingSteps])
 
-	useEffect(() => {
-		// set the current step and all data
+	const isSetupDone = useRef(false)
 
+	useEffect(() => {
+		if (isSetupDone.current) {
+			return
+		}
 		switch (currentStep?.slug) {
 			case OnboardingStepsEnum.CreateOrganization: {
 				// keep default
@@ -148,6 +151,8 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 			default:
 				break
 		}
+
+		isSetupDone.current = true
 	}, [onboardingSteps, currentStep?.slug, writeProperty])
 
 	useEffect(() => {
