@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-	title: 'Password Reset | WapiKit'
+	title: 'Reset Password | WapiKit'
 }
 
 export default function RootLayout({
