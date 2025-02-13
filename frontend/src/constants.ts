@@ -12,7 +12,7 @@ export const REDIRECT_URL_LS = '__redirect_url'
 
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
-		return 'http://192.168.29.20:8000/api'
+		return 'http://127.0.0.1:8000/api'
 	}
 
 	if (IS_MANAGED_CLOUD_EDITION) {

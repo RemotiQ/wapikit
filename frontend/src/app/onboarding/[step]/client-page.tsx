@@ -297,7 +297,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 											<FormLabel>Name</FormLabel>
 											<FormControl>
 												<Input
-													placeholder="name"
+													placeholder="Organization Name"
 													{...field}
 													autoComplete="off"
 													className="w-full"

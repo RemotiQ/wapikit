@@ -48,7 +48,7 @@ export default function AuthenticationPage() {
 				<div className="flex h-full items-center p-4 lg:p-8">
 					<div className="mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[350px]">
 						<div className="flex flex-col space-y-2 text-left">
-							<h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
+							<h1 className="text-2xl font-bold tracking-tight">Sign In</h1>
 						</div>
 						<UserLoginForm />
 						<p className="text-left text-sm font-normal text-muted-foreground">
@@ -87,7 +87,7 @@ export default function AuthenticationPage() {
 						<p className="cursor-pointer text-left text-sm font-normal text-muted-foreground">
 							Don't have an account?{' '}
 							<Link href="/signup" className="font-medium text-foreground hover:underline underline-offset-2">
-								Signup
+								Sign Up
 							</Link>
 						</p>
 					</div>

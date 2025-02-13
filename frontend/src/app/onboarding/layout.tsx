@@ -149,12 +149,12 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 				</Link>
 			</div>
 			<div className="flex h-full items-center p-4 lg:p-8">
-				<div className="mx-auto flex w-full max-w-xl flex-col justify-center space-y-6">
-					<div className="flex flex-col space-y-2 text-left">
-						<h1 className="text-xl font-semibold tracking-tight">
+				<div className="mx-auto flex w-full max-w-xl flex-col justify-center space-y-4">
+					<div className="flex flex-col space-y-1 text-left">
+						<h1 className="text-xl font-semibold tracking-tight text-foreground">
 							{currentStep.title}
 						</h1>
-						<p className="text-sm">{currentStep.description}</p>
+						<p className="text-sm font-normal text-muted-foreground">{currentStep.description}</p>
 					</div>
 					{props.children}
 				</div>

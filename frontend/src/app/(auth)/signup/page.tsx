@@ -56,7 +56,7 @@ export default function AuthenticationPage() {
 							</h1>
 						</div>
 						<UserSignupForm />
-						<p className="text-left text-sm text-muted-foreground">
+						<p className="text-left text-sm font-normal text-muted-foreground">
 							By clicking continue, you agree to our{' '}
 							<Link
 								href={createHref({
@@ -68,7 +68,7 @@ export default function AuthenticationPage() {
 										utm_source: 'application-login-page'
 									}
 								})}
-								className="cursor-pointer underline underline-offset-4 hover:text-primary"
+								className="cursor-pointer font-medium text-foreground underline-offset-2 hover:underline"
 							>
 								Terms & Conditions
 							</Link>{' '}
@@ -83,21 +83,20 @@ export default function AuthenticationPage() {
 										utm_source: 'application-login-page'
 									}
 								})}
-								className="cursor-pointer underline underline-offset-4 hover:text-primary"
+								className="cursor-pointer font-medium text-foreground underline-offset-2 hover:underline"
 							>
 								Privacy Policy
 							</Link>
 							.
 						</p>
-						<p className="text-left text-xs text-muted-foreground">
+						<p className="cursor-pointer text-left text-sm font-normal text-muted-foreground">
 							Already have an account?{' '}
 							<Link
 								href="/signin"
-								className="underline underline-offset-4 hover:text-primary"
+								className="font-medium text-foreground underline-offset-2 hover:underline"
 							>
 								Login
 							</Link>
-							.
 						</p>
 					</div>
 				</div>
