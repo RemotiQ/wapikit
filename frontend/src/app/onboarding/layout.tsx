@@ -9,9 +9,9 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Icons } from '~/components/icons'
 import { buttonVariants } from '~/components/ui/button'
-import { OnboardingSteps, type OnboardingStepsEnum } from '~/constants'
+import { OnboardingSteps, OnboardingStepsEnum } from '~/constants'
 import { useLayoutStore } from '~/store/layout.store'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
+
 
 const OnboardingLayout = (props: { children: React.ReactNode }) => {
 	const { onboardingSteps } = useLayoutStore()
@@ -160,15 +160,17 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 						</p>
 					</div>
 					{props.children}
-					<div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-						<Icons.infoCircle className="size-4" />
-						<p>
-							<Link href="" className="cursor-pointer text-blue-500">
-								Click here
-							</Link>{' '}
-							to know how to get your WhatsApp Business ID and API Key.
-						</p>
-					</div>
+					{currentStep.slug === OnboardingStepsEnum.WhatsappBusinessAccountDetails ? (
+						<div className="flex items-start justify-start gap-1 text-xs font-medium text-muted-foreground md:items-center">
+							<Icons.infoCircle className="size-4" />
+							<p>
+								<Link href="" className="cursor-pointer text-blue-500">
+									Click here
+								</Link>{' '}
+								to know how to get your WhatsApp Business ID and API Key.
+							</p>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</div>
