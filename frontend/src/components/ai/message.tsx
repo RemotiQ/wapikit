@@ -3,7 +3,6 @@
 import { clsx as cx } from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { PencilEditIcon, SparklesIcon } from './icons'
 import { Markdown } from './markdown'
 import { MessageActions } from './message-actions'
 import { clsx } from 'clsx'
@@ -15,6 +14,7 @@ import {
 	type AiChatMessageSchema,
 	type AiChatMessageVoteSchema
 } from 'root/.generated'
+import { Icons } from '../icons'
 
 const PreviewMessage = ({
 	chatId,
@@ -77,7 +77,7 @@ const PreviewMessage = ({
 					{message.role === AiChatMessageRoleEnum.Assistant && (
 						<div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-background ring-1 ring-border">
 							<div className="translate-y-px">
-								<SparklesIcon size={12} />
+								<Icons.aiStar className="size-4" />
 							</div>
 						</div>
 					)}
@@ -97,7 +97,7 @@ const PreviewMessage = ({
 						{message.content && mode === 'view' && (
 							<div
 								className={clsx(
-									'flex flex-row items-center gap-2 text-left',
+									'flex flex-row items-end gap-2 text-left',
 									message.role === AiChatMessageRoleEnum.User && 'justify-end'
 								)}
 							>
@@ -107,12 +107,13 @@ const PreviewMessage = ({
 											<TooltipTrigger asChild>
 												<Button
 													variant="ghost"
-													className="h-fit rounded-full px-2 text-muted-foreground opacity-0 group-hover/message:opacity-100"
+													size={'sm'}
+													className="h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
 													onClick={() => {
 														setMode('edit')
 													}}
 												>
-													<PencilEditIcon />
+													<Icons.pencilEdit className="size-4" />
 												</Button>
 											</TooltipTrigger>
 											<TooltipContent>Edit message</TooltipContent>
@@ -122,9 +123,9 @@ const PreviewMessage = ({
 
 								<div
 									className={clsx(
-										'flex max-w-lg flex-col items-center justify-start px-3 py-1 text-left text-sm',
+										'flex h-fit max-w-lg flex-col items-center justify-start px-3 py-1 text-left text-sm',
 										message.role === AiChatMessageRoleEnum.User
-											? 'rounded-md bg-primary text-primary-foreground'
+											? 'rounded-lg bg-primary text-primary-foreground'
 											: ''
 									)}
 								>
@@ -187,7 +188,7 @@ const ThinkingMessage = () => {
 				)}
 			>
 				<div className="flex size-8 shrink-0 items-center justify-center rounded-full ring-1 ring-border">
-					<SparklesIcon size={14} />
+					<Icons.aiStar className='size-4' />
 				</div>
 
 				<div className="flex w-full flex-col gap-2">

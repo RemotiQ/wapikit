@@ -48,7 +48,7 @@ export const navItems: NavItem[] = [
 		status: 'default'
 	},
 	{
-		title: 'Conversations',
+		title: 'Inbox',
 		href: '/conversations',
 		icon: 'messageChatSquare',
 		label: 'Conversations',
@@ -78,7 +78,7 @@ export const navItems: NavItem[] = [
 	{
 		title: 'Team',
 		href: '/team',
-		icon: 'faceIDSqaure',
+		icon: 'colors',
 		label: 'Teams',
 		status: 'default'
 	},

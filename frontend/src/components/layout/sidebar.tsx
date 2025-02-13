@@ -83,20 +83,21 @@ export default function Sidebar({ className }: SidebarProps) {
 				<div className="h-full px-3 py-2">
 					<div className="mt-3 flex h-full flex-col justify-between space-y-1">
 						<DashboardNav items={navItems} />
-
 						{!subscriptionDetails && !isMinimized ? (
 							<Button
-								className="mt-2 flex w-full flex-row justify-evenly gap-2 !bg-black"
+								className="mt-2 flex w-full flex-row justify-evenly gap-2"
 								onClick={() => {
 									writeProperty({
 										isPricingModalOpen: true
 									})
 								}}
+								variant={'rainbow'}
 							>
-								<Icons.bolt className="size-4 font-bold text-white" />
+								<Icons.lightningBolt className="size-4 font-bold text-white" />
 								<span className="flex-1 text-center font-bold">Upgrade to Pro</span>
 							</Button>
 						) : null}
+						
 					</div>
 				</div>
 			</div>

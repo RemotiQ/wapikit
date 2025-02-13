@@ -20,7 +20,7 @@ import {
 } from '~/components/ui/select'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
-import { Plus, EyeIcon, Clipboard } from 'lucide-react'
+import { Plus, EyeIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts'
 import {
 	RolePermissionEnum,
@@ -1040,7 +1040,7 @@ export default function SettingsPage() {
 														variant={'secondary'}
 														disabled={isBusy}
 													>
-														<Clipboard className="size-5" />
+														<Icons.copy className="size-5" />
 														Copy
 													</Button>
 												</span>
@@ -1100,7 +1100,7 @@ export default function SettingsPage() {
 														variant={'secondary'}
 														disabled={isBusy}
 													>
-														<Clipboard className="size-5" />
+														<Icons.copy className="size-5" />
 														Copy
 													</Button>
 												</span>{' '}
@@ -1382,7 +1382,7 @@ export default function SettingsPage() {
 														variant={'secondary'}
 														disabled={isBusy}
 													>
-														<Clipboard className="size-5" />
+														<Icons.copy className="size-5" />
 														Copy
 													</Button>
 												</span>

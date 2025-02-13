@@ -76,7 +76,7 @@ const components: Partial<Components> = {
 	},
 	h5: ({ children, ...props }) => {
 		return (
-			<h5 className="mb-1 mt-3 w-full text-base font-semibold" {...props}>
+			<h5 className="mb-1 w-full text-base font-semibold" {...props}>
 				{children}
 			</h5>
 		)
@@ -90,7 +90,7 @@ const components: Partial<Components> = {
 	},
 	p: ({ children, ...props }) => {
 		return (
-			<p className="mb-1 mt-3 w-full text-base" {...props}>
+			<p className="mb-1 w-full text-base" {...props}>
 				{children}
 			</p>
 		)

@@ -1,5 +1,4 @@
 import { useCopyToClipboard } from 'usehooks-ts'
-import { CopyIcon, ThumbDownIcon, ThumbUpIcon } from './icons'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import {
@@ -9,6 +8,7 @@ import {
 	type AiChatMessageVoteSchema
 } from 'root/.generated'
 import { successNotification } from '~/reusable-functions'
+import { Icons } from '../icons'
 
 const MessageActions = ({
 	chatId,
@@ -45,7 +45,7 @@ const MessageActions = ({
 								})
 							}}
 						>
-							<CopyIcon />
+							<Icons.copy className='size-4' />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Copy</TooltipContent>
@@ -82,7 +82,7 @@ const MessageActions = ({
 									})
 							}}
 						>
-							<ThumbUpIcon />
+							<Icons.thumbsUp className='size-4' />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Upvote Response</TooltipContent>
@@ -119,7 +119,7 @@ const MessageActions = ({
 									})
 							}}
 						>
-							<ThumbDownIcon />
+							<Icons.thumbsDown className='size-4' />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Downvote Response</TooltipContent>
