@@ -249,8 +249,8 @@ func CreateNewContactLists(context interfaces.ContextWithSession) error {
 	orgUuid, _ := uuid.Parse(context.Session.User.OrganizationId)
 
 	var contactList = model.ContactList{
-		Name: payload.Name,
-		// Description:    payload.Description,
+		Name:           payload.Name,
+		Description:    payload.Description,
 		OrganizationId: orgUuid,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
@@ -270,12 +270,71 @@ func CreateNewContactLists(context interfaces.ContextWithSession) error {
 
 	uniqueId := dest.UniqueId.String()
 
+	var tags []model.Tag
+
+	if len(payload.Tags) > 0 {
+		tagIdExpressions := make([]Expression, 0)
+		for _, tagId := range payload.Tags {
+			tagUuid, err := uuid.Parse(tagId)
+			if err != nil {
+				continue
+			}
+			tagIdExpressions = append(tagIdExpressions, UUID(tagUuid))
+		}
+
+		tagFetchQuery := SELECT(table.Tag.AllColumns).
+			FROM(table.Tag).
+			WHERE(table.Tag.UniqueId.IN(tagIdExpressions...))
+
+		err = tagFetchQuery.QueryContext(context.Request().Context(), context.App.Db, &tags)
+
+		if err != nil {
+			return context.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		modelTags := make([]model.ContactListTag, 0)
+		for _, tagId := range payload.Tags {
+			tagUuid, err := uuid.Parse(tagId)
+			if err != nil {
+				continue
+			}
+			modelTags = append(modelTags, model.ContactListTag{
+				TagId:         tagUuid,
+				ContactListId: dest.UniqueId,
+			})
+		}
+
+		if len(modelTags) > 0 {
+			insertQuery := table.ContactListTag.
+				INSERT().
+				MODELS(modelTags).
+				ON_CONFLICT(table.ContactListTag.ContactListId, table.ContactListTag.TagId).
+				DO_NOTHING()
+
+			_, err = insertQuery.ExecContext(context.Request().Context(), context.App.Db)
+
+			if err != nil {
+				return context.JSON(http.StatusInternalServerError, err.Error())
+			}
+		}
+	}
+
+	tagsToReturn := make([]api_types.TagSchema, 0)
+
+	for _, tag := range tags {
+		tagsToReturn = append(tagsToReturn, api_types.TagSchema{
+			UniqueId: tag.UniqueId.String(),
+			Label:    tag.Label,
+		})
+	}
+
 	return context.JSON(http.StatusCreated, api_types.CreateNewListResponseSchema{
 		List: api_types.ContactListSchema{
 			CreatedAt:   dest.CreatedAt,
 			Name:        dest.Name,
 			Description: dest.Name,
 			UniqueId:    uniqueId,
+			Tags:        tagsToReturn,
 		},
 	})
 }

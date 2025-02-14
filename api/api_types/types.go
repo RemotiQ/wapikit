@@ -915,10 +915,10 @@ type NewCampaignSchema struct {
 
 // NewContactListSchema defines model for NewContactListSchema.
 type NewContactListSchema struct {
-	ContactIds  *[]string   `json:"contactIds,omitempty"`
-	Description *string     `json:"description,omitempty"`
-	Name        string      `json:"name"`
-	Tags        []TagSchema `json:"tags"`
+	ContactIds  *[]string `json:"contactIds,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	Name        string    `json:"name"`
+	Tags        []string  `json:"tags"`
 }
 
 // NewContactSchema defines model for NewContactSchema.

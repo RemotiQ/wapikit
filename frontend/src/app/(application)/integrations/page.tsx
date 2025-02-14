@@ -1,15 +1,13 @@
 'use client'
 
 import { type IntegrationSchema, IntegrationStatusEnum } from 'root/.generated'
-import BreadCrumb from '~/components/breadcrumb'
+
 import IntegrationCard from '~/components/integration/card'
 import { Heading } from '~/components/ui/heading'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Separator } from '~/components/ui/separator'
 
 const IntegrationsPage = () => {
-	const breadcrumbItems = [{ title: 'Integrations', link: '/integrations' }]
-
 	// const { data } = useGetIntegrations({
 	// 	order: OrderEnum.asc,
 	// 	page: 1,

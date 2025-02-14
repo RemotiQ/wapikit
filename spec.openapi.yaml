@@ -5158,7 +5158,7 @@ components:
         tags:
           type: array
           items:
-            $ref: "#/components/schemas/TagSchema"
+            type: string
         contactIds:
           type: array
           items:

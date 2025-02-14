@@ -20,7 +20,6 @@ import { FileUploaderComponent } from '~/components/file-uploader'
 import { MultiSelect } from '~/components/multi-select'
 import { AUTH_TOKEN_LS, getBackendUrl } from '~/constants'
 import DocumentationPitch from '~/components/forms/documentation-pitch'
-import BreadCrumb from '~/components/breadcrumb'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
 import Progress from '~/components/progress'
@@ -209,15 +208,9 @@ const BulkImportContactPage = () => {
 		}
 	}
 
-	const breadcrumbItems = [
-		{ title: 'Contacts', link: '/contacts' },
-		{ title: 'Bulk Import', link: '/contacts/bulk-import' }
-	]
-
 	return (
 		<>
 			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
-				
 				<div className="flex items-start justify-between">
 					<Heading title={`Bulk import`} description="" />
 				</div>

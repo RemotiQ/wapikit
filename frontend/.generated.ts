@@ -664,7 +664,7 @@ export interface ContactListSchema {
 export interface NewContactListSchema {
 	name: string
 	description?: string
-	tags: TagSchema[]
+	tags: string[]
 	contactIds?: string[]
 }
 
