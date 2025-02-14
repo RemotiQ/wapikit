@@ -640,17 +640,17 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 	commonTagIds := make([]uuid.UUID, 0)
 
 	// * the tags ids that are in oldTagsUuids but not in newTagsUuids are needed to be deleted
-	for _, oldList := range oldTagsUuids {
+	for _, oldTag := range oldTagsUuids {
 		found := false
 		for _, newList := range newTagsUuids {
-			if oldList == newList {
+			if oldTag == newList {
 				found = true
-				commonTagIds = append(commonTagIds, oldList)
+				commonTagIds = append(commonTagIds, oldTag)
 				break
 			}
 		}
 		if !found {
-			tagsToBeDeleted = append(tagsToBeDeleted, UUID(oldList))
+			tagsToBeDeleted = append(tagsToBeDeleted, UUID(oldTag))
 		}
 	}
 

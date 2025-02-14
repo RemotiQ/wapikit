@@ -171,3 +171,12 @@ func CountCSVLines(file multipart.File) (int, error) {
 
 	return count - 1, nil
 }
+
+func Contains[T comparable](arr []T, value T) bool {
+	for _, v := range arr {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
