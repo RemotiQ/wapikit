@@ -187,8 +187,8 @@ const CampaignsPage = () => {
 	}
 
 	return (
-		<ScrollArea className="h-full">
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
+		<ScrollArea className="h-full !pt-2">
+			<div className="flex-1 space-y-4 p-4 pt-6 md:px-6">
 				{campaignId ? (
 					<>
 						<BreadCrumb items={breadcrumbItems} />
@@ -478,7 +478,6 @@ const CampaignsPage = () => {
 					</>
 				) : (
 					<>
-						<BreadCrumb items={breadcrumbItems} />
 						<div className="flex items-start justify-between">
 							<Heading
 								title={`Campaigns (${totalCampaigns})`}
@@ -492,7 +491,7 @@ const CampaignsPage = () => {
 								<Icons.plus className="mr-2 h-4 w-4" /> Add New
 							</Link>
 						</div>
-						<Separator />
+						<Separator className="" />
 
 						<TableComponent
 							searchKey="name"

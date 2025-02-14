@@ -233,7 +233,7 @@ export default function UserSignupForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="at least 6 characters"
+											placeholder="At least 6 characters"
 											disabled={isBusy}
 											{...field}
 										/>

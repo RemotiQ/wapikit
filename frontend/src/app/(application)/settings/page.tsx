@@ -969,7 +969,11 @@ export default function SettingsPage() {
 																						)
 																					}}
 																				>
-																					<EyeIcon className="size-5" />
+																					{whatsAppBusinessAccountDetailsVisibility.apiToken ? (
+																						<EyeIconOff className="size-5" />
+																					) : (
+																						<EyeIcon className="size-5" />
+																					)}
 																				</span>
 																			</div>
 																		</FormControl>
@@ -1041,7 +1045,6 @@ export default function SettingsPage() {
 														disabled={isBusy}
 													>
 														<Icons.copy className="size-5" />
-														Copy
 													</Button>
 												</span>
 												<span>
@@ -1053,8 +1056,11 @@ export default function SettingsPage() {
 														variant={'secondary'}
 														disabled={isBusy}
 													>
-														<EyeIcon className="size-5" />
-														Show
+														{showWebhookSecret ? (
+															<Icons.eyeOff className="size-5" />
+														) : (
+															<Icons.eye className="size-5" />
+														)}
 													</Button>
 												</span>
 											</CardContent>
@@ -1101,7 +1107,6 @@ export default function SettingsPage() {
 														disabled={isBusy}
 													>
 														<Icons.copy className="size-5" />
-														Copy
 													</Button>
 												</span>{' '}
 											</CardContent>
@@ -1367,7 +1372,7 @@ export default function SettingsPage() {
 														variant={'secondary'}
 														disabled={isBusy}
 													>
-														<EyeIcon className="size-5" />
+														<Icons.eye className="size-5" />
 														Show
 													</Button>
 												</span>
@@ -1535,7 +1540,7 @@ export default function SettingsPage() {
 													}}
 													disabled={isBusy}
 												>
-													<Plus className="mr-2 h-4 w-4" /> Add New
+													<Icons.plus className="mr-2 h-4 w-4" /> Add New
 												</Button>
 											</div>
 										</div>
@@ -1688,7 +1693,7 @@ export default function SettingsPage() {
 																	}}
 																	className="flex gap-2"
 																>
-																	<Icons.trash />
+																	<Icons.trash className="size-4" />
 																	Delete
 																</Button>
 															</TooltipTrigger>

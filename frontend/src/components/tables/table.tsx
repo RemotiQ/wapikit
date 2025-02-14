@@ -201,7 +201,6 @@ export function TableComponent<TData, TValue>({
 					}
 					className="w-full md:max-w-sm"
 				/>
-
 				{(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected()) && (
 					<Button
 						variant={'destructive'}
@@ -218,7 +217,7 @@ export function TableComponent<TData, TValue>({
 					</Button>
 				)}
 			</div>
-			<ScrollArea className="h-[calc(80vh-220px)] rounded-md border">
+			<ScrollArea className="h-[calc(90vh-220px)] rounded-md border">
 				{isFetching ? (
 					<div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4">
 						{Array.from({ length: 9 }).map((_, index) => (

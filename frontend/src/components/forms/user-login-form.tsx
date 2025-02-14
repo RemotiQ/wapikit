@@ -105,7 +105,7 @@ export default function UserLoginForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="at least 6 characters"
+											placeholder="At least 6 characters"
 											disabled={isBusy}
 											{...field}
 										/>

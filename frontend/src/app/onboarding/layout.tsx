@@ -163,7 +163,12 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 						<div className="flex items-start justify-start gap-1 text-xs font-medium text-muted-foreground md:items-center">
 							<Icons.infoCircle className="size-4" />
 							<p>
-								<Link href="" className="cursor-pointer text-blue-500">
+								<Link
+									href="https://javascript.wapikit.com/guide/whatsapp-api-setup/creating-business-app#add-whatsapp-product-to-the-application-created"
+									target="_blank"
+									title="click-here"
+									className="cursor-pointer text-blue-500"
+								>
 									Click here
 								</Link>{' '}
 								to know how to get your WhatsApp Business ID and API Key.

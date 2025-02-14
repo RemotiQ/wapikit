@@ -276,22 +276,6 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 					)
 				})}
 			</TooltipProvider>
-
-			{isMinimized ? null : (
-				<Button
-					className="ml-2 mt-2 flex w-[80%] justify-between gap-2 text-left"
-					onClick={() => {
-						writeProperty({
-							isCommandMenuOpen: true
-						})
-					}}
-				>
-					Quick Actions
-					<div className="flex flex-row items-center gap-1 rounded-md bg-primaryShades-600 px-1 text-sm">
-						<Icons.macoscommand className="size-3" /> K
-					</div>
-				</Button>
-			)}
 		</nav>
 	)
 }
