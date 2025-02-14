@@ -47,9 +47,9 @@ export default function Header() {
 								isCommandMenuOpen: true
 							})
 						}}
-						className=""
+						className="gap-1 !text-sm"
 					>
-						<Icons.macoscommand className="size-5" /> K
+						<Icons.macoscommand className="size-4" /> K
 					</Button>
 
 					<div className="flex items-center gap-1">
