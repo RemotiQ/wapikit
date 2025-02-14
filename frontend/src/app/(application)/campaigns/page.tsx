@@ -1,6 +1,5 @@
 'use client'
 
-import BreadCrumb from '~/components/breadcrumb'
 import { CampaignTableColumns } from '~/components/tables/columns'
 import { TableComponent } from '~/components/tables/table'
 import { Button, buttonVariants } from '~/components/ui/button'
@@ -28,8 +27,6 @@ import { Icons } from '~/components/icons'
 import { LinkClicks } from '~/components/analytics/link-clicks'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { ScrollArea } from '~/components/ui/scroll-area'
-
-const breadcrumbItems = [{ title: 'campaigns', link: '/campaigns' }]
 
 const CampaignsPage = () => {
 	const searchParams = useSearchParams()
@@ -191,7 +188,6 @@ const CampaignsPage = () => {
 			<div className="flex-1 space-y-4 p-4 pt-6 md:px-6">
 				{campaignId ? (
 					<>
-						<BreadCrumb items={breadcrumbItems} />
 						<div className="flex items-center justify-between">
 							<Heading title={`Campaigns Details`} description="" />
 							{campaignData && (
@@ -306,175 +302,243 @@ const CampaignsPage = () => {
 								</div>
 							)}
 						</div>
-						{campaignData && (
-							<Card className="flex flex-col gap-4">
-								<CardContent className="mt-4 flex flex-row items-start justify-between gap-2">
-									<div className="flex h-full flex-1 flex-col items-start justify-start gap-2 rounded-md border p-4">
-										<div className="flex flex-row items-center">
-											<span className="text-sm font-semibold">
-												name :&nbsp;{' '}
-											</span>{' '}
-											<div className="flex flex-wrap items-center justify-center gap-4">
-												{campaignData.campaign.name}
-												<Badge
-													variant={
-														campaignData.campaign.status === 'Draft'
-															? 'outline'
-															: campaignData.campaign.status ===
-																  'Cancelled'
-																? 'destructive'
-																: 'default'
-													}
-													className={clsx(
-														campaignData.campaign.status === 'Paused' ||
-															campaignData.campaign.status ===
-																'Scheduled'
-															? 'bg-yellow-500'
-															: campaignData.campaign.status ===
-																  'Cancelled'
-																? 'bg-red-300'
-																: ''
-													)}
-												>
-													{campaignData.campaign.status}
-												</Badge>
-												{campaignData.campaign.status === 'Running' ? (
-													<div className="flex h-full w-fit items-center justify-center">
-														<div className="rotate h-4 w-4 animate-spin rounded-full border-4 border-solid  border-l-primary" />
+
+						<div className="flex flex-col gap-4">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+								{[
+									{
+										title: 'Total Recipient Sent',
+										value: campaignAnalytics?.totalMessages || 0 || 0,
+										isPercentage: false
+									},
+									{
+										title: 'Open Rate',
+										value: campaignAnalytics?.openRate || 0,
+										isPercentage: true
+									},
+									{
+										title: 'Reply Rate',
+										value: campaignAnalytics?.responseRate || 0,
+										isPercentage: true
+									},
+									{
+										title: 'Engagement Rate',
+										value: campaignAnalytics?.engagementRate || 0,
+										isPercentage: true
+									}
+								].map((item, index) => {
+									return (
+										<Card key={index} className="">
+											<CardHeader>
+												<CardTitle className="text-sm font-normal text-muted-foreground">
+													{item.title}
+												</CardTitle>
+											</CardHeader>
+											<CardContent className="pl-5">
+												<div className="flex items-center gap-1 text-3xl font-bold">
+													{item.value}
+													<span className="text-xl text-muted-foreground">
+														{item.isPercentage ? '%' : ''}
+													</span>
+												</div>
+											</CardContent>
+										</Card>
+									)
+								})}
+							</div>
+
+							{campaignData ? (
+								<div className="flex flex-row items-center justify-center gap-4">
+									<Card className="flex h-full flex-1 flex-col items-center rounded-lg">
+										<CardContent className="mt-4 flex flex-row items-start justify-between gap-2">
+											<div className="flex h-full flex-1 flex-col items-start justify-start gap-2 rounded-md p-4">
+												<div className="flex flex-row items-center">
+													<span className="text-sm font-semibold">
+														name :&nbsp;{' '}
+													</span>{' '}
+													<div className="flex flex-wrap items-center justify-center gap-4">
+														{campaignData.campaign.name}
+														<Badge
+															variant={
+																campaignData.campaign.status ===
+																'Draft'
+																	? 'outline'
+																	: campaignData.campaign
+																				.status ===
+																		  'Cancelled'
+																		? 'destructive'
+																		: 'default'
+															}
+															className={clsx(
+																campaignData.campaign.status ===
+																	'Paused' ||
+																	campaignData.campaign.status ===
+																		'Scheduled'
+																	? 'bg-yellow-500'
+																	: campaignData.campaign
+																				.status ===
+																		  'Cancelled'
+																		? 'bg-red-300'
+																		: ''
+															)}
+														>
+															{campaignData.campaign.status}
+														</Badge>
+														{campaignData.campaign.status ===
+														'Running' ? (
+															<div className="flex h-full w-fit items-center justify-center">
+																<div className="rotate h-4 w-4 animate-spin rounded-full border-4 border-solid  border-l-primary" />
+															</div>
+														) : null}
 													</div>
-												) : null}
-											</div>
-										</div>
+												</div>
 
-										<p className="text-sm text-muted-foreground">
-											description: {campaignData.campaign.description}
-										</p>
-										<div className="flex h-full flex-col gap-6 pt-2">
-											{/* sent to lists */}
-											<div className="flex flex-row items-center">
-												<span className="text-sm font-semibold">
-													Sent To:&nbsp;{' '}
-												</span>{' '}
-												<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
-													{campaignData.campaign.lists.length === 0 && (
-														<Badge variant={'outline'}>None</Badge>
-													)}
-													{campaignData.campaign.lists.map(list => {
-														return (
-															<Badge key={list.uniqueId}>
-																{list.name}
-															</Badge>
-														)
-													})}
+												<p className="text-sm text-muted-foreground">
+													description: {campaignData.campaign.description}
+												</p>
+												<div className="flex h-full flex-col gap-6 pt-2">
+													{/* sent to lists */}
+													<div className="flex flex-row items-center">
+														<span className="text-sm font-semibold">
+															Sent To:&nbsp;{' '}
+														</span>{' '}
+														<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+															{campaignData.campaign.lists.length ===
+																0 && (
+																<Badge variant={'outline'}>
+																	None
+																</Badge>
+															)}
+															{campaignData.campaign.lists.map(
+																list => {
+																	return (
+																		<Badge key={list.uniqueId}>
+																			{list.name}
+																		</Badge>
+																	)
+																}
+															)}
+														</div>
+													</div>
+
+													{/* tags */}
+													<div className="flex flex-row items-center">
+														<span className="text-sm font-semibold">
+															Tags:&nbsp;{' '}
+														</span>{' '}
+														<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+															{campaignData.campaign.tags.length ===
+																0 && (
+																<Badge variant={'outline'}>
+																	None
+																</Badge>
+															)}
+															{campaignData.campaign.tags.map(tag => {
+																return (
+																	<Badge key={tag.uniqueId}>
+																		{tag.label}
+																	</Badge>
+																)
+															})}
+														</div>
+													</div>
+
+													{/* created on */}
+													<div className="flex flex-row items-center">
+														<span className="text-sm font-semibold">
+															created on:&nbsp;{' '}
+														</span>{' '}
+														<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+															{dayjs(
+																campaignData.campaign.createdAt
+															).format('DD MMM, YYYY')}
+														</div>
+													</div>
 												</div>
 											</div>
-
-											{/* tags */}
-											<div className="flex flex-row items-center">
-												<span className="text-sm font-semibold">
-													Tags:&nbsp;{' '}
-												</span>{' '}
-												<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
-													{campaignData.campaign.tags.length === 0 && (
-														<Badge variant={'outline'}>None</Badge>
-													)}
-													{campaignData.campaign.tags.map(tag => {
-														return (
-															<Badge key={tag.uniqueId}>
-																{tag.label}
-															</Badge>
-														)
-													})}
-												</div>
-											</div>
-
-											{/* created on */}
-											<div className="flex flex-row items-center">
-												<span className="text-sm font-semibold">
-													created on:&nbsp;{' '}
-												</span>{' '}
-												<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
-													{dayjs(campaignData.campaign.createdAt).format(
-														'DD MMM, YYYY'
-													)}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className="flex h-full flex-1 flex-col rounded-md border p-4">
-										<div className="flex h-full w-full flex-col gap-2 pt-2">
-											<p className="flex flex-row text-sm font-light text-muted-foreground">
-												<span className="flex gap-2">
-													<Icons.check className="size-5" />
-													<b>Messages Sent:</b>{' '}
-												</span>
-												<span className="font-extrabold">
-													{campaignAnalytics?.totalMessages || 0}
-												</span>
-											</p>
-											<p className="flex flex-row text-sm font-light text-muted-foreground">
-												<span className="flex gap-2">
-													<Icons.doubleCheck className="size-5" />
-													<b>Messages Delivered:</b>{' '}
-												</span>
-												<span className="font-extrabold">
-													{campaignAnalytics?.messagesDelivered || 0}
-												</span>
-											</p>
-											<p className="flex flex-row text-sm font-light text-muted-foreground">
-												<span className="flex gap-2">
-													<Icons.doubleCheck className="size-5 text-primary" />
-													<b>Messages Read:</b>{' '}
-												</span>
-												<span className="font-extrabold">
-													{campaignAnalytics?.messagesRead || 0}
-												</span>
-											</p>
-											<p className="flex flex-row text-sm font-light text-muted-foreground">
-												<span className="flex gap-2">
-													<Icons.xCircle className="size-5" />
-													<b>Messages Failed:</b>{' '}
-												</span>
-												<span className="font-extrabold">
-													{campaignAnalytics?.messagesFailed || 0}
-												</span>
-											</p>
-											<p className="flex flex-row text-sm font-light text-muted-foreground">
-												<span className="flex gap-2">
-													<Icons.xCircle className="size-5" />
-													<b>Messages Undelivered:</b>{' '}
-												</span>
-												<span className="font-extrabold">
-													{campaignAnalytics?.messagesUndelivered || 0}
-												</span>
-											</p>
-										</div>
-									</div>
-								</CardContent>
-							</Card>
-						)}
-						{campaignAnalytics && (
-							<div className="flex flex-row gap-4 ">
-								<Card className="flex-1">
-									<CardHeader>
-										<CardTitle>Message Analytics</CardTitle>
-									</CardHeader>
-									<CardContent className="pl-2">
-										<MessageAggregateAnalytics data={[]} />
-									</CardContent>
-								</Card>
-								{campaignData?.campaign.isLinkTrackingEnabled && (
-									<Card className="flex-1">
-										<CardHeader>
-											<CardTitle>Link Clicks</CardTitle>
-										</CardHeader>
-										<CardContent className="pl-2">
-											<LinkClicks data={[]} />
 										</CardContent>
 									</Card>
-								)}
-							</div>
-						)}
+
+									<Card className="flex h-full w-full max-w-[25rem] flex-col items-center rounded-lg">
+										<CardContent className="h-full w-full !py-4">
+											<div className="flex flex-row items-center justify-center gap-3">
+												<Icons.analytics className="size-4 text-center" />
+												<div className="text-gray-500">
+													Message Analytics
+												</div>
+											</div>
+											<Separator className="my-2" />
+											<div className="mx-auto flex w-full flex-col gap-4 px-10 py-8">
+												{[
+													{
+														label: 'Sent',
+														icon: 'send',
+														count: 0
+													},
+													{
+														label: 'Read',
+														icon: 'doubleCheck',
+														count: 0
+													},
+													{
+														label: 'Delivered',
+														icon: 'si',
+														count: 0
+													},
+													{
+														label: 'Failed',
+														icon: 'send',
+														count: 0
+													}
+												].map(item => {
+													const Icon =
+														Icons[item.icon as keyof typeof Icons]
+													return (
+														<div
+															className="flex w-full flex-1 justify-between"
+															key={item.label}
+														>
+															<div className="flex items-center justify-center gap-4 font-medium text-muted-foreground">
+																<Icon className="size-5" />
+																<p className="text-sm">
+																	{item.label}
+																</p>
+															</div>
+															<div className="text-center">
+																{item.count}
+															</div>
+														</div>
+													)
+												})}
+											</div>
+										</CardContent>
+									</Card>
+								</div>
+							) : null}
+
+							{campaignAnalytics && (
+								<div className="flex flex-row gap-4 ">
+									<Card className="flex-1">
+										<CardHeader>
+											<CardTitle>Message Analytics</CardTitle>
+										</CardHeader>
+										<CardContent className="pl-2">
+											<MessageAggregateAnalytics data={[]} />
+										</CardContent>
+									</Card>
+									{campaignData?.campaign.isLinkTrackingEnabled && (
+										<Card className="flex-1">
+											<CardHeader>
+												<CardTitle>Link Clicks</CardTitle>
+											</CardHeader>
+											<CardContent className="pl-2">
+												<LinkClicks data={[]} />
+											</CardContent>
+										</Card>
+									)}
+								</div>
+							)}
+						</div>
 					</>
 				) : (
 					<>

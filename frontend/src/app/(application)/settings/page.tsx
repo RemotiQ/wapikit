@@ -20,7 +20,7 @@ import {
 } from '~/components/ui/select'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
-import { Plus, EyeIcon } from 'lucide-react'
+import { EyeIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts'
 import {
 	RolePermissionEnum,
@@ -970,9 +970,9 @@ export default function SettingsPage() {
 																					}}
 																				>
 																					{whatsAppBusinessAccountDetailsVisibility.apiToken ? (
-																						<EyeIconOff className="size-5" />
+																						<Icons.eyeOff className="size-5" />
 																					) : (
-																						<EyeIcon className="size-5" />
+																						<Icons.eye className="size-5" />
 																					)}
 																				</span>
 																			</div>

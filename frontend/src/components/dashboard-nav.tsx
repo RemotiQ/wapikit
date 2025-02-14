@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
 import { Icons } from '~/components/icons'
 import { clsx as cn } from 'clsx'
 import { type NavItem } from '~/types'
@@ -39,7 +38,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 	const path = usePathname()
 	const { isMinimized } = useSidebar()
 	const { authState } = useAuthState()
-	const { currentOrganization, writeProperty } = useLayoutStore()
+	const { currentOrganization } = useLayoutStore()
 
 	const [isNewOrganizationFormModalOpen, setIsNewOrganizationFormModalOpen] = useState(false)
 

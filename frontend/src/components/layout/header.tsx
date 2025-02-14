@@ -9,7 +9,6 @@ import { useTheme } from 'next-themes'
 import { Notifications } from './notification-dropdown'
 import { useLayoutStore } from '~/store/layout.store'
 import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
 import { Icons } from '../icons'
 
 export default function Header() {

@@ -1,6 +1,5 @@
 'use client'
 
-import BreadCrumb from '~/components/breadcrumb'
 import { ContactTableColumns } from '~/components/tables/columns'
 import { TableComponent } from '~/components/tables/table'
 import { Button, buttonVariants } from '~/components/ui/button'
@@ -29,8 +28,6 @@ import { useRouter } from 'next/navigation'
 import { useLayoutStore } from '~/store/layout.store'
 import ContactDetailsSheet from '~/components/contact-details-sheet'
 import { MultiSelect } from '~/components/multi-select'
-
-const breadcrumbItems = [{ title: 'Contacts', link: '/contacts' }]
 
 const ContactsPage = () => {
 	const searchParams = useSearchParams()
