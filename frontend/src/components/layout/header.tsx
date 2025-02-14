@@ -38,20 +38,17 @@ export default function Header() {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<Badge
-						variant={'default'}
+					<div
 						onClick={() => {
 							writeProperty({
 								isCommandMenuOpen: true
 							})
 						}}
-						className="cursor-pointer  "
+						className="tetx-xs  flex cursor-pointer flex-row items-center gap-1 rounded-md border px-2.5 py-[1px] font-medium text-foreground"
 					>
 						<Icons.macoscommand className="size-3" /> K
-					</Badge>
-					{/* <div className="flex flex-row items-center gap-1 rounded-md px-1">
-							<Icons.macoscommand className="size-3" /> K
-						</div> */}
+					</div>
+
 					<div className="flex items-center gap-1">
 						<Notifications />
 						<UserNav />
