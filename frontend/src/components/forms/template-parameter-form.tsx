@@ -1,319 +1,200 @@
+import { clsx } from 'clsx'
 import { type UseFormReturn } from 'react-hook-form'
-import { Button } from '~/components/ui/button'
-import { type TemplateComponentSchema } from '~/schema'
 import { type z } from 'zod'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
-import { getParametersPerComponent } from '~/reusable-functions'
-import { type MessageTemplateComponentType, type MessageTemplateSchema } from 'root/.generated'
-import { Input } from '../ui/input'
-import { Separator } from '../ui/separator'
+import { Icons } from '~/components/icons'
+import { Button } from '~/components/ui/button'
+import { FormControl, FormField, FormItem, FormLabel, Form } from '~/components/ui/form'
+import { Input } from '~/components/ui/input'
+import {
+	Select,
+	SelectTrigger,
+	SelectValue,
+	SelectContent,
+	SelectItem
+} from '~/components/ui/select'
+import { Separator } from '~/components/ui/separator'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
+import { type TemplateComponentParametersSchema } from '~/schema'
 
-type Props = {
-	isBusy: boolean
-	setIsTemplateComponentsInputModalOpen: (isOpen: boolean) => void
-	templateMessageComponentParameterForm: UseFormReturn<
-		{
-			body: (string | null | undefined)[]
-			header: (string | null | undefined)[]
-			buttons: (string | null | undefined)[]
-		},
-		any,
-		undefined
-	>
-	handleTemplateComponentParameterSubmit: (
-		data: z.infer<typeof TemplateComponentSchema>
-	) => Promise<void>
-	template?: MessageTemplateSchema
+interface TemplateParameterFormProps {
+	onSubmit: (data: z.infer<typeof TemplateComponentParametersSchema>) => void
+	templateParameterForm: UseFormReturn<z.infer<typeof TemplateComponentParametersSchema>>
 }
 
-const TemplateParameterForm: React.FC<Props> = ({
-	isBusy,
-	setIsTemplateComponentsInputModalOpen,
-	templateMessageComponentParameterForm,
-	handleTemplateComponentParameterSubmit,
-	template
-}) => {
-	console.log({
-		templateMessageComponentParameterFormValues: JSON.stringify(
-			templateMessageComponentParameterForm.watch()
-		)
-	})
+const TemplateParameterForm = (props: TemplateParameterFormProps) => {
+	const { onSubmit, templateParameterForm } = props
 
-	console.log({
-		isValidating: templateMessageComponentParameterForm.formState.isValidating,
-		isSubmitting: templateMessageComponentParameterForm.formState.isSubmitting
-	})
+	const CONTACT_FIELD_OPTIONS = [
+		{ label: 'First Name', value: 'firstName' },
+		{ label: 'Last Name', value: 'lastName' },
+		{ label: 'Email', value: 'email' },
+		{ label: 'Phone', value: 'phoneNumber' }
+	]
+
+	const headerFields = templateParameterForm.watch('header')
+	const bodyFields = templateParameterForm.watch('body')
+	const buttonFields = templateParameterForm.watch('buttons')
+
+	// For brevity, let's define a small sub-component to render each parameter row:
+	const ParameterRow = (
+		compType: 'header' | 'body' | 'buttons',
+		fieldIndex: number,
+		fieldValue: z.infer<typeof TemplateComponentParametersSchema>['header'][number]
+	) => {
+		console.log({
+			parameterType: templateParameterForm.watch(`${compType}.${fieldIndex}.parameterType`)
+		})
+
+		// read & write with react-hook-form
+		return (
+			<div className="flex flex-row items-end justify-end gap-2 rounded p-3" key={fieldIndex}>
+				{/* If the user picks "static", show a text input */}
+				{templateParameterForm.watch(`${compType}.${fieldIndex}.parameterType`) ===
+					'static' && (
+					<FormField
+						control={templateParameterForm.control}
+						name={`${compType}.${fieldIndex}.staticValue` as const}
+						render={({ field }) => (
+							<FormItem className="flex-1">
+								<FormLabel>{fieldValue.label}</FormLabel>
+								<FormControl>
+									<Input placeholder="Type your text here..." {...field} />
+								</FormControl>
+							</FormItem>
+						)}
+					/>
+				)}
+
+				{/* If the user picks "dynamic", show a dropdown of contact fields */}
+				{templateParameterForm.watch(`${compType}.${fieldIndex}.parameterType`) ===
+					'dynamic' && (
+					<FormField
+						control={templateParameterForm.control}
+						name={`${compType}.${fieldIndex}.dynamicField` as const}
+						render={({ field }) => (
+							<FormItem className="flex-1">
+								<FormLabel>{fieldValue.label}</FormLabel>
+								<FormControl>
+									<Select
+										onValueChange={val => field.onChange(val)}
+										value={field.value ?? ''}
+									>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a field..." />
+										</SelectTrigger>
+										<SelectContent>
+											{CONTACT_FIELD_OPTIONS.map(opt => (
+												<SelectItem key={opt.value} value={opt.value}>
+													{opt.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</FormControl>
+							</FormItem>
+						)}
+					/>
+				)}
+
+				<FormField
+					control={templateParameterForm.control}
+					name={`${compType}.${fieldIndex}.parameterType` as const}
+					render={({ field }) => (
+						<FormItem>
+							<TooltipProvider delayDuration={200}>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant={'outline'}
+											className={clsx(
+												'mt-2 w-fit items-center text-blue-600',
+												field.value === 'dynamic' ? 'bg-blue-100' : ''
+											)}
+											onClick={e => {
+												e.preventDefault()
+												if (field.value === 'static') {
+													field.onChange('dynamic')
+												} else {
+													field.onChange('static')
+												}
+											}}
+										>
+											<span className="mr-1">{`{}`}</span>
+										</Button>
+									</TooltipTrigger>
+
+									<TooltipContent className="flex flex-row items-center gap-1">
+										<Icons.info className="size-4" />
+										{field.value === 'dynamic'
+											? 'Change to static'
+											: 'Change to dynamic'}
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</FormItem>
+					)}
+				/>
+			</div>
+		)
+	}
 
 	return (
-		<Form {...templateMessageComponentParameterForm}>
+		<Form {...templateParameterForm}>
 			<form
-				onSubmit={templateMessageComponentParameterForm.handleSubmit(
-					handleTemplateComponentParameterSubmit
-				)}
-				className="flex-1 space-y-8 px-2 "
+				onSubmit={templateParameterForm.handleSubmit(data => {
+					onSubmit(data)
+				})}
+				className="my-6 flex flex-col gap-3 px-5"
 			>
-				<div className="flex max-h-[32rem] flex-col gap-8 overflow-scroll pb-44">
-					{Object.entries(getParametersPerComponent(template)).map(
-						([key, value], index) => {
-							if (!value) {
-								return null
-							}
-
-							const componentType = key as Lowercase<MessageTemplateComponentType>
-
-							const component = template?.components?.find(component => {
-								return (
-									component.type &&
-									component.type === (componentType.toUpperCase() as any)
-								)
-							})
-
-							return (
-								<div key={`${key}_parameters`} className="flex flex-col gap-3">
-									<span className="font-bold">{key}</span>
-
-									{key === 'buttons' ? (
-										<div
-											key={'buttons-parameters'}
-											className="flex w-full flex-col gap-3"
-										>
-											{component?.buttons?.map((button, buttonIndex) => {
-												if (
-													button.example?.length ||
-													button.type === 'QUICK_REPLY'
-												) {
-													let exampleValue = button.example?.[0]
-													let placeHolderSuffix = 'parameter'
-
-													if (button.type === 'QUICK_REPLY') {
-														exampleValue = 'PAYLOAD'
-														placeHolderSuffix = 'payload'
-													}
-
-													return (
-														<FormField
-															key={`${componentType}-${buttonIndex}`}
-															control={
-																templateMessageComponentParameterForm.control
-															}
-															name={'buttons'}
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>
-																		<span className="flex flex-row">
-																			{button.type}{' '}
-																			{placeHolderSuffix}
-																			&nbsp;
-																			<pre className="italic text-red-500">
-																				Example:{' '}
-																				{exampleValue}
-																			</pre>
-																		</span>
-																	</FormLabel>
-																	<FormControl>
-																		<Input
-																			disabled={isBusy}
-																			placeholder={`${button.type} - ${placeHolderSuffix}`}
-																			{...field}
-																			autoComplete="off"
-																			value={
-																				(field?.value &&
-																					field.value[
-																						buttonIndex
-																					]) ||
-																				''
-																			}
-																			onChange={e => {
-																				// existing params
-																				const existingParamValue =
-																					templateMessageComponentParameterForm.getValues(
-																						'buttons'
-																					)
-
-																				if (
-																					existingParamValue
-																				) {
-																					existingParamValue[
-																						buttonIndex
-																					] =
-																						e.target.value
-
-																					templateMessageComponentParameterForm.setValue(
-																						'buttons',
-																						existingParamValue
-																					)
-																				} else {
-																					// create a new object
-																					const paramArray =
-																						[]
-
-																					paramArray[
-																						buttonIndex
-																					] =
-																						e.target.value
-
-																					console.log({
-																						paramArray
-																					})
-
-																					templateMessageComponentParameterForm.setValue(
-																						'buttons',
-																						paramArray
-																					)
-																				}
-																			}}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-													)
-												} else {
-													return null
-												}
-											})}
-										</div>
-									) : (
-										<>
-											{Array(value)
-												.fill(0)
-												.map((_, index) => {
-													let exampleValue: string | null = null
-
-													if (component) {
-														switch (componentType) {
-															case 'header':
-																exampleValue =
-																	component.example
-																		?.header_text?.[index] ||
-																	null
-																break
-															case 'body':
-																exampleValue =
-																	component.example
-																		?.body_text?.[0][index] ||
-																	null
-																break
-															default:
-																exampleValue = null
-																break
-														}
-													}
-
-													return (
-														<FormField
-															key={`${componentType}-${index}`}
-															control={
-																templateMessageComponentParameterForm.control
-															}
-															name={
-																componentType as 'header' | 'body'
-															}
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>
-																		<span className="flex flex-row">
-																			{`{{${index + 1}}}`}
-																			&nbsp;
-																			<pre className="italic text-red-500">
-																				Example:{' '}
-																				{exampleValue}
-																			</pre>
-																		</span>
-																	</FormLabel>
-																	<FormControl>
-																		<Input
-																			disabled={isBusy}
-																			placeholder={`${componentType} - {{${index + 1}}} - ${exampleValue}`}
-																			{...field}
-																			autoComplete="off"
-																			value={
-																				(field?.value &&
-																					field.value[
-																						index
-																					]) ||
-																				''
-																			}
-																			onChange={e => {
-																				// existing params
-
-																				const existingParamValue =
-																					templateMessageComponentParameterForm.getValues(
-																						componentType as
-																							| 'header'
-																							| 'body'
-																					)
-
-																				if (
-																					existingParamValue
-																				) {
-																					existingParamValue[
-																						index
-																					] =
-																						e.target.value
-
-																					templateMessageComponentParameterForm.setValue(
-																						componentType as
-																							| 'header'
-																							| 'body',
-																						existingParamValue
-																					)
-																				} else {
-																					// create a new object
-																					const paramArray =
-																						[]
-
-																					paramArray[
-																						index
-																					] =
-																						e.target.value
-
-																					templateMessageComponentParameterForm.setValue(
-																						componentType as
-																							| 'header'
-																							| 'body'
-																							| 'buttons',
-																						paramArray
-																					)
-																				}
-																			}}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-													)
-												})}
-										</>
-									)}
-
-									{index < 2 && <Separator className="mt-6" />}
-								</div>
-							)
-						}
-					)}
-				</div>
-
-				<div className="sticky bottom-36 flex w-full flex-col gap-3 bg-background py-10">
-					<pre className="text-xs text-red-500">NOTE: Scroll for more inputs</pre>
-					<div className="flex w-full flex-row gap-3">
-						<Button disabled={isBusy} className="ml-auto mr-0 w-full" type="submit">
-							Save
-						</Button>
-						<Button
-							disabled={isBusy}
-							variant={'outline'}
-							className="ml-auto mr-0 w-full"
-							type="button"
-							onClick={() => {
-								setIsTemplateComponentsInputModalOpen(false)
-							}}
-						>
-							Cancel
-						</Button>
+				{/* HEADER PARAMS */}
+				{headerFields.length > 0 && (
+					<div className="flex flex-col gap-2">
+						<h3 className="rounded-lg bg-accent p-2 text-base font-semibold text-muted-foreground">
+							Header Parameters
+						</h3>
+						<div className="flex flex-col gap-2">
+							{headerFields.map((field, index) =>
+								ParameterRow('header', index, field)
+							)}
+						</div>
+						<Separator className="my-2" />
 					</div>
+				)}
+
+				{/* BODY PARAMS */}
+				{bodyFields.length > 0 && (
+					<div className="flex flex-col gap-2">
+						<h3 className="rounded-lg bg-accent p-2 text-base font-semibold text-muted-foreground">
+							Body Parameters
+						</h3>
+						<div className="flex flex-col gap-4">
+							{bodyFields.map((field, index) => ParameterRow('body', index, field))}
+						</div>
+						<Separator className="my-4" />
+					</div>
+				)}
+
+				{/* BUTTON PARAMS */}
+				{buttonFields.length > 0 && (
+					<div className="flex flex-col gap-2">
+						<h3 className="rounded-lg bg-accent p-2 text-base font-semibold text-muted-foreground">
+							Button Parameters
+						</h3>
+						<div className="flex flex-col gap-4">
+							{buttonFields.map((field, index) =>
+								ParameterRow('buttons', index, field)
+							)}
+						</div>
+					</div>
+				)}
+
+				<div className="sticky bottom-0 left-0 right-0 z-10 flex gap-3 bg-white p-4 pb-10 shadow-md">
+					<Button type="submit" className="w-full flex-1" variant="default">
+						Save
+					</Button>
+					<Button type="button" className="w-full flex-1" variant="outline">
+						Cancel
+					</Button>
 				</div>
 			</form>
 		</Form>

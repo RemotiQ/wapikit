@@ -5,7 +5,7 @@ import { CardHeader, CardFooter } from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Button } from '~/components/ui/button'
-import { SendIcon, Image as ImageIcon, MoreVerticalIcon } from 'lucide-react'
+import { SendIcon, Image as ImageIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
 	DropdownMenu,

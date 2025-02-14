@@ -4,7 +4,7 @@ import { LineChart } from '@tremor/react'
 import React from 'react'
 import { type DateToCountGraphDataPointSchema } from 'root/.generated'
 
-export const LinkClicks: React.FC<{ data: LinkClicksGraphDataPointSchema[] }> = ({ data }) => {
+export const LinkClicks: React.FC<{ data: DateToCountGraphDataPointSchema[] }> = ({ data }) => {
 	return (
 		<div className="h-[375px] w-full rounded-lg">
 			<LineChart

@@ -8,6 +8,8 @@ import { Icons } from './components/icons'
 import { APP_BASE_DOMAIN } from './constants'
 import { type UtmTags } from './types'
 import { type PricingPlan } from 'root/cloud_generated'
+import { type z } from 'zod'
+import { type TemplateComponentParametersSchema } from './schema'
 
 export function generateUniqueId() {
 	return v4()
@@ -157,14 +159,83 @@ export function getParametersPerComponent(
 
 export function countParameterCountInTemplateComponent(template?: MessageTemplateSchema): number {
 	let total = 0
-
 	const paramsCount = getParametersPerComponent(template)
+	Object.entries(paramsCount).map(param => {
+		total = total + param[1]
+	})
+	return total
+}
 
-	Object.entries(paramsCount).map(([_, c]) => {
-		total = total + c
+type TemplateParameterInputType = z.infer<typeof TemplateComponentParametersSchema>['header'][0]
+
+export function parseTemplateComponents(
+	template?: MessageTemplateSchema
+): z.infer<typeof TemplateComponentParametersSchema> {
+	// This function:
+	// 1. Inspects template.components.
+	// 2. For each placeholder in the header/body, or each button payload,
+	//    it creates a TemplateParameterInput with default values.
+
+	const headerParams: TemplateParameterInputType[] = []
+	const bodyParams: TemplateParameterInputType[] = []
+	const buttonParams: TemplateParameterInputType[] = []
+
+	if (!template || !template.components) {
+		return {
+			header: headerParams,
+			body: bodyParams,
+			buttons: buttonParams
+		}
+	}
+
+	template.components?.forEach(comp => {
+		const type = comp.type?.toUpperCase()
+		if (type === 'HEADER') {
+			// Suppose comp.text = "Your order {{1}} is ready"
+			// We'll parse out placeholders -> "1"
+			// Or if named -> "order_id"
+			// For demonstration, assume we found 1 placeholder
+			headerParams.push({
+				nameOrIndex: '1',
+				label: 'Header placeholder #1',
+				parameterType: 'static', // default
+				staticValue: ''
+			})
+		} else if (type === 'BODY') {
+			// Similarly parse placeholders from comp.text
+			// For demonstration, assume 2 placeholders
+			bodyParams.push({
+				nameOrIndex: '1',
+				label: 'Body placeholder #1',
+				parameterType: 'static',
+				staticValue: ''
+			})
+			bodyParams.push({
+				nameOrIndex: '2',
+				label: 'Body placeholder #2',
+				parameterType: 'dynamic',
+				dynamicField: 'firstName'
+			})
+		} else if (type === 'BUTTONS' && comp.buttons) {
+			// For each button that needs a param (URL, phone, etc.)
+			comp.buttons.forEach((btn, idx) => {
+				// e.g. If button type=URL and it has a placeholder
+				// We'll add an item:
+				buttonParams.push({
+					nameOrIndex: String(idx),
+					label: `Button #${idx} payload`,
+					parameterType: 'static',
+					staticValue: '' // or from example
+				})
+			})
+		}
 	})
 
-	return total
+	return {
+		header: headerParams,
+		body: bodyParams,
+		buttons: buttonParams
+	}
 }
 
 export const createHref = ({

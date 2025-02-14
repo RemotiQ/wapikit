@@ -113,10 +113,18 @@ export const AssignConversationForm = z.object({
 	assignee: z.string()
 })
 
-export const TemplateComponentSchema = z.object({
-	body: z.array(z.string().nullish()),
-	header: z.array(z.string().nullish()),
-	buttons: z.array(z.string().nullish())
+export const TemplateParameterInputSchema = z.object({
+	nameOrIndex: z.string(),
+	label: z.string(),
+	parameterType: z.enum(['static', 'dynamic']),
+	dynamicField: z.string().optional(),
+	staticValue: z.string().optional()
+})
+
+export const TemplateComponentParametersSchema = z.object({
+	header: z.array(TemplateParameterInputSchema),
+	body: z.array(TemplateParameterInputSchema),
+	buttons: z.array(TemplateParameterInputSchema)
 })
 
 export const BulkImportContactsFormSchema = z.object({
@@ -124,11 +132,3 @@ export const BulkImportContactsFormSchema = z.object({
 	file: z.any(),
 	listIds: z.string().array().default([])
 })
-
-// export const TemplateComponentParametersSchema = z.object({
-// 	body: z.array(z.object({
-
-// 	})),
-// 	header: z.array(),
-// 	button: z.array()
-// })

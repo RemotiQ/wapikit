@@ -180,3 +180,23 @@ func Contains[T comparable](arr []T, value T) bool {
 	}
 	return false
 }
+
+func ParseName(fullName string) (string, string) {
+	// If the contact name is empty, return empty
+	if fullName == "" {
+		return "", ""
+	}
+
+	// Split on spaces
+	parts := strings.Fields(fullName) // "Alice Johnson" -> ["Alice", "Johnson"]
+
+	if len(parts) == 1 {
+		// If there's only one word, treat it as firstName
+		return parts[0], ""
+	}
+
+	// Otherwise, use the first token as firstName, the rest as lastName
+	firstName := parts[0]
+	lastName := strings.Join(parts[1:], " ")
+	return firstName, lastName
+}

@@ -35,7 +35,6 @@ import {
 	TwitterLogoIcon,
 	RowsIcon,
 	MinusCircledIcon,
-	Pencil2Icon,
 	DownloadIcon,
 	ExitIcon,
 	ClockIcon,

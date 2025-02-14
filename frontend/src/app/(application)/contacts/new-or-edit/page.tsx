@@ -3,19 +3,12 @@
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { useSearchParams } from 'next/navigation'
 import { useGetContactById } from 'root/.generated'
-import BreadCrumb from '~/components/breadcrumb'
 import DocumentationPitch from '~/components/forms/documentation-pitch'
 import NewContactForm from '~/components/forms/new-contact-form'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
-import TemplateMessageRenderer from '~/components/chat/template-message-renderer'
 
 const CreateNewContactPage = () => {
-	const breadcrumbItems = [
-		{ title: 'Contacts', link: '/contacts' },
-		{ title: 'Create', link: '/contacts/new-or-edit' }
-	]
-
 	const searchParams = useSearchParams()
 	const contactId = searchParams.get('id')
 

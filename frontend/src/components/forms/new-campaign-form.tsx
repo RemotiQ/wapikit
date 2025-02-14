@@ -20,9 +20,10 @@ import {
 	countParameterCountInTemplateComponent,
 	errorNotification,
 	materialConfirm,
+	parseTemplateComponents,
 	successNotification
 } from '~/reusable-functions'
-import { NewCampaignSchema, TemplateComponentSchema } from '~/schema'
+import { NewCampaignSchema, TemplateComponentParametersSchema } from '~/schema'
 import {
 	type CampaignSchema,
 	useCreateCampaign,
@@ -55,10 +56,10 @@ import {
 import { Separator } from '../ui/separator'
 import { ScrollArea } from '../ui/scroll-area'
 import { isPresent } from 'ts-is-present'
-
-import TemplateParameterForm from './template-parameter-form'
 import TemplateMessageRenderer from '../chat/template-message-renderer'
 import { Icons } from '../icons'
+import { clsx } from 'clsx'
+import TemplateParameterForm from './template-parameter-form'
 
 interface FormProps {
 	initialData: CampaignSchema | null
@@ -120,8 +121,10 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		resolver: zodResolver(NewCampaignSchema)
 	})
 
-	const templateMessageComponentParameterForm = useForm<z.infer<typeof TemplateComponentSchema>>({
-		resolver: zodResolver(TemplateComponentSchema),
+	const templateMessageComponentParameterForm = useForm<
+		z.infer<typeof TemplateComponentParametersSchema>
+	>({
+		resolver: zodResolver(TemplateComponentParametersSchema),
 		defaultValues: {
 			body: [],
 			header: [],
@@ -240,7 +243,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 	}
 
 	const handleTemplateComponentParameterSubmit = async (
-		data: z.infer<typeof TemplateComponentSchema>
+		data: z.infer<typeof TemplateComponentParametersSchema>
 	) => {
 		try {
 			const campaignId = newCampaignId || initialData?.uniqueId
@@ -361,6 +364,18 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		}
 	}, [hasUnsavedChanges])
 
+	useEffect(() => {
+		const defaultValuesForTemplateParameter = parseTemplateComponents(
+			templatesResponse?.find(template => {
+				return template.id === campaignForm.getValues('templateId')
+			})
+		)
+
+		templateMessageComponentParameterForm.reset({
+			...defaultValuesForTemplateParameter
+		})
+	}, [templatesResponse, campaignForm, templateMessageComponentParameterForm])
+
 	return (
 		<>
 			<Drawer
@@ -391,7 +406,18 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 					}
 				}}
 			>
-				<DrawerContent className="mx-auto max-h-[80vh] min-h-[80vh] w-2/3 px-20">
+				<DrawerContent
+					className={clsx(
+						'mx-auto max-h-[80vh] min-h-[80vh]',
+						countParameterCountInTemplateComponent(
+							templatesResponse?.find(template => {
+								return template.id === campaignForm.getValues('templateId')
+							})
+						) > 0
+							? ''
+							: 'w-2/3 px-20'
+					)}
+				>
 					{countParameterCountInTemplateComponent(
 						templatesResponse?.find(template => {
 							return template.id === campaignForm.getValues('templateId')
@@ -408,27 +434,14 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 								</DrawerDescription>
 							</DrawerHeader>
 							<Separator />
-							<div className="flex w-full items-start justify-end space-x-2 pt-6">
-								<div className="h-full flex-1">
-									<ScrollArea className="h-full flex-1">
+							<div className="relative flex h-full w-full items-start justify-end space-x-2 pt-6">
+								<div className="h-screen flex-1 pb-72">
+									<ScrollArea className="h-full">
 										<TemplateParameterForm
-											handleTemplateComponentParameterSubmit={
-												handleTemplateComponentParameterSubmit
-											}
-											isBusy={isBusy}
-											setIsTemplateComponentsInputModalOpen={
-												setIsTemplateComponentsInputModalOpen
-											}
-											templateMessageComponentParameterForm={
+											templateParameterForm={
 												templateMessageComponentParameterForm
 											}
-											key={'template-parameter-form'}
-											template={templatesResponse?.find(template => {
-												return (
-													template.id ===
-													campaignForm.getValues('templateId')
-												)
-											})}
+											onSubmit={handleTemplateComponentParameterSubmit}
 										/>
 									</ScrollArea>
 								</div>
