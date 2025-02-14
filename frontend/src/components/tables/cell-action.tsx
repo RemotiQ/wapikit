@@ -18,7 +18,7 @@ export const CellAction: React.FC<{ actions: TableCellActionProps[]; data: any }
 		<>
 			<DropdownMenu modal={false}>
 				<DropdownMenuTrigger asChild>
-					<Icons.dotsVertical className="h-4 w-4 text-secondary-foreground cursor-pointer" />
+					<Icons.dotsVertical className="h-4 w-4 cursor-pointer text-secondary-foreground" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
