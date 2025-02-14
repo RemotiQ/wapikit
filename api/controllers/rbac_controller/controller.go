@@ -256,7 +256,9 @@ func getRoleById(context interfaces.ContextWithSession) error {
 		UniqueId:    roleId,
 	}
 
-	return context.JSON(http.StatusOK, role)
+	return context.JSON(http.StatusOK, api_types.GetRoleByIdResponseSchema{
+		Role: role,
+	})
 }
 
 func createRole(context interfaces.ContextWithSession) error {

@@ -80,7 +80,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 		ref
 	) => {
 		const [selectedValues, setSelectedValues] = useState<string[]>(defaultValue)
-
 		const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
 		const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -126,6 +125,12 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 				onValueChange(allValues)
 			}
 		}
+
+		React.useEffect(() => {
+			if (defaultValue.length > 0 && selectedValues.length === 0) {
+				setSelectedValues(defaultValue)
+			}
+		}, [selectedValues.length, defaultValue])
 
 		return (
 			<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={modalPopover}>

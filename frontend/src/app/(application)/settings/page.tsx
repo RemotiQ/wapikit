@@ -71,7 +71,6 @@ import SubscriptionSettings from '~/components/settings/subscription'
 import { PRODUCTION_WEBHOOK_URL } from '~/constants'
 
 export default function SettingsPage() {
-	console.log('REACT VERSION PUBLIC', React.version)
 	const { user, isOwner, currentOrganization, writeProperty, phoneNumbers, featureFlags } =
 		useLayoutStore()
 
@@ -166,13 +165,12 @@ export default function SettingsPage() {
 
 	const [showWebhookSecret, setShowWebhookSecret] = useState(false)
 	const [showAiApiKey, setShowAiApiKey] = useState(false)
-
 	const createRoleMutation = useCreateOrganizationRole()
 	const updateRoleMutation = useUpdateOrganizationRoleById()
 	const updateWhatsappBusinessAccountDetailsMutation = useUpdateWhatsappBusinessAccountDetails()
 	const updateUserMutation = useUpdateUser()
 	const updateOrganizationMutation = useUpdateOrganization()
-	const { data: roleData } = useGetOrganizationRoleById('', {
+	const { data: roleData } = useGetOrganizationRoleById(roleIdToEdit || '', {
 		query: {
 			enabled: !!roleIdToEdit
 		}
@@ -1160,9 +1158,6 @@ export default function SettingsPage() {
 											</CardHeader>
 											<CardContent className="flex h-fit items-center justify-center pb-0">
 												<Select
-													onValueChange={e => {
-														console.log(e)
-													}}
 													value={
 														phoneNumbers?.[0]?.display_phone_number ||
 														'no organizations'

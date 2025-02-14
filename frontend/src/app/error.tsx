@@ -6,7 +6,6 @@ import { Button } from '~/components/ui/button'
 import { WEBSITE_URL } from '~/constants'
 
 export default function Error({ reset, error }: { error: Error; reset: () => void }) {
-	console.log({ error: error })
 	return (
 		<div className="flex h-[70vh] flex-col items-center justify-center gap-4">
 			<h2 className="mx-auto text-center text-xl text-gray-900">
