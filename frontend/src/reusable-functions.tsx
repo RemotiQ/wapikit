@@ -230,7 +230,6 @@ export async function displayRazorpayCheckoutModal(params: {
 		description: description,
 		subscription_id: sessionId,
 		handler: function (response: any) {
-			console.log(response)
 			if (response.razorpay_payment_id) {
 				onSuccess(verificationToken)
 			} else {

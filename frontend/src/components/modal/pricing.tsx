@@ -135,8 +135,6 @@ export function PricingModal() {
 				return !matchedPlan?.shouldCtaBeDisabled
 			})
 
-			console.log({ nextPlan })
-
 			if (nextPlan) {
 				// Map the plan names to the currentScalePlan values
 				const planMapping = {

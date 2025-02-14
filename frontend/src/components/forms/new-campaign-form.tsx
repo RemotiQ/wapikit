@@ -511,7 +511,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 													shouldValidate: true
 												})
 											}}
-											defaultValue={campaignForm.getValues('lists')}
+											defaultValue={campaignForm.watch('lists')}
 											placeholder="Select lists"
 											variant="default"
 										/>
