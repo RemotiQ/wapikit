@@ -8,6 +8,7 @@ import DocumentationPitch from '~/components/forms/documentation-pitch'
 import NewContactForm from '~/components/forms/new-contact-form'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
+import TemplateMessageRenderer from '~/components/chat/template-message-renderer'
 
 const CreateNewContactPage = () => {
 	const breadcrumbItems = [
