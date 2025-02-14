@@ -36,7 +36,6 @@ import {
 	TwitterLogoIcon,
 	RowsIcon,
 	MinusCircledIcon,
-	CheckIcon,
 	Pencil2Icon,
 	DownloadIcon,
 	ExitIcon,
@@ -660,6 +659,24 @@ export const Icons = {
 			/>
 		</svg>
 	),
+	key: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M17 8.99994C17 8.48812 16.8047 7.9763 16.4142 7.58579C16.0237 7.19526 15.5118 7 15 7M15 15C18.3137 15 21 12.3137 21 9C21 5.68629 18.3137 3 15 3C11.6863 3 9 5.68629 9 9C9 9.27368 9.01832 9.54308 9.05381 9.80704C9.11218 10.2412 9.14136 10.4583 9.12172 10.5956C9.10125 10.7387 9.0752 10.8157 9.00469 10.9419C8.937 11.063 8.81771 11.1823 8.57913 11.4209L3.46863 16.5314C3.29568 16.7043 3.2092 16.7908 3.14736 16.8917C3.09253 16.9812 3.05213 17.0787 3.02763 17.1808C3 17.2959 3 17.4182 3 17.6627V19.4C3 19.9601 3 20.2401 3.10899 20.454C3.20487 20.6422 3.35785 20.7951 3.54601 20.891C3.75992 21 4.03995 21 4.6 21H7V19H9V17H11L12.5791 15.4209C12.8177 15.1823 12.937 15.063 13.0581 14.9953C13.1843 14.9248 13.2613 14.8987 13.4044 14.8783C13.5417 14.8586 13.7588 14.8878 14.193 14.9462C14.4569 14.9817 14.7263 15 15 15Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
 	documentation: ({ ...props }: LucideProps) => (
 		<svg
 			width="24"
@@ -1176,7 +1193,77 @@ export const Icons = {
 			/>
 		</svg>
 	),
-
-	twitter: TwitterLogoIcon,
-	check: CheckIcon
+	cross: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M17 7L7 17M7 7L17 17"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	crossSquare: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M9 9L15 15M15 9L9 15M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	crossCircle: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M15 9L9 15M9 9L15 15M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	check: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M20 6L9 17L4 12"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	twitter: TwitterLogoIcon
 }

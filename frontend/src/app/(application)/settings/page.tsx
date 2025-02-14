@@ -913,7 +913,7 @@ export default function SettingsPage() {
 																					}
 																				/>
 																				<span
-																					className="rounded-md border p-1 px-2"
+																					className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 																					onClick={() => {
 																						setWhatsAppBusinessAccountDetailsVisibility(
 																							data => ({
@@ -924,7 +924,11 @@ export default function SettingsPage() {
 																						)
 																					}}
 																				>
-																					<EyeIcon className="size-5" />
+																					{whatsAppBusinessAccountDetailsVisibility.whatsappBusinessAccountId ? (
+																						<Icons.eyeOff className="size-5" />
+																					) : (
+																						<Icons.eye className="size-5" />
+																					)}
 																				</span>
 																			</div>
 																		</FormControl>
@@ -958,7 +962,7 @@ export default function SettingsPage() {
 																					}
 																				/>
 																				<span
-																					className="rounded-md border p-1 px-2"
+																					className="flex items-center justify-center rounded-md border p-1 px-2"
 																					onClick={() => {
 																						setWhatsAppBusinessAccountDetailsVisibility(
 																							data => ({
@@ -1022,7 +1026,7 @@ export default function SettingsPage() {
 													disabled
 												/>
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															const secret =
 																currentOrganization
@@ -1040,28 +1044,24 @@ export default function SettingsPage() {
 																})
 															}
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
 														<Icons.copy className="size-5" />
-													</Button>
+													</span>
 												</span>
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															setShowWebhookSecret(data => !data)
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
 														{showWebhookSecret ? (
 															<Icons.eyeOff className="size-5" />
 														) : (
 															<Icons.eye className="size-5" />
 														)}
-													</Button>
+													</span>
 												</span>
 											</CardContent>
 										</Card>
@@ -1091,7 +1091,7 @@ export default function SettingsPage() {
 													{PRODUCTION_WEBHOOK_URL}
 												</p>
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															copyToClipboard(
 																PRODUCTION_WEBHOOK_URL
@@ -1102,12 +1102,10 @@ export default function SettingsPage() {
 																	'Secret copied to clipboard'
 															})
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
 														<Icons.copy className="size-5" />
-													</Button>
+													</span>
 												</span>{' '}
 											</CardContent>
 										</Card>
@@ -1362,35 +1360,38 @@ export default function SettingsPage() {
 													disabled
 												/>
 												<span>
-													<Button
+													<span
 														onClick={() => {
-															getApiKey().catch(error =>
-																console.error(error)
-															)
+															if (apiKey) {
+																setApiKey(null)
+															} else {
+																getApiKey().catch(error =>
+																	console.error(error)
+																)
+															}
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
-														<Icons.eye className="size-5" />
-														Show
-													</Button>
+														{apiKey ? (
+															<Icons.eyeOff className="size-5" />
+														) : (
+															<Icons.eye className="size-5" />
+														)}
+														{/* // <Icons.eyeOff className="size-5" /> */}
+													</span>
 												</span>
 
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															copyApiKey().catch(error =>
 																console.error(error)
 															)
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
 														<Icons.copy className="size-5" />
-														Copy
-													</Button>
+													</span>
 												</span>
 
 												{/* regenerate button */}
@@ -2112,6 +2113,11 @@ export default function SettingsPage() {
 																									isBusy
 																								}
 																							>
+																								{showAiApiKey ? (
+																									<Icons.eyeOff className="size-5" />
+																								) : (
+																									<Icons.eye className="size-5" />
+																								)}
 																								<EyeIcon className="size-5" />
 																							</Button>
 																						</span>

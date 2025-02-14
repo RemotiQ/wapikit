@@ -1,5 +1,6 @@
 'use client'
 
+import { ScrollArea } from '~/components/ui/scroll-area'
 import { useSearchParams } from 'next/navigation'
 import { useGetContactById } from 'root/.generated'
 import BreadCrumb from '~/components/breadcrumb'
@@ -24,20 +25,20 @@ const CreateNewContactPage = () => {
 	})
 
 	return (
-		<>
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
+		<ScrollArea className="relative h-full w-full">
+			<div className="relative  flex-1 space-y-4 p-4 pt-6 md:px-6">
 				<div className="flex items-start justify-between">
 					<Heading title={`Create New Contact`} description="" />
 				</div>
 				<Separator />
 
-				<div className="flex flex-row gap-10">
+				<div className="relative flex flex-row gap-10">
 					<NewContactForm initialData={contactResponse.data?.contact || null} />
+
 					<DocumentationPitch type="contact" />
 				</div>
-			</div>
-		</>
+			</div>{' '}
+		</ScrollArea>
 	)
 }
 

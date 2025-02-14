@@ -60,8 +60,7 @@ const CreateNewContactListPage = () => {
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
+			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
 				<div className="flex items-start justify-between">
 					<Heading
 						title={listId ? 'Edit Contact List' : `Create New Contact List`}

@@ -1,3 +1,4 @@
+import { clsx } from 'clsx'
 import Link from 'next/link'
 import React from 'react'
 import { Icons } from '~/components/icons'
@@ -32,7 +33,7 @@ const data = [
 		slug: 'api-key',
 		title: 'Api Key Usage',
 		description: 'Checkout the documentation for api key usage, how to create and manage them.',
-		Icon: Icons.puzzleSquare,
+		Icon: Icons.key,
 		ctaText: 'Check Docs',
 		ctaUrl: 'https://docs.wapikit.com/guide/manage-api-keys'
 	}
@@ -40,7 +41,10 @@ const data = [
 
 type DocumentationPitchType = (typeof data)[number]['slug']
 
-const DocumentationPitch: React.FC<{ type: DocumentationPitchType }> = ({ type }) => {
+const DocumentationPitch: React.FC<{ type: DocumentationPitchType; className?: string }> = ({
+	type,
+	className
+}) => {
 	const dataToUse = data.find(item => item.slug === type)
 
 	if (!dataToUse) {
@@ -50,7 +54,10 @@ const DocumentationPitch: React.FC<{ type: DocumentationPitchType }> = ({ type }
 
 		return (
 			<div
-				className="documentation-pitch group mt-8 flex h-fit max-w-md flex-col gap-4 rounded-lg border p-4 hover:border-primary"
+				className={clsx(
+					'documentation-pitch group mt-8 flex h-fit max-w-md flex-col gap-4 rounded-lg border p-4 hover:border-primary',
+					className
+				)}
 				key={slug}
 			>
 				<div className="flex items-center gap-2">

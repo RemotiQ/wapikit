@@ -6,6 +6,7 @@ import { useAuthState } from '~/hooks/use-auth-state'
 import { Icons } from '../icons'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Separator } from '../ui/separator'
+import { Button } from '../ui/button'
 
 export function Notifications() {
 	const router = useRouter()
@@ -29,7 +30,9 @@ export function Notifications() {
 		return (
 			<Popover>
 				<PopoverTrigger asChild>
-					<Icons.bell className="size-5 text-muted-foreground" />
+					<Button variant={'outline'} size={'badge'}>
+						<Icons.bell className="size-5 text-muted-foreground" />
+					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-56 rounded-md" align="end" forceMount>
 					<div className="p-3 px-2">Notifications</div>
