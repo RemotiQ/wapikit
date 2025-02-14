@@ -198,13 +198,15 @@ const CampaignsPage = () => {
 												`/campaigns/new-or-edit?id=${campaignData.campaign.uniqueId}`
 											)
 										}}
+										variant={'secondary'}
+										size={'medium'}
 										disabled={
 											isBusy ||
 											campaignData.campaign.status === 'Running' ||
 											campaignData.campaign.status === 'Cancelled' ||
 											campaignData.campaign.status === 'Finished'
 										}
-										className="flex flex-row gap-2"
+										className="flex flex-row gap-1"
 									>
 										<Icons.edit className="size-4" />
 										Edit
@@ -214,6 +216,7 @@ const CampaignsPage = () => {
 										disabled={
 											isBusy || campaignData.campaign.status === 'Running'
 										}
+										size={'medium'}
 										onClick={() => {
 											deleteCampaign(campaignData.campaign.uniqueId).catch(
 												console.error
@@ -227,6 +230,7 @@ const CampaignsPage = () => {
 									{campaignData.campaign.status === 'Running' ? (
 										<>
 											<Button
+												size={'medium'}
 												variant={'secondary'}
 												onClick={() => {
 													updateCampaignStatus(
@@ -242,6 +246,7 @@ const CampaignsPage = () => {
 
 											<Button
 												variant={'secondary'}
+												size={'medium'}
 												onClick={() => {
 													updateCampaignStatus(
 														campaignData.campaign,
@@ -263,6 +268,7 @@ const CampaignsPage = () => {
 														'resume'
 													).catch(console.error)
 												}}
+												size={'medium'}
 												className="flex flex-row gap-2"
 											>
 												<Icons.play className="size-4" />
@@ -277,6 +283,7 @@ const CampaignsPage = () => {
 														'cancel'
 													).catch(console.error)
 												}}
+												size={'medium'}
 												className="flex flex-row gap-2"
 											>
 												<Icons.xCircle className="size-4" />
@@ -292,7 +299,8 @@ const CampaignsPage = () => {
 														'running'
 													).catch(console.error)
 												}}
-												className="flex flex-row gap-2"
+												size={'medium'}
+												className="flex flex-row"
 											>
 												<Icons.arrowRight className="size-4" />
 												Send
@@ -482,7 +490,7 @@ const CampaignsPage = () => {
 													},
 													{
 														label: 'Delivered',
-														icon: 'si',
+														icon: 'send',
 														count: 0
 													},
 													{

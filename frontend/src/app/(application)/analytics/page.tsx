@@ -5,9 +5,7 @@ import { CalendarDateRangePicker } from '~/components/date-range-picker'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { ConversationStatusChart } from '~/components/analytics/conversation-data'
 import { MessageTypeBifurcation } from '~/components/analytics/message-type-distribution'
-import { OrganizationMembers } from '~/components/analytics/org-members'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Toaster } from '~/components/ui/sonner'
@@ -269,24 +267,6 @@ export default function Page() {
 																[]
 															}
 														/>
-													</CardContent>
-												</Card>
-											</div>
-											<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8">
-												<Card className="col-span-3 md:col-span-4">
-													<CardHeader>
-														<CardTitle>Organization Members</CardTitle>
-													</CardHeader>
-													<CardContent className="pl-2">
-														<OrganizationMembers />
-													</CardContent>
-												</Card>
-												<Card className="col-span-3 md:col-span-4">
-													<CardHeader>
-														<CardTitle>Conversation Status</CardTitle>
-													</CardHeader>
-													<CardContent className="pl-2">
-														<ConversationStatusChart />
 													</CardContent>
 												</Card>
 											</div>
