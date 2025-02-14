@@ -5295,6 +5295,9 @@ components:
               type: number
             sent:
               type: number
+          required:
+            - totalMessages
+            - sent
       required:
         - uniqueId
         - name
@@ -5785,6 +5788,7 @@ components:
       properties:
         avgResponseTimeInMinutes:
           type: number
+          format: double
         totalConversations:
           type: integer
         conversationsActive:
@@ -5796,7 +5800,8 @@ components:
         serviceConversations:
           type: integer
         inboundToOutboundRatio:
-          type: integer
+          type: number
+          format: double
         conversationsAnalytics:
           type: array
           items:
@@ -5842,11 +5847,14 @@ components:
         conversationInitiated:
           type: integer
         responseRate:
-          type: integer
+          type: number
+          format: double
         openRate:
-          type: integer
+          type: number
+          format: double
         engagementRate:
-          type: integer
+          type: number
+          format: double
         totalLinkClicks:
           type: integer
         engagementTrends:
