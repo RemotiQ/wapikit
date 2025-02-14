@@ -521,7 +521,7 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 			),
 			CTE("insert_tag").AS(
 				table.ContactListTag.
-					INSERT(table.ContactListTag.MutableColumns).
+					INSERT().
 					MODELS(tagsToBeInserted).
 					ON_CONFLICT(table.ContactListTag.ContactListId, table.ContactListTag.TagId).
 					DO_NOTHING(),
@@ -540,7 +540,7 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 	}
 
 	updateQuery := table.ContactList.
-		UPDATE(table.ContactList.Name, table.ContactList.Name).
+		UPDATE(table.ContactList.Name, table.ContactList.Description).
 		SET(payload.Name, payload.Description).
 		WHERE(
 			table.ContactList.UniqueId.EQ(UUID(contactListUuid)).
@@ -561,7 +561,7 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 			Label:    tag.Label,
 		})
 	}
-	
+
 	for _, tag := range contactList.Tags {
 		if utils.Contains(commonTagIds, tag.UniqueId) {
 			tagsToReturn = append(tagsToReturn, api_types.TagSchema{
