@@ -3358,12 +3358,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
-  /analytics/primary:
+  /analytics/aggregate-counts:
     get:
       tags:
         - Analytics
-      description: returns main analytics dashboard data.
-      operationId: getPrimaryAnalytics
+      description: returns aggregate counts of all analytics.
+      operationId: getAggregateCounts
       parameters:
         - in: query
           name: from
@@ -3385,7 +3385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PrimaryAnalyticsResponseSchema"
+                $ref: "#/components/schemas/DashboardAggregateCountResponseSchema"
         "404":
           description: Not Found
           content:
@@ -3411,12 +3411,65 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
-  /analytics/secondary:
+  /analytics/campaigns:
     get:
       tags:
         - Analytics
-      description: returns all secondary analytics.
-      operationId: getSecondaryAnalytics
+      description: returns aggregate campaign analytics
+      operationId: getAggregateCampaignAnalytics
+      parameters:
+        - in: query
+          name: from
+          description: starting range of time span to get analytics for
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - in: query
+          name: to
+          description: ending range of time span to get analytics for
+          schema:
+            type: string
+            format: date-time
+          required: true
+      responses:
+        "200":
+          description: messaging analytics graph data points
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAggregateCampaignAnalyticsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /analytics/conversations:
+    get:
+      tags:
+        - Analytics
+      description: returns conversation analytics.
+      operationId: getConversationAnalytics
       parameters:
         - in: query
           name: from
@@ -3437,7 +3490,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SecondaryAnalyticsDashboardResponseSchema"
+                $ref: "#/components/schemas/GetConversationAnalyticsResponseSchema"
         "404":
           description: Not Found
           content:
@@ -3480,58 +3533,6 @@ paths:
       responses:
         "200":
           description: campaign analytics graph data points
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
-
-  /analytics/campaigns:
-    get:
-      tags:
-        - Analytics
-      description: returns all campaigns analytics.
-      operationId: getCampaignsAnalytics
-      parameters:
-        - in: query
-          name: from
-          description: starting range of time span to get analytics for
-          schema:
-            type: string
-            format: date-time
-        - in: query
-          name: to
-          description: ending range of time span to get analytics for
-          schema:
-            type: string
-            format: date-time
-
-      responses:
-        "200":
-          description: list of campaigns analytics
           content:
             application/json:
               schema:
@@ -5702,6 +5703,8 @@ components:
           type: string
         sent:
           type: integer
+        delivered:
+          type: integer
         replied:
           type: integer
         read:
@@ -5712,6 +5715,7 @@ components:
         - sent
         - replied
         - read
+        - delivered
 
     MessageTypeDistributionGraphDataPointSchema:
       type: object
@@ -5727,7 +5731,7 @@ components:
         - sent
         - received
 
-    LinkClicksGraphDataPointSchema:
+    DateToCountGraphDataPointSchema:
       type: object
       properties:
         date:
@@ -5760,27 +5764,39 @@ components:
         - numberOfActiveConversation
         - numberOfNewConversationOpened
 
-    PrimaryAnalyticsResponseSchema:
+    DashboardAggregateCountResponseSchema:
       type: object
       properties:
         aggregateAnalytics:
           $ref: "#/components/schemas/AggregateAnalyticsSchema"
-        messageAnalytics:
-          type: array
-          items:
-            $ref: "#/components/schemas/MessageAnalyticGraphDataPointSchema"
-        linkClickAnalytics:
-          type: array
-          items:
-            $ref: "#/components/schemas/LinkClicksGraphDataPointSchema"
       required:
         - aggregateAnalytics
-        - messageAnalytics
-        - linkClickAnalytics
 
-    SecondaryAnalyticsDashboardResponseSchema:
+    GetConversationAnalyticsResponseSchema:
       type: object
       properties:
+        analytics:
+          $ref: "#/components/schemas/ConversationAggregateAnalytics"
+      required:
+        - analytics
+
+    ConversationAggregateAnalytics:
+      type: object
+      properties:
+        avgResponseTimeInMinutes:
+          type: number
+        totalConversations:
+          type: integer
+        conversationsActive:
+          type: integer
+        conversationsClosed:
+          type: integer
+        conversationsPending:
+          type: integer
+        serviceConversations:
+          type: integer
+        inboundToOutboundRatio:
+          type: integer
         conversationsAnalytics:
           type: array
           items:
@@ -5790,8 +5806,23 @@ components:
           items:
             $ref: "#/components/schemas/MessageTypeDistributionGraphDataPointSchema"
       required:
+        - totalConversations
+        - conversationsActive
+        - conversationsClosed
+        - conversationsPending
+        - serviceConversations
+        - inboundToOutboundRatio
         - conversationsAnalytics
         - messageTypeTrafficDistributionAnalytics
+        - avgResponseTimeInMinutes
+
+    GetAggregateCampaignAnalyticsResponseSchema:
+      type: object
+      properties:
+        analytics:
+          $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
+      required:
+        - analytics
 
     CampaignAnalyticsResponseSchema:
       type: object
@@ -5818,10 +5849,18 @@ components:
           type: integer
         totalLinkClicks:
           type: integer
+        engagementTrends:
+          type: array
+          items:
+            $ref: "#/components/schemas/DateToCountGraphDataPointSchema"
         linkClicksData:
           type: array
           items:
-            $ref: "#/components/schemas/LinkClicksGraphDataPointSchema"
+            $ref: "#/components/schemas/DateToCountGraphDataPointSchema"
+        messageAnalytics:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageAnalyticGraphDataPointSchema"
       required:
         - messagesSent
         - messagesFailed
@@ -5835,6 +5874,8 @@ components:
         - responseRate
         - openRate
         - engagementRate
+        - messageAnalytics
+        - engagementTrends
 
     GetIntegrationResponseSchema:
       type: object

@@ -448,14 +448,17 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 	}
 
 	cacheKey := redis.ComputeCacheKey("otp", payload.Email, "registration")
-	cachedOtp, err := redis.GetCachedData(cacheKey)
+
+	var cachedOtp string
+	ok, err := redis.GetCachedData(cacheKey, &cachedOtp)
+
+	if !ok || cachedOtp != payload.Otp {
+		return context.JSON(http.StatusInternalServerError, "Invalid OTP.")
+	}
+
 	if err != nil {
 		context.App.Logger.Error("Error getting cached otp", err.Error())
 		return context.JSON(http.StatusInternalServerError, "Something went wrong while processing your request.")
-	}
-
-	if cachedOtp != payload.Otp {
-		return context.JSON(http.StatusBadRequest, "Invalid OTP")
 	}
 
 	// check if the user already exists
@@ -917,14 +920,16 @@ func resetPasswordVerify(context interfaces.ContextWithoutSession) error {
 	}
 
 	cacheKey := context.App.Redis.ComputeCacheKey("otp", payload.Email, "reset-password")
-	cachedOtp, err := context.App.Redis.GetCachedData(cacheKey)
 
-	if err != nil {
-		context.App.Logger.Error("Error getting cached otp", err.Error())
+	var cachedOtp string
+	ok, err := context.App.Redis.GetCachedData(cacheKey, &cachedOtp)
+
+	if !ok || cachedOtp != payload.Otp {
 		return context.JSON(http.StatusBadRequest, "Invalid OTP")
 	}
 
-	if cachedOtp != payload.Otp {
+	if err != nil {
+		context.App.Logger.Error("Error getting cached otp", err.Error())
 		return context.JSON(http.StatusBadRequest, "Invalid OTP")
 	}
 
@@ -965,7 +970,9 @@ func resetPasswordComplete(context interfaces.ContextWithoutSession) error {
 	}
 
 	verificationCacheKey := context.App.Redis.ComputeCacheKey("reset-password", payload.Email, "verified")
-	_, err := context.App.Redis.GetCachedData(verificationCacheKey)
+
+	var isVerified string
+	_, err := context.App.Redis.GetCachedData(verificationCacheKey, &isVerified)
 
 	if err != nil {
 		return context.JSON(http.StatusBadRequest, "Your verification has been expired. Please try again.")

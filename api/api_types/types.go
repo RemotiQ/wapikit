@@ -367,18 +367,20 @@ type BulkImportSchema struct {
 
 // CampaignAnalyticsResponseSchema defines model for CampaignAnalyticsResponseSchema.
 type CampaignAnalyticsResponseSchema struct {
-	ConversationInitiated int                              `json:"conversationInitiated"`
-	EngagementRate        int                              `json:"engagementRate"`
-	LinkClicksData        []LinkClicksGraphDataPointSchema `json:"linkClicksData"`
-	MessagesDelivered     int                              `json:"messagesDelivered"`
-	MessagesFailed        int                              `json:"messagesFailed"`
-	MessagesRead          int                              `json:"messagesRead"`
-	MessagesSent          int                              `json:"messagesSent"`
-	MessagesUndelivered   int                              `json:"messagesUndelivered"`
-	OpenRate              int                              `json:"openRate"`
-	ResponseRate          int                              `json:"responseRate"`
-	TotalLinkClicks       int                              `json:"totalLinkClicks"`
-	TotalMessages         int                              `json:"totalMessages"`
+	ConversationInitiated int                                   `json:"conversationInitiated"`
+	EngagementRate        int                                   `json:"engagementRate"`
+	EngagementTrends      []DateToCountGraphDataPointSchema     `json:"engagementTrends"`
+	LinkClicksData        []DateToCountGraphDataPointSchema     `json:"linkClicksData"`
+	MessageAnalytics      []MessageAnalyticGraphDataPointSchema `json:"messageAnalytics"`
+	MessagesDelivered     int                                   `json:"messagesDelivered"`
+	MessagesFailed        int                                   `json:"messagesFailed"`
+	MessagesRead          int                                   `json:"messagesRead"`
+	MessagesSent          int                                   `json:"messagesSent"`
+	MessagesUndelivered   int                                   `json:"messagesUndelivered"`
+	OpenRate              int                                   `json:"openRate"`
+	ResponseRate          int                                   `json:"responseRate"`
+	TotalLinkClicks       int                                   `json:"totalLinkClicks"`
+	TotalMessages         int                                   `json:"totalMessages"`
 }
 
 // CampaignSchema defines model for CampaignSchema.
@@ -440,6 +442,19 @@ type ContactWithoutConversationSchema struct {
 	Phone      string                 `json:"phone"`
 	Status     ContactStatusEnum      `json:"status"`
 	UniqueId   string                 `json:"uniqueId"`
+}
+
+// ConversationAggregateAnalytics defines model for ConversationAggregateAnalytics.
+type ConversationAggregateAnalytics struct {
+	AvgResponseTimeInMinutes                float32                                       `json:"avgResponseTimeInMinutes"`
+	ConversationsActive                     int                                           `json:"conversationsActive"`
+	ConversationsAnalytics                  []ConversationAnalyticsDataPointSchema        `json:"conversationsAnalytics"`
+	ConversationsClosed                     int                                           `json:"conversationsClosed"`
+	ConversationsPending                    int                                           `json:"conversationsPending"`
+	InboundToOutboundRatio                  int                                           `json:"inboundToOutboundRatio"`
+	MessageTypeTrafficDistributionAnalytics []MessageTypeDistributionGraphDataPointSchema `json:"messageTypeTrafficDistributionAnalytics"`
+	ServiceConversations                    int                                           `json:"serviceConversations"`
+	TotalConversations                      int                                           `json:"totalConversations"`
 }
 
 // ConversationAnalyticsDataPointSchema defines model for ConversationAnalyticsDataPointSchema.
@@ -530,6 +545,18 @@ type CreateNewRoleResponseSchema struct {
 	Role OrganizationRoleSchema `json:"role"`
 }
 
+// DashboardAggregateCountResponseSchema defines model for DashboardAggregateCountResponseSchema.
+type DashboardAggregateCountResponseSchema struct {
+	AggregateAnalytics AggregateAnalyticsSchema `json:"aggregateAnalytics"`
+}
+
+// DateToCountGraphDataPointSchema defines model for DateToCountGraphDataPointSchema.
+type DateToCountGraphDataPointSchema struct {
+	Count int       `json:"count"`
+	Date  time.Time `json:"date"`
+	Label string    `json:"label"`
+}
+
 // DeleteContactByIdResponseSchema defines model for DeleteContactByIdResponseSchema.
 type DeleteContactByIdResponseSchema struct {
 	Data bool `json:"data"`
@@ -568,6 +595,11 @@ type FullAiConfiguration struct {
 	ApiKey    string      `json:"apiKey"`
 	IsEnabled bool        `json:"isEnabled"`
 	Model     AiModelEnum `json:"model"`
+}
+
+// GetAggregateCampaignAnalyticsResponseSchema defines model for GetAggregateCampaignAnalyticsResponseSchema.
+type GetAggregateCampaignAnalyticsResponseSchema struct {
+	Analytics CampaignAnalyticsResponseSchema `json:"analytics"`
 }
 
 // GetAiChatByIdResponseSchema defines model for GetAiChatByIdResponseSchema.
@@ -640,6 +672,11 @@ type GetContactListResponseSchema struct {
 type GetContactsResponseSchema struct {
 	Contacts       []ContactSchema `json:"contacts"`
 	PaginationMeta PaginationMeta  `json:"paginationMeta"`
+}
+
+// GetConversationAnalyticsResponseSchema defines model for GetConversationAnalyticsResponseSchema.
+type GetConversationAnalyticsResponseSchema struct {
+	Analytics ConversationAggregateAnalytics `json:"analytics"`
 }
 
 // GetConversationByIdResponseSchema defines model for GetConversationByIdResponseSchema.
@@ -786,13 +823,6 @@ type JoinOrganizationResponseBodySchema struct {
 	Token string `json:"token"`
 }
 
-// LinkClicksGraphDataPointSchema defines model for LinkClicksGraphDataPointSchema.
-type LinkClicksGraphDataPointSchema struct {
-	Count int       `json:"count"`
-	Date  time.Time `json:"date"`
-	Label string    `json:"label"`
-}
-
 // LoginRequestBodySchema defines model for LoginRequestBodySchema.
 type LoginRequestBodySchema struct {
 	Password string `json:"password"`
@@ -807,11 +837,12 @@ type LoginResponseBodySchema struct {
 
 // MessageAnalyticGraphDataPointSchema defines model for MessageAnalyticGraphDataPointSchema.
 type MessageAnalyticGraphDataPointSchema struct {
-	Date    time.Time `json:"date"`
-	Label   string    `json:"label"`
-	Read    int       `json:"read"`
-	Replied int       `json:"replied"`
-	Sent    int       `json:"sent"`
+	Date      time.Time `json:"date"`
+	Delivered int       `json:"delivered"`
+	Label     string    `json:"label"`
+	Read      int       `json:"read"`
+	Replied   int       `json:"replied"`
+	Sent      int       `json:"sent"`
 }
 
 // MessageDirectionEnum defines model for MessageDirectionEnum.
@@ -1007,13 +1038,6 @@ type PhoneNumberSchema struct {
 	VerifiedName       string `json:"verified_name"`
 }
 
-// PrimaryAnalyticsResponseSchema defines model for PrimaryAnalyticsResponseSchema.
-type PrimaryAnalyticsResponseSchema struct {
-	AggregateAnalytics AggregateAnalyticsSchema              `json:"aggregateAnalytics"`
-	LinkClickAnalytics []LinkClicksGraphDataPointSchema      `json:"linkClickAnalytics"`
-	MessageAnalytics   []MessageAnalyticGraphDataPointSchema `json:"messageAnalytics"`
-}
-
 // RateLimitErrorResponseSchema defines model for RateLimitErrorResponseSchema.
 type RateLimitErrorResponseSchema struct {
 	Message   string `json:"message"`
@@ -1063,12 +1087,6 @@ type RoleUpdateSchema struct {
 	Description *string              `json:"description,omitempty"`
 	Name        string               `json:"name"`
 	Permissions []RolePermissionEnum `json:"permissions"`
-}
-
-// SecondaryAnalyticsDashboardResponseSchema defines model for SecondaryAnalyticsDashboardResponseSchema.
-type SecondaryAnalyticsDashboardResponseSchema struct {
-	ConversationsAnalytics                  []ConversationAnalyticsDataPointSchema        `json:"conversationsAnalytics"`
-	MessageTypeTrafficDistributionAnalytics []MessageTypeDistributionGraphDataPointSchema `json:"messageTypeTrafficDistributionAnalytics"`
 }
 
 // SegmentationRecommendation defines model for SegmentationRecommendation.
@@ -1395,17 +1413,8 @@ type GetAiChatSegmentRecommendationsParams struct {
 	ContactId *int64 `form:"contactId,omitempty" json:"contactId,omitempty"`
 }
 
-// GetCampaignsAnalyticsParams defines parameters for GetCampaignsAnalytics.
-type GetCampaignsAnalyticsParams struct {
-	// From starting range of time span to get analytics for
-	From *time.Time `form:"from,omitempty" json:"from,omitempty"`
-
-	// To ending range of time span to get analytics for
-	To *time.Time `form:"to,omitempty" json:"to,omitempty"`
-}
-
-// GetPrimaryAnalyticsParams defines parameters for GetPrimaryAnalytics.
-type GetPrimaryAnalyticsParams struct {
+// GetAggregateCountsParams defines parameters for GetAggregateCounts.
+type GetAggregateCountsParams struct {
 	// From starting range of time span to get analytics for
 	From time.Time `form:"from" json:"from"`
 
@@ -1413,8 +1422,17 @@ type GetPrimaryAnalyticsParams struct {
 	To time.Time `form:"to" json:"to"`
 }
 
-// GetSecondaryAnalyticsParams defines parameters for GetSecondaryAnalytics.
-type GetSecondaryAnalyticsParams struct {
+// GetAggregateCampaignAnalyticsParams defines parameters for GetAggregateCampaignAnalytics.
+type GetAggregateCampaignAnalyticsParams struct {
+	// From starting range of time span to get analytics for
+	From time.Time `form:"from" json:"from"`
+
+	// To ending range of time span to get analytics for
+	To time.Time `form:"to" json:"to"`
+}
+
+// GetConversationAnalyticsParams defines parameters for GetConversationAnalytics.
+type GetConversationAnalyticsParams struct {
 	// From starting range of time span to get analytics for
 	From *time.Time `form:"from,omitempty" json:"from,omitempty"`
 

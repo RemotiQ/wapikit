@@ -2,6 +2,7 @@ package cache_service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -37,7 +38,7 @@ func NewRedisClient(
 	_, err = redisClient.Ping(context.Background()).Result()
 	if err != nil {
 		fmt.Println("Error connecting to Redis: ", err)
-		return nil
+		panic(err)
 	}
 
 	pool := redisPoolLib.NewPool(redisClient)
@@ -52,38 +53,60 @@ func NewRedisClient(
 	}
 }
 
-func (client *RedisClient) CacheData(key string, value interface{}, ttl time.Duration) error {
+func (client *RedisClient) CacheData(key string, data interface{}, expiration time.Duration) error {
 	ctx := context.Background()
-	err := client.Set(ctx, key, value, ttl).Err()
-	if err != nil {
-		return err
+
+	var value string
+	switch v := data.(type) {
+	case string:
+		value = v
+	default:
+		jsonData, err := json.Marshal(v)
+		if err != nil {
+			return fmt.Errorf("failed to marshal data: %w", err)
+		}
+		value = string(jsonData)
 	}
+	err := client.Set(ctx, key, value, expiration).Err()
+	if err != nil {
+		return fmt.Errorf("failed to set cache data: %w", err)
+	}
+
 	return nil
 }
 
-func (client *RedisClient) GetCachedData(key string) (string, error) {
+func (client *RedisClient) GetCachedData(key string, out interface{}) (bool, error) {
 	ctx := context.Background()
 	val, err := client.Get(ctx, key).Result()
 	if err != nil {
-		return "", err
+		if err == redis.Nil {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to get cache data: %w", err)
 	}
-	return val, nil
+
+	if strPtr, ok := out.(*string); ok {
+		*strPtr = val
+		return true, nil
+	}
+
+	if err := json.Unmarshal([]byte(val), out); err != nil {
+		return false, fmt.Errorf("failed to unmarshal cache data: %w", err)
+	}
+
+	return true, nil
 }
 
 func (client *RedisClient) ComputeCacheKey(context, id, object string) string {
-	return strings.Join([]string{context, object, id}, ":")
+	return strings.Join([]string{"wapikit", context, object, id}, ":")
 }
 
 func (client *RedisClient) PublishMessageToRedisChannel(channel string, message []byte) error {
-	fmt.Println("Publishing message to Redis channel...", channel)
-
 	ctx := context.Background()
 	err := client.Publish(ctx, channel, message).Err()
 	if err != nil {
-		fmt.Println("Error publishing message to Redis channel: ", err.Error())
 		return err
 	}
-	fmt.Println("Message published to Redis channel successfully!!!")
 	return nil
 }
 
@@ -92,9 +115,7 @@ func (client *RedisClient) ComputeRateLimitKey(ipAddress, path string) string {
 }
 
 func (client *RedisClient) AcquireLock(lockKey string, ttl time.Duration) (*redsync.Mutex, error) {
-	// Create a mutex with the specified key and TTL
 	mutex := client.RedSync.NewMutex(lockKey, redsync.WithExpiry(ttl))
-
 	// Try to acquire the lock
 	if err := mutex.Lock(); err != nil {
 		return nil, err

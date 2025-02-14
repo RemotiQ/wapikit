@@ -29,8 +29,8 @@ func NewEventService(db *sql.DB, logger *slog.Logger, redis *cache_service.Redis
 func (service *EventService) HandleApiServerEvents(ctx context.Context) <-chan ApiServerEventInterface {
 	service.Logger.Info("Event service is listening for API server events...")
 	streamChannel := make(chan ApiServerEventInterface, 1000)
-
 	redisClient := service.Redis
+	fmt.Println("redisClient", redisClient)
 	pubsub := redisClient.Subscribe(ctx, service.RedisApiServerEventChannelName)
 	redisEventChannel := pubsub.Channel()
 
