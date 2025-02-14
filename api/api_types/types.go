@@ -368,7 +368,7 @@ type BulkImportSchema struct {
 // CampaignAnalyticsResponseSchema defines model for CampaignAnalyticsResponseSchema.
 type CampaignAnalyticsResponseSchema struct {
 	ConversationInitiated int                                   `json:"conversationInitiated"`
-	EngagementRate        int                                   `json:"engagementRate"`
+	EngagementRate        float64                               `json:"engagementRate"`
 	EngagementTrends      []DateToCountGraphDataPointSchema     `json:"engagementTrends"`
 	LinkClicksData        []DateToCountGraphDataPointSchema     `json:"linkClicksData"`
 	MessageAnalytics      []MessageAnalyticGraphDataPointSchema `json:"messageAnalytics"`
@@ -377,8 +377,8 @@ type CampaignAnalyticsResponseSchema struct {
 	MessagesRead          int                                   `json:"messagesRead"`
 	MessagesSent          int                                   `json:"messagesSent"`
 	MessagesUndelivered   int                                   `json:"messagesUndelivered"`
-	OpenRate              int                                   `json:"openRate"`
-	ResponseRate          int                                   `json:"responseRate"`
+	OpenRate              float64                               `json:"openRate"`
+	ResponseRate          float64                               `json:"responseRate"`
 	TotalLinkClicks       int                                   `json:"totalLinkClicks"`
 	TotalMessages         int                                   `json:"totalMessages"`
 }
@@ -392,8 +392,8 @@ type CampaignSchema struct {
 	Name                  string              `json:"name"`
 	PhoneNumberInUse      *string             `json:"phoneNumberInUse,omitempty"`
 	Progress              *struct {
-		Sent          *float32 `json:"sent,omitempty"`
-		TotalMessages *float32 `json:"totalMessages,omitempty"`
+		Sent          float32 `json:"sent"`
+		TotalMessages float32 `json:"totalMessages"`
 	} `json:"progress,omitempty"`
 	ScheduledAt                 *time.Time                       `json:"scheduledAt,omitempty"`
 	SentAt                      *time.Time                       `json:"sentAt,omitempty"`
@@ -446,12 +446,12 @@ type ContactWithoutConversationSchema struct {
 
 // ConversationAggregateAnalytics defines model for ConversationAggregateAnalytics.
 type ConversationAggregateAnalytics struct {
-	AvgResponseTimeInMinutes                float32                                       `json:"avgResponseTimeInMinutes"`
+	AvgResponseTimeInMinutes                float64                                       `json:"avgResponseTimeInMinutes"`
 	ConversationsActive                     int                                           `json:"conversationsActive"`
 	ConversationsAnalytics                  []ConversationAnalyticsDataPointSchema        `json:"conversationsAnalytics"`
 	ConversationsClosed                     int                                           `json:"conversationsClosed"`
 	ConversationsPending                    int                                           `json:"conversationsPending"`
-	InboundToOutboundRatio                  int                                           `json:"inboundToOutboundRatio"`
+	InboundToOutboundRatio                  float64                                       `json:"inboundToOutboundRatio"`
 	MessageTypeTrafficDistributionAnalytics []MessageTypeDistributionGraphDataPointSchema `json:"messageTypeTrafficDistributionAnalytics"`
 	ServiceConversations                    int                                           `json:"serviceConversations"`
 	TotalConversations                      int                                           `json:"totalConversations"`

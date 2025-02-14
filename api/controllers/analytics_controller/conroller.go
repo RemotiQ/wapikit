@@ -1,6 +1,7 @@
 package analytics_controller
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strings"
@@ -309,13 +310,11 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 
 	minDateRange := params.From
 	maxDateRange := params.To
-
 	if minDateRange.IsZero() || maxDateRange.IsZero() {
 		return context.JSON(http.StatusBadRequest, "Invalid date range")
 	}
 
 	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
-
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, "Invalid organization id")
 	}
@@ -332,107 +331,112 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 		return context.JSON(http.StatusOK, responseToReturn)
 	}
 
+	// Query daily link click data.
 	linkClickDataQuery := SELECT(
 		table.TrackLinkClick.CreatedAt.AS("date"),
 		COALESCE(COUNT(table.TrackLinkClick.UniqueId), Int(0)).AS("count"),
 		TO_CHAR(table.TrackLinkClick.CreatedAt, String("DD-MM-YYYY")).AS("label"),
 	).
-		FROM(table.TrackLinkClick.
-			LEFT_JOIN(table.TrackLink, table.TrackLinkClick.TrackLinkId.EQ(table.TrackLink.UniqueId))).
-		WHERE(table.TrackLink.OrganizationId.EQ(UUID(orgUuid)).
-			AND(table.TrackLinkClick.CreatedAt.
-				BETWEEN(
-					TimestampzExp(Timestamp(minDateRange.Year(), minDateRange.Month(), minDateRange.Day(), minDateRange.Hour(), minDateRange.Minute(), minDateRange.Second())),
-					TimestampzExp(Timestamp(maxDateRange.Year(), maxDateRange.Month(), maxDateRange.Day(), maxDateRange.Hour(), maxDateRange.Minute(), maxDateRange.Second())),
+		FROM(
+			table.TrackLinkClick.
+				LEFT_JOIN(table.TrackLink, table.TrackLinkClick.TrackLinkId.EQ(table.TrackLink.UniqueId)),
+		).
+		WHERE(
+			table.TrackLink.OrganizationId.EQ(UUID(orgUuid)).
+				AND(
+					table.TrackLinkClick.CreatedAt.BETWEEN(
+						TimestampzExp(TimestampzT(minDateRange)),
+						TimestampzExp(TimestampzT(maxDateRange)),
+					),
 				),
-			)).
+		).
 		GROUP_BY(table.TrackLinkClick.CreatedAt).
 		ORDER_BY(table.TrackLinkClick.CreatedAt)
 
+	// Query daily message analytics.
 	messageDataSeriesQuery := SELECT(
 		table.Message.CreatedAt.AS("date"),
-		COALESCE(
-			SUM(CASE().WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_OutBound.String()))).
-				THEN(CAST(Int(1)).AS_INTEGER()).
-				ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("sent"),
-		COALESCE(
-			SUM(CASE().WHEN(table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Read.String()))).
-				THEN(CAST(Int(1)).AS_INTEGER()).
-				ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("read"),
-		COALESCE(
-			SUM(
-				CASE().
-					WHEN(
-						EXISTS(
-							SELECT(table.Message.UniqueId).
-								FROM(table.Message).
-								WHERE(table.Message.RepliedTo.EQ(table.Message.UniqueId)),
-						),
-					).
-					THEN(CAST(Int(1)).AS_INTEGER()).
-					ELSE(CAST(Int(0)).AS_INTEGER()),
-			),
-			Int(0),
-		).AS("replied"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_OutBound.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("sent"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Read.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("read"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.RepliedTo.IS_NOT_NULL()).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("replied"),
 		TO_CHAR(table.Message.CreatedAt, String("DD-MM-YYYY")).AS("label"),
-	).FROM(
-		table.Message,
-	).WHERE(
-		table.Message.OrganizationId.EQ(UUID(orgUuid)).
-			AND(table.Message.CreatedAt.
-				BETWEEN(
-					TimestampzExp(Timestamp(minDateRange.Year(), minDateRange.Month(), minDateRange.Day(), minDateRange.Hour(), minDateRange.Minute(), minDateRange.Second())),
-					TimestampzExp(Timestamp(maxDateRange.Year(), maxDateRange.Month(), maxDateRange.Day(), maxDateRange.Hour(), maxDateRange.Minute(), maxDateRange.Second())),
+	).
+		FROM(table.Message).
+		WHERE(
+			table.Message.OrganizationId.EQ(UUID(orgUuid)).
+				AND(
+					table.Message.CreatedAt.BETWEEN(
+						TimestampzExp(TimestampzT(minDateRange)),
+						TimestampzExp(TimestampzT(maxDateRange)),
+					),
 				),
-			),
-	).GROUP_BY(
-		table.Message.CreatedAt,
-	).ORDER_BY(
-		table.Message.CreatedAt,
-	)
+		).
+		GROUP_BY(table.Message.CreatedAt).
+		ORDER_BY(table.Message.CreatedAt)
 
-	linkDataSeries := []api_types.DateToCountGraphDataPointSchema{}
+	var linkDataSeries []api_types.DateToCountGraphDataPointSchema
 	err = linkClickDataQuery.QueryContext(context.Request().Context(), context.App.Db, &linkDataSeries)
-
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		fmt.Println("error is", err.Error())
-		if err.Error() == qrm.ErrNoRows.Error() {
-			fmt.Println("No link click data found")
-			// do nothing keep the empty response as defined above in the controller
-		} else {
-			return context.JSON(http.StatusInternalServerError, "Error getting link click data")
-		}
+		return context.JSON(http.StatusInternalServerError, "Error getting link click data")
 	}
 
-	messageDataSeries := []api_types.MessageAnalyticGraphDataPointSchema{}
+	var messageDataSeries []api_types.MessageAnalyticGraphDataPointSchema
 	err = messageDataSeriesQuery.QueryContext(context.Request().Context(), context.App.Db, &messageDataSeries)
-
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		fmt.Println("error is", err.Error())
-		if err.Error() == qrm.ErrNoRows.Error() {
-			fmt.Println("No message data found")
-			// do nothing keep the empty response as defined above in the controller
-		} else {
-			return context.JSON(http.StatusInternalServerError, "Error getting message data")
-		}
+		return context.JSON(http.StatusInternalServerError, "Error getting message data")
 	}
+
+	// Aggregate totals from daily series.
+	var totalMessagesSent, totalMessagesRead, totalReplies int
+	for _, m := range messageDataSeries {
+		totalMessagesSent += m.Sent
+		totalMessagesRead += m.Read
+		totalReplies += m.Replied
+	}
+	var totalLinkClicks int
+	for _, d := range linkDataSeries {
+		totalLinkClicks += d.Count
+	}
+
+	var openRate, clickRate, engagementRate float64
+	if totalMessagesSent > 0 {
+		openRate = (float64(totalMessagesRead) / float64(totalMessagesSent)) * 100
+		clickRate = (float64(totalLinkClicks) / float64(totalMessagesSent)) * 100
+		engagementRate = (float64(totalLinkClicks+totalReplies) / float64(totalMessagesSent)) * 100
+	}
+
+	fmt.Println("clickRate", clickRate)
 
 	responseToReturn = &api_types.GetAggregateCampaignAnalyticsResponseSchema{
 		Analytics: api_types.CampaignAnalyticsResponseSchema{
-			ConversationInitiated: 0,
-			EngagementRate:        0,
-			EngagementTrends:      []api_types.DateToCountGraphDataPointSchema{},
-			LinkClicksData:        []api_types.DateToCountGraphDataPointSchema{},
-			MessageAnalytics:      []api_types.MessageAnalyticGraphDataPointSchema{},
+			OpenRate:              openRate,
+			ResponseRate:          0, // ! TODO: implement
+			EngagementRate:        engagementRate,
+			EngagementTrends:      []api_types.DateToCountGraphDataPointSchema{}, // Optionally merge clicks & replies
+			LinkClicksData:        linkDataSeries,
+			MessageAnalytics:      messageDataSeries,
 			MessagesDelivered:     0,
 			MessagesFailed:        0,
-			MessagesRead:          0,
-			MessagesSent:          0,
+			MessagesRead:          totalMessagesRead,
+			MessagesSent:          totalMessagesSent,
 			MessagesUndelivered:   0,
-			OpenRate:              0,
-			ResponseRate:          0,
-			TotalLinkClicks:       0,
-			TotalMessages:         0,
+			TotalLinkClicks:       totalLinkClicks,
+			TotalMessages:         totalMessagesSent,
+			ConversationInitiated: 0,
 		},
 	}
 
@@ -441,17 +445,132 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 }
 
 func handleAggregateConversationAnalytics(context interfaces.ContextWithSession) error {
-	// ! TODO: these analytics we will need once the live team inbox will be implemented
+	logger := context.App.Logger
+	// Compute conversation analytics:
+	// - Average response time (seconds)
+	// - Total active conversations
+	// - Total service conversations (initiated by "Contact")
+	// - Inbound/outbound message ratio
+	// - Message type distribution
+
+	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, "Invalid organization id")
+	}
+
+	// Raw SQL query for average response time:
+	// For each conversation, compute MIN(out.CreatedAt - in.CreatedAt) where out is the first outbound after an inbound.
+	var avgResponseTime sql.NullFloat64
+	rawAvgQuery := `
+		SELECT AVG(diff) 
+			FROM (
+    			SELECT MIN(m_out."CreatedAt" - m_in."CreatedAt") AS diff
+    			FROM "Message" m_in
+    			JOIN "Message" m_out ON m_in."ConversationId" = m_out."ConversationId"
+    			WHERE m_in."OrganizationId" = $1
+      				AND m_in."Direction" = 'InBound'
+      				AND m_out."Direction" = 'OutBound'
+      				AND m_out."CreatedAt" > m_in."CreatedAt"
+    			GROUP BY m_in."ConversationId"
+				) sub;
+	`
+	err = context.App.Db.QueryRowContext(context.Request().Context(), rawAvgQuery, orgUuid).Scan(&avgResponseTime)
+	if err != nil && err != sql.ErrNoRows {
+		logger.Error("Error computing average response time", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, "Error computing average response time")
+	}
+
+	// Active conversations.
+	activeConversationsQuery := SELECT(
+		COUNT(table.Conversation.UniqueId).AS("activeCount"),
+	).
+		FROM(table.Conversation).
+		WHERE(
+			table.Conversation.OrganizationId.EQ(UUID(orgUuid)).
+				AND(table.Conversation.Status.EQ(utils.EnumExpression(model.ConversationStatusEnum_Active.String()))),
+		)
+
+	var activeCountDest struct {
+		ActiveCount int
+	}
+	err = activeConversationsQuery.QueryContext(context.Request().Context(), context.App.Db, &activeCountDest)
+	if err != nil && err != sql.ErrNoRows {
+		return context.JSON(http.StatusInternalServerError, "Error getting active conversations")
+	}
+
+	// Service conversations: initiated by "Contact".
+	serviceConversationsQuery := SELECT(
+		COUNT(table.Conversation.UniqueId).AS("serviceCount"),
+	).
+		FROM(table.Conversation).
+		WHERE(
+			table.Conversation.OrganizationId.EQ(UUID(orgUuid)).
+				AND(table.Conversation.InitiatedBy.EQ(utils.EnumExpression("Contact"))),
+		)
+	var serviceCountDest struct {
+		ServiceCount int
+	}
+	err = serviceConversationsQuery.QueryContext(context.Request().Context(), context.App.Db, &serviceCountDest)
+	if err != nil && err != sql.ErrNoRows {
+		logger.Error("Error getting service conversations", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, "Error getting service conversations")
+	}
+
+	// Inbound and outbound message counts.
+	inboundOutboundQuery := SELECT(
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_InBound.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("inbound"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_OutBound.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("outbound"),
+	).
+		FROM(table.Message).
+		WHERE(table.Message.OrganizationId.EQ(UUID(orgUuid)))
+	var dest struct {
+		Inbound  int
+		Outbound int
+	}
+	err = inboundOutboundQuery.QueryContext(context.Request().Context(), context.App.Db, &dest)
+	if err != nil && err != sql.ErrNoRows {
+		logger.Error("Error getting inbound/outbound counts", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, "Error getting inbound/outbound counts")
+	}
+	var inboundOutboundRatio float64
+	if dest.Outbound > 0 {
+		inboundOutboundRatio = float64(dest.Inbound) / float64(dest.Outbound)
+	}
+
+	// Message type distribution grouped by MessageType.
+	messageTypeDistributionQuery := SELECT(
+		table.Message.MessageType,
+		COUNT(table.Message.UniqueId).AS("count"),
+	).
+		FROM(table.Message).
+		WHERE(table.Message.OrganizationId.EQ(UUID(orgUuid))).
+		GROUP_BY(table.Message.MessageType).
+		ORDER_BY(table.Message.MessageType)
+	var messageTypeDistribution []api_types.MessageTypeDistributionGraphDataPointSchema
+	err = messageTypeDistributionQuery.QueryContext(context.Request().Context(), context.App.Db, &messageTypeDistribution)
+	if err != nil && err != sql.ErrNoRows {
+		return context.JSON(http.StatusInternalServerError, "Error getting message type distribution")
+	}
+
 	responseToReturn := api_types.GetConversationAnalyticsResponseSchema{
 		Analytics: api_types.ConversationAggregateAnalytics{
-			ConversationsActive:                     0,
+			ConversationsActive:                     activeCountDest.ActiveCount,
 			ConversationsClosed:                     0,
 			ConversationsPending:                    0,
-			InboundToOutboundRatio:                  0,
-			ServiceConversations:                    0,
-			TotalConversations:                      0,
+			InboundToOutboundRatio:                  inboundOutboundRatio,
+			ServiceConversations:                    serviceCountDest.ServiceCount,
+			TotalConversations:                      activeCountDest.ActiveCount, // Optionally add closed count
+			AvgResponseTimeInMinutes:                avgResponseTime.Float64,
 			ConversationsAnalytics:                  []api_types.ConversationAnalyticsDataPointSchema{},
-			MessageTypeTrafficDistributionAnalytics: []api_types.MessageTypeDistributionGraphDataPointSchema{},
+			MessageTypeTrafficDistributionAnalytics: messageTypeDistribution,
 		},
 	}
 

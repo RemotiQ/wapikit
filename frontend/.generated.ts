@@ -711,8 +711,8 @@ export interface TemplateSchema {
 export type CampaignSchemaTemplateComponentParameters = { [key: string]: unknown }
 
 export type CampaignSchemaProgress = {
-	totalMessages?: number
-	sent?: number
+	totalMessages: number
+	sent: number
 }
 
 export interface CampaignSchema {
