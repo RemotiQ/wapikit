@@ -432,7 +432,6 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 													) : (
 														<Icons.eye className="size-5" />
 													)}
-													
 												</span>
 											</div>
 										</FormControl>

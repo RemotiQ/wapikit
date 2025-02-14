@@ -1,4 +1,4 @@
-import {clsx} from 'clsx'
+import { clsx } from 'clsx'
 import Link from 'next/link'
 import React from 'react'
 import { Icons } from '~/components/icons'
@@ -41,7 +41,10 @@ const data = [
 
 type DocumentationPitchType = (typeof data)[number]['slug']
 
-const DocumentationPitch: React.FC<{ type: DocumentationPitchType; className?: string }> = ({ type, className }) => {
+const DocumentationPitch: React.FC<{ type: DocumentationPitchType; className?: string }> = ({
+	type,
+	className
+}) => {
 	const dataToUse = data.find(item => item.slug === type)
 
 	if (!dataToUse) {
@@ -51,7 +54,10 @@ const DocumentationPitch: React.FC<{ type: DocumentationPitchType; className?: s
 
 		return (
 			<div
-				className={clsx("documentation-pitch group mt-8 flex h-fit max-w-md flex-col gap-4 rounded-lg border p-4 hover:border-primary", className)}
+				className={clsx(
+					'documentation-pitch group mt-8 flex h-fit max-w-md flex-col gap-4 rounded-lg border p-4 hover:border-primary',
+					className
+				)}
 				key={slug}
 			>
 				<div className="flex items-center gap-2">

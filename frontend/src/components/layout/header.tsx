@@ -10,6 +10,7 @@ import { Notifications } from './notification-dropdown'
 import { useLayoutStore } from '~/store/layout.store'
 import { Badge } from '../ui/badge'
 import { Icons } from '../icons'
+import { Button } from '../ui/button'
 
 export default function Header() {
 	const { resolvedTheme } = useTheme()
@@ -38,16 +39,18 @@ export default function Header() {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<div
+					<Button
+						variant={'outline'}
+						size={'badge'}
 						onClick={() => {
 							writeProperty({
 								isCommandMenuOpen: true
 							})
 						}}
-						className="tetx-xs  flex cursor-pointer flex-row items-center gap-1 rounded-md border px-2.5 py-[1px] font-medium text-foreground"
+						className=""
 					>
-						<Icons.macoscommand className="size-3" /> K
-					</div>
+						<Icons.macoscommand className="size-5" /> K
+					</Button>
 
 					<div className="flex items-center gap-1">
 						<Notifications />

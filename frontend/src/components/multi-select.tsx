@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { XCircle, XIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
@@ -246,7 +245,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 											className={clsx(
 												'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border ',
 												selectedValues.length === options.length
-													? 'bg-primary text-primary border-primary'
+													? 'border-primary bg-primary text-primary'
 													: ' border-muted-foreground opacity-50 [&_svg]:invisible'
 											)}
 										>
@@ -267,7 +266,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 												className={clsx(
 													'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border ',
 													isSelected
-														? 'bg-primary border-primary text-primary'
+														? 'border-primary bg-primary text-primary'
 														: 'border-muted-foreground opacity-50 [&_svg]:invisible'
 												)}
 											>

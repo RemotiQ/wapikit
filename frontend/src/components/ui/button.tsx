@@ -29,11 +29,11 @@ const buttonVariants = cva(
 				default: 'px-4 py-2 text-sm rounded-lg',
 				xSmallForGraphics: 'rounded-[4px] px-1.5 py-[2px] text-[5px] gap-1',
 				smallForGraphics: 'rounded-md px-1.5 py-1 text-[6px] gap-1',
-				sm: 'rounded-lg px-2.5 py-1.5 text-xs gap-4 ',
-				medium: 'rounded-lg px-3 py-1.5 text-sm gap-4 ',
-				lg: 'rounded-lg px-4 py-2 text-sm gap-4 ',
-				xLarge: 'rounded-lg px-6 py-1.5 text-base gap-4 ',
-				badge: 'rounded-full px-3 py-1.5 text-xs gap-4 ',
+				sm: 'rounded-lg px-2.5 py-1.5 text-xs',
+				medium: 'rounded-lg px-3 py-1.5 text-sm',
+				lg: 'rounded-lg px-4 py-2 text-sm',
+				xLarge: 'rounded-lg px-6 py-1.5 text-base',
+				badge: 'rounded-lg px-2 py-1 text-xs ',
 				icon: 'rounded-full p-2'
 			}
 		},

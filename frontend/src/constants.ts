@@ -101,7 +101,7 @@ export const navItems: NavItem[] = [
 export enum OnboardingStepsEnum {
 	CreateOrganization = 'create-organization',
 	WhatsappBusinessAccountDetails = 'whatsapp-business-account-details',
-	InviteTeamMembers = 'invite-team-members',
+	InviteTeamMembers = 'invite-team-members'
 }
 
 export const OnboardingSteps: {
