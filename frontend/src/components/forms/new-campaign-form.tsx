@@ -11,12 +11,17 @@ import {
 import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '~/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Pencil, Trash } from 'lucide-react'
+import { Trash } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { type z } from 'zod'
-import { errorNotification, materialConfirm, successNotification } from '~/reusable-functions'
+import {
+	countParameterCountInTemplateComponent,
+	errorNotification,
+	materialConfirm,
+	successNotification
+} from '~/reusable-functions'
 import { NewCampaignSchema, TemplateComponentSchema } from '~/schema'
 import {
 	type CampaignSchema,
@@ -386,65 +391,116 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 					}
 				}}
 			>
-				<DrawerContent className="max-h-[80vh] min-h-[80vh] px-10">
-					<div className="mx-auto w-full">
-						<DrawerHeader className="w-full">
-							<DrawerTitle>Fill template components</DrawerTitle>
-							<DrawerDescription>
-								Add the values for the template components parameters. You may use
-								templating variables to add dynamic values. For example, you can use
-								first_name to add the first name of the contact. Check docs here.
-							</DrawerDescription>
-						</DrawerHeader>
-						<Separator />
-						<div className="flex w-full items-start justify-end space-x-2 pt-6">
-							<div className="h-full flex-1">
-								<ScrollArea className="h-full flex-1">
-									<TemplateParameterForm
-										handleTemplateComponentParameterSubmit={
-											handleTemplateComponentParameterSubmit
-										}
-										isBusy={isBusy}
-										setIsTemplateComponentsInputModalOpen={
-											setIsTemplateComponentsInputModalOpen
-										}
-										templateMessageComponentParameterForm={
-											templateMessageComponentParameterForm
-										}
-										key={'template-parameter-form'}
-										template={templatesResponse?.find(template => {
-											return (
-												template.id === campaignForm.getValues('templateId')
-											)
-										})}
-									/>
-								</ScrollArea>
-							</div>
-
-							<Separator orientation="vertical" className="h-full" />
-
-							<div className="h-full flex-1 rounded-md border">
-								<div className="rounded-t-md bg-primary px-2 py-1 text-sm text-primary-foreground">
-									Template Preview
-								</div>
-								<div className="relative h-full w-full rounded-b-md bg-[#ebe5de] p-4 dark:bg-[#202c33]">
-									<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/conversations-canvas-bg.png")] bg-repeat opacity-20' />
-
-									<div className="relative z-30 h-96">
-										<TemplateMessageRenderer
-											templateMessage={templatesResponse?.find(template => {
+				<DrawerContent className="mx-auto max-h-[80vh] min-h-[80vh] w-2/3 px-20">
+					{countParameterCountInTemplateComponent(
+						templatesResponse?.find(template => {
+							return template.id === campaignForm.getValues('templateId')
+						})
+					) > 0 ? (
+						<div className="mx-auto w-full">
+							<DrawerHeader className="w-full">
+								<DrawerTitle>Fill template components</DrawerTitle>
+								<DrawerDescription>
+									Add the values for the template components parameters. You may
+									use templating variables to add dynamic values. For example, you
+									can use first_name to add the first name of the contact. Check
+									docs here.
+								</DrawerDescription>
+							</DrawerHeader>
+							<Separator />
+							<div className="flex w-full items-start justify-end space-x-2 pt-6">
+								<div className="h-full flex-1">
+									<ScrollArea className="h-full flex-1">
+										<TemplateParameterForm
+											handleTemplateComponentParameterSubmit={
+												handleTemplateComponentParameterSubmit
+											}
+											isBusy={isBusy}
+											setIsTemplateComponentsInputModalOpen={
+												setIsTemplateComponentsInputModalOpen
+											}
+											templateMessageComponentParameterForm={
+												templateMessageComponentParameterForm
+											}
+											key={'template-parameter-form'}
+											template={templatesResponse?.find(template => {
 												return (
 													template.id ===
 													campaignForm.getValues('templateId')
 												)
 											})}
-											parameterValues={templateMessageComponentParameterForm.getValues()}
 										/>
+									</ScrollArea>
+								</div>
+
+								<Separator orientation="vertical" className="h-full" />
+
+								<div className="h-full flex-1 rounded-md border">
+									<div className="rounded-t-md bg-primary px-2 py-1 text-sm text-primary-foreground">
+										Template Preview
+									</div>
+									<div className="relative h-full w-full rounded-b-md bg-[#ebe5de] p-4 dark:bg-[#202c33]">
+										<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/conversations-canvas-bg.png")] bg-repeat opacity-20' />
+
+										<div className="relative z-30 h-96">
+											<TemplateMessageRenderer
+												templateMessage={templatesResponse?.find(
+													template => {
+														return (
+															template.id ===
+															campaignForm.getValues('templateId')
+														)
+													}
+												)}
+												parameterValues={templateMessageComponentParameterForm.getValues()}
+											/>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					) : (
+						<div className="mx-auto w-full">
+							<DrawerHeader className="w-full">
+								<DrawerTitle className="text-center">Template Preview</DrawerTitle>
+							</DrawerHeader>
+							<Separator />
+							<div className="mx-auto mt-4 flex h-full w-full max-w-xl flex-1 flex-col gap-4 rounded-md">
+								<div className="flex flex-col">
+									<div className="rounded-t-md bg-primary px-2 py-1 text-sm text-primary-foreground">
+										Template Preview
+									</div>
+									<div className="relative h-full w-full rounded-b-md bg-[#ebe5de] p-4 dark:bg-[#202c33]">
+										<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/conversations-canvas-bg.png")] bg-repeat opacity-20' />
+										<div className="relative z-30 h-96">
+											<TemplateMessageRenderer
+												templateMessage={templatesResponse?.find(
+													template => {
+														return (
+															template.id ===
+															campaignForm.getValues('templateId')
+														)
+													}
+												)}
+												parameterValues={templateMessageComponentParameterForm.getValues()}
+											/>
+										</div>
+									</div>
+								</div>
+								<Button
+									size={'medium'}
+									variant={'secondary'}
+									onClick={() => {
+										setIsTemplateComponentsInputModalOpen(() => false)
+									}}
+									className="gap-2"
+								>
+									<Icons.crossCircle className="size-4" />
+									Close
+								</Button>
+							</div>
+						</div>
+					)}
 				</DrawerContent>
 			</Drawer>
 
@@ -788,22 +844,46 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 							</Button>
 							{initialData && (
 								<>
-									<Button
-										disabled={
-											loading ||
-											isBusy ||
-											!campaignForm.getValues('templateId')
-										}
-										variant="secondary"
-										type="button"
-										onClick={() => {
-											setIsTemplateComponentsInputModalOpen(true)
-										}}
-										className="flex flex-1 items-center justify-center gap-1"
-									>
-										<Pencil className="h-4 w-4" />
-										Edit Template Parameters
-									</Button>
+									{countParameterCountInTemplateComponent(
+										templatesResponse?.find(
+											template =>
+												template.id === campaignForm.getValues('templateId')
+										)
+									) > 0 ? (
+										<Button
+											disabled={
+												loading ||
+												isBusy ||
+												!campaignForm.getValues('templateId')
+											}
+											variant="secondary"
+											type="button"
+											onClick={() => {
+												setIsTemplateComponentsInputModalOpen(true)
+											}}
+											className="flex flex-1 items-center justify-center gap-1"
+										>
+											<Icons.pencilEdit className="h-4 w-4" />
+											Edit Template Parameters
+										</Button>
+									) : (
+										<Button
+											disabled={
+												loading ||
+												isBusy ||
+												!campaignForm.getValues('templateId')
+											}
+											variant="secondary"
+											type="button"
+											onClick={() => {
+												setIsTemplateComponentsInputModalOpen(true)
+											}}
+											className="flex flex-1 items-center justify-center gap-1"
+										>
+											<Icons.eye className="h-4 w-4" />
+											Preview Template Parameters
+										</Button>
+									)}
 
 									<Button
 										disabled={loading || isBusy}

@@ -155,6 +155,18 @@ export function getParametersPerComponent(
 	return parameterCounts
 }
 
+export function countParameterCountInTemplateComponent(template?: MessageTemplateSchema): number {
+	let total = 0
+
+	const paramsCount = getParametersPerComponent(template)
+
+	Object.entries(paramsCount).map(([_, c]) => {
+		total = total + c
+	})
+
+	return total
+}
+
 export const createHref = ({
 	href,
 	domain = APP_BASE_DOMAIN,
