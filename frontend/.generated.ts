@@ -675,7 +675,7 @@ export interface CreateNewListResponseSchema {
 export interface UpdateContactListSchema {
 	name: string
 	description?: string
-	tags: TagSchema[]
+	tags: string[]
 }
 
 export interface UpdateListByIdResponseSchema {

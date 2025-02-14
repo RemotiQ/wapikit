@@ -70,7 +70,11 @@ const MembersPage = () => {
 		sortBy: sortBy ? (sortBy as OrderEnum) : undefined
 	})
 
-	const { data: orgInvites, isFetching: isFetchingInvites } = useGetOrganizationInvites({
+	const {
+		data: orgInvites,
+		isFetching: isFetchingInvites,
+		refetch: refetchInvitations
+	} = useGetOrganizationInvites({
 		page: 1,
 		per_page: 50
 	})
@@ -142,7 +146,7 @@ const MembersPage = () => {
 				})
 				newMemberInviteForm.reset()
 				setIsInvitationModalOpen(false)
-				await refetchMembers()
+				await refetchInvitations()
 			} else {
 				errorNotification({
 					message: 'Something went wrong, While inviting a user. Please try again.'
@@ -379,7 +383,7 @@ const MembersPage = () => {
 									<>
 										<div className="flex items-start justify-between">
 											<Heading
-												title={`Invitations (${totalUsers})`}
+												title={`Invitations (${totalInvitations})`}
 												description="Manage members"
 											/>
 											<Button

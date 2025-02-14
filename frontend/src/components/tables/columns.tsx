@@ -45,7 +45,7 @@ export const ContactTableColumns: ColumnDef<ContactSchema>[] = [
 	},
 	{
 		accessorKey: 'name',
-		header: 'NAME (Click to view details)',
+		header: 'Name (Click to view details)',
 		cell(props) {
 			const name: string = props.getValue() as string
 
@@ -68,7 +68,7 @@ export const ContactTableColumns: ColumnDef<ContactSchema>[] = [
 	},
 	{
 		accessorKey: 'phone',
-		header: 'PHONE'
+		header: 'Phone'
 	}
 ]
 
@@ -100,7 +100,7 @@ export const CampaignTableColumns: ColumnDef<CampaignSchema>[] = [
 	},
 	{
 		accessorKey: 'name',
-		header: 'NAME (Click for more details)',
+		header: 'Name (Click for more details)',
 		cell(props) {
 			const name: string = props.getValue() as string
 
@@ -123,7 +123,7 @@ export const CampaignTableColumns: ColumnDef<CampaignSchema>[] = [
 	},
 	{
 		accessorKey: 'status',
-		header: 'STATUS',
+		header: 'Status',
 		cell(props) {
 			const status: CampaignStatusEnum = props.getValue() as CampaignStatusEnum
 
@@ -158,7 +158,7 @@ export const CampaignTableColumns: ColumnDef<CampaignSchema>[] = [
 	},
 	{
 		accessorKey: 'lists',
-		header: 'LISTS',
+		header: 'Lists',
 		cell(props) {
 			const listNames: string[] =
 				(props.getValue() as unknown as { name: string }[])?.map(role => role.name) || []
@@ -179,7 +179,7 @@ export const CampaignTableColumns: ColumnDef<CampaignSchema>[] = [
 	},
 	{
 		accessorKey: 'tags',
-		header: 'TAGS',
+		header: 'Tags',
 		cell(props) {
 			const tagNames: string[] =
 				(props.getValue() as unknown as { label: string }[])?.map(tag => tag.label) || []
@@ -228,7 +228,7 @@ export const ContactListTableColumns: ColumnDef<ContactListSchema>[] = [
 	},
 	{
 		accessorKey: 'name',
-		header: 'NAME'
+		header: 'Name'
 	},
 	{
 		accessorKey: 'created_at',
@@ -259,7 +259,24 @@ export const ContactListTableColumns: ColumnDef<ContactListSchema>[] = [
 	},
 	{
 		accessorKey: 'tags',
-		header: 'TAGS'
+		header: 'Tags',
+		cell(props) {
+			const tagNames: string[] =
+				(props.getValue() as unknown as { label: string }[])?.map(tag => tag.label) || []
+
+			return (
+				<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+					{tagNames.length === 0 && <Badge variant={'outline'}>None</Badge>}
+					{tagNames.map((perm: string, index) => {
+						if (index > 2) {
+							return null
+						}
+						return <Badge key={perm}>{perm}</Badge>
+					})}
+					{tagNames.length > 3 && <Badge>+{tagNames.length - 3}</Badge>}
+				</div>
+			)
+		}
 	}
 ]
 
@@ -291,19 +308,19 @@ export const OrganizationMembersTableColumns: ColumnDef<OrganizationMemberSchema
 	},
 	{
 		accessorKey: 'name',
-		header: 'NAME'
+		header: 'Name'
 	},
 	{
 		accessorKey: 'email',
-		header: 'EMAIL'
+		header: 'Email'
 	},
 	{
 		accessorKey: 'accessLevel',
-		header: 'ACCESS LEVEL'
+		header: 'Access Level'
 	},
 	{
 		accessorKey: 'roles',
-		header: 'ROLES',
+		header: 'Roles',
 		cell(props) {
 			const rolesName: string[] =
 				(props.getValue() as unknown as { name: string }[])?.map(role => role.name) || []
@@ -361,11 +378,11 @@ export const RolesTableColumns: ColumnDef<OrganizationRoleSchema>[] = [
 	},
 	{
 		accessorKey: 'name',
-		header: 'NAME'
+		header: 'Name'
 	},
 	{
 		accessorKey: 'permissions',
-		header: 'PERMISSIONS',
+		header: 'Permissions',
 		cell(props) {
 			const permissions: string[] = (props.getValue() as unknown as string[]) || []
 
@@ -414,15 +431,15 @@ export const columns: ColumnDef<Contact>[] = [
 	},
 	{
 		accessorKey: 'name',
-		header: 'NAME'
+		header: 'Name'
 	},
 	{
 		accessorKey: 'phone',
-		header: 'PHONE'
+		header: 'Phone'
 	},
 	{
 		accessorKey: 'list',
-		header: 'EMAIL'
+		header: 'Email'
 	}
 ]
 
@@ -469,7 +486,7 @@ export const invitationColumn: ColumnDef<OrganizationMemberInviteSchema>[] = [
 	},
 	{
 		accessorKey: 'status',
-		header: 'STATUS',
+		header: 'Status',
 		cell(props) {
 			const status: InviteStatusEnum = props.getValue() as InviteStatusEnum
 

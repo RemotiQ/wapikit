@@ -294,7 +294,7 @@ const ContactsPage = () => {
 							}
 						},
 						{
-							icon: 'plus',
+							icon: 'filePlus',
 							label: 'Add to lists',
 							onClick: (contactId: string) => {
 								setContactToEditListsFor(() => contactId)

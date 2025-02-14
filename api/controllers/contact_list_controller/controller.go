@@ -75,7 +75,7 @@ func NewContactListController() *ContactListController {
 					},
 				},
 				{
-					Path:                    "/api/contacts/:id",
+					Path:                    "/api/lists/:id",
 					Method:                  http.MethodDelete,
 					Handler:                 interfaces.HandlerWithSession(DeleteContactListById),
 					IsAuthorizationRequired: true,
@@ -91,7 +91,7 @@ func NewContactListController() *ContactListController {
 					},
 				},
 				{
-					Path:                    "/api/contacts/:id",
+					Path:                    "/api/lists/:id",
 					Method:                  http.MethodPost,
 					Handler:                 interfaces.HandlerWithSession(UpdateContactListById),
 					IsAuthorizationRequired: true,

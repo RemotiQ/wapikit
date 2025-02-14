@@ -25,7 +25,7 @@ const data = [
 		slug: 'lists',
 		title: 'Lists',
 		description: 'Checkout the documentation for lists, how to create and manage them.',
-		Icon: Icons.list,
+		Icon: Icons.file,
 		ctaText: 'Check Docs',
 		ctaUrl: 'https://docs.wapikit.com/guide/manage-lists'
 	},

@@ -265,16 +265,19 @@ export function TableComponent<TData, TValue>({
 													)}
 												</TableCell>
 											))}
-											<TableCell key={'column_actions'}>
-												<CellAction
-													actions={
-														typeof actions === 'function'
-															? actions(row.original)
-															: actions
-													}
-													data={row.id}
-												/>
-											</TableCell>
+
+											{actions.length ? (
+												<TableCell key={'column_actions'}>
+													<CellAction
+														actions={
+															typeof actions === 'function'
+																? actions(row.original)
+																: actions
+														}
+														data={row.id}
+													/>
+												</TableCell>
+											) : null}
 										</TableRow>
 									)
 								})

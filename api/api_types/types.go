@@ -1225,9 +1225,9 @@ type UpdateContactByIdResponseSchema struct {
 
 // UpdateContactListSchema defines model for UpdateContactListSchema.
 type UpdateContactListSchema struct {
-	Description *string     `json:"description,omitempty"`
-	Name        string      `json:"name"`
-	Tags        []TagSchema `json:"tags"`
+	Description *string  `json:"description,omitempty"`
+	Name        string   `json:"name"`
+	Tags        []string `json:"tags"`
 }
 
 // UpdateContactSchema defines model for UpdateContactSchema.

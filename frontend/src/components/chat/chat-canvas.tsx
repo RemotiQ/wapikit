@@ -415,7 +415,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 							</div>
 							<DropdownMenu modal={false}>
 								<DropdownMenuTrigger asChild>
-									<MoreVerticalIcon className="text-bold h-5 w-5  text-secondary-foreground" />
+									<Icons.dotsVertical className="text-bold h-5 w-5 cursor-pointer text-secondary-foreground" />
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
 									{chatActions.map((action, index) => {
