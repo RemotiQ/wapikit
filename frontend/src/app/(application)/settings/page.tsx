@@ -1298,7 +1298,8 @@ export default function SettingsPage() {
 													<SubscriptionSettings />
 												) : null}
 
-												<Card className="flex flex-1 items-center justify-between">
+												{/* ! TODO: ENABLE THIS ONCE BACKEND IS IMPLEMENTED FOR DELETE ACCOUNT */}
+												{/* <Card className="flex flex-1 items-center justify-between">
 													<CardHeader>
 														<CardTitle>Delete Account</CardTitle>
 													</CardHeader>
@@ -1332,7 +1333,7 @@ export default function SettingsPage() {
 															</Tooltip>
 														</TooltipProvider>
 													</CardContent>
-												</Card>
+												</Card> */}
 											</>
 										) : (
 											<LoadingSpinner />

@@ -86,7 +86,10 @@ export default function AuthenticationPage() {
 						</p>
 						<p className="text-left text-sm font-normal text-muted-foreground">
 							Don't have an account?{' '}
-							<Link href="/signup" className="cursor-pointer font-medium text-foreground hover:underline underline-offset-2">
+							<Link
+								href="/signup"
+								className="cursor-pointer font-medium text-foreground underline-offset-2 hover:underline"
+							>
 								Sign Up
 							</Link>
 						</p>

@@ -37,7 +37,7 @@ func NewCampaignController() *CampaignController {
 					MetaData: interfaces.RouteMetaData{
 						PermissionRoleLevel: api_types.Member,
 						RateLimitConfig: interfaces.RateLimitConfig{
-							MaxRequests:    60,
+							MaxRequests:    100,
 							WindowTimeInMs: 1000 * 60 * 60, // 1 hour
 						},
 						RequiredPermission: []api_types.RolePermissionEnum{

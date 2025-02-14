@@ -99,6 +99,42 @@ func NewAuthController() *AuthController {
 						},
 					},
 				},
+				{
+					Path:                    "/api/auth/reset-password/init",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithoutSession(resetPasswordInit),
+					IsAuthorizationRequired: false,
+					MetaData: interfaces.RouteMetaData{
+						RateLimitConfig: interfaces.RateLimitConfig{
+							MaxRequests:    5,
+							WindowTimeInMs: 1000 * 60 * 15, // 15 minutes
+						},
+					},
+				},
+				{
+					Path:                    "/api/auth/reset-password/verify",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithoutSession(resetPasswordVerify),
+					IsAuthorizationRequired: false,
+					MetaData: interfaces.RouteMetaData{
+						RateLimitConfig: interfaces.RateLimitConfig{
+							MaxRequests:    20,
+							WindowTimeInMs: 1000 * 60 * 60, // 1 hour
+						},
+					},
+				},
+				{
+					Path:                    "/api/auth/reset-password/complete",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithoutSession(resetPasswordComplete),
+					IsAuthorizationRequired: false,
+					MetaData: interfaces.RouteMetaData{
+						RateLimitConfig: interfaces.RateLimitConfig{
+							MaxRequests:    10,
+							WindowTimeInMs: 1000 * 60 * 60, // 1 hour
+						},
+					},
+				},
 			},
 		},
 	}
@@ -226,7 +262,6 @@ func acceptOrganizationInvite(context interfaces.ContextWithSession) error {
 }
 
 func handleSignIn(context interfaces.ContextWithoutSession) error {
-
 	logger := context.App.Logger
 
 	payload := new(api_types.LoginRequestBodySchema)
@@ -805,5 +840,152 @@ func switchOrganization(context interfaces.ContextWithSession) error {
 
 	return context.JSON(http.StatusOK, api_types.SwitchOrganizationResponseSchema{
 		Token: token,
+	})
+}
+
+func resetPasswordInit(context interfaces.ContextWithoutSession) error {
+	payload := new(api_types.ResetPasswordInitJSONBody)
+	if err := context.Bind(payload); err != nil {
+		return context.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	if payload.Email == "" {
+		return context.JSON(http.StatusBadRequest, "Email is required")
+	}
+
+	// * get the user
+	userQuery := SELECT(
+		table.User.AllColumns,
+	).
+		FROM(
+			table.User,
+		).
+		WHERE(
+			table.User.Email.EQ(String(payload.Email)),
+		).LIMIT(1)
+
+	var user model.User
+	userQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
+
+	if user.UniqueId != uuid.Nil {
+		otp := utils.GenerateOtp(context.App.Constants.IsProduction)
+		cacheKey := context.App.Redis.ComputeCacheKey("otp", payload.Email, "reset-password")
+		err := context.App.Redis.CacheData(cacheKey, otp, time.Minute*5)
+
+		if err != nil {
+			context.App.Logger.Error("error caching otp", err.Error(), nil)
+			return context.JSON(http.StatusInternalServerError, "Something went wrong while processing your request.")
+		}
+
+		// * send otp on email
+		err = context.App.NotificationService.SendEmail(payload.Email, "Wapikit Password Reset OTP", fmt.Sprintf("Your OTP is %s", otp), context.App.Constants.IsProduction)
+	} else {
+		// do not send otp, but respond with success
+	}
+
+	return context.JSON(http.StatusOK, api_types.ResetPasswordInitResponseBodySchema{
+		IsOtpSent: true,
+	})
+}
+
+func resetPasswordVerify(context interfaces.ContextWithoutSession) error {
+	payload := new(api_types.ResetPasswordVerifyJSONBody)
+	if err := context.Bind(payload); err != nil {
+		return context.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	if payload.Email == "" || payload.Otp == "" {
+		return context.JSON(http.StatusBadRequest, "Email and OTP are required")
+	}
+
+	// * get the user
+	userQuery := SELECT(
+		table.User.AllColumns,
+	).
+		FROM(
+			table.User,
+		).
+		WHERE(
+			table.User.Email.EQ(String(payload.Email)),
+		).LIMIT(1)
+
+	var user model.User
+	userQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
+
+	if user.UniqueId == uuid.Nil {
+		return context.JSON(http.StatusNotFound, "User not found")
+	}
+
+	cacheKey := context.App.Redis.ComputeCacheKey("otp", payload.Email, "reset-password")
+	cachedOtp, err := context.App.Redis.GetCachedData(cacheKey)
+
+	if err != nil {
+		context.App.Logger.Error("Error getting cached otp", err.Error())
+		return context.JSON(http.StatusBadRequest, "Invalid OTP")
+	}
+
+	if cachedOtp != payload.Otp {
+		return context.JSON(http.StatusBadRequest, "Invalid OTP")
+	}
+
+	verificationCacheKey := context.App.Redis.ComputeCacheKey("reset-password", payload.Email, "verified")
+	context.App.Redis.CacheData(verificationCacheKey, "true", time.Minute*5)
+
+	return context.JSON(http.StatusOK, api_types.ResetPasswordVerifyResponseBodySchema{
+		IsVerified: true,
+	})
+}
+
+func resetPasswordComplete(context interfaces.ContextWithoutSession) error {
+	payload := new(api_types.ResetPasswordCompleteJSONBody)
+	if err := context.Bind(payload); err != nil {
+		return context.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	if payload.Email == "" || payload.Password == "" {
+		return context.JSON(http.StatusBadRequest, "Email and Password are required")
+	}
+
+	// * get the user
+	userQuery := SELECT(
+		table.User.AllColumns,
+	).
+		FROM(
+			table.User,
+		).
+		WHERE(
+			table.User.Email.EQ(String(payload.Email)),
+		).LIMIT(1)
+
+	var user model.User
+	userQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
+
+	if user.UniqueId == uuid.Nil {
+		return context.JSON(http.StatusNotFound, "User not found")
+	}
+
+	verificationCacheKey := context.App.Redis.ComputeCacheKey("reset-password", payload.Email, "verified")
+	_, err := context.App.Redis.GetCachedData(verificationCacheKey)
+
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "Your verification has been expired. Please try again.")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, "Error hashing password")
+	}
+
+	passwordString := string(hashedPassword)
+
+	_, err = table.User.UPDATE(table.User.Password).SET(passwordString).WHERE(table.User.UniqueId.EQ(UUID(user.UniqueId))).ExecContext(context.Request().Context(), context.App.Db)
+
+	if err != nil {
+		context.App.Logger.Error("database query error", "error", err.Error())
+		return context.JSON(http.StatusInternalServerError, "Something went wrong while processing your request.")
+	}
+
+	return context.JSON(http.StatusOK, api_types.ResetPasswordCompleteResponseBodySchema{
+		IsPasswordReset: true,
 	})
 }

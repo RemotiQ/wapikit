@@ -46,7 +46,7 @@ func NewRedisClient(
 	return &RedisClient{
 		redisClient,
 		redSync,
-		"wapikit-dev:rate_limit",
+		"wapikit:rate-limit",
 		RedisApiServerEventChannelName,
 		RedisCampaignManagerChannelName,
 	}

@@ -12,7 +12,6 @@ import { buttonVariants } from '~/components/ui/button'
 import { OnboardingSteps, OnboardingStepsEnum } from '~/constants'
 import { useLayoutStore } from '~/store/layout.store'
 
-
 const OnboardingLayout = (props: { children: React.ReactNode }) => {
 	const { onboardingSteps } = useLayoutStore()
 

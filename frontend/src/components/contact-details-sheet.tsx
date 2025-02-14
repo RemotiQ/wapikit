@@ -110,7 +110,7 @@ const ContactDetailsSheet = () => {
 												}
 
 												if (key === 'lists') {
-													IconToRender = Icons.dashboard
+													IconToRender = Icons.grid
 
 													return (
 														<div

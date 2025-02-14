@@ -710,6 +710,11 @@ export interface TemplateSchema {
 
 export type CampaignSchemaTemplateComponentParameters = { [key: string]: unknown }
 
+export type CampaignSchemaProgress = {
+	totalMessages?: number
+	sent?: number
+}
+
 export interface CampaignSchema {
 	uniqueId: string
 	name: string
@@ -725,6 +730,7 @@ export interface CampaignSchema {
 	tags: TagSchema[]
 	templateComponentParameters?: CampaignSchemaTemplateComponentParameters
 	stats?: CampaignAnalyticsResponseSchema
+	progress?: CampaignSchemaProgress
 }
 
 export interface NewCampaignSchema {
@@ -1251,8 +1257,34 @@ export interface UnauthorizedErrorResponseSchema {
 	message: string
 }
 
+export interface ResetPasswordInitResponseBodySchema {
+	isOtpSent: boolean
+}
+
+export interface ResetPasswordVerifyResponseBodySchema {
+	isVerified: boolean
+}
+
+export interface ResetPasswordCompleteResponseBodySchema {
+	isPasswordReset: boolean
+}
+
 export type GetHealthCheck200 = {
 	data?: boolean
+}
+
+export type ResetPasswordInitBody = {
+	email: string
+}
+
+export type ResetPasswordVerifyBody = {
+	otp: string
+	email: string
+}
+
+export type ResetPasswordCompleteBody = {
+	email: string
+	password: string
 }
 
 export type GetUserNotificationsParams = {
@@ -2300,6 +2332,276 @@ export const useJoinOrganization = <
 	TContext
 > => {
 	const mutationOptions = getJoinOrganizationMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * reset password init endpoint
+ */
+export const resetPasswordInit = (
+	resetPasswordInitBody: ResetPasswordInitBody,
+	signal?: AbortSignal
+) => {
+	return customInstance<ResetPasswordInitResponseBodySchema>({
+		url: `/auth/reset-password/init`,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		data: resetPasswordInitBody,
+		signal
+	})
+}
+
+export const getResetPasswordInitMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordInit>>,
+		TError,
+		{ data: ResetPasswordInitBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof resetPasswordInit>>,
+	TError,
+	{ data: ResetPasswordInitBody },
+	TContext
+> => {
+	const mutationKey = ['resetPasswordInit']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof resetPasswordInit>>,
+		{ data: ResetPasswordInitBody }
+	> = props => {
+		const { data } = props ?? {}
+
+		return resetPasswordInit(data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type ResetPasswordInitMutationResult = NonNullable<
+	Awaited<ReturnType<typeof resetPasswordInit>>
+>
+export type ResetPasswordInitMutationBody = ResetPasswordInitBody
+export type ResetPasswordInitMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useResetPasswordInit = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordInit>>,
+		TError,
+		{ data: ResetPasswordInitBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof resetPasswordInit>>,
+	TError,
+	{ data: ResetPasswordInitBody },
+	TContext
+> => {
+	const mutationOptions = getResetPasswordInitMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * reset password verify endpoint
+ */
+export const resetPasswordVerify = (
+	resetPasswordVerifyBody: ResetPasswordVerifyBody,
+	signal?: AbortSignal
+) => {
+	return customInstance<ResetPasswordVerifyResponseBodySchema>({
+		url: `/auth/reset-password/verify`,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		data: resetPasswordVerifyBody,
+		signal
+	})
+}
+
+export const getResetPasswordVerifyMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordVerify>>,
+		TError,
+		{ data: ResetPasswordVerifyBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof resetPasswordVerify>>,
+	TError,
+	{ data: ResetPasswordVerifyBody },
+	TContext
+> => {
+	const mutationKey = ['resetPasswordVerify']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof resetPasswordVerify>>,
+		{ data: ResetPasswordVerifyBody }
+	> = props => {
+		const { data } = props ?? {}
+
+		return resetPasswordVerify(data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type ResetPasswordVerifyMutationResult = NonNullable<
+	Awaited<ReturnType<typeof resetPasswordVerify>>
+>
+export type ResetPasswordVerifyMutationBody = ResetPasswordVerifyBody
+export type ResetPasswordVerifyMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useResetPasswordVerify = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordVerify>>,
+		TError,
+		{ data: ResetPasswordVerifyBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof resetPasswordVerify>>,
+	TError,
+	{ data: ResetPasswordVerifyBody },
+	TContext
+> => {
+	const mutationOptions = getResetPasswordVerifyMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * reset password complete endpoint
+ */
+export const resetPasswordComplete = (
+	resetPasswordCompleteBody: ResetPasswordCompleteBody,
+	signal?: AbortSignal
+) => {
+	return customInstance<ResetPasswordCompleteResponseBodySchema>({
+		url: `/auth/reset-password/complete`,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		data: resetPasswordCompleteBody,
+		signal
+	})
+}
+
+export const getResetPasswordCompleteMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordComplete>>,
+		TError,
+		{ data: ResetPasswordCompleteBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof resetPasswordComplete>>,
+	TError,
+	{ data: ResetPasswordCompleteBody },
+	TContext
+> => {
+	const mutationKey = ['resetPasswordComplete']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof resetPasswordComplete>>,
+		{ data: ResetPasswordCompleteBody }
+	> = props => {
+		const { data } = props ?? {}
+
+		return resetPasswordComplete(data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type ResetPasswordCompleteMutationResult = NonNullable<
+	Awaited<ReturnType<typeof resetPasswordComplete>>
+>
+export type ResetPasswordCompleteMutationBody = ResetPasswordCompleteBody
+export type ResetPasswordCompleteMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useResetPasswordComplete = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordComplete>>,
+		TError,
+		{ data: ResetPasswordCompleteBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof resetPasswordComplete>>,
+	TError,
+	{ data: ResetPasswordCompleteBody },
+	TContext
+> => {
+	const mutationOptions = getResetPasswordCompleteMutationOptions(options)
 
 	return useMutation(mutationOptions)
 }

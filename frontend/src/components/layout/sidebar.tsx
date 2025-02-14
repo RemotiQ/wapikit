@@ -97,7 +97,6 @@ export default function Sidebar({ className }: SidebarProps) {
 								<span className="flex-1 text-center font-bold">Upgrade to Pro</span>
 							</Button>
 						) : null}
-						
 					</div>
 				</div>
 			</div>

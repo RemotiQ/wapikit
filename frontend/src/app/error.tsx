@@ -18,7 +18,7 @@ export default function Error({ reset, error }: { error: Error; reset: () => voi
 				</Button>
 				<Link title="contact-support" href={`${WEBSITE_URL}/contact-us`} rel="">
 					<Button size={'medium'} variant={'outline'}>
-						<Icons.message className="h-6 w-6 text-white" /> Contact Support
+						<Icons.messageTextSquare className="h-6 w-6 text-white" /> Contact Support
 					</Button>
 				</Link>
 			</div>

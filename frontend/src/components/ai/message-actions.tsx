@@ -45,7 +45,7 @@ const MessageActions = ({
 								})
 							}}
 						>
-							<Icons.copy className='size-4' />
+							<Icons.copy className="size-4" />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Copy</TooltipContent>
@@ -82,7 +82,7 @@ const MessageActions = ({
 									})
 							}}
 						>
-							<Icons.thumbsUp className='size-4' />
+							<Icons.thumbsUp className="size-4" />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Upvote Response</TooltipContent>
@@ -119,7 +119,7 @@ const MessageActions = ({
 									})
 							}}
 						>
-							<Icons.thumbsDown className='size-4' />
+							<Icons.thumbsDown className="size-4" />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>Downvote Response</TooltipContent>

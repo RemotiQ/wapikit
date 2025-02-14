@@ -47,7 +47,8 @@ import {
 	CheckCircledIcon,
 	ArrowUpIcon,
 	GlobeIcon,
-	DotFilledIcon
+	DotFilledIcon,
+	StarFilledIcon
 } from '@radix-ui/react-icons'
 import { Avatar } from '@radix-ui/react-avatar'
 export type Icon = LucideIcon
@@ -100,6 +101,7 @@ export const Icons = {
 	play: PlayIcon,
 	removeUser: MinusCircledIcon,
 	rows: RowsIcon,
+	star: StarFilledIcon,
 	gitHub: ({ ...props }: LucideProps) => (
 		<svg
 			aria-hidden="true"

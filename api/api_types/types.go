@@ -383,12 +383,16 @@ type CampaignAnalyticsResponseSchema struct {
 
 // CampaignSchema defines model for CampaignSchema.
 type CampaignSchema struct {
-	CreatedAt                   time.Time                        `json:"createdAt"`
-	Description                 *string                          `json:"description,omitempty"`
-	IsLinkTrackingEnabled       bool                             `json:"isLinkTrackingEnabled"`
-	Lists                       []ContactListSchema              `json:"lists"`
-	Name                        string                           `json:"name"`
-	PhoneNumberInUse            *string                          `json:"phoneNumberInUse,omitempty"`
+	CreatedAt             time.Time           `json:"createdAt"`
+	Description           *string             `json:"description,omitempty"`
+	IsLinkTrackingEnabled bool                `json:"isLinkTrackingEnabled"`
+	Lists                 []ContactListSchema `json:"lists"`
+	Name                  string              `json:"name"`
+	PhoneNumberInUse      *string             `json:"phoneNumberInUse,omitempty"`
+	Progress              *struct {
+		Sent          *float32 `json:"sent,omitempty"`
+		TotalMessages *float32 `json:"totalMessages,omitempty"`
+	} `json:"progress,omitempty"`
 	ScheduledAt                 *time.Time                       `json:"scheduledAt,omitempty"`
 	SentAt                      *time.Time                       `json:"sentAt,omitempty"`
 	Stats                       *CampaignAnalyticsResponseSchema `json:"stats,omitempty"`
@@ -1036,6 +1040,21 @@ type RegisterRequestResponseBodySchema struct {
 	IsOtpSent bool `json:"isOtpSent"`
 }
 
+// ResetPasswordCompleteResponseBodySchema defines model for ResetPasswordCompleteResponseBodySchema.
+type ResetPasswordCompleteResponseBodySchema struct {
+	IsPasswordReset bool `json:"isPasswordReset"`
+}
+
+// ResetPasswordInitResponseBodySchema defines model for ResetPasswordInitResponseBodySchema.
+type ResetPasswordInitResponseBodySchema struct {
+	IsOtpSent bool `json:"isOtpSent"`
+}
+
+// ResetPasswordVerifyResponseBodySchema defines model for ResetPasswordVerifyResponseBodySchema.
+type ResetPasswordVerifyResponseBodySchema struct {
+	IsVerified bool `json:"isVerified"`
+}
+
 // RolePermissionEnum defines model for RolePermissionEnum.
 type RolePermissionEnum string
 
@@ -1403,6 +1422,23 @@ type GetSecondaryAnalyticsParams struct {
 	To *time.Time `form:"to,omitempty" json:"to,omitempty"`
 }
 
+// ResetPasswordCompleteJSONBody defines parameters for ResetPasswordComplete.
+type ResetPasswordCompleteJSONBody struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// ResetPasswordInitJSONBody defines parameters for ResetPasswordInit.
+type ResetPasswordInitJSONBody struct {
+	Email string `json:"email"`
+}
+
+// ResetPasswordVerifyJSONBody defines parameters for ResetPasswordVerify.
+type ResetPasswordVerifyJSONBody struct {
+	Email string `json:"email"`
+	Otp   string `json:"otp"`
+}
+
 // SwitchOrganizationJSONBody defines parameters for SwitchOrganization.
 type SwitchOrganizationJSONBody struct {
 	OrganizationId *string `json:"organizationId,omitempty"`
@@ -1641,6 +1677,15 @@ type LoginJSONRequestBody = LoginRequestBodySchema
 
 // RegisterJSONRequestBody defines body for Register for application/json ContentType.
 type RegisterJSONRequestBody = RegisterRequestBodySchema
+
+// ResetPasswordCompleteJSONRequestBody defines body for ResetPasswordComplete for application/json ContentType.
+type ResetPasswordCompleteJSONRequestBody ResetPasswordCompleteJSONBody
+
+// ResetPasswordInitJSONRequestBody defines body for ResetPasswordInit for application/json ContentType.
+type ResetPasswordInitJSONRequestBody ResetPasswordInitJSONBody
+
+// ResetPasswordVerifyJSONRequestBody defines body for ResetPasswordVerify for application/json ContentType.
+type ResetPasswordVerifyJSONRequestBody ResetPasswordVerifyJSONBody
 
 // SwitchOrganizationJSONRequestBody defines body for SwitchOrganization for application/json ContentType.
 type SwitchOrganizationJSONRequestBody SwitchOrganizationJSONBody

@@ -220,6 +220,160 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
+  /auth/reset-password/init:
+    post:
+      tags:
+        - Auth
+      description: reset password init endpoint
+      operationId: resetPasswordInit
+      requestBody:
+        description: email
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        "200":
+          description: reset password init response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordInitResponseBodySchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /auth/reset-password/verify:
+    post:
+      tags:
+        - Auth
+      description: reset password verify endpoint
+      operationId: resetPasswordVerify
+      requestBody:
+        description: reset password verify credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                otp:
+                  type: string
+                email:
+                  type: string
+              required:
+                - otp
+                - email
+      responses:
+        "200":
+          description: reset password verify response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordVerifyResponseBodySchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /auth/reset-password/complete:
+    post:
+      tags:
+        - Auth
+      description: reset password complete endpoint
+      operationId: resetPasswordComplete
+      requestBody:
+        description: reset password complete credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - otp
+                - password
+      responses:
+        "200":
+          description: reset password complete response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordCompleteResponseBodySchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
   /user:
     get:
       tags:
@@ -6265,3 +6419,27 @@ components:
           type: string
       required:
         - message
+
+    ResetPasswordInitResponseBodySchema:
+      type: object
+      properties:
+        isOtpSent:
+          type: boolean
+      required:
+        - isOtpSent
+
+    ResetPasswordVerifyResponseBodySchema:
+      type: object
+      properties:
+        isVerified:
+          type: boolean
+      required:
+        - isVerified
+
+    ResetPasswordCompleteResponseBodySchema:
+      type: object
+      properties:
+        isPasswordReset:
+          type: boolean
+      required:
+        - isPasswordReset

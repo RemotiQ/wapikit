@@ -10,14 +10,12 @@ import {
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useRegister, useVerifyOtp } from '~/generated'
-import { useLocalStorage } from '~/hooks/use-local-storage'
-import { AUTH_TOKEN_LS, REDIRECT_URL_LS } from '~/constants'
-import { errorNotification } from '~/reusable-functions'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useResetPasswordComplete, useResetPasswordInit, useResetPasswordVerify } from '~/generated'
+import { errorNotification, successNotification } from '~/reusable-functions'
+import { useRouter } from 'next/navigation'
 
 const otpFormSchema = z.object({
 	otp: z.string().length(6, { message: 'OTP must be 6 characters' })
@@ -26,29 +24,18 @@ const otpFormSchema = z.object({
 const confirmEmailFormSchema = z.object({
 	email: z.string().email({ message: 'Enter a valid email address' })
 })
+
 const resetPasswordFormSchema = z.object({
 	password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 	confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' })
 })
-type confirmEmailValue = z.infer<typeof confirmEmailFormSchema>
-type resetPasswordFormValue = z.infer<typeof resetPasswordFormSchema>
+
+type ConfirmEmailValue = z.infer<typeof confirmEmailFormSchema>
+type ResetPasswordFormValue = z.infer<typeof resetPasswordFormSchema>
 type OtpFormValue = z.infer<typeof otpFormSchema>
 
 export default function UserResetPasswordForm() {
-	const setAuthToken = useLocalStorage<string | undefined>(AUTH_TOKEN_LS, undefined)[1]
-	const [redirectUrl, setRedirectUrl] = useLocalStorage<string | undefined>(
-		REDIRECT_URL_LS,
-		undefined
-	)
-	const searchParams = useSearchParams()
 	const router = useRouter()
-
-	useEffect(() => {
-		const redirectUrl = searchParams.get('redirectUri')
-		if (redirectUrl) {
-			setRedirectUrl(redirectUrl)
-		}
-	}, [searchParams, setRedirectUrl])
 
 	const [isBusy, setIsBusy] = useState(false)
 	const [activeForm, setActiveForm] = useState<
@@ -59,7 +46,7 @@ export default function UserResetPasswordForm() {
 		email: ''
 	}
 
-	const confirmEmailForm = useForm<confirmEmailValue>({
+	const confirmEmailForm = useForm<ConfirmEmailValue>({
 		resolver: zodResolver(confirmEmailFormSchema),
 		defaultValues
 	})
@@ -71,32 +58,33 @@ export default function UserResetPasswordForm() {
 		}
 	})
 
-	const resetPasswordForm = useForm<resetPasswordFormValue>({
-		resolver: zodResolver(otpFormSchema),
+	const resetPasswordForm = useForm<ResetPasswordFormValue>({
+		resolver: zodResolver(resetPasswordFormSchema),
 		defaultValues: {
 			password: '',
 			confirmPassword: ''
 		}
 	})
 
-	const sendEmailConfirmationOtpMutation = useRegister()
-	const createAccountMutation = useVerifyOtp()
+	const resetPasswordInit = useResetPasswordInit()
+	const resetPasswordVerify = useResetPasswordVerify()
+	const resetPasswordComplete = useResetPasswordComplete()
 
-	async function ConfirmEmail(data: confirmEmailValue) {
+	async function ConfirmEmail(data: ConfirmEmailValue) {
 		try {
 			if (isBusy) {
 				return
 			}
 			setIsBusy(true)
 
-			if (data.password !== data.confirmPassword) {
+			if (!data.email) {
 				errorNotification({
-					message: 'Passwords do not match'
+					message: 'Email is required'
 				})
 				return
 			}
 
-			const response = await sendEmailConfirmationOtpMutation.mutateAsync({
+			const response = await resetPasswordInit.mutateAsync({
 				data: {
 					email: data.email
 				}
@@ -105,8 +93,10 @@ export default function UserResetPasswordForm() {
 			if (response.isOtpSent) {
 				// open the otp form
 				setActiveForm(() => 'otpForm')
-			} else {
-				// something went wrong show error token not found
+				successNotification({
+					message:
+						'You must has received an email with OTP, if the email belongs to one of a user.'
+				})
 			}
 		} catch (error) {
 			console.error(error)
@@ -127,26 +117,62 @@ export default function UserResetPasswordForm() {
 
 			const userData = confirmEmailForm.getValues()
 
-			const response = await createAccountMutation.mutateAsync({
+			const response = await resetPasswordVerify.mutateAsync({
 				data: {
-					// password: userData.password,
-					// username: userData.username,
 					email: userData.email,
 					otp: data.otp
 				}
 			})
 
-			if (response.token) {
-				setAuthToken(response.token)
-
-				if (redirectUrl) {
-					router.push(redirectUrl)
-					return
-				} else {
-					window.location.href = '/signin'
-				}
+			if (response.isVerified) {
+				successNotification({
+					message: 'OTP verified successfully'
+				})
+				setActiveForm(() => 'resetpasswordForm')
 			} else {
 				// something went wrong show error token not found
+				errorNotification({
+					message: 'Something went wrong'
+				})
+			}
+		} catch (error) {
+			console.error(error)
+			errorNotification({
+				message: (error as any).error
+			})
+		} finally {
+			setIsBusy(false)
+		}
+	}
+
+	async function resetPassword(data: ResetPasswordFormValue) {
+		try {
+			console.log('reset password')
+			console.log({ data })
+			if (isBusy) return
+			setIsBusy(true)
+
+			const userData = confirmEmailForm.getValues()
+			if (data.password !== data.confirmPassword) {
+				errorNotification({
+					message: 'Passwords do not match'
+				})
+				return
+			}
+
+			const response = await resetPasswordComplete.mutateAsync({
+				data: {
+					email: userData.email,
+					password: data.password
+				}
+			})
+
+			if (response.isPasswordReset) {
+				successNotification({
+					message: 'Password reset successfully'
+				})
+				router.push('/signin')
+			} else {
 				errorNotification({
 					message: 'Something went wrong'
 				})
@@ -160,8 +186,6 @@ export default function UserResetPasswordForm() {
 			setIsBusy(false)
 		}
 	}
-
-	async function resetPassword(data: resetPasswordFormValue) {}
 
 	return (
 		<>
@@ -213,8 +237,8 @@ export default function UserResetPasswordForm() {
 			) : activeForm === 'otpForm' ? (
 				<Form {...otpForm}>
 					<p className="text-sm font-normal text-muted-foreground">
-						We send an email with verification code. Please check
-						your spam folder as well.
+						We send an email with verification code. Please check your spam folder as
+						well.
 					</p>
 					<form
 						onSubmit={otpForm.handleSubmit(submitOtp)}
@@ -227,7 +251,7 @@ export default function UserResetPasswordForm() {
 							key={'otp_field'}
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Otp</FormLabel>
+									<FormLabel>OTP</FormLabel>
 									<FormControl>
 										<Input
 											id="otp"
@@ -248,13 +272,11 @@ export default function UserResetPasswordForm() {
 				</Form>
 			) : (
 				<Form {...resetPasswordForm}>
-					<p className="text-sm font-normal text-muted-foreground">
-						Set New password.
-					</p>
+					<p className="text-sm font-normal text-muted-foreground">Set New password.</p>
 					<form
 						onSubmit={resetPasswordForm.handleSubmit(resetPassword)}
-						className="flex w-full flex-col gap-1"
-						id="registration-details-form"
+						className="flex w-full flex-col gap-2"
+						id="reset-password-complete-form"
 					>
 						<FormField
 							control={resetPasswordForm.control}

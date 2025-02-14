@@ -188,7 +188,7 @@ const ThinkingMessage = () => {
 				)}
 			>
 				<div className="flex size-8 shrink-0 items-center justify-center rounded-full ring-1 ring-border">
-					<Icons.aiStar className='size-4' />
+					<Icons.aiStar className="size-4" />
 				</div>
 
 				<div className="flex w-full flex-col gap-2">

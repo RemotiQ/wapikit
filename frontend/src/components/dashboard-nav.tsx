@@ -279,7 +279,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 
 			{isMinimized ? null : (
 				<Button
-					className="ml-2 mt-2 flex w-[80%] gap-2 justify-between text-left"
+					className="ml-2 mt-2 flex w-[80%] justify-between gap-2 text-left"
 					onClick={() => {
 						writeProperty({
 							isCommandMenuOpen: true
@@ -287,7 +287,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 					}}
 				>
 					Quick Actions
-					<div className="flex flex-row items-center gap-1 px-1 bg-primaryShades-600 rounded-md text-sm">
+					<div className="flex flex-row items-center gap-1 rounded-md bg-primaryShades-600 px-1 text-sm">
 						<Icons.macoscommand className="size-3" /> K
 					</div>
 				</Button>
