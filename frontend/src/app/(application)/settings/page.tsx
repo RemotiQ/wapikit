@@ -1400,6 +1400,7 @@ export default function SettingsPage() {
 													variant={'destructive'}
 													disabled={isBusy}
 												>
+													<Icons.regenerate className="size-5" />
 													Regenerate
 												</Button>
 											</CardContent>

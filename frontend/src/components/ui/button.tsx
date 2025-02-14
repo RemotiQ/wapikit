@@ -26,7 +26,7 @@ const buttonVariants = cva(
 					'group relative animate-rainbow cursor-pointer border-0 bg-[linear-gradient(#121213,#121213),linear-gradient(#121213_50%,rgba(18,18,19,0.6)_80%,rgba(18,18,19,0)),linear-gradient(90deg,#FF4242,#A1FF42,#42A1FF,#42D0FF,#A142FF)]  bg-[length:200%] text-white [background-clip:padding-box,border-box,border-box] [background-origin:border-box] [border:calc(0.08*1rem)_solid_transparent] before:absolute before:bottom-[-20%] before:left-1/2 before:z-[0] before:h-[20%] before:w-[60%] before:-translate-x-1/2 before:animate-rainbow before:bg-[linear-gradient(90deg,#FF4242,#A1FF42,#42A1FF,#42D0FF,#A142FF)] before:[filter:blur(calc(0.8*1rem))]'
 			},
 			size: {
-				default: 'px-4 py-2 text-sm rounded-lg',
+				default: 'px-4 py-2 text-sm rounded-lg gap-2',
 				xSmallForGraphics: 'rounded-[4px] px-1.5 py-[2px] text-[5px] gap-1',
 				smallForGraphics: 'rounded-md px-1.5 py-1 text-[6px] gap-1',
 				sm: 'rounded-lg px-2.5 py-1.5 text-xs',
