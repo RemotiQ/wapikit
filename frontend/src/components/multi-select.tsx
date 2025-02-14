@@ -18,6 +18,7 @@ import {
 	CommandSeparator
 } from './ui/command'
 import { CaretSortIcon } from '@radix-ui/react-icons'
+import { Icons } from './icons'
 
 const multiSelectVariants = cva(
 	'm-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300',
@@ -58,23 +59,6 @@ interface MultiSelectProps
 		label: JSX.Element
 		onClick: () => void
 	}
-}
-const CheckFilled = () => {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="18"
-			height="18"
-			viewBox="0 0 18 18"
-			fill="#202020"
-			className={clsx('h-8 w-8 ')}
-		>
-			<path
-				d="M5.25 3.75C4.85218 3.75 4.47064 3.90804 4.18934 4.18934C3.90804 4.47064 3.75 4.85218 3.75 5.25V12.75C3.75 13.1478 3.90804 13.5294 4.18934 13.8107C4.47064 14.092 4.85218 14.25 5.25 14.25H12.75C13.1478 14.25 13.5294 14.092 13.8107 13.8107C14.092 13.5294 14.25 13.1478 14.25 12.75V5.25C14.25 4.85218 14.092 4.47064 13.8107 4.18934C13.5294 3.90804 13.1478 3.75 12.75 3.75H5.25ZM8.25 11.5605L6.21975 9.53025L7.28025 8.46975L8.25 9.4395L11.0948 6.59475L12.1553 7.65525L8.25 11.5605Z"
-				fill="#ffffff"
-			/>
-		</svg>
-	)
 }
 
 export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
@@ -170,10 +154,11 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 															' py-0.5',
 															multiSelectVariants({ variant })
 														)}
+														variant={'outline'}
 													>
 														{option?.label || option?.value}
-														<XCircle
-															className="ml-2 h-4 w-4 cursor-pointer"
+														<Icons.crossCircle
+															className="ml-2 h-3 w-3 cursor-pointer"
 															onClick={event => {
 																event.stopPropagation()
 																toggleOption(value)
@@ -185,13 +170,14 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 											{selectedValues.length > maxCount && (
 												<Badge
 													className={clsx(
-														'border-foreground/1 bg-transparent text-foreground hover:bg-transparent',
+														'',
 														multiSelectVariants({ variant })
 													)}
+													variant={'outline'}
 												>
 													{`+ ${selectedValues.length - maxCount} more`}
-													<XCircle
-														className="ml-2 h-4 w-4 cursor-pointer"
+													<Icons.crossCircle
+														className="ml-2 h-3 w-3 cursor-pointer"
 														onClick={event => {
 															event.stopPropagation()
 															clearExtraOptions()
@@ -201,7 +187,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 											)}
 										</div>
 										<div className="flex items-center justify-between">
-											<XIcon
+											<Icons.cross
 												className="mx-2 h-4 w-4 cursor-pointer opacity-50"
 												onClick={event => {
 													event.stopPropagation()
@@ -258,13 +244,13 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 									>
 										<div
 											className={clsx(
-												'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+												'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border ',
 												selectedValues.length === options.length
-													? 'bg-primary text-primary-foreground'
-													: 'opacity-50 [&_svg]:invisible'
+													? 'bg-primary text-primary border-primary'
+													: ' border-muted-foreground opacity-50 [&_svg]:invisible'
 											)}
 										>
-											<CheckFilled />
+											<Icons.check className="text-white" />
 										</div>
 										<span>(Select All)</span>
 									</CommandItem>
@@ -279,13 +265,13 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 										>
 											<div
 												className={clsx(
-													'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+													'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border ',
 													isSelected
-														? 'bg-primary text-primary-foreground'
-														: 'opacity-50 [&_svg]:invisible'
+														? 'bg-primary border-primary text-primary'
+														: 'border-muted-foreground opacity-50 [&_svg]:invisible'
 												)}
 											>
-												<CheckFilled />
+												<Icons.check className="text-white" />
 											</div>
 											<span>{option?.label || option.value}</span>
 										</CommandItem>
@@ -301,13 +287,11 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 												actionButtonConfig.onClick()
 												setIsPopoverOpen(false)
 											}}
-											className="w-full max-w-full flex-1 cursor-pointer justify-center"
+											className="cursor-pointe w-full max-w-full flex-1 justify-center"
 										>
 											{actionButtonConfig.label}
 										</CommandItem>
 									) : null}
-
-									{}
 
 									{selectedValues.length > 0 && (
 										<>

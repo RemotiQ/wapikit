@@ -428,11 +428,11 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 													}}
 												>
 													{whatsAppBusinessAccountDetailsVisibility.whatsappBusinessAccountId ? (
-														<Icons.eye className="size-5" />
-													) : (
 														<Icons.eyeOff className="size-5" />
+													) : (
+														<Icons.eye className="size-5" />
 													)}
-													{/* <Icons.eye className="size-5" /> */}
+													
 												</span>
 											</div>
 										</FormControl>
@@ -471,9 +471,9 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 													}}
 												>
 													{whatsAppBusinessAccountDetailsVisibility.apiToken ? (
-														<Icons.eye className="size-5" />
-													) : (
 														<Icons.eyeOff className="size-5" />
+													) : (
+														<Icons.eye className="size-5" />
 													)}
 												</span>
 											</div>
