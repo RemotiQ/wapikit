@@ -6098,16 +6098,55 @@ components:
           type: array
           items:
             type: string
+          description: For media headers (IMAGE, VIDEO, DOCUMENT).
         header_text:
           type: array
           items:
             type: string
+          description: For positional header text examples.
+        header_text_named_params:
+          type: array
+          description: For named parameters in header components.
+          items:
+            type: object
+            properties:
+              param_name:
+                type: string
+              example:
+                type: string
+            required:
+              - param_name
+              - example
         body_text:
           type: array
           items:
             type: array
             items:
               type: string
+          description: For positional examples in body components.
+        body_text_named_params:
+          type: array
+          description: For named parameters in body components.
+          items:
+            type: object
+            properties:
+              param_name:
+                type: string
+              example:
+                type: string
+            required:
+              - param_name
+              - example
+
+    TemplateMessageLimitedTimeOfferParameter:
+      type: object
+      description: Limited time offer parameters, if applicable.
+      properties:
+        # Add fields as required.
+        offer_code:
+          type: string
+        expiry_minutes:
+          type: integer
 
     WhatsAppBusinessHSMWhatsAppHSMComponent:
       type: object
@@ -6129,7 +6168,7 @@ components:
         format:
           $ref: "#/components/schemas/MessageTemplateComponentFormat"
         limited_time_offer:
-          type: object
+          $ref: "#/components/schemas/TemplateMessageLimitedTimeOfferParameter"
         text:
           type: string
         type:

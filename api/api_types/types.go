@@ -1142,9 +1142,32 @@ type TemplateMessageComponentButton struct {
 
 // TemplateMessageComponentExample defines model for TemplateMessageComponentExample.
 type TemplateMessageComponentExample struct {
-	BodyText     *[][]string `json:"body_text,omitempty"`
-	HeaderHandle *[]string   `json:"header_handle,omitempty"`
-	HeaderText   *[]string   `json:"header_text,omitempty"`
+	// BodyText For positional examples in body components.
+	BodyText *[][]string `json:"body_text,omitempty"`
+
+	// BodyTextNamedParams For named parameters in body components.
+	BodyTextNamedParams *[]struct {
+		Example   string `json:"example"`
+		ParamName string `json:"param_name"`
+	} `json:"body_text_named_params,omitempty"`
+
+	// HeaderHandle For media headers (IMAGE, VIDEO, DOCUMENT).
+	HeaderHandle *[]string `json:"header_handle,omitempty"`
+
+	// HeaderText For positional header text examples.
+	HeaderText *[]string `json:"header_text,omitempty"`
+
+	// HeaderTextNamedParams For named parameters in header components.
+	HeaderTextNamedParams *[]struct {
+		Example   string `json:"example"`
+		ParamName string `json:"param_name"`
+	} `json:"header_text_named_params,omitempty"`
+}
+
+// TemplateMessageLimitedTimeOfferParameter Limited time offer parameters, if applicable.
+type TemplateMessageLimitedTimeOfferParameter struct {
+	ExpiryMinutes *int    `json:"expiry_minutes,omitempty"`
+	OfferCode     *string `json:"offer_code,omitempty"`
 }
 
 // TemplateMessageQualityScore defines model for TemplateMessageQualityScore.
@@ -1357,9 +1380,11 @@ type WhatsAppBusinessHSMWhatsAppHSMComponent struct {
 	CodeExpirationMinutes     *int                              `json:"code_expiration_minutes,omitempty"`
 	Example                   *TemplateMessageComponentExample  `json:"example,omitempty"`
 	Format                    *MessageTemplateComponentFormat   `json:"format,omitempty"`
-	LimitedTimeOffer          *map[string]interface{}           `json:"limited_time_offer,omitempty"`
-	Text                      *string                           `json:"text,omitempty"`
-	Type                      *MessageTemplateComponentType     `json:"type,omitempty"`
+
+	// LimitedTimeOffer Limited time offer parameters, if applicable.
+	LimitedTimeOffer *TemplateMessageLimitedTimeOfferParameter `json:"limited_time_offer,omitempty"`
+	Text             *string                                   `json:"text,omitempty"`
+	Type             *MessageTemplateComponentType             `json:"type,omitempty"`
 }
 
 // GetAiChatMessagesParams defines parameters for GetAiChatMessages.

@@ -168,14 +168,41 @@ export function countParameterCountInTemplateComponent(template?: MessageTemplat
 
 type TemplateParameterInputType = z.infer<typeof TemplateComponentParametersSchema>['header'][0]
 
+function extractExampleValueForUrlButton(templateUrl: string, exampleUrl: string): string {
+	// Find the placeholder start
+	console.log({ templateUrl, exampleUrl })
+	const startIndex = templateUrl.indexOf('{{1}}')
+	if (startIndex === -1) {
+		// No placeholder, return full example
+		return exampleUrl
+	}
+
+	// The prefix is everything before the placeholder
+	const prefix = templateUrl.substring(0, startIndex)
+	// Find the end of the placeholder (first "}" after the "${")
+	const endIndex = templateUrl.indexOf('}', startIndex)
+	// The suffix is everything after the placeholder, if any
+	const suffix =
+		endIndex !== -1 && endIndex + 1 < templateUrl.length
+			? templateUrl.substring(endIndex + 1)
+			: ''
+
+	let dynamicPart = exampleUrl
+	// Remove prefix if present
+	if (prefix && exampleUrl.startsWith(prefix)) {
+		dynamicPart = dynamicPart.substring(prefix.length)
+	}
+	// Remove suffix if present
+	if (suffix && dynamicPart.endsWith(suffix)) {
+		dynamicPart = dynamicPart.substring(0, dynamicPart.length - suffix.length)
+	}
+	return dynamicPart
+}
+
 export function parseTemplateComponents(
 	template?: MessageTemplateSchema
 ): z.infer<typeof TemplateComponentParametersSchema> {
-	// This function:
-	// 1. Inspects template.components.
-	// 2. For each placeholder in the header/body, or each button payload,
-	//    it creates a TemplateParameterInput with default values.
-
+	// Initialize arrays to hold parameters for each component type.
 	const headerParams: TemplateParameterInputType[] = []
 	const bodyParams: TemplateParameterInputType[] = []
 	const buttonParams: TemplateParameterInputType[] = []
@@ -188,47 +215,116 @@ export function parseTemplateComponents(
 		}
 	}
 
-	template.components?.forEach(comp => {
+	template.components.forEach(comp => {
 		const type = comp.type?.toUpperCase()
+
 		if (type === 'HEADER') {
-			// Suppose comp.text = "Your order {{1}} is ready"
-			// We'll parse out placeholders -> "1"
-			// Or if named -> "order_id"
-			// For demonstration, assume we found 1 placeholder
-			headerParams.push({
-				nameOrIndex: '1',
-				label: 'Header placeholder #1',
-				parameterType: 'static', // default
-				staticValue: ''
-			})
-		} else if (type === 'BODY') {
-			// Similarly parse placeholders from comp.text
-			// For demonstration, assume 2 placeholders
-			bodyParams.push({
-				nameOrIndex: '1',
-				label: 'Body placeholder #1',
-				parameterType: 'static',
-				staticValue: ''
-			})
-			bodyParams.push({
-				nameOrIndex: '2',
-				label: 'Body placeholder #2',
-				parameterType: 'dynamic',
-				dynamicField: 'firstName'
-			})
-		} else if (type === 'BUTTONS' && comp.buttons) {
-			// For each button that needs a param (URL, phone, etc.)
-			comp.buttons.forEach((btn, idx) => {
-				// e.g. If button type=URL and it has a placeholder
-				// We'll add an item:
-				buttonParams.push({
-					nameOrIndex: String(idx),
-					label: `Button #${idx} payload`,
-					parameterType: 'static',
-					staticValue: '' // or from example
+			// For HEADER components, check first for named parameters.
+			if (
+				comp.example?.header_text_named_params &&
+				comp.example.header_text_named_params.length > 0
+			) {
+				comp.example.header_text_named_params.forEach(param => {
+					headerParams.push({
+						nameOrIndex: param.param_name,
+						label: `Header parameter`,
+						parameterType: 'static',
+						example: param.example,
+						placeholder: `{{${param.param_name}}}`
+					})
 				})
-			})
+			} else if (comp.example?.header_text && comp.example.header_text.length > 0) {
+				// Fallback: use positional parameters from header_text (array of strings).
+				comp.example.header_text.forEach((ex, idx) => {
+					headerParams.push({
+						nameOrIndex: String(idx + 1),
+						label: `Header`,
+						parameterType: 'static',
+						example: ex,
+						placeholder: `{{${idx + 1}}}`
+					})
+				})
+			}
+			// If header is of media type (format !== 'TEXT') and no parameters added, add a default parameter.
+			if (comp.format && comp.format !== 'TEXT' && headerParams.length === 0) {
+				headerParams.push({
+					nameOrIndex: 'media_link',
+					label: 'Header media link',
+					parameterType: 'static',
+					example: 'https://example.com/image.jpg',
+					placeholder: '{{media_link}}'
+				})
+			}
+		} else if (type === 'BODY') {
+			// For BODY components, check for named parameters first.
+			if (
+				comp.example?.body_text_named_params &&
+				comp.example.body_text_named_params.length > 0
+			) {
+				comp.example.body_text_named_params.forEach(param => {
+					bodyParams.push({
+						nameOrIndex: param.param_name,
+						label: `Body parameter {{${param.param_name}}}`,
+						parameterType: 'static',
+						example: param.example,
+						placeholder: `{{${param.param_name}}}`
+					})
+				})
+			} else if (comp.example?.body_text && comp.example.body_text.length > 0) {
+				comp.example.body_text[0].forEach((ex, idx) => {
+					bodyParams.push({
+						nameOrIndex: String(idx + 1),
+						label: `Body placeholder #${idx + 1}`,
+						parameterType: 'static',
+						example: ex,
+						placeholder: `{{${idx + 1}}}`
+					})
+				})
+			}
+		} else if (type === 'BUTTONS') {
+			// For BUTTONS components, iterate over each button.
+			if (comp.buttons && comp.buttons.length > 0) {
+				comp.buttons.forEach((btn, btnIndex) => {
+					// Check if button has an example array (positional example)
+					if (btn.example && Array.isArray(btn.example) && btn.example.length > 0) {
+						btn.example.forEach((example, idx) => {
+							if (btn.type === 'URL') {
+								const actualExample = extractExampleValueForUrlButton(
+									btn.url || '',
+									example
+								)
+
+								buttonParams.push({
+									nameOrIndex: 'url',
+									label: `${btn.type} - parameter for placeholder "{{1}}"`,
+									parameterType: 'static',
+									example: actualExample,
+									placeholder: btn.url
+								})
+							} else {
+								buttonParams.push({
+									nameOrIndex: String(idx + 1),
+									label: `${btn.type} Button #${btnIndex + 1} parameter #${idx + 1}`,
+									parameterType: 'static',
+									example: example,
+									placeholder: `{{${idx + 1}}}`
+								})
+							}
+						})
+					} else if (btn.type && btn.type.toUpperCase() === 'QUICK_REPLY') {
+						// QUICK_REPLY buttons always need a parameter (using dynamic type).
+						buttonParams.push({
+							nameOrIndex: 'payload',
+							label: `Quick Reply Button #${btnIndex + 1} {{payload}}`,
+							parameterType: 'static',
+							example: 'PAYLOAD_VALUE',
+							placeholder: '{{payload}}'
+						})
+					}
+				})
+			}
 		}
+		// FOOTER components usually don't support parameters so we skip them.
 	})
 
 	return {

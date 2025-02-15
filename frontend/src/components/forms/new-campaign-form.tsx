@@ -60,6 +60,7 @@ import TemplateMessageRenderer from '../chat/template-message-renderer'
 import { Icons } from '../icons'
 import { clsx } from 'clsx'
 import TemplateParameterForm from './template-parameter-form'
+import { Skeleton } from '../ui/skeleton'
 
 interface FormProps {
 	initialData: CampaignSchema | null
@@ -88,13 +89,21 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		per_page: 50
 	})
 
-	const { data: phoneNumbersResponse, refetch: refetchPhoneNumbers } = useGetAllPhoneNumbers({
+	const {
+		data: phoneNumbersResponse,
+		refetch: refetchPhoneNumbers,
+		isFetching: isFetchingPhoneNumbers
+	} = useGetAllPhoneNumbers({
 		query: {
 			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
-	const { data: templatesResponse, refetch: refetchMessageTemplates } = useGetAllTemplates({
+	const {
+		data: templatesResponse,
+		refetch: refetchMessageTemplates,
+		isFetching: isFetchingTemplates
+	} = useGetAllTemplates({
 		query: {
 			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
@@ -364,17 +373,19 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		}
 	}, [hasUnsavedChanges])
 
+	const currentTemplateId = campaignForm.watch('templateId')
+
 	useEffect(() => {
 		const defaultValuesForTemplateParameter = parseTemplateComponents(
 			templatesResponse?.find(template => {
-				return template.id === campaignForm.getValues('templateId')
+				return template.id === currentTemplateId
 			})
 		)
 
 		templateMessageComponentParameterForm.reset({
 			...defaultValuesForTemplateParameter
 		})
-	}, [templatesResponse, campaignForm, templateMessageComponentParameterForm])
+	}, [templatesResponse, campaignForm, templateMessageComponentParameterForm, currentTemplateId])
 
 	return (
 		<>
@@ -411,7 +422,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						'mx-auto max-h-[80vh] min-h-[80vh]',
 						countParameterCountInTemplateComponent(
 							templatesResponse?.find(template => {
-								return template.id === campaignForm.getValues('templateId')
+								return template.id === currentTemplateId
 							})
 						) > 0
 							? ''
@@ -420,7 +431,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 				>
 					{countParameterCountInTemplateComponent(
 						templatesResponse?.find(template => {
-							return template.id === campaignForm.getValues('templateId')
+							return template.id === currentTemplateId
 						})
 					) > 0 ? (
 						<div className="mx-auto w-full">
@@ -442,6 +453,9 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 												templateMessageComponentParameterForm
 											}
 											onSubmit={handleTemplateComponentParameterSubmit}
+											closeModal={() => {
+												setIsTemplateComponentsInputModalOpen(() => false)
+											}}
 										/>
 									</ScrollArea>
 								</div>
@@ -459,10 +473,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											<TemplateMessageRenderer
 												templateMessage={templatesResponse?.find(
 													template => {
-														return (
-															template.id ===
-															campaignForm.getValues('templateId')
-														)
+														return template.id === currentTemplateId
 													}
 												)}
 												parameterValues={templateMessageComponentParameterForm.getValues()}
@@ -489,10 +500,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											<TemplateMessageRenderer
 												templateMessage={templatesResponse?.find(
 													template => {
-														return (
-															template.id ===
-															campaignForm.getValues('templateId')
-														)
+														return template.id === currentTemplateId
 													}
 												)}
 												parameterValues={templateMessageComponentParameterForm.getValues()}
@@ -848,72 +856,83 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 							) : null}
 						</div>
 
-						<div className="sticky bottom-0 mr-auto flex w-full flex-1 items-start justify-start gap-2 bg-background py-5">
-							<Button
-								disabled={loading || isBusy || !campaignForm.formState.isDirty}
-								className="ml-auto flex-1"
-								type="submit"
-							>
-								{action}
-							</Button>
-							{initialData && (
-								<>
-									{countParameterCountInTemplateComponent(
-										templatesResponse?.find(
-											template =>
-												template.id === campaignForm.getValues('templateId')
-										)
-									) > 0 ? (
-										<Button
-											disabled={
-												loading ||
-												isBusy ||
-												!campaignForm.getValues('templateId')
-											}
-											variant="secondary"
-											type="button"
-											onClick={() => {
-												setIsTemplateComponentsInputModalOpen(true)
-											}}
-											className="flex flex-1 items-center justify-center gap-1"
-										>
-											<Icons.pencilEdit className="h-4 w-4" />
-											Edit Template Parameters
-										</Button>
-									) : (
-										<Button
-											disabled={
-												loading ||
-												isBusy ||
-												!campaignForm.getValues('templateId')
-											}
-											variant="secondary"
-											type="button"
-											onClick={() => {
-												setIsTemplateComponentsInputModalOpen(true)
-											}}
-											className="flex flex-1 items-center justify-center gap-1"
-										>
-											<Icons.eye className="h-4 w-4" />
-											Preview Template Parameters
-										</Button>
-									)}
+						{isFetchingPhoneNumbers || isFetchingTemplates ? (
+							<div className="sticky bottom-0 mr-auto flex w-full flex-1 items-start justify-start gap-2 bg-background py-5">
+								{Array.from({ length: 3 }).map((_, index) => (
+									<Skeleton className="h-10 w-full flex-1" key={index} />
+								))}
+							</div>
+						) : (
+							<div className="sticky bottom-0 mr-auto flex w-full flex-1 items-start justify-start gap-2 bg-background py-5">
+								<Button
+									disabled={loading || isBusy || !campaignForm.formState.isDirty}
+									className="ml-auto flex-1"
+									type="submit"
+								>
+									{action}
+								</Button>
+								{initialData && (
+									<>
+										{countParameterCountInTemplateComponent(
+											templatesResponse?.find(
+												template =>
+													template.id ===
+													campaignForm.getValues('templateId')
+											)
+										) > 0 ? (
+											<Button
+												disabled={
+													loading ||
+													isBusy ||
+													!campaignForm.getValues('templateId')
+												}
+												variant="secondary"
+												type="button"
+												onClick={() => {
+													setIsTemplateComponentsInputModalOpen(true)
+												}}
+												className="flex flex-1 items-center justify-center gap-1"
+											>
+												<Icons.pencilEdit className="h-4 w-4" />
+												Edit Template Parameters
+											</Button>
+										) : (
+											<Button
+												disabled={
+													loading ||
+													isBusy ||
+													!campaignForm.getValues('templateId')
+												}
+												variant="secondary"
+												type="button"
+												onClick={() => {
+													setIsTemplateComponentsInputModalOpen(true)
+												}}
+												className="flex flex-1 items-center justify-center gap-1"
+											>
+												<Icons.eye className="h-4 w-4" />
+												Preview Template Parameters
+											</Button>
+										)}
 
-									<Button
-										disabled={loading || isBusy}
-										variant="destructive"
-										type="button"
-										onClick={() => {
-											deleteCampaign().catch(error => console.error(error))
-										}}
-										className="flex flex-1 items-center justify-center gap-1"
-									>
-										<Trash className="h-4 w-4" />
-										Delete
-									</Button>
-								</>
-							)}
-						</div>
+										<Button
+											disabled={loading || isBusy}
+											variant="destructive"
+											type="button"
+											onClick={() => {
+												deleteCampaign().catch(error =>
+													console.error(error)
+												)
+											}}
+											className="flex flex-1 items-center justify-center gap-1"
+										>
+											<Trash className="h-4 w-4" />
+											Delete
+										</Button>
+									</>
+								)}
+							</div>
+						)}
 					</div>
 				</form>
 			</Form>

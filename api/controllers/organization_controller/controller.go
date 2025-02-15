@@ -1,6 +1,7 @@
 package organization_controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -1868,6 +1869,10 @@ func getAllMessageTemplates(context interfaces.ContextWithSession) error {
 	})
 
 	templateResponse, err := wapiClient.Business.Template.FetchAll()
+
+	jsonString, err := json.Marshal(templateResponse)
+
+	context.App.Logger.Info("templateResponse", string(jsonString))
 
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())

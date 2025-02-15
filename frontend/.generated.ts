@@ -1100,15 +1100,38 @@ export interface TemplateMessageComponentButton {
 	url?: string
 }
 
+export type TemplateMessageComponentExampleHeaderTextNamedParamsItem = {
+	param_name: string
+	example: string
+}
+
+export type TemplateMessageComponentExampleBodyTextNamedParamsItem = {
+	param_name: string
+	example: string
+}
+
 export interface TemplateMessageComponentExample {
+	/** For media headers (IMAGE, VIDEO, DOCUMENT). */
 	header_handle?: string[]
+	/** For positional header text examples. */
 	header_text?: string[]
+	/** For named parameters in header components. */
+	header_text_named_params?: TemplateMessageComponentExampleHeaderTextNamedParamsItem[]
+	/** For positional examples in body components. */
 	body_text?: string[][]
+	/** For named parameters in body components. */
+	body_text_named_params?: TemplateMessageComponentExampleBodyTextNamedParamsItem[]
+}
+
+/**
+ * Limited time offer parameters, if applicable.
+ */
+export interface TemplateMessageLimitedTimeOfferParameter {
+	offer_code?: string
+	expiry_minutes?: number
 }
 
 export type WhatsAppBusinessHSMWhatsAppHSMComponentCardsItem = { [key: string]: unknown }
-
-export type WhatsAppBusinessHSMWhatsAppHSMComponentLimitedTimeOffer = { [key: string]: unknown }
 
 export interface WhatsAppBusinessHSMWhatsAppHSMComponent {
 	add_security_recommendation?: boolean
@@ -1117,7 +1140,7 @@ export interface WhatsAppBusinessHSMWhatsAppHSMComponent {
 	code_expiration_minutes?: number
 	example?: TemplateMessageComponentExample
 	format?: MessageTemplateComponentFormat
-	limited_time_offer?: WhatsAppBusinessHSMWhatsAppHSMComponentLimitedTimeOffer
+	limited_time_offer?: TemplateMessageLimitedTimeOfferParameter
 	text?: string
 	type?: MessageTemplateComponentType
 }

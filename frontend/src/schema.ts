@@ -118,7 +118,9 @@ export const TemplateParameterInputSchema = z.object({
 	label: z.string(),
 	parameterType: z.enum(['static', 'dynamic']),
 	dynamicField: z.string().optional(),
-	staticValue: z.string().optional()
+	staticValue: z.string().optional(),
+	example: z.string().optional(),
+	placeholder: z.string().optional()
 })
 
 export const TemplateComponentParametersSchema = z.object({

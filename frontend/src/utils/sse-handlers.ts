@@ -41,13 +41,11 @@ export function messageEventHandler(params: {
 export function conversationAssignedEventHandler(
 	message: z.infer<
 		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ChatAssignment]['shape']['data']
-	>,
+	>
 ): boolean {
 	try {
 		const { conversationId } = message
 		console.log({ conversationId })
-
-
 
 		// ! get the conversation from the store
 		// ! update the conversation with the new assignee

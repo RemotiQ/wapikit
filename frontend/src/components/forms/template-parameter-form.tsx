@@ -19,10 +19,11 @@ import { type TemplateComponentParametersSchema } from '~/schema'
 interface TemplateParameterFormProps {
 	onSubmit: (data: z.infer<typeof TemplateComponentParametersSchema>) => void
 	templateParameterForm: UseFormReturn<z.infer<typeof TemplateComponentParametersSchema>>
+	closeModal: () => void
 }
 
 const TemplateParameterForm = (props: TemplateParameterFormProps) => {
-	const { onSubmit, templateParameterForm } = props
+	const { onSubmit, templateParameterForm, closeModal } = props
 
 	const CONTACT_FIELD_OPTIONS = [
 		{ label: 'First Name', value: 'firstName' },
@@ -56,9 +57,14 @@ const TemplateParameterForm = (props: TemplateParameterFormProps) => {
 						name={`${compType}.${fieldIndex}.staticValue` as const}
 						render={({ field }) => (
 							<FormItem className="flex-1">
-								<FormLabel>{fieldValue.label}</FormLabel>
+								<FormLabel>
+									{fieldValue.label} -{' '}
+									<code className="text-xs italic text-red-500">
+										Ex: {fieldValue.example}
+									</code>
+								</FormLabel>
 								<FormControl>
-									<Input placeholder="Type your text here..." {...field} />
+									<Input placeholder={fieldValue.placeholder} {...field} />
 								</FormControl>
 							</FormItem>
 						)}
@@ -73,14 +79,19 @@ const TemplateParameterForm = (props: TemplateParameterFormProps) => {
 						name={`${compType}.${fieldIndex}.dynamicField` as const}
 						render={({ field }) => (
 							<FormItem className="flex-1">
-								<FormLabel>{fieldValue.label}</FormLabel>
+								<FormLabel>
+									{fieldValue.label} -{' '}
+									<code className="text-xs italic text-red-500">
+										Ex: {fieldValue.example}
+									</code>
+								</FormLabel>
 								<FormControl>
 									<Select
 										onValueChange={val => field.onChange(val)}
 										value={field.value ?? ''}
 									>
 										<SelectTrigger>
-											<SelectValue placeholder="Select a field..." />
+											<SelectValue placeholder={fieldValue.placeholder} />
 										</SelectTrigger>
 										<SelectContent>
 											{CONTACT_FIELD_OPTIONS.map(opt => (
@@ -192,7 +203,14 @@ const TemplateParameterForm = (props: TemplateParameterFormProps) => {
 					<Button type="submit" className="w-full flex-1" variant="default">
 						Save
 					</Button>
-					<Button type="button" className="w-full flex-1" variant="outline">
+					<Button
+						type="button"
+						onClick={() => {
+							closeModal()
+						}}
+						className="w-full flex-1"
+						variant="outline"
+					>
 						Cancel
 					</Button>
 				</div>
