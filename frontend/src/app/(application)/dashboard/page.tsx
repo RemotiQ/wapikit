@@ -87,7 +87,7 @@ export default function Page() {
 						description:
 							'Get started with our documentation to understand how to use the platform.',
 						href: '/docs',
-						icon: 'page'
+						icon: 'documentation'
 					}
 				] as TipCardPropType[])
 			: [])

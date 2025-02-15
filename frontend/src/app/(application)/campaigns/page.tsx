@@ -27,6 +27,7 @@ import { Icons } from '~/components/icons'
 import { LinkClicks } from '~/components/analytics/link-clicks'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { ScrollArea } from '~/components/ui/scroll-area'
+import { Tag } from '~/components/ui/tag'
 
 const CampaignsPage = () => {
 	const searchParams = useSearchParams()
@@ -206,7 +207,7 @@ const CampaignsPage = () => {
 											campaignData.campaign.status === 'Cancelled' ||
 											campaignData.campaign.status === 'Finished'
 										}
-										className="flex flex-row gap-1"
+										className="flex flex-row gap-2"
 									>
 										<Icons.edit className="size-4" />
 										Edit
@@ -224,7 +225,7 @@ const CampaignsPage = () => {
 										}}
 										className="flex flex-row gap-2"
 									>
-										<Icons.edit className="size-4" />
+										<Icons.trash className="size-4" />
 										Delete
 									</Button>
 									{campaignData.campaign.status === 'Running' ? (
@@ -300,9 +301,9 @@ const CampaignsPage = () => {
 													).catch(console.error)
 												}}
 												size={'medium'}
-												className="flex flex-row"
+												className="flex flex-row gap-2"
 											>
-												<Icons.arrowRight className="size-4" />
+												<Icons.send className="size-4" />
 												Send
 											</Button>
 										</>
@@ -356,118 +357,200 @@ const CampaignsPage = () => {
 							</div>
 
 							{campaignData ? (
-								<div className="flex flex-row items-center justify-center gap-4">
-									<Card className="flex h-full flex-1 flex-col items-center rounded-lg">
-										<CardContent className="mt-4 flex flex-row items-start justify-between gap-2">
-											<div className="flex h-full flex-1 flex-col items-start justify-start gap-2 rounded-md p-4">
-												<div className="flex flex-row items-center">
-													<span className="text-sm font-semibold">
-														name :&nbsp;{' '}
-													</span>{' '}
-													<div className="flex flex-wrap items-center justify-center gap-4">
-														{campaignData.campaign.name}
-														<Badge
-															variant={
-																campaignData.campaign.status ===
-																'Draft'
-																	? 'outline'
-																	: campaignData.campaign
-																				.status ===
-																		  'Cancelled'
-																		? 'destructive'
-																		: 'default'
-															}
-															className={clsx(
-																campaignData.campaign.status ===
-																	'Paused' ||
-																	campaignData.campaign.status ===
-																		'Scheduled'
-																	? 'bg-yellow-500'
-																	: campaignData.campaign
-																				.status ===
-																		  'Cancelled'
-																		? 'bg-red-300'
-																		: ''
-															)}
-														>
-															{campaignData.campaign.status}
-														</Badge>
-														{campaignData.campaign.status ===
-														'Running' ? (
-															<div className="flex h-full w-fit items-center justify-center">
-																<div className="rotate h-4 w-4 animate-spin rounded-full border-4 border-solid  border-l-primary" />
-															</div>
-														) : null}
+								<div className="flex flex-row items-center justify-center gap-4 ">
+									<Card className="flex h-full w-full items-center  gap-x-4 rounded-lg !py-4">
+										<CardContent className="grid h-full w-full grid-cols-5 items-start justify-between gap-2 gap-x-16 rounded-lg">
+											<div className="col-span-3">
+												<div className="flex flex-row items-center justify-start gap-3">
+													<Icons.announcement className="size-4 text-center" />
+													<div className="font-medium text-foreground">
+														Campaign Details
 													</div>
 												</div>
-
-												<p className="text-sm text-muted-foreground">
-													description: {campaignData.campaign.description}
-												</p>
-												<div className="flex h-full flex-col gap-6 pt-2">
-													{/* sent to lists */}
-													<div className="flex flex-row items-center">
-														<span className="text-sm font-semibold">
-															Sent To:&nbsp;{' '}
-														</span>{' '}
-														<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
-															{campaignData.campaign.lists.length ===
-																0 && (
-																<Badge variant={'outline'}>
-																	None
-																</Badge>
-															)}
-															{campaignData.campaign.lists.map(
-																list => {
-																	return (
-																		<Badge key={list.uniqueId}>
-																			{list.name}
-																		</Badge>
-																	)
+												<Separator className="my-2" />
+												<div className="flex h-full w-full flex-1 flex-col items-start justify-start gap-4 py-2">
+													<div className="flex w-full flex-row items-center justify-start gap-x-4">
+														<p className="text-sm font-medium text-foreground min-w-28">
+															Name
+														</p>
+														<div className="flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm font-normal">
+															{campaignData.campaign.name}
+															<Badge
+																variant={
+																	campaignData.campaign.status ===
+																	'Draft'
+																		? 'outline'
+																		: campaignData.campaign
+																					.status ===
+																			  'Cancelled'
+																			? 'destructive'
+																			: 'default'
 																}
-															)}
+																className={clsx(
+																	campaignData.campaign.status ===
+																		'Paused' ||
+																		campaignData.campaign
+																			.status === 'Scheduled'
+																		? 'bg-yellow-500'
+																		: campaignData.campaign
+																					.status ===
+																			  'Cancelled'
+																			? 'bg-red-300'
+																			: ''
+																)}
+															>
+																{campaignData.campaign.status}
+															</Badge>
+															{campaignData.campaign.status ===
+															'Running' ? (
+																<div className="flex h-full w-fit items-center justify-center">
+																	<div className="rotate h-4 w-4 animate-spin rounded-full border-4 border-solid  border-l-primary" />
+																</div>
+															) : null}
+														</div>
+													</div>
+													<div className="flex w-full flex-row items-start justify-start gap-x-4">
+														<p className="text-sm font-medium text-foreground min-w-28">
+															Description
+														</p>
+
+														<div className="line-clamp-3 flex w-full flex-wrap items-center justify-center gap-4 text-balance font-normal text-muted-foreground text-sm">
+															{campaignData.campaign.description}
 														</div>
 													</div>
 
-													{/* tags */}
-													<div className="flex flex-row items-center">
-														<span className="text-sm font-semibold">
-															Tags:&nbsp;{' '}
-														</span>{' '}
-														<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
-															{campaignData.campaign.tags.length ===
-																0 && (
-																<Badge variant={'outline'}>
-																	None
-																</Badge>
-															)}
-															{campaignData.campaign.tags.map(tag => {
-																return (
-																	<Badge key={tag.uniqueId}>
-																		{tag.label}
+													<div className="flex h-full w-full flex-col gap-4">
+														{/* sent to lists */}
+														<div className="flex w-full flex-row items-center justify-start gap-x-4">
+															<p className="text-sm font-medium text-foreground min-w-28">
+																Sent
+															</p>
+
+															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+																{campaignData.campaign.lists
+																	.length === 0 && (
+																	<Badge variant={'outline'}>
+																		None
 																	</Badge>
-																)
-															})}
+																)}
+																{campaignData.campaign.lists.map(
+																	list => {
+																		return (
+																			<Badge
+																				key={list.uniqueId}
+																			>
+																				{list.name}
+																			</Badge>
+																		)
+																	}
+																)}
+															</div>
 														</div>
-													</div>
 
-													{/* created on */}
-													<div className="flex flex-row items-center">
-														<span className="text-sm font-semibold">
-															created on:&nbsp;{' '}
-														</span>{' '}
-														<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
-															{dayjs(
-																campaignData.campaign.createdAt
-															).format('DD MMM, YYYY')}
+														{/* tags */}
+														<div className="flex w-full flex-row items-center justify-start gap-x-4 ">
+															<p className="text-sm font-medium text-foreground min-w-28">
+																Tag
+															</p>
+															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+																{campaignData.campaign.tags
+																	.length === 0 && (
+																	<Badge variant={'outline'}>
+																		None
+																	</Badge>
+																)}
+																{campaignData.campaign.tags.map(
+																	tag => {
+																		return (
+																			<Tag
+																				label={tag.label}
+																				key={tag.uniqueId}
+																			/>
+																		)
+																	}
+																)}
+															</div>
+														</div>
+
+														{/* created on */}
+														<div className="flex w-full flex-row items-center justify-start gap-x-4">
+															<p className="text-sm font-medium text-foreground min-w-28">
+																Create on
+															</p>
+															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate  font-normal text-sm text-muted-foreground">
+																{dayjs(
+																	campaignData.campaign.createdAt
+																).format('DD MMM, YYYY')}
+															</div>
 														</div>
 													</div>
+												</div>
+											</div>
+											<div className="col-span-2">
+												<div className="flex flex-row items-center justify-start gap-3">
+													<Icons.analytics className="size-4 text-center" />
+													<div className="font-medium text-foreground">
+														Message Analytics
+													</div>
+												</div>
+												<Separator className="my-2" />
+												<div className="flex w-full flex-col items-start justify-start gap-4 py-2">
+													{[
+														{
+															label: 'Sent',
+															icon: 'check',
+															className: '',
+															count: 0
+														},
+														{
+															label: 'Delivered',
+															className: '',
+															icon: 'doubleCheck',
+															count: 0
+														},
+														{
+															label: 'Read',
+															icon: 'doubleCheck',
+															className: 'text-green-500',
+															count: 0
+														},
+														{
+															label: 'Failed',
+															className: '',
+															icon: 'alertTriangle',
+															count: 0
+														}
+													].map(item => {
+														const Icon =
+															Icons[item.icon as keyof typeof Icons]
+														return (
+															<div
+																className="flex w-full max-w-[50%] flex-1 justify-between "
+																key={item.label}
+															>
+																<div className="flex items-center justify-center gap-4 font-medium text-muted-foreground">
+																	<Icon
+																		className={clsx(
+																			'size-5',
+																			item.className
+																		)}
+																	/>
+																	<p className="text-sm">
+																		{item.label}
+																	</p>
+																</div>
+																<div className="text-center text-foreground">
+																	{item.count}
+																</div>
+															</div>
+														)
+													})}
 												</div>
 											</div>
 										</CardContent>
 									</Card>
 
-									<Card className="flex h-full w-full max-w-[25rem] flex-col items-center rounded-lg">
+									{/* <Card className="flex h-full w-full max-w-[25rem] flex-col items-center rounded-lg">
 										<CardContent className="h-full w-full !py-4">
 											<div className="flex flex-row items-center justify-center gap-3">
 												<Icons.analytics className="size-4 text-center" />
@@ -520,7 +603,7 @@ const CampaignsPage = () => {
 												})}
 											</div>
 										</CardContent>
-									</Card>
+									</Card> */}
 								</div>
 							) : null}
 

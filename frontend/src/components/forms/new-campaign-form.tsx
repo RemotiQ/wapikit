@@ -11,7 +11,6 @@ import {
 import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '~/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -639,8 +638,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											Message Template
 											<Button
 												disabled={isBusy}
-												size={'sm'}
-												variant={'secondary'}
+												size={'badge'}
+												variant={'outline'}
 												type="button"
 												onClick={e => {
 													e.preventDefault()
@@ -653,7 +652,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 														.catch(error => console.error(error))
 												}}
 											>
-												<ReloadIcon className="size-3" />
+												<Icons.regenerate className="size-3" />
 											</Button>
 										</FormLabel>
 										<FormControl>
@@ -726,9 +725,9 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											Phone Number
 											<Button
 												disabled={isBusy}
-												size={'sm'}
+												variant={'outline'}
+												size={'badge'}
 												type="button"
-												variant={'secondary'}
 												onClick={e => {
 													e.preventDefault()
 													refetchPhoneNumbers()
@@ -740,7 +739,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 														.catch(error => console.error(error))
 												}}
 											>
-												<ReloadIcon className="size-3" />
+												<Icons.regenerate className="size-3" />
 											</Button>
 										</FormLabel>
 										<FormControl>
@@ -908,7 +907,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 										}}
 										className="flex flex-1 items-center justify-center gap-1"
 									>
-										<Trash className="h-4 w-4" />
+										<Icons.trash className="h-4 w-4" />
 										Delete
 									</Button>
 								</>
