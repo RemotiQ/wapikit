@@ -4,8 +4,6 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
-// import { Cross2Icon } from '@radix-ui/react-icons'
-
 import { clsx as cn } from 'clsx'
 
 const Dialog = DialogPrimitive.Root

@@ -1,9 +1,6 @@
 'use client'
 
-import { DotFilledIcon, GitHubLogoIcon } from '@radix-ui/react-icons'
 import { clsx } from 'clsx'
-import { CheckIcon } from '@radix-ui/react-icons'
-import { StarFilledIcon } from '@radix-ui/react-icons'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -63,7 +60,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 										<div className="group relative flex items-start">
 											<span className="flex h-9 items-center">
 												<span className="relative z-10 flex items-center justify-center rounded-full border-2 border-[#25d366] p-2 backdrop-blur-md">
-													<CheckIcon
+													<Icons.check
 														className={`size-4 text-[#25d366]`}
 													/>
 												</span>
@@ -92,7 +89,7 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 										>
 											<span className="flex h-9 items-center">
 												<span className="relative z-10 flex items-center justify-center rounded-full border-2 border-primary-foreground p-2 backdrop-blur-md">
-													<DotFilledIcon
+													<Icons.dotFilled
 														className={`size-4 text-white`}
 													/>
 												</span>
@@ -142,9 +139,9 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 					className="group relative z-10 mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
 				>
 					<blockquote className=" flex items-center gap-2">
-						<GitHubLogoIcon className="text-gray-400" />
+						<Icons.github className="text-gray-400" />
 						<p className="text-sm font-bold text-gray-400">Star us on Github</p>
-						<StarFilledIcon className="size-4  text-yellow-400" />
+						<Icons.starfilled className="size-4  text-yellow-400" />
 					</blockquote>
 				</Link>
 			</div>

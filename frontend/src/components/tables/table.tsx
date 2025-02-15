@@ -27,7 +27,6 @@ import {
 	TableHeader,
 	TableRow
 } from '~/components/ui/table'
-import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ScrollArea, ScrollBar } from '~/components/ui/scroll-area'
 import { type TableCellActionProps } from '~/types'
@@ -343,7 +342,7 @@ export function TableComponent<TData, TValue>({
 								onClick={() => table.setPageIndex(0)}
 								disabled={!table.getCanPreviousPage()}
 							>
-								<DoubleArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
+								<Icons.doubleArrowLeft className="h-4 w-4" aria-hidden="true" />
 							</Button>
 							<Button
 								aria-label="Go to previous page"
@@ -370,7 +369,7 @@ export function TableComponent<TData, TValue>({
 								onClick={() => table.setPageIndex(table.getPageCount() - 1)}
 								disabled={!table.getCanNextPage()}
 							>
-								<DoubleArrowRightIcon className="h-4 w-4" aria-hidden="true" />
+								<Icons.doubleArrowRight className="h-4 w-4" aria-hidden="true" />
 							</Button>
 						</div>
 					)}

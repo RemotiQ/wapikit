@@ -51,7 +51,7 @@ export function DashboardCampaignCard({
 						</div>
 						<div className="flex flex-row items-center gap-2">
 							<span className="flex items-center gap-2 text-sm">
-								<Icons.user className="size-4" />
+								<Icons.contacts className="size-4" />
 								Total Recipients:
 							</span>
 							<span>
@@ -124,7 +124,7 @@ export function DashboardCampaignCard({
 								className="hover:underline-none my-2 flex w-fit items-center  bg-secondary"
 								size={'sm'}
 							>
-								<Icons.info className="size-4" />
+								<Icons.infoCircle className="size-4" />
 								View Details
 							</Button>
 						</Link>

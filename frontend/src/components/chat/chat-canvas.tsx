@@ -5,7 +5,6 @@ import { CardHeader, CardFooter } from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Button } from '~/components/ui/button'
-import { SendIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
 	DropdownMenu,
@@ -182,7 +181,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		},
 		{
 			label: 'Info',
-			icon: 'info',
+			icon: 'infoCircle',
 			onClick: () => {
 				writeProperty({
 					contactSheetContactId: currentConversation?.contact.uniqueId
@@ -742,7 +741,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 								)}
 
 								<Button type="submit" className="rounded-lg" disabled={isBusy}>
-									<SendIcon className="size-4" />
+									<Icons.send className="size-4" />
 								</Button>
 							</form>
 						</CardFooter>

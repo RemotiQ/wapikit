@@ -16,7 +16,6 @@ import {
 	CommandList,
 	CommandSeparator
 } from './ui/command'
-import { CaretSortIcon } from '@radix-ui/react-icons'
 import { Icons } from './icons'
 
 const multiSelectVariants = cva(
@@ -202,7 +201,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 												orientation="vertical"
 												className="mr-2 flex h-full min-h-6"
 											/>
-											<CaretSortIcon className="h-4 w-4 opacity-50" />
+											<Icons.caretSort className="h-4 w-4 opacity-50" />
 										</div>
 									</div>
 								) : (
@@ -210,14 +209,14 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
 										<span className="mx-2 text-sm text-muted-foreground">
 											{placeholder}
 										</span>
-										<CaretSortIcon className="h-4 w-4 opacity-50" />
+										<Icons.caretSort className="h-4 w-4 opacity-50" />
 									</div>
 								)}
 							</>
 						) : (
 							<div className="mx-auto flex w-full items-center justify-between">
 								<span className="mx-2 text-sm text-gray-300">{placeholder}</span>
-								<CaretSortIcon className="h-4 w-4 opacity-50" />
+								<Icons.caretSort className="h-4 w-4 opacity-50" />
 							</div>
 						)}
 					</div>

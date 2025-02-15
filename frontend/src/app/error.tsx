@@ -12,8 +12,8 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
 				Oops! Something went wrong{' '}
 			</h2>
 			<div className="flex gap-4">
-				<Button onClick={() => reset()} size={'medium'}>
-					<Icons.arrowClockwise className="size-6 text-white" /> Try again
+				<Button onClick={() => reset()} size={'medium'} className="gap-2 ">
+					<Icons.regenerate className="size-6 text-white" /> Try again
 				</Button>
 				<Link title="contact-support" href={`${WEBSITE_URL}/contact-us`} rel="">
 					<Button size={'medium'} variant={'outline'}>

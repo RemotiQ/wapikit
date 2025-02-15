@@ -2,8 +2,8 @@
 import { DashboardNav } from '~/components/dashboard-nav'
 import { Sheet, SheetContent, SheetTrigger } from '~/components/ui/sheet'
 import { navItems } from '~/constants'
-import { MenuIcon } from 'lucide-react'
 import { useState } from 'react'
+import { Icons } from '../icons'
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>
 
@@ -13,7 +13,7 @@ export function MobileSidebar(props: SidebarProps) {
 		<>
 			<Sheet open={open} onOpenChange={setOpen} {...props}>
 				<SheetTrigger asChild>
-					<MenuIcon />
+					<Icons.menu />
 				</SheetTrigger>
 				<SheetContent side="left" className="!px-0">
 					<div className="space-y-4 py-4">
