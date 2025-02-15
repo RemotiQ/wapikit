@@ -30,11 +30,9 @@ func NewConversationService(db *sql.DB, logger *slog.Logger, redis *cache_servic
 
 func (service *ConversationService) ParseDbMessageToApiMessage(message model.Message) api_types.MessageSchema {
 	var apiMsg api_types.MessageSchema
-
 	// For each message type, we create a concrete instance,
 	// populate the common (base) fields, and then use the corresponding FromX function
 	// to set the union.
-
 	// We'll try to extract the raw union data if present.
 	var rawData map[string]interface{}
 	if message.MessageData != nil {
@@ -299,4 +297,16 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 	default:
 		return nil, fmt.Errorf("unsupported message type: %s", messageType)
 	}
+}
+
+func (service *ConversationService) GetUnreadMessagesCountByConversationId(conversationId string) (int, error) {
+	// query := "SELECT COUNT(*) FROM messages WHERE conversation_id = $1 AND status = $2"
+	// var count int
+	// err := service.Db.QueryRow(query, conversationId, model.MessageStatusEnum_Unread).Scan(&count)
+	// if err != nil {
+	// 	return 0, err
+	// }
+	// return count, nil
+
+	return 0, nil
 }

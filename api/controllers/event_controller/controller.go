@@ -108,8 +108,6 @@ func handleEventsSubscription(context interfaces.ContextWithoutSession) error {
 				continue
 			}
 
-			logger.Info("Sending event: %s", message)
-
 			fmt.Fprintf(context.Response(), "event: %s\ndata: %s\n\n", eventType, message)
 			context.Response().Flush()
 

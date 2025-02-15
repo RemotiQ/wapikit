@@ -8,6 +8,7 @@ import { generateUniqueId } from '~/reusable-functions'
 import { type ConversationSchema, ConversationStatusEnum } from 'root/.generated'
 import { listStringEnumMembers } from 'ts-enum-utils'
 import { useRouter } from 'next/navigation'
+import LastMessagePreview from './last-message-preview'
 
 enum ConversationListSidebarTab {
 	All = 'All',
@@ -35,7 +36,6 @@ const RenderConversations = ({
 			)}
 
 			{conversations.map((conversation, index) => {
-				const lastMessage = ''
 				return (
 					<>
 						<div
@@ -57,7 +57,7 @@ const RenderConversations = ({
 									<div className="flex items-center gap-2">
 										<p className="text-sm"> {conversation.contact.name}</p>
 									</div>
-									<p className="text-xs text-gray-500">{lastMessage || ''}</p>
+									<LastMessagePreview conversation={conversation} />
 								</div>
 								<div className="flex items-center justify-center">
 									{conversation.numberOfUnreadMessages > 0 && (

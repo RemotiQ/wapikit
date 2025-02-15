@@ -3,14 +3,15 @@ import { toast } from 'sonner'
 import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { createRoot } from 'react-dom/client'
 import { AlertModal } from './components/modal/alert-modal'
-import { MessageTypeEnum, type MessageTemplateSchema } from 'root/.generated'
+import { MessageTypeEnum, type MessageTemplateSchema, type MessageSchema } from 'root/.generated'
 import { Icons } from './components/icons'
 import { APP_BASE_DOMAIN } from './constants'
 import { type UtmTags } from './types'
 import { type PricingPlan } from 'root/cloud_generated'
 import { type z } from 'zod'
 import { type TemplateComponentParametersSchema } from './schema'
-import mime from 'mime-types'
+import { lookup } from 'mime-types'
+import dayjs from 'dayjs'
 
 export function generateUniqueId() {
 	return v4()
@@ -338,7 +339,7 @@ export async function displayRazorpayCheckoutModal(params: {
  */
 export function determineMessageType(file: File): MessageTypeEnum {
 	// Use file.type if provided, otherwise fall back to looking it up by extension.
-	const mimeTypeFromFile = file.type || (mime.lookup(file.name) as string) || ''
+	const mimeTypeFromFile = file.type || (lookup(file.name) as string) || ''
 	const mimeType = mimeTypeFromFile.toLowerCase()
 	const fileName = file.name.toLowerCase()
 
@@ -383,4 +384,54 @@ export function determineMessageType(file: File): MessageTypeEnum {
 	}
 
 	throw new Error('Unsupported file type')
+}
+
+type GroupedMessages = {
+	date: dayjs.Dayjs
+	messages: MessageSchema[]
+}
+
+/**
+ * Group an array of messages by their date (ignoring time).
+ */
+export function groupMessagesByDate(messages: MessageSchema[]): GroupedMessages[] {
+	const groups: GroupedMessages[] = []
+	let currentDay: dayjs.Dayjs = dayjs()
+	let currentGroup: MessageSchema[] = []
+
+	for (const msg of messages) {
+		const msgDay = dayjs(msg.createdAt).startOf('day')
+		if (!currentDay || !msgDay.isSame(currentDay)) {
+			// If we already have a current group, push it.
+			if (currentGroup.length > 0) {
+				groups.push({ date: currentDay, messages: currentGroup })
+			}
+			// Start a new group for this day.
+			currentDay = msgDay
+			currentGroup = [msg]
+		} else {
+			// Same day, keep adding messages to the current group.
+			currentGroup.push(msg)
+		}
+	}
+
+	// Push the final group if it exists.
+	if (currentGroup.length > 0 && currentDay) {
+		groups.push({ date: currentDay, messages: currentGroup })
+	}
+
+	return groups
+}
+
+/**
+ * Return a label for the given date, such as "Today", "Yesterday", or "DD MMM".
+ */
+export function getDayLabel(date: dayjs.Dayjs): string {
+	if (date.isSame(dayjs(), 'day')) {
+		return 'Today'
+	}
+	if (date.isSame(dayjs().subtract(1, 'day'), 'day')) {
+		return 'Yesterday'
+	}
+	return date.format('DD MMM')
 }

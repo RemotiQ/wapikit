@@ -14,7 +14,7 @@ import {
 	DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 import { Icons } from '../icons'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import {
 	type ConversationSchema,
 	type MessageSchema,
@@ -28,7 +28,13 @@ import {
 } from 'root/.generated'
 import MessageRenderer from './message-renderer'
 import { useRouter } from 'next/navigation'
-import { determineMessageType, errorNotification, successNotification } from '~/reusable-functions'
+import {
+	determineMessageType,
+	errorNotification,
+	getDayLabel,
+	groupMessagesByDate,
+	successNotification
+} from '~/reusable-functions'
 import { Modal } from '../ui/modal'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select'
@@ -379,20 +385,22 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		]
 	)
 
-	useEffect(() => {
-		// check if input is focussed, on enter sendMessage function should be called
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (
-				document.activeElement === textInputRef.current &&
-				event.key === 'Enter' &&
-				messageContent
-			) {
-				sendMessage(messageContent).catch(error => console.error(error))
-			}
-		}
+	// useEffect(() => {
+	// 	// check if input is focussed, on enter sendMessage function should be called
+	// 	const handleKeyDown = (event: KeyboardEvent) => {
+	// 		if (
+	// 			document.activeElement === textInputRef.current &&
+	// 			event.key === 'Enter' &&
+	// 			messageContent
+	// 		) {
+	// 			sendMessage(messageContent).catch(error => console.error(error))
+	// 		}
+	// 	}
 
-		textInputRef.current?.addEventListener('keydown', handleKeyDown)
-	}, [messageContent, sendMessage])
+	// 	textInputRef.current?.addEventListener('keydown', handleKeyDown)
+	// }, [messageContent, sendMessage])
+
+	const groupedMessages = groupMessagesByDate(currentConversation?.messages || [])
 
 	return (
 		<div className="relative flex h-full flex-col justify-between">
@@ -562,30 +570,35 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 					{/* ! TODO: this should always open at the end of scroll container */}
 					<ScrollArea
 						className={clsx(
-							'h-screen bg-[#ebe5de] !py-4 px-2 dark:bg-[#111b21]',
+							'h-screen bg-[#ebe5de] px-2 dark:bg-[#111b21]',
 							suggestions?.suggestions.length ? '!pb-64' : '!pb-44'
 						)}
 					>
 						<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/chat-canvas-bg.png")] bg-repeat opacity-20' />
-						<div className="flex h-full flex-col gap-1">
-							{currentConversation.messages.map((message, index) => {
-								return (
-									<div
-										className="relative z-30 w-full"
-										key={index}
-										ref={messagesContainerRef}
-									>
+						<div className="flex h-full flex-col gap-2" ref={messagesContainerRef}>
+							{groupedMessages.map((group, groupIndex) => (
+								<div
+									key={groupIndex}
+									className="relative z-30 flex w-full flex-col gap-1"
+								>
+									{/* Date Header */}
+									<div className="my-2 flex w-full justify-center">
+										<span className="rounded bg-gray-200 px-2 py-0.5 text-sm text-gray-700 dark:bg-[#2a3942] dark:text-gray-300">
+											{getDayLabel(group.date)}
+										</span>
+									</div>
+
+									{/* All messages for this date */}
+									{group.messages.map((message, index) => (
 										<MessageRenderer
+											key={message.uniqueId || index}
 											message={message}
 											isActionsEnabled={true}
 										/>
-										<div
-											ref={messagesEndRef}
-											className="min-h-[24px] min-w-[24px] shrink-0"
-										/>
-									</div>
-								)
-							})}
+									))}
+								</div>
+							))}
+							<div ref={messagesEndRef} />
 						</div>
 					</ScrollArea>
 

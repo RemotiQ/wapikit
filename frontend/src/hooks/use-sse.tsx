@@ -74,6 +74,7 @@ const useServerSideEvents = () => {
 					const result = schema.safeParse(JSON.parse(event.data))
 
 					if (!result.success) {
+						
 						console.error('Invalid event format:', result.error)
 						return
 					}

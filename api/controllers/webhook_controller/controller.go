@@ -713,17 +713,16 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	insertQuery := table.Message.
 		INSERT(table.Message.MutableColumns).
 		MODEL(messageToInsert).
-		RETURNING(table.Message.UniqueId)
+		RETURNING(table.Message.AllColumns)
 
 	err = insertQuery.Query(app.Db, &insertedMessage)
 
 	if err != nil {
+		fmt.Println("error inserting message in the database", err)
 		app.Logger.Error("error inserting message in the database", err.Error(), nil)
 	}
 
 	message := app.ConversationService.ParseDbMessageToApiMessage(insertedMessage)
-	fmt.Println("conversationDetails", conversationDetails)
-
 	messageEvent := event_service.NewNewMessageEvent(*conversationDetails, message, nil, &conversationDetails.OrganizationId)
 	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisApiServerEventChannelName, messageEvent.ToJson())
 

@@ -23,6 +23,7 @@ export const PreviewAttachment: React.FC<PreviewAttachmentProps> = ({ removeFile
 
 	const isImage = mediaType === MessageTypeEnum.Image
 	const isVideo = mediaType === MessageTypeEnum.Video
+	const isAudio = mediaType === MessageTypeEnum.Audio
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -39,13 +40,21 @@ export const PreviewAttachment: React.FC<PreviewAttachmentProps> = ({ removeFile
 			<div className="relative flex aspect-video h-12 w-16 items-center justify-center rounded-md bg-muted">
 				{isImage ? (
 					// eslint-disable-next-line @next/next/no-img-element
-					<img
-						key={fileUrl}
-						src={fileUrl}
-						alt={fileName || 'Attachment preview'}
-						className="h-full w-full rounded-md object-cover"
-					/>
-				) : isVideo ? (
+					<>
+						{fileUrl ? (
+							<img
+								key={fileUrl}
+								src={fileUrl}
+								alt={fileName || 'Attachment preview'}
+								className="h-full w-full rounded-md object-cover"
+							/>
+						) : (
+							<div className="flex h-full w-full items-center justify-center">
+								<Icons.media className="h-6 w-6" />
+							</div>
+						)}
+					</>
+				) : isVideo || isAudio ? (
 					<div className="flex h-full w-full items-center justify-center">
 						<Icons.play className="h-6 w-6" />
 					</div>

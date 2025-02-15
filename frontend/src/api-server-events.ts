@@ -3,7 +3,8 @@ import {
 	ConversationInitiatedByEnum,
 	ConversationStatusEnum,
 	MessageDirectionEnum,
-	MessageStatusEnum
+	MessageStatusEnum,
+	MessageTypeEnum
 } from 'root/.generated'
 import { z } from 'zod'
 
@@ -25,16 +26,101 @@ export const MessageStatus = z.nativeEnum(MessageStatusEnum)
 export const MessageDirection = z.nativeEnum(MessageDirectionEnum)
 export const ConversationStatus = z.nativeEnum(ConversationStatusEnum)
 export const ConversationInitiatedBy = z.nativeEnum(ConversationInitiatedByEnum)
+export const MessageType = z.nativeEnum(MessageTypeEnum)
+
 
 // 2️⃣ COMMON SCHEMAS
-export const MessageSchema = z.object({
+// The base message schema with shared fields.
+export const BaseMessageSchema = z.object({
+	uniqueId: z.string(),
 	conversationId: z.string(),
-	createdAt: z.string(), // Assuming ISO date string
 	direction: MessageDirection,
-	messageData: z.record(z.unknown()).optional(),
-	message_type: z.string(),
 	status: MessageStatus,
-	uniqueId: z.string()
+	messageType: MessageType,
+	createdAt: z.string(),
+})
+
+// 3a. Text Message
+const TextMessageDataSchema = z.object({
+	text: z.string(),
+})
+
+export const TextMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Text"),
+	messageData: TextMessageDataSchema,
+})
+
+// 3b. Audio Message
+const AudioMessageDataSchema = z.object({
+	id: z.string(),
+	link: z.string().url(),
+})
+export const AudioMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Audio"),
+	messageData: AudioMessageDataSchema,
+})
+
+// 3c. Video Message
+const VideoMessageDataSchema = z.object({
+	id: z.string(),
+	link: z.string().url(),
+})
+export const VideoMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Video"),
+	messageData: VideoMessageDataSchema,
+})
+
+// 3d. Image Message
+const ImageMessageDataSchema = z.object({
+	id: z.string(),
+	link: z.string().url(),
+	caption: z.string().optional(),
+})
+export const ImageMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Image"),
+	messageData: ImageMessageDataSchema,
+})
+
+// 3e. Document Message
+const DocumentMessageDataSchema = z.object({
+	id: z.string(),
+	link: z.string().url(),
+})
+export const DocumentMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Document"),
+	messageData: DocumentMessageDataSchema,
+})
+
+// 3f. Sticker Message
+const StickerMessageDataSchema = z.object({
+	id: z.string(),
+	link: z.string().url(),
+})
+export const StickerMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Sticker"),
+	messageData: StickerMessageDataSchema,
+})
+
+// 3g. Reaction Message
+const ReactionMessageDataSchema = z.object({
+	reaction: z.string(),
+	messageId: z.string().optional(),
+})
+export const ReactionMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Reaction"),
+	messageData: ReactionMessageDataSchema,
+})
+
+// 3h. Location Message
+const LocationMessageDataSchema = z.object({
+	latitude: z.number(),
+	longitude: z.number(),
+	address: z.string().optional(),
+	name: z.string().optional(),
+})
+export const LocationMessageSchema = BaseMessageSchema.extend({
+	messageType: z.literal("Location"),
+	messageData: LocationMessageDataSchema,
 })
 
 export const ContactSchema = z.object({
@@ -43,6 +129,18 @@ export const ContactSchema = z.object({
 	status: z.string(),
 	uniqueId: z.string()
 })
+
+
+export const MessageSchema = z.discriminatedUnion('messageType', [
+	TextMessageSchema,
+	AudioMessageSchema,
+	VideoMessageSchema,
+	ImageMessageSchema,
+	DocumentMessageSchema,
+	StickerMessageSchema,
+	ReactionMessageSchema,
+	LocationMessageSchema
+])
 
 export const ConversationSchema = z.object({
 	contact: ContactSchema,
