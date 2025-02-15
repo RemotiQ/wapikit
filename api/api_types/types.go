@@ -212,6 +212,12 @@ const (
 	URL         TemplateMessageButtonType = "URL"
 )
 
+// Defines values for TemplateParameterInputParameterType.
+const (
+	Dynamic TemplateParameterInputParameterType = "dynamic"
+	Static  TemplateParameterInputParameterType = "static"
+)
+
 // Defines values for UserPermissionLevelEnum.
 const (
 	Member UserPermissionLevelEnum = "Member"
@@ -395,14 +401,16 @@ type CampaignSchema struct {
 		Sent          float32 `json:"sent"`
 		TotalMessages float32 `json:"totalMessages"`
 	} `json:"progress,omitempty"`
-	ScheduledAt                 *time.Time                       `json:"scheduledAt,omitempty"`
-	SentAt                      *time.Time                       `json:"sentAt,omitempty"`
-	Stats                       *CampaignAnalyticsResponseSchema `json:"stats,omitempty"`
-	Status                      CampaignStatusEnum               `json:"status"`
-	Tags                        []TagSchema                      `json:"tags"`
-	TemplateComponentParameters *map[string]interface{}          `json:"templateComponentParameters,omitempty"`
-	TemplateMessageId           *string                          `json:"templateMessageId,omitempty"`
-	UniqueId                    string                           `json:"uniqueId"`
+	ScheduledAt *time.Time                       `json:"scheduledAt,omitempty"`
+	SentAt      *time.Time                       `json:"sentAt,omitempty"`
+	Stats       *CampaignAnalyticsResponseSchema `json:"stats,omitempty"`
+	Status      CampaignStatusEnum               `json:"status"`
+	Tags        []TagSchema                      `json:"tags"`
+
+	// TemplateComponentParameters Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+	TemplateComponentParameters *TemplateComponentParameters `json:"templateComponentParameters,omitempty"`
+	TemplateMessageId           *string                      `json:"templateMessageId,omitempty"`
+	UniqueId                    string                       `json:"uniqueId"`
 }
 
 // CampaignStatusEnum defines model for CampaignStatusEnum.
@@ -1128,6 +1136,18 @@ type TagSchema struct {
 	UniqueId string `json:"uniqueId"`
 }
 
+// TemplateComponentParameters Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+type TemplateComponentParameters struct {
+	// Body Parameters for body components.
+	Body []TemplateParameterInput `json:"body"`
+
+	// Buttons Parameters for button components.
+	Buttons []TemplateParameterInput `json:"buttons"`
+
+	// Header Parameters for header components.
+	Header []TemplateParameterInput `json:"header"`
+}
+
 // TemplateMessageButtonType defines model for TemplateMessageButtonType.
 type TemplateMessageButtonType string
 
@@ -1176,6 +1196,33 @@ type TemplateMessageQualityScore struct {
 	Reasons *[]string `json:"reasons,omitempty"`
 	Score   *int      `json:"score,omitempty"`
 }
+
+// TemplateParameterInput A single template parameter input. It can be either static or dynamic.
+type TemplateParameterInput struct {
+	// DynamicField For dynamic parameters, the field name to resolve (e.g. 'firstName').
+	DynamicField *string `json:"dynamicField,omitempty"`
+
+	// Example An example value for the parameter.
+	Example *string `json:"example,omitempty"`
+
+	// Label The display label for the parameter.
+	Label string `json:"label"`
+
+	// NameOrIndex The name or index identifying the parameter.
+	NameOrIndex string `json:"nameOrIndex"`
+
+	// ParameterType Specifies whether the parameter is static or dynamic.
+	ParameterType TemplateParameterInputParameterType `json:"parameterType"`
+
+	// Placeholder Placeholder text to guide the user input.
+	Placeholder *string `json:"placeholder,omitempty"`
+
+	// StaticValue The static value to be used if applicable.
+	StaticValue *string `json:"staticValue,omitempty"`
+}
+
+// TemplateParameterInputParameterType Specifies whether the parameter is static or dynamic.
+type TemplateParameterInputParameterType string
 
 // TemplateSchema defines model for TemplateSchema.
 type TemplateSchema struct {
@@ -1229,16 +1276,18 @@ type UpdateCampaignByIdResponseSchema struct {
 
 // UpdateCampaignSchema defines model for UpdateCampaignSchema.
 type UpdateCampaignSchema struct {
-	Description                 *string                 `json:"description,omitempty"`
-	EnableLinkTracking          bool                    `json:"enableLinkTracking"`
-	ListIds                     []string                `json:"listIds"`
-	Name                        string                  `json:"name"`
-	PhoneNumber                 *string                 `json:"phoneNumber,omitempty"`
-	ScheduledAt                 *time.Time              `json:"scheduledAt,omitempty"`
-	Status                      *CampaignStatusEnum     `json:"status,omitempty"`
-	Tags                        []string                `json:"tags"`
-	TemplateComponentParameters *map[string]interface{} `json:"templateComponentParameters,omitempty"`
-	TemplateMessageId           *string                 `json:"templateMessageId,omitempty"`
+	Description        *string             `json:"description,omitempty"`
+	EnableLinkTracking bool                `json:"enableLinkTracking"`
+	ListIds            []string            `json:"listIds"`
+	Name               string              `json:"name"`
+	PhoneNumber        *string             `json:"phoneNumber,omitempty"`
+	ScheduledAt        *time.Time          `json:"scheduledAt,omitempty"`
+	Status             *CampaignStatusEnum `json:"status,omitempty"`
+	Tags               []string            `json:"tags"`
+
+	// TemplateComponentParameters Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+	TemplateComponentParameters *TemplateComponentParameters `json:"templateComponentParameters,omitempty"`
+	TemplateMessageId           *string                      `json:"templateMessageId,omitempty"`
 }
 
 // UpdateContactByIdResponseSchema defines model for UpdateContactByIdResponseSchema.

@@ -60,18 +60,18 @@ const Tag: React.FC<{ label: string }> = ({ label }) => {
 	const [colorMap, setColorMap] = useState<Record<string, string>>(() => getStoredColors())
 	const [tagColor, setTagColor] = useState<string | null>(null)
 
-	useEffect(() => {
-		let updatedMap = { ...colorMap }
+	// useEffect(() => {
+	// 	let updatedMap = { ...colorMap }
 
-		if (!colorMap[label]) {
-			const newColor = getRandomColor()
-			updatedMap[label] = newColor
-			storeColors(updatedMap)
-		}
+	// 	if (!colorMap[label]) {
+	// 		const newColor = getRandomColor()
+	// 		updatedMap[label] = newColor
+	// 		storeColors(updatedMap)
+	// 	}
 
-		setColorMap(updatedMap)
-		setTagColor(updatedMap[label] || '#CCCCCC') // Ensure tagColor is always defined
-	}, [colorMap, label])
+	// 	setColorMap(updatedMap)
+	// 	setTagColor(updatedMap[label] || '#CCCCCC') // Ensure tagColor is always defined
+	// }, [colorMap, label])
 
 	if (!tagColor) return null // Prevent rendering until color is available
 

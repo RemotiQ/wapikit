@@ -195,6 +195,7 @@ const CampaignsPage = () => {
 								<div className="flex w-fit flex-row items-center justify-end gap-3 p-6">
 									<Button
 										onClick={() => {
+											console.log('clicked')
 											router.push(
 												`/campaigns/new-or-edit?id=${campaignData.campaign.uniqueId}`
 											)

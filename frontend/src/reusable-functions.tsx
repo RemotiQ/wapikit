@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { createRoot } from 'react-dom/client'
 import { AlertModal } from './components/modal/alert-modal'
-import { type MessageTemplateSchema } from 'root/.generated'
+import { type TemplateComponentParameters, type MessageTemplateSchema } from 'root/.generated'
 import { Icons } from './components/icons'
 import { APP_BASE_DOMAIN } from './constants'
 import { type UtmTags } from './types'
@@ -89,80 +89,12 @@ export function parseMessageContentForHyperLink(message: string) {
 	return message.replace(urlRegex, '<a href="$1" target="_blank">$1</a>')
 }
 
-/**
- * Calculates the number of parameters required for each component in the template.
- * @param template - The template object.
- * @returns An object with component types as keys and parameter counts as values.
- */
-export function getParametersPerComponent(
-	template?: MessageTemplateSchema
-): Record<string, number> {
-	const parameterCounts: Record<string, number> = {}
-
-	if (!template || !template.components) {
-		return parameterCounts
-	}
-
-	template.components.forEach(component => {
-		if (!component.type) {
-			return
-		}
-
-		let parameterCount = 0
-
-		// Check the example field of the main component
-		if (component.example) {
-			switch (component.type) {
-				case 'BODY': {
-					if (component.example.body_text?.length) {
-						// it is an array of array
-						component.example.body_text.forEach(bodyText => {
-							parameterCount += bodyText.length
-						})
-					}
-					break
-				}
-
-				case 'HEADER': {
-					if (component.example.header_text) {
-						parameterCount += component.example.header_text.length
-					}
-
-					if (component.format !== 'TEXT') {
-						parameterCount += 1
-					}
-
-					break
-				}
-			}
-		}
-
-		// Check the example field of any buttons
-		// ! TODO: enable this after fixing the wapi.go object structure for template buttons
-		if (component.buttons) {
-			component.buttons.forEach(button => {
-				if (button.example) {
-					parameterCount += button.example.length
-				}
-			})
-		}
-
-		const keyToUse =
-			component.type === 'BODY' ? 'body' : component.type === 'BUTTONS' ? 'buttons' : 'header'
-
-		// Add the count for this component
-		parameterCounts[keyToUse] = parameterCount
-	})
-
-	return parameterCounts
-}
-
 export function countParameterCountInTemplateComponent(template?: MessageTemplateSchema): number {
 	let total = 0
-	const paramsCount = getParametersPerComponent(template)
-	Object.entries(paramsCount).map(param => {
-		total = total + param[1]
-	})
+	const parsedParams = parseTemplateComponents(template)
+	total += parsedParams.header.length
+	total += parsedParams.body.length
+	total += parsedParams.buttons.length
 	return total
 }
 
@@ -200,12 +132,19 @@ function extractExampleValueForUrlButton(templateUrl: string, exampleUrl: string
 }
 
 export function parseTemplateComponents(
-	template?: MessageTemplateSchema
+	template?: MessageTemplateSchema,
+	defaults?: TemplateComponentParameters
 ): z.infer<typeof TemplateComponentParametersSchema> {
 	// Initialize arrays to hold parameters for each component type.
 	const headerParams: TemplateParameterInputType[] = []
 	const bodyParams: TemplateParameterInputType[] = []
 	const buttonParams: TemplateParameterInputType[] = []
+
+	if (defaults) {
+		headerParams.push(...defaults.header)
+		bodyParams.push(...defaults.body)
+		buttonParams.push(...defaults.buttons)
+	}
 
 	if (!template || !template.components) {
 		return {
