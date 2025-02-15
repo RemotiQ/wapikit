@@ -431,6 +431,13 @@ export default function SettingsPage() {
 						}
 					}
 				})
+				successNotification({
+					message: 'WhatsApp Business Account details updated successfully!!'
+				})
+				whatsappBusinessAccountIdForm.reset({
+					whatsappBusinessAccountId: response.businessAccountId,
+					apiToken: response.accessToken
+				})
 			} else {
 				errorNotification({
 					message: 'Error updating WhatsApp Business Account ID'
