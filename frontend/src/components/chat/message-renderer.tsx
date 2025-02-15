@@ -1,14 +1,11 @@
 import { clsx } from 'clsx'
 import dayjs from 'dayjs'
 import {
-	type AudioMessage,
 	type DocumentMessage,
-	type ImageMessage,
 	type LocationMessage,
 	MessageDirectionEnum,
 	MessageTypeEnum,
 	type TextMessage,
-	type VideoMessage,
 	type MessageSchema
 } from 'root/.generated'
 import { ChevronDown } from 'lucide-react'
@@ -21,17 +18,76 @@ import {
 import { Icons } from '../icons'
 import { useCopyToClipboard } from 'usehooks-ts'
 import { successNotification } from '~/reusable-functions'
+import { getBackendUrl } from '~/constants'
+import React, { useEffect, useState } from 'react'
+import { useAuthState } from '~/hooks/use-auth-state'
+import { Skeleton } from '../ui/skeleton'
 
 const TextMessage = (message: TextMessage) => {
 	return <p className="text-wrap text-sm">{message.messageData.text}</p>
 }
 
-const VideoMessage = (message: VideoMessage) => {
-	return <video src={message.messageData.link} controls />
-}
+function LoadMedia({
+	conversationId,
+	mediaId,
+	mediaType
+}: {
+	mediaType: MessageTypeEnum
+	mediaId: string
+	conversationId: string
+}) {
+	const [blobUrl, setBlobUrl] = useState<string | null>(null)
+	const { authState } = useAuthState()
 
-const ImageMessage = (message: ImageMessage) => {
-	return <img src={message.messageData.link} alt="image" />
+	useEffect(() => {
+		if (!authState.isAuthenticated) {
+			return
+		}
+		let url: string | null = null
+		// Our authenticated fetch to the backend:
+		fetch(`${getBackendUrl()}/conversation/${conversationId}/media/${mediaId}`, {
+			headers: {
+				'x-access-token': `${authState.data.token}`
+			},
+			credentials: 'include',
+			mode: 'cors',
+			cache: 'no-cache'
+		})
+			.then(res => res.blob())
+			.then(blob => {
+				url = URL.createObjectURL(blob)
+				setBlobUrl(url)
+			})
+			.catch(err => {
+				console.error('Failed to load image', err)
+			})
+
+		return () => {
+			// Cleanup
+			if (url) {
+				URL.revokeObjectURL(url)
+			}
+		}
+	}, [authState, conversationId, mediaId, mediaType])
+
+	if (!blobUrl) {
+		return <Skeleton className="size-44" />
+	}
+
+	if (mediaType === MessageTypeEnum.Image) {
+		return <img src={blobUrl} alt="image message" />
+	} else if (mediaType === MessageTypeEnum.Video) {
+		return <video src={blobUrl} controls={true} />
+	} else if (mediaType === MessageTypeEnum.Audio) {
+		return <audio src={blobUrl} controls />
+	} else {
+		return (
+			<div>
+				<Icons.info className="size-4" />
+				Unsupported media type
+			</div>
+		)
+	}
 }
 
 const DocumentMessage = (message: DocumentMessage) => {
@@ -40,10 +96,6 @@ const DocumentMessage = (message: DocumentMessage) => {
 			{message.messageData.link}
 		</a>
 	)
-}
-
-const AudioMessage = (message: AudioMessage) => {
-	return <audio src={message.messageData.link} controls />
 }
 
 const LocationMessage = (message: LocationMessage) => {
@@ -120,19 +172,31 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 					: 'ml-auto bg-[#d9fdd3]  text-secondary-foreground dark:bg-[#005c4b]'
 			)}
 		>
-			{message.messageType === MessageTypeEnum.Text
-				? TextMessage(message)
-				: message.messageType === MessageTypeEnum.Video
-					? VideoMessage(message)
-					: message.messageType === MessageTypeEnum.Document
-						? DocumentMessage(message)
-						: message.messageType === MessageTypeEnum.Image
-							? ImageMessage(message)
-							: message.messageType === MessageTypeEnum.Audio
-								? AudioMessage(message)
-								: message.messageType === MessageTypeEnum.Location
-									? LocationMessage(message)
-									: null}
+			{message.messageType === MessageTypeEnum.Text ? (
+				TextMessage(message)
+			) : message.messageType === MessageTypeEnum.Video ? (
+				<LoadMedia
+					conversationId={message.conversationId}
+					mediaId={message.messageData.id}
+					mediaType={message.messageType}
+				/>
+			) : message.messageType === MessageTypeEnum.Document ? (
+				DocumentMessage(message)
+			) : message.messageType === MessageTypeEnum.Image ? (
+				<LoadMedia
+					conversationId={message.conversationId}
+					mediaId={message.messageData.id}
+					mediaType={message.messageType}
+				/>
+			) : message.messageType === MessageTypeEnum.Audio ? (
+				<LoadMedia
+					conversationId={message.conversationId}
+					mediaId={message.messageData.id}
+					mediaType={message.messageType}
+				/>
+			) : message.messageType === MessageTypeEnum.Location ? (
+				LocationMessage(message)
+			) : null}
 
 			<div className="flex flex-col items-center  justify-end gap-1">
 				{isActionsEnabled ? (

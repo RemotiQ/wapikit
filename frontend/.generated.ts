@@ -876,9 +876,9 @@ export type TextMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				TextMessageAllOf & {
-					messageType: TextMessageMessageType
-				},
+			TextMessageAllOf & {
+				messageType: TextMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -926,9 +926,9 @@ export type AudioMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				AudioMessageAllOf & {
-					messageType: AudioMessageMessageType
-				},
+			AudioMessageAllOf & {
+				messageType: AudioMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -976,9 +976,9 @@ export type VideoMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				VideoMessageAllOf & {
-					messageType: VideoMessageMessageType
-				},
+			VideoMessageAllOf & {
+				messageType: VideoMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1027,9 +1027,9 @@ export type ImageMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				ImageMessageAllOf & {
-					messageType: ImageMessageMessageType
-				},
+			ImageMessageAllOf & {
+				messageType: ImageMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1077,9 +1077,9 @@ export type DocumentMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				DocumentMessageAllOf & {
-					messageType: DocumentMessageMessageType
-				},
+			DocumentMessageAllOf & {
+				messageType: DocumentMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1127,9 +1127,9 @@ export type StickerMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				StickerMessageAllOf & {
-					messageType: StickerMessageMessageType
-				},
+			StickerMessageAllOf & {
+				messageType: StickerMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1177,9 +1177,9 @@ export type ReactionMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				ReactionMessageAllOf & {
-					messageType: ReactionMessageMessageType
-				},
+			ReactionMessageAllOf & {
+				messageType: ReactionMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1231,9 +1231,9 @@ export type LocationMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				LocationMessageAllOf & {
-					messageType: LocationMessageMessageType
-				},
+			LocationMessageAllOf & {
+				messageType: LocationMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1258,37 +1258,37 @@ export type MessageSchema =
  */
 export type NewMessageDataSchema =
 	| (TextMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (AudioMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (VideoMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (ImageMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (DocumentMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (StickerMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (ReactionMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (LocationMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 
 /**
  * Request payload for sending a new message. The payload includes the messageType, createdAt date, and a messageData field whose structure depends on the messageType.
@@ -2214,28 +2214,28 @@ export function useGetHealthCheck<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getHealthCheck>>,
-				TError,
-				Awaited<ReturnType<typeof getHealthCheck>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getHealthCheck>>,
+			TError,
+			Awaited<ReturnType<typeof getHealthCheck>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetHealthCheck<
 	TData = Awaited<ReturnType<typeof getHealthCheck>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getHealthCheck>>,
-				TError,
-				Awaited<ReturnType<typeof getHealthCheck>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getHealthCheck>>,
+			TError,
+			Awaited<ReturnType<typeof getHealthCheck>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetHealthCheck<
 	TData = Awaited<ReturnType<typeof getHealthCheck>>,
@@ -2300,28 +2300,28 @@ export function useGetMetaData<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getMetaData>>,
-				TError,
-				Awaited<ReturnType<typeof getMetaData>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getMetaData>>,
+			TError,
+			Awaited<ReturnType<typeof getMetaData>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMetaData<
 	TData = Awaited<ReturnType<typeof getMetaData>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getMetaData>>,
-				TError,
-				Awaited<ReturnType<typeof getMetaData>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getMetaData>>,
+			TError,
+			Awaited<ReturnType<typeof getMetaData>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMetaData<
 	TData = Awaited<ReturnType<typeof getMetaData>>,
@@ -2389,28 +2389,28 @@ export function useGetSSEUpdates<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getSSEUpdates>>,
-				TError,
-				Awaited<ReturnType<typeof getSSEUpdates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getSSEUpdates>>,
+			TError,
+			Awaited<ReturnType<typeof getSSEUpdates>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetSSEUpdates<
 	TData = Awaited<ReturnType<typeof getSSEUpdates>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getSSEUpdates>>,
-				TError,
-				Awaited<ReturnType<typeof getSSEUpdates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getSSEUpdates>>,
+			TError,
+			Awaited<ReturnType<typeof getSSEUpdates>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetSSEUpdates<
 	TData = Awaited<ReturnType<typeof getSSEUpdates>>,
@@ -2689,28 +2689,28 @@ export function useRegenerateApiKey<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof regenerateApiKey>>,
-				TError,
-				Awaited<ReturnType<typeof regenerateApiKey>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof regenerateApiKey>>,
+			TError,
+			Awaited<ReturnType<typeof regenerateApiKey>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useRegenerateApiKey<
 	TData = Awaited<ReturnType<typeof regenerateApiKey>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof regenerateApiKey>>,
-				TError,
-				Awaited<ReturnType<typeof regenerateApiKey>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof regenerateApiKey>>,
+			TError,
+			Awaited<ReturnType<typeof regenerateApiKey>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useRegenerateApiKey<
 	TData = Awaited<ReturnType<typeof regenerateApiKey>>,
@@ -2754,10 +2754,10 @@ export const joinOrganization = (
 
 export const getJoinOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -2803,10 +2803,10 @@ export type JoinOrganizationMutationError =
 
 export const useJoinOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -2844,10 +2844,10 @@ export const resetPasswordInit = (
 
 export const getResetPasswordInitMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -2893,10 +2893,10 @@ export type ResetPasswordInitMutationError =
 
 export const useResetPasswordInit = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -2934,10 +2934,10 @@ export const resetPasswordVerify = (
 
 export const getResetPasswordVerifyMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -2983,10 +2983,10 @@ export type ResetPasswordVerifyMutationError =
 
 export const useResetPasswordVerify = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3024,10 +3024,10 @@ export const resetPasswordComplete = (
 
 export const getResetPasswordCompleteMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3073,10 +3073,10 @@ export type ResetPasswordCompleteMutationError =
 
 export const useResetPasswordComplete = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3110,10 +3110,10 @@ export const getGetUserQueryKey = () => {
 export const getGetUserQueryOptions = <
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
 }) => {
@@ -3141,46 +3141,46 @@ export type GetUserQueryError =
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUser>>,
-				TError,
-				Awaited<ReturnType<typeof getUser>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUser>>,
+			TError,
+			Awaited<ReturnType<typeof getUser>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUser>>,
-				TError,
-				Awaited<ReturnType<typeof getUser>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUser>>,
+			TError,
+			Awaited<ReturnType<typeof getUser>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -3188,10 +3188,10 @@ export function useGetUser<
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -3221,10 +3221,10 @@ export const updateUser = (updateUserSchema: UpdateUserSchema, signal?: AbortSig
 
 export const getUpdateUserMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3268,10 +3268,10 @@ export type UpdateUserMutationError =
 
 export const useUpdateUser = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3310,10 +3310,10 @@ export const getGetUserNotificationsQueryKey = (params: GetUserNotificationsPara
 export const getGetUserNotificationsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
@@ -3348,56 +3348,56 @@ export type GetUserNotificationsQueryError =
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserNotifications>>,
-					TError,
-					Awaited<ReturnType<typeof getUserNotifications>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserNotifications>>,
+				TError,
+				Awaited<ReturnType<typeof getUserNotifications>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserNotifications>>,
-					TError,
-					Awaited<ReturnType<typeof getUserNotifications>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserNotifications>>,
+				TError,
+				Awaited<ReturnType<typeof getUserNotifications>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
@@ -3410,10 +3410,10 @@ export function useGetUserNotifications<
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
@@ -3451,10 +3451,10 @@ export const getGetUserFeatureFlagsQueryKey = () => {
 export const getGetUserFeatureFlagsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>>
 }) => {
@@ -3484,50 +3484,50 @@ export type GetUserFeatureFlagsQueryError =
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
 	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUserFeatureFlags>>,
-				TError,
-				Awaited<ReturnType<typeof getUserFeatureFlags>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUserFeatureFlags>>,
+			TError,
+			Awaited<ReturnType<typeof getUserFeatureFlags>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
 	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUserFeatureFlags>>,
-				TError,
-				Awaited<ReturnType<typeof getUserFeatureFlags>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUserFeatureFlags>>,
+			TError,
+			Awaited<ReturnType<typeof getUserFeatureFlags>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -3535,10 +3535,10 @@ export function useGetUserFeatureFlags<
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -3571,10 +3571,10 @@ export const getGetApiKeysQueryKey = () => {
 export const getGetApiKeysQueryOptions = <
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
 }) => {
@@ -3602,46 +3602,46 @@ export type GetApiKeysQueryError =
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getApiKeys>>,
-				TError,
-				Awaited<ReturnType<typeof getApiKeys>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getApiKeys>>,
+			TError,
+			Awaited<ReturnType<typeof getApiKeys>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getApiKeys>>,
-				TError,
-				Awaited<ReturnType<typeof getApiKeys>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getApiKeys>>,
+			TError,
+			Awaited<ReturnType<typeof getApiKeys>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -3649,10 +3649,10 @@ export function useGetApiKeys<
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -3685,10 +3685,10 @@ export const switchOrganization = (
 
 export const getSwitchOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3734,10 +3734,10 @@ export type SwitchOrganizationMutationError =
 
 export const useSwitchOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3775,10 +3775,10 @@ export const createOrganization = (
 
 export const getCreateOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3824,10 +3824,10 @@ export type CreateOrganizationMutationError =
 
 export const useCreateOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3866,10 +3866,10 @@ export const getGetUserOrganizationsQueryKey = (params: GetUserOrganizationsPara
 export const getGetUserOrganizationsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
@@ -3904,56 +3904,56 @@ export type GetUserOrganizationsQueryError =
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserOrganizations>>,
-					TError,
-					Awaited<ReturnType<typeof getUserOrganizations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserOrganizations>>,
+				TError,
+				Awaited<ReturnType<typeof getUserOrganizations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserOrganizations>>,
-					TError,
-					Awaited<ReturnType<typeof getUserOrganizations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserOrganizations>>,
+				TError,
+				Awaited<ReturnType<typeof getUserOrganizations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
@@ -3966,10 +3966,10 @@ export function useGetUserOrganizations<
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
@@ -4007,10 +4007,10 @@ export const getGetOrganizationByIdQueryKey = (id: string) => {
 export const getGetOrganizationByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -4045,56 +4045,56 @@ export type GetOrganizationByIdQueryError =
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -4107,10 +4107,10 @@ export function useGetOrganizationById<
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -4149,10 +4149,10 @@ export const updateOrganization = (
 
 export const getUpdateOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4198,10 +4198,10 @@ export type UpdateOrganizationMutationError =
 
 export const useUpdateOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4239,10 +4239,10 @@ export const getGetAIConfigurationQueryKey = () => {
 export const getGetAIConfigurationQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>>
 }) => {
@@ -4272,48 +4272,48 @@ export type GetAIConfigurationQueryError =
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAIConfiguration>>,
-				TError,
-				Awaited<ReturnType<typeof getAIConfiguration>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAIConfiguration>>,
+			TError,
+			Awaited<ReturnType<typeof getAIConfiguration>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
 	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAIConfiguration>>,
-				TError,
-				Awaited<ReturnType<typeof getAIConfiguration>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAIConfiguration>>,
+			TError,
+			Awaited<ReturnType<typeof getAIConfiguration>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -4321,10 +4321,10 @@ export function useGetAIConfiguration<
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -4358,10 +4358,10 @@ export const getGetOrganizationRolesQueryKey = (params: GetOrganizationRolesPara
 export const getGetOrganizationRolesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
@@ -4396,56 +4396,56 @@ export type GetOrganizationRolesQueryError =
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoles>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoles>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoles>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoles>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoles>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoles>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoles>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoles>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
@@ -4458,10 +4458,10 @@ export function useGetOrganizationRoles<
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
@@ -4499,10 +4499,10 @@ export const createOrganizationRole = (
 
 export const getCreateOrganizationRoleMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4548,10 +4548,10 @@ export type CreateOrganizationRoleMutationError =
 
 export const useCreateOrganizationRole = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4589,10 +4589,10 @@ export const getGetOrganizationRoleByIdQueryKey = (id: string) => {
 export const getGetOrganizationRoleByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -4628,56 +4628,56 @@ export type GetOrganizationRoleByIdQueryError =
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoleById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoleById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoleById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoleById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoleById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoleById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoleById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoleById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoleById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoleById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -4690,10 +4690,10 @@ export function useGetOrganizationRoleById<
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -4732,10 +4732,10 @@ export const updateOrganizationRoleById = (
 
 export const getUpdateOrganizationRoleByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4781,10 +4781,10 @@ export type UpdateOrganizationRoleByIdMutationError =
 
 export const useUpdateOrganizationRoleById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4816,10 +4816,10 @@ export const deleteOrganizationRoleById = (id: string) => {
 
 export const getDeleteOrganizationRoleByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4865,10 +4865,10 @@ export type DeleteOrganizationRoleByIdMutationError =
 
 export const useDeleteOrganizationRoleById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4907,10 +4907,10 @@ export const getGetOrganizationTagsQueryKey = (params: GetOrganizationTagsParams
 export const getGetOrganizationTagsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
@@ -4945,56 +4945,56 @@ export type GetOrganizationTagsQueryError =
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationTags>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationTags>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationTags>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationTags>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationTags>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationTags>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationTags>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationTags>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
@@ -5007,10 +5007,10 @@ export function useGetOrganizationTags<
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
@@ -5048,10 +5048,10 @@ export const createOrganizationTag = (
 
 export const getCreateOrganizationTagMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5097,10 +5097,10 @@ export type CreateOrganizationTagMutationError =
 
 export const useCreateOrganizationTag = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5142,10 +5142,10 @@ export const getGetOrganizationInvitesQueryKey = (params: GetOrganizationInvites
 export const getGetOrganizationInvitesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
@@ -5181,56 +5181,56 @@ export type GetOrganizationInvitesQueryError =
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInvites>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInvites>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInvites>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInvites>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInvites>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInvites>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInvites>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInvites>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInvites>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInvites>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
@@ -5243,10 +5243,10 @@ export function useGetOrganizationInvites<
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
@@ -5284,10 +5284,10 @@ export const createOrganizationInvite = (
 
 export const getCreateOrganizationInviteMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5333,10 +5333,10 @@ export type CreateOrganizationInviteMutationError =
 
 export const useCreateOrganizationInvite = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5374,10 +5374,10 @@ export const getGetOrganizationInviteBySlugQueryKey = (slug: string) => {
 export const getGetOrganizationInviteBySlugQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
@@ -5413,56 +5413,56 @@ export type GetOrganizationInviteBySlugQueryError =
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
@@ -5475,10 +5475,10 @@ export function useGetOrganizationInviteBySlug<
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
@@ -5511,10 +5511,10 @@ export const acceptOrganizationInvite = (slug: string, signal?: AbortSignal) => 
 
 export const getAcceptOrganizationInviteMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5560,10 +5560,10 @@ export type AcceptOrganizationInviteMutationError =
 
 export const useAcceptOrganizationInvite = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5605,10 +5605,10 @@ export const getGetOrganizationMembersQueryKey = (params: GetOrganizationMembers
 export const getGetOrganizationMembersQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
@@ -5644,56 +5644,56 @@ export type GetOrganizationMembersQueryError =
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMembers>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMembers>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMembers>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMembers>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMembers>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMembers>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMembers>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMembers>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMembers>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMembers>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
@@ -5706,10 +5706,10 @@ export function useGetOrganizationMembers<
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
@@ -5747,10 +5747,10 @@ export const getGetOrganizationMemberByIdQueryKey = (id: string) => {
 export const getGetOrganizationMemberByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -5786,56 +5786,56 @@ export type GetOrganizationMemberByIdQueryError =
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMemberById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMemberById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMemberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMemberById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMemberById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMemberById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMemberById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMemberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMemberById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMemberById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -5848,10 +5848,10 @@ export function useGetOrganizationMemberById<
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -5890,10 +5890,10 @@ export const updateOrganizationMemberById = (
 
 export const getUpdateOrganizationMemberByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5939,10 +5939,10 @@ export type UpdateOrganizationMemberByIdMutationError =
 
 export const useUpdateOrganizationMemberById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5974,10 +5974,10 @@ export const deleteOrganizationMemberById = (id: string) => {
 
 export const getDeleteOrganizationMemberByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6023,10 +6023,10 @@ export type DeleteOrganizationMemberByIdMutationError =
 
 export const useDeleteOrganizationMemberById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6065,10 +6065,10 @@ export const updateOrganizationMemberRoleById = (
 
 export const getUpdateOrganizationMemberRoleByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6114,10 +6114,10 @@ export type UpdateOrganizationMemberRoleByIdMutationError =
 
 export const useUpdateOrganizationMemberRoleById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6156,10 +6156,10 @@ export const transferOrganizationOwnership = (
 
 export const getTransferOrganizationOwnershipMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6205,10 +6205,10 @@ export type TransferOrganizationOwnershipMutationError =
 
 export const useTransferOrganizationOwnership = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6246,10 +6246,10 @@ export const getGetAllTemplatesQueryKey = () => {
 export const getGetAllTemplatesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>>
 }) => {
@@ -6277,46 +6277,46 @@ export type GetAllTemplatesQueryError =
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllTemplates>>,
-				TError,
-				Awaited<ReturnType<typeof getAllTemplates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllTemplates>>,
+			TError,
+			Awaited<ReturnType<typeof getAllTemplates>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllTemplates>>,
-				TError,
-				Awaited<ReturnType<typeof getAllTemplates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllTemplates>>,
+			TError,
+			Awaited<ReturnType<typeof getAllTemplates>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -6324,10 +6324,10 @@ export function useGetAllTemplates<
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -6360,10 +6360,10 @@ export const getGetTemplateByIdQueryKey = (id: string) => {
 export const getGetTemplateByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6394,56 +6394,56 @@ export type GetTemplateByIdQueryError =
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getTemplateById>>,
-					TError,
-					Awaited<ReturnType<typeof getTemplateById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getTemplateById>>,
+				TError,
+				Awaited<ReturnType<typeof getTemplateById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getTemplateById>>,
-					TError,
-					Awaited<ReturnType<typeof getTemplateById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getTemplateById>>,
+				TError,
+				Awaited<ReturnType<typeof getTemplateById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6454,10 +6454,10 @@ export function useGetTemplateById<
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6520,14 +6520,14 @@ export function useGetAllPhoneNumbers<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-				TError,
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>,
+			TError,
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllPhoneNumbers<
 	TData = Awaited<ReturnType<typeof getAllPhoneNumbers>>,
@@ -6536,14 +6536,14 @@ export function useGetAllPhoneNumbers<
 	query?: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
 	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-				TError,
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>,
+			TError,
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllPhoneNumbers<
 	TData = Awaited<ReturnType<typeof getAllPhoneNumbers>>,
@@ -6587,10 +6587,10 @@ export const getGetPhoneNumberByIdQueryKey = (id: string) => {
 export const getGetPhoneNumberByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6625,56 +6625,56 @@ export type GetPhoneNumberByIdQueryError =
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPhoneNumberById>>,
-					TError,
-					Awaited<ReturnType<typeof getPhoneNumberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getPhoneNumberById>>,
+				TError,
+				Awaited<ReturnType<typeof getPhoneNumberById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPhoneNumberById>>,
-					TError,
-					Awaited<ReturnType<typeof getPhoneNumberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getPhoneNumberById>>,
+				TError,
+				Awaited<ReturnType<typeof getPhoneNumberById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6687,10 +6687,10 @@ export function useGetPhoneNumberById<
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6728,10 +6728,10 @@ export const updateWhatsappBusinessAccountDetails = (
 
 export const getUpdateWhatsappBusinessAccountDetailsMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6778,10 +6778,10 @@ export type UpdateWhatsappBusinessAccountDetailsMutationError =
 
 export const useUpdateWhatsappBusinessAccountDetails = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6820,10 +6820,10 @@ export const getGetContactsQueryKey = (params: GetContactsParams) => {
 export const getGetContactsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
@@ -6854,52 +6854,52 @@ export type GetContactsQueryError =
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContacts>>,
-					TError,
-					Awaited<ReturnType<typeof getContacts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContacts>>,
+				TError,
+				Awaited<ReturnType<typeof getContacts>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContacts>>,
-					TError,
-					Awaited<ReturnType<typeof getContacts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContacts>>,
+				TError,
+				Awaited<ReturnType<typeof getContacts>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
@@ -6910,10 +6910,10 @@ export function useGetContacts<
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
@@ -6946,10 +6946,10 @@ export const createContacts = (newContactSchema: NewContactSchema[], signal?: Ab
 
 export const getCreateContactsMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6993,10 +6993,10 @@ export type CreateContactsMutationError =
 
 export const useCreateContacts = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7025,10 +7025,10 @@ export const deleteContactsByList = (params: DeleteContactsByListParams) => {
 
 export const getDeleteContactsByListMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7074,10 +7074,10 @@ export type DeleteContactsByListMutationError =
 
 export const useDeleteContactsByList = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7114,10 +7114,10 @@ export const bulkImportContacts = (
 
 export const getBulkImportContactsMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7163,10 +7163,10 @@ export type BulkImportContactsMutationError =
 
 export const useBulkImportContacts = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7204,10 +7204,10 @@ export const getGetContactByIdQueryKey = (id: string) => {
 export const getGetContactByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7238,54 +7238,54 @@ export type GetContactByIdQueryError =
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactById>>,
-					TError,
-					Awaited<ReturnType<typeof getContactById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactById>>,
+				TError,
+				Awaited<ReturnType<typeof getContactById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactById>>,
-					TError,
-					Awaited<ReturnType<typeof getContactById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactById>>,
+				TError,
+				Awaited<ReturnType<typeof getContactById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7296,10 +7296,10 @@ export function useGetContactById<
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7336,10 +7336,10 @@ export const updateContactById = (
 
 export const getUpdateContactByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7385,10 +7385,10 @@ export type UpdateContactByIdMutationError =
 
 export const useUpdateContactById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7420,10 +7420,10 @@ export const deleteContactById = (id: string) => {
 
 export const getDeleteContactByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7469,10 +7469,10 @@ export type DeleteContactByIdMutationError =
 
 export const useDeleteContactById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7511,10 +7511,10 @@ export const getGetContactListsQueryKey = (params: GetContactListsParams) => {
 export const getGetContactListsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
@@ -7545,56 +7545,56 @@ export type GetContactListsQueryError =
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactLists>>,
-					TError,
-					Awaited<ReturnType<typeof getContactLists>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactLists>>,
+				TError,
+				Awaited<ReturnType<typeof getContactLists>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactLists>>,
-					TError,
-					Awaited<ReturnType<typeof getContactLists>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactLists>>,
+				TError,
+				Awaited<ReturnType<typeof getContactLists>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
@@ -7605,10 +7605,10 @@ export function useGetContactLists<
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
@@ -7641,10 +7641,10 @@ export const createList = (newContactListSchema: NewContactListSchema, signal?: 
 
 export const getCreateListMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7688,10 +7688,10 @@ export type CreateListMutationError =
 
 export const useCreateList = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7725,10 +7725,10 @@ export const getGetListByIdQueryKey = (id: string) => {
 export const getGetListByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7759,52 +7759,52 @@ export type GetListByIdQueryError =
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getListById>>,
-					TError,
-					Awaited<ReturnType<typeof getListById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getListById>>,
+				TError,
+				Awaited<ReturnType<typeof getListById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getListById>>,
-					TError,
-					Awaited<ReturnType<typeof getListById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getListById>>,
+				TError,
+				Awaited<ReturnType<typeof getListById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7815,10 +7815,10 @@ export function useGetListById<
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7855,10 +7855,10 @@ export const updateListById = (
 
 export const getUpdateListByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7902,10 +7902,10 @@ export type UpdateListByIdMutationError =
 
 export const useUpdateListById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7934,10 +7934,10 @@ export const deleteListById = (id: string) => {
 
 export const getDeleteListByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7981,10 +7981,10 @@ export type DeleteListByIdMutationError =
 
 export const useDeleteListById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8023,10 +8023,10 @@ export const getGetCampaignsQueryKey = (params: GetCampaignsParams) => {
 export const getGetCampaignsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
@@ -8057,52 +8057,52 @@ export type GetCampaignsQueryError =
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaigns>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaigns>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaigns>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaigns>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaigns>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaigns>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaigns>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaigns>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
@@ -8113,10 +8113,10 @@ export function useGetCampaigns<
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
@@ -8149,10 +8149,10 @@ export const createCampaign = (newCampaignSchema: NewCampaignSchema, signal?: Ab
 
 export const getCreateCampaignMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8196,10 +8196,10 @@ export type CreateCampaignMutationError =
 
 export const useCreateCampaign = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8237,10 +8237,10 @@ export const getGetCampaignByIdQueryKey = (id: string) => {
 export const getGetCampaignByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8271,56 +8271,56 @@ export type GetCampaignByIdQueryError =
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8331,10 +8331,10 @@ export function useGetCampaignById<
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8371,10 +8371,10 @@ export const updateCampaignById = (
 
 export const getUpdateCampaignByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8420,10 +8420,10 @@ export type UpdateCampaignByIdMutationError =
 
 export const useUpdateCampaignById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8452,10 +8452,10 @@ export const deleteCampaignById = (id: string) => {
 
 export const getDeleteCampaignByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8501,10 +8501,10 @@ export type DeleteCampaignByIdMutationError =
 
 export const useDeleteCampaignById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8543,10 +8543,10 @@ export const getGetConversationsQueryKey = (params: GetConversationsParams) => {
 export const getGetConversationsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
@@ -8579,56 +8579,56 @@ export type GetConversationsQueryError =
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversations>>,
-					TError,
-					Awaited<ReturnType<typeof getConversations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversations>>,
+				TError,
+				Awaited<ReturnType<typeof getConversations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversations>>,
-					TError,
-					Awaited<ReturnType<typeof getConversations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversations>>,
+				TError,
+				Awaited<ReturnType<typeof getConversations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
@@ -8641,10 +8641,10 @@ export function useGetConversations<
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
@@ -8682,10 +8682,10 @@ export const getGetConversationByIdQueryKey = (id: string) => {
 export const getGetConversationByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8720,56 +8720,56 @@ export type GetConversationByIdQueryError =
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationById>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationById>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationById>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationById>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8782,10 +8782,10 @@ export function useGetConversationById<
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8824,10 +8824,10 @@ export const updateConversationById = (
 
 export const getUpdateConversationByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8873,10 +8873,10 @@ export type UpdateConversationByIdMutationError =
 
 export const useUpdateConversationById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8908,10 +8908,10 @@ export const deleteConversationById = (id: string) => {
 
 export const getDeleteConversationByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8957,10 +8957,10 @@ export type DeleteConversationByIdMutationError =
 
 export const useDeleteConversationById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8999,10 +8999,10 @@ export const assignConversation = (
 
 export const getAssignConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9048,10 +9048,10 @@ export type AssignConversationMutationError =
 
 export const useAssignConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9090,10 +9090,10 @@ export const unassignConversation = (
 
 export const getUnassignConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9139,10 +9139,10 @@ export type UnassignConversationMutationError =
 
 export const useUnassignConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9188,10 +9188,10 @@ export const getGetConversationMessagesQueryKey = (
 export const getGetConversationMessagesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -9228,10 +9228,10 @@ export type GetConversationMessagesQueryError =
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -9239,23 +9239,23 @@ export function useGetConversationMessages<
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationMessages>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -9263,23 +9263,23 @@ export function useGetConversationMessages<
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationMessages>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -9293,10 +9293,10 @@ export function useGetConversationMessages<
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -9336,10 +9336,10 @@ export const sendMessageInConversation = (
 
 export const getSendMessageInConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9385,10 +9385,10 @@ export type SendMessageInConversationMutationError =
 
 export const useSendMessageInConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9432,10 +9432,10 @@ export const uploadFileInConversation = (
 
 export const getUploadFileInConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9481,10 +9481,10 @@ export type UploadFileInConversationMutationError =
 
 export const useUploadFileInConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9518,10 +9518,10 @@ export const getGetMessagesQueryKey = (params?: GetMessagesParams) => {
 export const getGetMessagesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
@@ -9552,52 +9552,52 @@ export type GetMessagesQueryError =
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetMessagesParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
@@ -9608,10 +9608,10 @@ export function useGetMessages<
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
@@ -9648,10 +9648,10 @@ export const getGetIntegrationsQueryKey = (params?: GetIntegrationsParams) => {
 export const getGetIntegrationsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
@@ -9682,56 +9682,56 @@ export type GetIntegrationsQueryError =
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetIntegrationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getIntegrations>>,
-					TError,
-					Awaited<ReturnType<typeof getIntegrations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getIntegrations>>,
+				TError,
+				Awaited<ReturnType<typeof getIntegrations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getIntegrations>>,
-					TError,
-					Awaited<ReturnType<typeof getIntegrations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getIntegrations>>,
+				TError,
+				Awaited<ReturnType<typeof getIntegrations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
@@ -9742,10 +9742,10 @@ export function useGetIntegrations<
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
@@ -9782,10 +9782,10 @@ export const getGetAggregateCountsQueryKey = (params: GetAggregateCountsParams) 
 export const getGetAggregateCountsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
@@ -9820,56 +9820,56 @@ export type GetAggregateCountsQueryError =
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCounts>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCounts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCounts>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCounts>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCounts>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCounts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCounts>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCounts>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
@@ -9882,10 +9882,10 @@ export function useGetAggregateCounts<
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
@@ -9929,10 +9929,10 @@ export const getGetAggregateCampaignAnalyticsQueryKey = (
 export const getGetAggregateCampaignAnalyticsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -9972,10 +9972,10 @@ export type GetAggregateCampaignAnalyticsQueryError =
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options: {
@@ -9986,23 +9986,23 @@ export function useGetAggregateCampaignAnalytics<
 				TData
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -10013,23 +10013,23 @@ export function useGetAggregateCampaignAnalytics<
 				TData
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -10046,10 +10046,10 @@ export function useGetAggregateCampaignAnalytics<
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -10095,10 +10095,10 @@ export const getGetConversationAnalyticsQueryKey = (params?: GetConversationAnal
 export const getGetConversationAnalyticsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
@@ -10134,56 +10134,56 @@ export type GetConversationAnalyticsQueryError =
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetConversationAnalyticsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
@@ -10196,10 +10196,10 @@ export function useGetConversationAnalytics<
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
@@ -10237,10 +10237,10 @@ export const getGetCampaignAnalyticsByIdQueryKey = (campaignId: string) => {
 export const getGetCampaignAnalyticsByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
@@ -10276,56 +10276,56 @@ export type GetCampaignAnalyticsByIdQueryError =
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignAnalyticsById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignAnalyticsById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
@@ -10338,10 +10338,10 @@ export function useGetCampaignAnalyticsById<
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
@@ -10380,10 +10380,10 @@ export const getGetAiChatsQueryKey = (params?: GetAiChatsParams) => {
 export const getGetAiChatsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
@@ -10414,52 +10414,52 @@ export type GetAiChatsQueryError =
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetAiChatsParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChats>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChats>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChats>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChats>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChats>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChats>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChats>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChats>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
@@ -10470,10 +10470,10 @@ export function useGetAiChats<
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
@@ -10509,10 +10509,10 @@ export const getGetAiChatByIdQueryKey = (id: string) => {
 export const getGetAiChatByIdQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10543,52 +10543,52 @@ export type GetAiChatByIdQueryError =
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatById>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatById>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatById>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatById>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10599,10 +10599,10 @@ export function useGetAiChatById<
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10643,10 +10643,10 @@ export const getGetAiChatMessagesQueryKey = (id: string, params: GetAiChatMessag
 export const getGetAiChatMessagesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -10682,10 +10682,10 @@ export type GetAiChatMessagesQueryError =
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -10693,23 +10693,23 @@ export function useGetAiChatMessages<
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -10717,23 +10717,23 @@ export function useGetAiChatMessages<
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -10747,10 +10747,10 @@ export function useGetAiChatMessages<
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -10791,10 +10791,10 @@ export const sendMessageInAiChat = (
 
 export const getSendMessageInAiChatMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10840,10 +10840,10 @@ export type SendMessageInAiChatMutationError =
 
 export const useSendMessageInAiChat = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10889,10 +10889,10 @@ export const getGetAiChatMessageVotesQueryKey = (
 export const getGetAiChatMessageVotesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -10929,10 +10929,10 @@ export type GetAiChatMessageVotesQueryError =
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -10940,23 +10940,23 @@ export function useGetAiChatMessageVotes<
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessageVotes>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -10964,23 +10964,23 @@ export function useGetAiChatMessageVotes<
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessageVotes>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -10994,10 +10994,10 @@ export function useGetAiChatMessageVotes<
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -11037,10 +11037,10 @@ export const voteOnAiChatMessage = (
 
 export const getVoteOnAiChatMessageMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11086,10 +11086,10 @@ export type VoteOnAiChatMessageMutationError =
 
 export const useVoteOnAiChatMessage = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11133,10 +11133,10 @@ export const getGetAiChatSegmentRecommendationsQueryKey = (
 export const getGetAiChatSegmentRecommendationsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -11176,10 +11176,10 @@ export type GetAiChatSegmentRecommendationsQueryError =
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetAiChatSegmentRecommendationsParams,
 	options: {
@@ -11190,23 +11190,23 @@ export function useGetAiChatSegmentRecommendations<
 				TData
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -11217,23 +11217,23 @@ export function useGetAiChatSegmentRecommendations<
 				TData
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -11250,10 +11250,10 @@ export function useGetAiChatSegmentRecommendations<
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -11301,10 +11301,10 @@ export const getGetConversationResponseSuggestionsQueryKey = (
 export const getGetConversationResponseSuggestionsQueryOptions = <
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
@@ -11344,10 +11344,10 @@ export type GetConversationResponseSuggestionsQueryError =
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options: {
@@ -11358,23 +11358,23 @@ export function useGetConversationResponseSuggestions<
 				TData
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
@@ -11385,23 +11385,23 @@ export function useGetConversationResponseSuggestions<
 				TData
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
@@ -11418,10 +11418,10 @@ export function useGetConversationResponseSuggestions<
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {

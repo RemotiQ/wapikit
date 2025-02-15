@@ -3,8 +3,10 @@ package conversation_controller
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -173,6 +175,12 @@ func NewConversationController() *ConversationController {
 							api_types.GetConversation,
 						},
 					},
+				},
+				{
+					Path:                    "/api/conversation/:id/media/:mediaId",
+					Method:                  http.MethodGet,
+					Handler:                 interfaces.HandlerWithSession(handleProxyWhatsAppMedia),
+					IsAuthorizationRequired: true,
 				},
 			},
 		},
@@ -719,7 +727,7 @@ func handleSendMessage(context interfaces.ContextWithSession) error {
 		ContactId:                 convoData.ContactId,
 		Direction:                 model.MessageDirectionEnum_OutBound,
 		Status:                    model.MessageStatusEnum_Sent,
-		MessageType:               model.MessageTypeEnum_Text, // override if needed
+		MessageType:               model.MessageTypeEnum(discriminator), // override if needed
 		OrganizationId:            convoData.OrganizationId,
 		WhatsAppMessageId:         &whatsappMessageId,
 		WhatsappBusinessAccountId: &convoData.WhatsappBusinessAccount.AccountId,
@@ -1032,15 +1040,131 @@ func handleMediaUpload(context interfaces.ContextWithSession) error {
 	}
 
 	// Optionally, retrieve a temporary media URL.
-	mediaURL, err := mediaManager.GetMediaUrlById(mediaID)
+	mediaUrl, err := mediaManager.GetMediaUrlById(mediaID)
 	if err != nil {
 		// Log the error but we can still proceed with mediaID.
 		context.App.Logger.Error("failed to retrieve media URL", err.Error(), nil)
 	}
 
 	// Return the media ID and URL to the frontend.
-	return context.JSON(http.StatusOK, map[string]interface{}{
-		"mediaId":  mediaID,
-		"mediaUrl": mediaURL,
+	return context.JSON(http.StatusOK, api_types.UploadFileInConversationResponseSchema{
+		MediaId:  mediaID,
+		MediaUrl: mediaUrl,
 	})
+}
+
+func handleProxyWhatsAppMedia(context interfaces.ContextWithSession) error {
+	redis := context.App.Redis
+	// logger := context.App.Logger
+
+	// 0. Validate conversationId
+	conversationId := context.Param("id")
+	if conversationId == "" {
+		return context.JSON(http.StatusBadRequest, "conversation id is required")
+	}
+
+	conversationUuid, err := uuid.Parse(conversationId)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "invalid conversation id")
+	}
+
+	conversationQuery := SELECT(
+		table.Conversation.AllColumns,
+		table.Organization.AllColumns,
+		table.WhatsappBusinessAccount.AllColumns,
+	).FROM(
+		table.Conversation.LEFT_JOIN(
+			table.Organization, table.Conversation.OrganizationId.EQ(table.Organization.UniqueId),
+		).LEFT_JOIN(
+			table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Organization.UniqueId),
+		),
+	).WHERE(
+		table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
+	).LIMIT(1)
+
+	var conversation struct {
+		model.Conversation
+		Organization            model.Organization
+		WhatsappBusinessAccount model.WhatsappBusinessAccount
+	}
+
+	err = conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &conversation)
+
+	if err != nil {
+		if err.Error() == qrm.ErrNoRows.Error() {
+			return context.JSON(http.StatusNotFound, "conversation not found")
+		}
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	mediaId := context.Param("mediaId")
+	if mediaId == "" {
+		return context.JSON(http.StatusBadRequest, "Missing mediaId")
+	}
+
+	// Use MediaManager to upload the media file to WhatsApp.
+	messagingClient := context.App.WapiClient.NewMessagingClient(conversation.PhoneNumberUsed)
+	mediaManager := messagingClient.Media
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, fmt.Sprintf("upload failed: %v", err))
+	}
+
+	cacheKey := redis.ComputeCacheKey("media", mediaId, "url")
+	var mediaUrl string
+	ok, err := redis.GetCachedData(cacheKey, &mediaUrl)
+
+	if !ok || err != nil {
+		mediaUrl, err = mediaManager.GetMediaUrlById(mediaId)
+		if err != nil {
+			return context.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to get media url: %v", err))
+		}
+		redis.CacheData(cacheKey, mediaUrl, time.Minute*4)
+	}
+
+	if mediaUrl == "" {
+		return context.JSON(http.StatusNotFound, "media url is empty or not found")
+	}
+
+	// 3. Build an HTTP GET request to that ephemeral URL, adding your bearer token if needed.
+	req, err := http.NewRequest(http.MethodGet, mediaUrl, nil)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to create request: %v", err))
+	}
+
+	// Possibly set an Authorization header, if the ephemeral URL requires your token.
+	// For example:
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", conversation.WhatsappBusinessAccount.AccessToken))
+
+	// 4. Execute the request.
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return context.JSON(http.StatusBadGateway, fmt.Sprintf("failed to fetch media from WhatsApp: %v", err))
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return context.JSON(resp.StatusCode, fmt.Sprintf("upstream error: %s", string(bodyBytes)))
+	}
+
+	// 5. Copy relevant headers to the response (e.g. Content-Type, Content-Length).
+	contentType := resp.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	context.Response().Header().Set("Content-Type", contentType)
+
+	// 6. Stream the body directly to the client.
+	// If your framework supports returning a "stream" response, you can do that.
+	// Otherwise, manually copy the bytes to the Context's writer.
+
+	// Option A: Manually copy the stream:
+	_, copyErr := io.Copy(context.Response().Writer, resp.Body)
+	if copyErr != nil && !strings.Contains(copyErr.Error(), "broken pipe") {
+		// Log or handle partial writes if needed
+		context.App.Logger.Error("error streaming media to client", copyErr.Error(), nil)
+	}
+
+	return nil
 }

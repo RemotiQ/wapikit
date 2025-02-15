@@ -381,13 +381,20 @@ func handleSignIn(context interfaces.ContextWithoutSession) error {
 		return context.JSON(http.StatusInternalServerError, "Error generating token")
 	}
 
+	domain := "localhost"
+	secure := false
+	if context.App.Constants.IsProduction {
+		domain = ".wapikit.com"
+		secure = true
+	}
+
 	cookie := &http.Cookie{
 		Name:     "__auth_token",
 		Value:    token,
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   secure,
 		Path:     "/",
-		Domain:   ".wapikit.com",
+		Domain:   domain,
 		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Now().Add(24 * 60 * time.Hour),
 	}
@@ -595,17 +602,23 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 		return context.JSON(http.StatusInternalServerError, "Error generating token")
 	}
 
+	domain := "localhost"
+	secure := false
+	if context.App.Constants.IsProduction {
+		domain = ".wapikit.com"
+		secure = true
+	}
+
 	cookie := &http.Cookie{
 		Name:     "__auth_token",
 		Value:    token,
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   secure,
 		Path:     "/",
-		Domain:   ".wapikit.com",
+		Domain:   domain,
 		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Now().Add(24 * 60 * time.Hour),
 	}
-
 	context.SetCookie(cookie)
 
 	// ! send slack notification for new user registration

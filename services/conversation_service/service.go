@@ -199,8 +199,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 			return nil, err
 		}
 		audioMsg, err := components.NewAudioMessage(components.AudioMessageConfigs{
-			Id:   audioData.Id,
-			Link: audioData.Link,
+			Id: audioData.Id,
 		})
 		if err != nil {
 			return nil, err
@@ -230,8 +229,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 			return nil, err
 		}
 		videoMsg, err := components.NewVideoMessage(components.VideoMessageConfigs{
-			Id:   videoData.Id,
-			Link: videoData.Link,
+			Id: videoData.Id,
 		})
 		if err != nil {
 			return nil, err
@@ -245,7 +243,6 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		imageMsg, err := components.NewImageMessage(components.ImageMessageConfigs{
 			Id:      imageData.Id,
-			Link:    imageData.Link,
 			Caption: *imageData.Caption,
 		})
 		if err != nil {
@@ -272,8 +269,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 			return nil, err
 		}
 		stickerMsg, err := components.NewStickerMessage(&components.StickerMessageConfigs{
-			Id:   stickerData.Id,
-			Link: stickerData.Link,
+			Id: stickerData.Id,
 		})
 		if err != nil {
 			return nil, err

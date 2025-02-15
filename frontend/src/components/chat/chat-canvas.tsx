@@ -209,7 +209,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		}
 	)
 
-	const { error, uploadMedia } = useUploadMedia()
+	const { error, uploadMedia } = useUploadMedia(conversationId)
 
 	const pushMessageToConversation = useCallback(
 		(message: MessageSchema) => {
@@ -243,7 +243,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 					message
 				})
 
-				if (!currentConversation || !message) return
+				if (!currentConversation || (!message && !attachedFiles.length)) return
 				setIsBusy(true)
 
 				// * user can select multiple files at a time, but will be sent as separate messages only
@@ -262,14 +262,18 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 								return f
 							})
 						)
-						const { mediaId, mediaUrl } = await uploadMedia(file.file)
+						const response = await uploadMedia(file.file)
 
-						if (error) {
+						if (error || !response) {
 							errorNotification({
-								message: error
+								message: error || 'Failed to upload media'
 							})
 							return
 						}
+
+						const { mediaId, mediaUrl } = response
+
+						console.log('mediaUrl', mediaUrl)
 
 						// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 						let messageData: NewMessageDataSchema | null = null
