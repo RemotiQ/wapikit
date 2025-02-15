@@ -42,7 +42,7 @@ const CreateNewCampaignPage = () => {
 						<NewCampaignForm initialData={campaignResponse?.campaign || null} />
 					)}
 
-					<DocumentationPitch type="campaign" className='hidden lg:flex' />
+					<DocumentationPitch type="campaign" className="hidden lg:flex" />
 				</div>
 			</div>
 		</ScrollArea>

@@ -355,7 +355,8 @@ const MembersPage = () => {
 													buttonVariants({ variant: 'default' })
 												)}
 											>
-												<Icons.inviteTeamMember className="mr-2 h-4 w-4" /> Invite New
+												<Icons.inviteTeamMember className="mr-2 h-4 w-4" />{' '}
+												Invite New
 											</Button>
 										</div>
 										<Separator />
@@ -394,7 +395,8 @@ const MembersPage = () => {
 													buttonVariants({ variant: 'default' })
 												)}
 											>
-												<Icons.inviteTeamMember className="mr-2 h-4 w-4" /> Add New
+												<Icons.inviteTeamMember className="mr-2 h-4 w-4" />{' '}
+												Add New
 											</Button>
 										</div>
 										<Separator />

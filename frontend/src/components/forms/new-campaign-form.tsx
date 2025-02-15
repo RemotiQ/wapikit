@@ -61,7 +61,6 @@ import { Icons } from '../icons'
 import { clsx } from 'clsx'
 import TemplateParameterForm from './template-parameter-form'
 
-
 interface FormProps {
 	initialData: CampaignSchema | null
 }
