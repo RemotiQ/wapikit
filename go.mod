@@ -29,7 +29,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/tmc/langchaingo v0.1.13-pre.0.0.20250202074804-0672790bb23a
 	github.com/vmihailenco/msgpack/v5 v5.4.1
-	github.com/wapikit/wapi.go v0.0.16
+	github.com/wapikit/wapi.go v0.1.1
 	github.com/wapikit/wapikit-enterprise v0.0.0
 	golang.org/x/crypto v0.32.0
 )
