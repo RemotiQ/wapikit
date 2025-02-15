@@ -71,7 +71,7 @@ const Tag: React.FC<{ label: string }> = ({ label }) => {
 
 		setColorMap(updatedMap)
 		setTagColor(updatedMap[label] || '#CCCCCC') // Ensure tagColor is always defined
-	}, [label])
+	}, [colorMap, label])
 
 	if (!tagColor) return null // Prevent rendering until color is available
 
