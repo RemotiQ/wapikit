@@ -38,7 +38,6 @@ import {
 import { Textarea } from '../ui/textarea'
 import { Checkbox } from '../ui/checkbox'
 import { type CheckedState } from '@radix-ui/react-checkbox'
-import { DatePicker } from '../ui/date-picker'
 import { MultiSelect } from '../multi-select'
 import { useLayoutStore } from '~/store/layout.store'
 import { useAuthState } from '~/hooks/use-auth-state'
@@ -58,6 +57,7 @@ import { Icons } from '../icons'
 import { clsx } from 'clsx'
 import TemplateParameterForm from './template-parameter-form'
 import { Skeleton } from '../ui/skeleton'
+import { DateTimePicker } from '../ui/date-time-picker/date-time-picker'
 
 interface FormProps {
 	initialData: CampaignSchema | null
@@ -170,7 +170,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						templateMessageId: data.templateId,
 						phoneNumber: data.phoneNumberToUse,
 						tags: data.tags,
-						status: initialData.status
+						status: isScheduled ? CampaignStatusEnum.Scheduled : initialData.status,
+						scheduledAt: isScheduled ? data.schedule.date : undefined
 					}
 				})
 
@@ -192,7 +193,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						name: data.name,
 						templateMessageId: data.templateId,
 						phoneNumberToUse: data.phoneNumberToUse,
-						tags: data.tags
+						tags: data.tags,
+						scheduledAt: isScheduled ? data.schedule.date : undefined
 					}
 				})
 
@@ -361,7 +363,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 	const isSetupDone = useRef(false)
 	// On initial load, use initial data if available
 	useEffect(() => {
-		if (isSetupDone.current) return
+		if (isSetupDone.current || !currentTemplateId || isFetchingTemplates) return
 
 		console.log('setting up form')
 		const currentTemplate = templatesResponse?.find(
@@ -374,12 +376,16 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 			initialData?.templateComponentParameters ?? undefined
 		)
 
+		console.log({ defaultValuesForTemplateParameter })
+
 		templateMessageComponentParameterForm.reset(defaultValuesForTemplateParameter, {
 			keepDirty: false
 		})
+
 		isSetupDone.current = true
 	}, [
 		templatesResponse,
+		isFetchingTemplates,
 		currentTemplateId,
 		initialData?.templateComponentParameters,
 		templateMessageComponentParameterForm
@@ -401,7 +407,12 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		)
 
 		templateMessageComponentParameterForm.reset(defaultValuesForTemplateParameter)
-	}, [currentTemplateId, templatesResponse, templateMessageComponentParameterForm])
+	}, [
+		currentTemplateId,
+		templatesResponse,
+		templateMessageComponentParameterForm,
+		campaignForm.formState.dirtyFields.templateId
+	])
 
 	return (
 		<>
@@ -861,10 +872,13 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 									name="schedule.date"
 									render={({ field }) => (
 										<FormItem>
-											<DatePicker
-												prefilledDate={
+											<DateTimePicker
+												defaultDate={
 													field.value ? new Date(field.value) : undefined
 												}
+												onChange={() => {
+													field.onChange(new Date())
+												}}
 											/>
 											{/* <DateTimePickerForm /> */}
 											<FormMessage />

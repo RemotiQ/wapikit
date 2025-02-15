@@ -27,7 +27,6 @@ import { Icons } from '~/components/icons'
 import { LinkClicks } from '~/components/analytics/link-clicks'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { ScrollArea } from '~/components/ui/scroll-area'
-import { Tag } from '~/components/ui/tag'
 
 const CampaignsPage = () => {
 	const searchParams = useSearchParams()
@@ -411,11 +410,11 @@ const CampaignsPage = () => {
 														</div>
 													</div>
 													<div className="flex w-full flex-row items-start justify-start gap-x-4">
-														<p className="min-w-28 text-sm font-medium text-foreground">
+														<p className="min-w-28 text-left text-sm font-medium text-foreground">
 															Description
 														</p>
 
-														<div className="line-clamp-3 flex w-full flex-wrap items-center justify-center gap-4 text-balance text-sm font-normal text-muted-foreground">
+														<div className="line-clamp-3 flex w-full flex-wrap items-center justify-start gap-4 text-balance text-sm font-normal text-muted-foreground">
 															{campaignData.campaign.description}
 														</div>
 													</div>
@@ -463,10 +462,12 @@ const CampaignsPage = () => {
 																{campaignData.campaign.tags.map(
 																	tag => {
 																		return (
-																			<Tag
-																				label={tag.label}
+																			<Badge
+																				variant={'outline'}
 																				key={tag.uniqueId}
-																			/>
+																			>
+																				{tag.label}
+																			</Badge>
 																		)
 																	}
 																)}

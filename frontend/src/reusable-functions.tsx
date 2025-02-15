@@ -140,10 +140,14 @@ export function parseTemplateComponents(
 	const bodyParams: TemplateParameterInputType[] = []
 	const buttonParams: TemplateParameterInputType[] = []
 
+	console.log({ template, defaults })
+
 	if (defaults) {
 		headerParams.push(...defaults.header)
 		bodyParams.push(...defaults.body)
 		buttonParams.push(...defaults.buttons)
+
+		return defaults
 	}
 
 	if (!template || !template.components) {
@@ -153,6 +157,8 @@ export function parseTemplateComponents(
 			buttons: buttonParams
 		}
 	}
+
+	console.log('template.components', template.components)
 
 	template.components.forEach(comp => {
 		const type = comp.type?.toUpperCase()
@@ -263,7 +269,6 @@ export function parseTemplateComponents(
 				})
 			}
 		}
-		// FOOTER components usually don't support parameters so we skip them.
 	})
 
 	return {

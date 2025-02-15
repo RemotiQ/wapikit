@@ -83,7 +83,7 @@ func (rc *runningCampaign) nextContactsBatch() bool {
 	var fromClause ReadableTable
 
 	if len(contactListIdExpression) > 0 {
-	fromClause = table.Contact.
+		fromClause = table.Contact.
 			INNER_JOIN(
 				table.ContactListContact, table.ContactListContact.ContactId.EQ(table.Contact.UniqueId).
 					AND(table.ContactListContact.ContactListId.IN(contactListIdExpression...)),
