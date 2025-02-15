@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-const getRandomColor = () => {
+const getRandomColor = (): string => {
 	const colors = [
 		'#FF5733',
 		'#33FF57',
@@ -30,34 +30,60 @@ const getRandomColor = () => {
 	return colors[Math.floor(Math.random() * colors.length)]
 }
 
-const getStoredColors = () => {
-	const stored = localStorage.getItem('tagColors')
-	return stored ? JSON.parse(stored) : {}
+// Function to adjust color brightness
+const adjustColor = (color: string, amount: number): string => {
+	if (!color || !color.startsWith('#') || color.length !== 7) return '#CCCCCC' // Default color
+	const num = parseInt(color.substring(1), 16) // Remove # before parsing
+	const r = Math.min(255, Math.max(0, (num >> 16) + amount))
+	const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount))
+	const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount))
+	return `rgb(${r}, ${g}, ${b})`
 }
 
+// Get colors from localStorage
+const getStoredColors = (): Record<string, string> => {
+	try {
+		const stored = localStorage.getItem('tagColors')
+		return stored ? JSON.parse(stored) : {}
+	} catch (error) {
+		console.error('Error reading colors from storage:', error)
+		return {}
+	}
+}
+
+// Store colors persistently
 const storeColors = (colors: Record<string, string>) => {
 	localStorage.setItem('tagColors', JSON.stringify(colors))
 }
 
 const Tag: React.FC<{ label: string }> = ({ label }) => {
 	const [colorMap, setColorMap] = useState<Record<string, string>>(() => getStoredColors())
+	const [tagColor, setTagColor] = useState<string | null>(null)
 
 	useEffect(() => {
+		let updatedMap = { ...colorMap }
+
 		if (!colorMap[label]) {
 			const newColor = getRandomColor()
-			const updatedMap = { ...colorMap, [label]: newColor }
-			setColorMap(updatedMap)
+			updatedMap[label] = newColor
 			storeColors(updatedMap)
 		}
-	}, [label, colorMap])
+
+		setColorMap(updatedMap)
+		setTagColor(updatedMap[label] || '#CCCCCC') // Ensure tagColor is always defined
+	}, [label])
+
+	if (!tagColor) return null // Prevent rendering until color is available
+
+	const backgroundColor = adjustColor(tagColor, 100) // Lighten color
+	const textColor = adjustColor(tagColor, -50) // Darken color
 
 	return (
-		<div className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 pointer-events-none">
-			<span
-				className="h-2 w-2 rounded-full"
-				style={{ backgroundColor: colorMap[label] }}
-			></span>
-			<span className="text-xs font-medium text-gray-700">{label}</span>
+		<div
+			className="py-o.5 rounded-md px-2 text-sm font-medium"
+			style={{ backgroundColor, color: textColor }}
+		>
+			{label}
 		</div>
 	)
 }

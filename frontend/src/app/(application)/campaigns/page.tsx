@@ -359,8 +359,8 @@ const CampaignsPage = () => {
 							{campaignData ? (
 								<div className="flex flex-row items-center justify-center gap-4 ">
 									<Card className="flex h-full w-full items-center  gap-x-4 rounded-lg !py-4">
-										<CardContent className="grid h-full w-full grid-cols-5 items-start justify-between gap-2 gap-x-16 rounded-lg">
-											<div className="col-span-3">
+										<CardContent className="grid h-full w-full grid-cols-12 items-start justify-between gap-2 gap-x-8 rounded-lg">
+											<div className="col-span-6">
 												<div className="flex flex-row items-center justify-start gap-3">
 													<Icons.announcement className="size-4 text-center" />
 													<div className="font-medium text-foreground">
@@ -370,10 +370,10 @@ const CampaignsPage = () => {
 												<Separator className="my-2" />
 												<div className="flex h-full w-full flex-1 flex-col items-start justify-start gap-4 py-2">
 													<div className="flex w-full flex-row items-center justify-start gap-x-4">
-														<p className="text-sm font-medium text-foreground min-w-28">
+														<p className="min-w-28 text-sm font-medium text-foreground">
 															Name
 														</p>
-														<div className="flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm font-normal">
+														<div className="flex flex-wrap items-center justify-center gap-4 text-sm font-normal text-muted-foreground">
 															{campaignData.campaign.name}
 															<Badge
 																variant={
@@ -410,11 +410,11 @@ const CampaignsPage = () => {
 														</div>
 													</div>
 													<div className="flex w-full flex-row items-start justify-start gap-x-4">
-														<p className="text-sm font-medium text-foreground min-w-28">
+														<p className="min-w-28 text-sm font-medium text-foreground">
 															Description
 														</p>
 
-														<div className="line-clamp-3 flex w-full flex-wrap items-center justify-center gap-4 text-balance font-normal text-muted-foreground text-sm">
+														<div className="line-clamp-3 flex w-full flex-wrap items-center justify-center gap-4 text-balance text-sm font-normal text-muted-foreground">
 															{campaignData.campaign.description}
 														</div>
 													</div>
@@ -422,8 +422,8 @@ const CampaignsPage = () => {
 													<div className="flex h-full w-full flex-col gap-4">
 														{/* sent to lists */}
 														<div className="flex w-full flex-row items-center justify-start gap-x-4">
-															<p className="text-sm font-medium text-foreground min-w-28">
-																Sent
+															<p className="min-w-28 text-sm font-medium text-foreground">
+																Sent to
 															</p>
 
 															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
@@ -449,10 +449,10 @@ const CampaignsPage = () => {
 
 														{/* tags */}
 														<div className="flex w-full flex-row items-center justify-start gap-x-4 ">
-															<p className="text-sm font-medium text-foreground min-w-28">
+															<p className="min-w-28 text-sm font-medium text-foreground">
 																Tag
 															</p>
-															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate">
+															<div className="flex flex-wrap items-center justify-start gap-1 truncate">
 																{campaignData.campaign.tags
 																	.length === 0 && (
 																	<Badge variant={'outline'}>
@@ -474,10 +474,10 @@ const CampaignsPage = () => {
 
 														{/* created on */}
 														<div className="flex w-full flex-row items-center justify-start gap-x-4">
-															<p className="text-sm font-medium text-foreground min-w-28">
-																Create on
+															<p className="min-w-28 text-sm font-medium text-foreground">
+																Created on
 															</p>
-															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate  font-normal text-sm text-muted-foreground">
+															<div className="flex flex-wrap items-center justify-center gap-0.5 truncate  text-sm font-normal text-muted-foreground">
 																{dayjs(
 																	campaignData.campaign.createdAt
 																).format('DD MMM, YYYY')}
@@ -486,7 +486,11 @@ const CampaignsPage = () => {
 													</div>
 												</div>
 											</div>
-											<div className="col-span-2">
+											<Separator
+												orientation="vertical"
+												className="col-span-1 mx-auto"
+											/>
+											<div className="col-span-5">
 												<div className="flex flex-row items-center justify-start gap-3">
 													<Icons.analytics className="size-4 text-center" />
 													<div className="font-medium text-foreground">
@@ -549,61 +553,6 @@ const CampaignsPage = () => {
 											</div>
 										</CardContent>
 									</Card>
-
-									{/* <Card className="flex h-full w-full max-w-[25rem] flex-col items-center rounded-lg">
-										<CardContent className="h-full w-full !py-4">
-											<div className="flex flex-row items-center justify-center gap-3">
-												<Icons.analytics className="size-4 text-center" />
-												<div className="text-gray-500">
-													Message Analytics
-												</div>
-											</div>
-											<Separator className="my-2" />
-											<div className="mx-auto flex w-full flex-col gap-4 px-10 py-8">
-												{[
-													{
-														label: 'Sent',
-														icon: 'send',
-														count: 0
-													},
-													{
-														label: 'Read',
-														icon: 'doubleCheck',
-														count: 0
-													},
-													{
-														label: 'Delivered',
-														icon: 'send',
-														count: 0
-													},
-													{
-														label: 'Failed',
-														icon: 'send',
-														count: 0
-													}
-												].map(item => {
-													const Icon =
-														Icons[item.icon as keyof typeof Icons]
-													return (
-														<div
-															className="flex w-full flex-1 justify-between"
-															key={item.label}
-														>
-															<div className="flex items-center justify-center gap-4 font-medium text-muted-foreground">
-																<Icon className="size-5" />
-																<p className="text-sm">
-																	{item.label}
-																</p>
-															</div>
-															<div className="text-center">
-																{item.count}
-															</div>
-														</div>
-													)
-												})}
-											</div>
-										</CardContent>
-									</Card> */}
 								</div>
 							) : null}
 

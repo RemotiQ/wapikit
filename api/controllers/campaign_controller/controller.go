@@ -709,7 +709,7 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 			),
 			CTE("insert_tag").AS(
 				table.CampaignTag.
-					INSERT(table.CampaignTag.MutableColumns).
+					INSERT().
 					MODELS(tagsToBeInserted).
 					ON_CONFLICT(table.CampaignTag.CampaignId, table.CampaignTag.TagId).
 					DO_NOTHING(),
