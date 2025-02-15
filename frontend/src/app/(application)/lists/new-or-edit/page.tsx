@@ -2,7 +2,6 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useDeleteListById, useGetListById } from 'root/.generated'
-import BreadCrumb from '~/components/breadcrumb'
 import DocumentationPitch from '~/components/forms/documentation-pitch'
 import NewContactListForm from '~/components/forms/new-contact-list-form'
 import { Icons } from '~/components/icons'
@@ -13,11 +12,6 @@ import { Separator } from '~/components/ui/separator'
 import { errorNotification, materialConfirm, successNotification } from '~/reusable-functions'
 
 const CreateNewContactListPage = () => {
-	const breadcrumbItems = [
-		{ title: 'Lists', link: '/lists' },
-		{ title: 'Create', link: '/lists/new-or-edit' }
-	]
-
 	const searchParams = useSearchParams()
 	const listId = searchParams.get('id')
 	const deleteContactListMutation = useDeleteListById()
@@ -60,8 +54,7 @@ const CreateNewContactListPage = () => {
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
+			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
 				<div className="flex items-start justify-between">
 					<Heading
 						title={listId ? 'Edit Contact List' : `Create New Contact List`}

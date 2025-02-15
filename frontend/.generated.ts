@@ -664,7 +664,7 @@ export interface ContactListSchema {
 export interface NewContactListSchema {
 	name: string
 	description?: string
-	tags: TagSchema[]
+	tags: string[]
 	contactIds?: string[]
 }
 
@@ -675,7 +675,7 @@ export interface CreateNewListResponseSchema {
 export interface UpdateContactListSchema {
 	name: string
 	description?: string
-	tags: TagSchema[]
+	tags: string[]
 }
 
 export interface UpdateListByIdResponseSchema {
@@ -708,7 +708,10 @@ export interface TemplateSchema {
 	createdAt: string
 }
 
-export type CampaignSchemaTemplateComponentParameters = { [key: string]: unknown }
+export type CampaignSchemaProgress = {
+	totalMessages: number
+	sent: number
+}
 
 export interface CampaignSchema {
 	uniqueId: string
@@ -723,8 +726,9 @@ export interface CampaignSchema {
 	isLinkTrackingEnabled: boolean
 	phoneNumberInUse?: string
 	tags: TagSchema[]
-	templateComponentParameters?: CampaignSchemaTemplateComponentParameters
+	templateComponentParameters?: TemplateComponentParameters
 	stats?: CampaignAnalyticsResponseSchema
+	progress?: CampaignSchemaProgress
 }
 
 export interface NewCampaignSchema {
@@ -738,7 +742,51 @@ export interface NewCampaignSchema {
 	tags: string[]
 }
 
-export type UpdateCampaignSchemaTemplateComponentParameters = { [key: string]: unknown }
+/**
+ * Specifies whether the parameter is static or dynamic.
+ */
+export type TemplateParameterInputParameterType =
+	(typeof TemplateParameterInputParameterType)[keyof typeof TemplateParameterInputParameterType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TemplateParameterInputParameterType = {
+	static: 'static',
+	dynamic: 'dynamic'
+} as const
+
+/**
+ * A single template parameter input. It can be either static or dynamic.
+
+ */
+export interface TemplateParameterInput {
+	/** The name or index identifying the parameter. */
+	nameOrIndex: string
+	/** The display label for the parameter. */
+	label: string
+	/** Specifies whether the parameter is static or dynamic. */
+	parameterType: TemplateParameterInputParameterType
+	/** For dynamic parameters, the field name to resolve (e.g. 'firstName'). */
+	dynamicField?: string
+	/** The static value to be used if applicable. */
+	staticValue?: string
+	/** An example value for the parameter. */
+	example?: string
+	/** Placeholder text to guide the user input. */
+	placeholder?: string
+}
+
+/**
+ * Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+
+ */
+export interface TemplateComponentParameters {
+	/** Parameters for header components. */
+	header: TemplateParameterInput[]
+	/** Parameters for body components. */
+	body: TemplateParameterInput[]
+	/** Parameters for button components. */
+	buttons: TemplateParameterInput[]
+}
 
 export interface UpdateCampaignSchema {
 	name: string
@@ -749,7 +797,7 @@ export interface UpdateCampaignSchema {
 	tags: string[]
 	status?: CampaignStatusEnum
 	phoneNumber?: string
-	templateComponentParameters?: UpdateCampaignSchemaTemplateComponentParameters
+	templateComponentParameters?: TemplateComponentParameters
 	scheduledAt?: string
 }
 
@@ -898,6 +946,7 @@ export interface MessageAnalyticGraphDataPointSchema {
 	date: string
 	label: string
 	sent: number
+	delivered: number
 	replied: number
 	read: number
 }
@@ -908,7 +957,7 @@ export interface MessageTypeDistributionGraphDataPointSchema {
 	received: number
 }
 
-export interface LinkClicksGraphDataPointSchema {
+export interface DateToCountGraphDataPointSchema {
 	date: string
 	label: string
 	count: number
@@ -921,15 +970,28 @@ export interface ConversationAnalyticsDataPointSchema {
 	numberOfNewConversationOpened: number
 }
 
-export interface PrimaryAnalyticsResponseSchema {
+export interface DashboardAggregateCountResponseSchema {
 	aggregateAnalytics: AggregateAnalyticsSchema
-	messageAnalytics: MessageAnalyticGraphDataPointSchema[]
-	linkClickAnalytics: LinkClicksGraphDataPointSchema[]
 }
 
-export interface SecondaryAnalyticsDashboardResponseSchema {
+export interface GetConversationAnalyticsResponseSchema {
+	analytics: ConversationAggregateAnalytics
+}
+
+export interface ConversationAggregateAnalytics {
+	avgResponseTimeInMinutes: number
+	totalConversations: number
+	conversationsActive: number
+	conversationsClosed: number
+	conversationsPending: number
+	serviceConversations: number
+	inboundToOutboundRatio: number
 	conversationsAnalytics: ConversationAnalyticsDataPointSchema[]
 	messageTypeTrafficDistributionAnalytics: MessageTypeDistributionGraphDataPointSchema[]
+}
+
+export interface GetAggregateCampaignAnalyticsResponseSchema {
+	analytics: CampaignAnalyticsResponseSchema
 }
 
 export interface CampaignAnalyticsResponseSchema {
@@ -944,7 +1006,9 @@ export interface CampaignAnalyticsResponseSchema {
 	openRate: number
 	engagementRate: number
 	totalLinkClicks: number
-	linkClicksData: LinkClicksGraphDataPointSchema[]
+	engagementTrends: DateToCountGraphDataPointSchema[]
+	linkClicksData: DateToCountGraphDataPointSchema[]
+	messageAnalytics: MessageAnalyticGraphDataPointSchema[]
 }
 
 export interface GetIntegrationResponseSchema {
@@ -1078,15 +1142,38 @@ export interface TemplateMessageComponentButton {
 	url?: string
 }
 
+export type TemplateMessageComponentExampleHeaderTextNamedParamsItem = {
+	param_name: string
+	example: string
+}
+
+export type TemplateMessageComponentExampleBodyTextNamedParamsItem = {
+	param_name: string
+	example: string
+}
+
 export interface TemplateMessageComponentExample {
+	/** For media headers (IMAGE, VIDEO, DOCUMENT). */
 	header_handle?: string[]
+	/** For positional header text examples. */
 	header_text?: string[]
+	/** For named parameters in header components. */
+	header_text_named_params?: TemplateMessageComponentExampleHeaderTextNamedParamsItem[]
+	/** For positional examples in body components. */
 	body_text?: string[][]
+	/** For named parameters in body components. */
+	body_text_named_params?: TemplateMessageComponentExampleBodyTextNamedParamsItem[]
+}
+
+/**
+ * Limited time offer parameters, if applicable.
+ */
+export interface TemplateMessageLimitedTimeOfferParameter {
+	offer_code?: string
+	expiry_minutes?: number
 }
 
 export type WhatsAppBusinessHSMWhatsAppHSMComponentCardsItem = { [key: string]: unknown }
-
-export type WhatsAppBusinessHSMWhatsAppHSMComponentLimitedTimeOffer = { [key: string]: unknown }
 
 export interface WhatsAppBusinessHSMWhatsAppHSMComponent {
 	add_security_recommendation?: boolean
@@ -1095,7 +1182,7 @@ export interface WhatsAppBusinessHSMWhatsAppHSMComponent {
 	code_expiration_minutes?: number
 	example?: TemplateMessageComponentExample
 	format?: MessageTemplateComponentFormat
-	limited_time_offer?: WhatsAppBusinessHSMWhatsAppHSMComponentLimitedTimeOffer
+	limited_time_offer?: TemplateMessageLimitedTimeOfferParameter
 	text?: string
 	type?: MessageTemplateComponentType
 }
@@ -1251,8 +1338,34 @@ export interface UnauthorizedErrorResponseSchema {
 	message: string
 }
 
+export interface ResetPasswordInitResponseBodySchema {
+	isOtpSent: boolean
+}
+
+export interface ResetPasswordVerifyResponseBodySchema {
+	isVerified: boolean
+}
+
+export interface ResetPasswordCompleteResponseBodySchema {
+	isPasswordReset: boolean
+}
+
 export type GetHealthCheck200 = {
 	data?: boolean
+}
+
+export type ResetPasswordInitBody = {
+	email: string
+}
+
+export type ResetPasswordVerifyBody = {
+	otp: string
+	email: string
+}
+
+export type ResetPasswordCompleteBody = {
+	email: string
+	password: string
 }
 
 export type GetUserNotificationsParams = {
@@ -1557,7 +1670,7 @@ export type GetIntegrationsParams = {
 	status?: IntegrationStatusEnum
 }
 
-export type GetPrimaryAnalyticsParams = {
+export type GetAggregateCountsParams = {
 	/**
 	 * starting range of time span to get analytics for
 	 */
@@ -1568,18 +1681,18 @@ export type GetPrimaryAnalyticsParams = {
 	to: string
 }
 
-export type GetSecondaryAnalyticsParams = {
+export type GetAggregateCampaignAnalyticsParams = {
 	/**
 	 * starting range of time span to get analytics for
 	 */
-	from?: string
+	from: string
 	/**
 	 * ending range of time span to get analytics for
 	 */
-	to?: string
+	to: string
 }
 
-export type GetCampaignsAnalyticsParams = {
+export type GetConversationAnalyticsParams = {
 	/**
 	 * starting range of time span to get analytics for
 	 */
@@ -2300,6 +2413,276 @@ export const useJoinOrganization = <
 	TContext
 > => {
 	const mutationOptions = getJoinOrganizationMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * reset password init endpoint
+ */
+export const resetPasswordInit = (
+	resetPasswordInitBody: ResetPasswordInitBody,
+	signal?: AbortSignal
+) => {
+	return customInstance<ResetPasswordInitResponseBodySchema>({
+		url: `/auth/reset-password/init`,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		data: resetPasswordInitBody,
+		signal
+	})
+}
+
+export const getResetPasswordInitMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordInit>>,
+		TError,
+		{ data: ResetPasswordInitBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof resetPasswordInit>>,
+	TError,
+	{ data: ResetPasswordInitBody },
+	TContext
+> => {
+	const mutationKey = ['resetPasswordInit']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof resetPasswordInit>>,
+		{ data: ResetPasswordInitBody }
+	> = props => {
+		const { data } = props ?? {}
+
+		return resetPasswordInit(data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type ResetPasswordInitMutationResult = NonNullable<
+	Awaited<ReturnType<typeof resetPasswordInit>>
+>
+export type ResetPasswordInitMutationBody = ResetPasswordInitBody
+export type ResetPasswordInitMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useResetPasswordInit = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordInit>>,
+		TError,
+		{ data: ResetPasswordInitBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof resetPasswordInit>>,
+	TError,
+	{ data: ResetPasswordInitBody },
+	TContext
+> => {
+	const mutationOptions = getResetPasswordInitMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * reset password verify endpoint
+ */
+export const resetPasswordVerify = (
+	resetPasswordVerifyBody: ResetPasswordVerifyBody,
+	signal?: AbortSignal
+) => {
+	return customInstance<ResetPasswordVerifyResponseBodySchema>({
+		url: `/auth/reset-password/verify`,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		data: resetPasswordVerifyBody,
+		signal
+	})
+}
+
+export const getResetPasswordVerifyMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordVerify>>,
+		TError,
+		{ data: ResetPasswordVerifyBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof resetPasswordVerify>>,
+	TError,
+	{ data: ResetPasswordVerifyBody },
+	TContext
+> => {
+	const mutationKey = ['resetPasswordVerify']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof resetPasswordVerify>>,
+		{ data: ResetPasswordVerifyBody }
+	> = props => {
+		const { data } = props ?? {}
+
+		return resetPasswordVerify(data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type ResetPasswordVerifyMutationResult = NonNullable<
+	Awaited<ReturnType<typeof resetPasswordVerify>>
+>
+export type ResetPasswordVerifyMutationBody = ResetPasswordVerifyBody
+export type ResetPasswordVerifyMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useResetPasswordVerify = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordVerify>>,
+		TError,
+		{ data: ResetPasswordVerifyBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof resetPasswordVerify>>,
+	TError,
+	{ data: ResetPasswordVerifyBody },
+	TContext
+> => {
+	const mutationOptions = getResetPasswordVerifyMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * reset password complete endpoint
+ */
+export const resetPasswordComplete = (
+	resetPasswordCompleteBody: ResetPasswordCompleteBody,
+	signal?: AbortSignal
+) => {
+	return customInstance<ResetPasswordCompleteResponseBodySchema>({
+		url: `/auth/reset-password/complete`,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		data: resetPasswordCompleteBody,
+		signal
+	})
+}
+
+export const getResetPasswordCompleteMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordComplete>>,
+		TError,
+		{ data: ResetPasswordCompleteBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof resetPasswordComplete>>,
+	TError,
+	{ data: ResetPasswordCompleteBody },
+	TContext
+> => {
+	const mutationKey = ['resetPasswordComplete']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof resetPasswordComplete>>,
+		{ data: ResetPasswordCompleteBody }
+	> = props => {
+		const { data } = props ?? {}
+
+		return resetPasswordComplete(data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type ResetPasswordCompleteMutationResult = NonNullable<
+	Awaited<ReturnType<typeof resetPasswordComplete>>
+>
+export type ResetPasswordCompleteMutationBody = ResetPasswordCompleteBody
+export type ResetPasswordCompleteMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useResetPasswordComplete = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof resetPasswordComplete>>,
+		TError,
+		{ data: ResetPasswordCompleteBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof resetPasswordComplete>>,
+	TError,
+	{ data: ResetPasswordCompleteBody },
+	TContext
+> => {
+	const mutationOptions = getResetPasswordCompleteMutationOptions(options)
 
 	return useMutation(mutationOptions)
 }
@@ -8876,137 +9259,137 @@ export function useGetIntegrations<
 }
 
 /**
- * returns main analytics dashboard data.
+ * returns aggregate counts of all analytics.
  */
-export const getPrimaryAnalytics = (params: GetPrimaryAnalyticsParams, signal?: AbortSignal) => {
-	return customInstance<PrimaryAnalyticsResponseSchema>({
-		url: `/analytics/primary`,
+export const getAggregateCounts = (params: GetAggregateCountsParams, signal?: AbortSignal) => {
+	return customInstance<DashboardAggregateCountResponseSchema>({
+		url: `/analytics/aggregate-counts`,
 		method: 'GET',
 		params,
 		signal
 	})
 }
 
-export const getGetPrimaryAnalyticsQueryKey = (params: GetPrimaryAnalyticsParams) => {
-	return [`/analytics/primary`, ...(params ? [params] : [])] as const
+export const getGetAggregateCountsQueryKey = (params: GetAggregateCountsParams) => {
+	return [`/analytics/aggregate-counts`, ...(params ? [params] : [])] as const
 }
 
-export const getGetPrimaryAnalyticsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+export const getGetAggregateCountsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params: GetPrimaryAnalyticsParams,
+	params: GetAggregateCountsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getPrimaryAnalytics>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		>
 	}
 ) => {
 	const { query: queryOptions } = options ?? {}
 
-	const queryKey = queryOptions?.queryKey ?? getGetPrimaryAnalyticsQueryKey(params)
+	const queryKey = queryOptions?.queryKey ?? getGetAggregateCountsQueryKey(params)
 
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getPrimaryAnalytics>>> = ({ signal }) =>
-		getPrimaryAnalytics(params, signal)
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAggregateCounts>>> = ({ signal }) =>
+		getAggregateCounts(params, signal)
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-		Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+		Awaited<ReturnType<typeof getAggregateCounts>>,
 		TError,
 		TData
 	> & { queryKey: DataTag<QueryKey, TData> }
 }
 
-export type GetPrimaryAnalyticsQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getPrimaryAnalytics>>
+export type GetAggregateCountsQueryResult = NonNullable<
+	Awaited<ReturnType<typeof getAggregateCounts>>
 >
-export type GetPrimaryAnalyticsQueryError =
+export type GetAggregateCountsQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
 
-export function useGetPrimaryAnalytics<
-	TData = Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+export function useGetAggregateCounts<
+	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params: GetPrimaryAnalyticsParams,
+	params: GetAggregateCountsParams,
 	options: {
 		query: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getPrimaryAnalytics>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+					Awaited<ReturnType<typeof getAggregateCounts>>,
 					TError,
-					Awaited<ReturnType<typeof getPrimaryAnalytics>>
+					Awaited<ReturnType<typeof getAggregateCounts>>
 				>,
 				'initialData'
 			>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetPrimaryAnalytics<
-	TData = Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+export function useGetAggregateCounts<
+	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params: GetPrimaryAnalyticsParams,
+	params: GetAggregateCountsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getPrimaryAnalytics>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+					Awaited<ReturnType<typeof getAggregateCounts>>,
 					TError,
-					Awaited<ReturnType<typeof getPrimaryAnalytics>>
+					Awaited<ReturnType<typeof getAggregateCounts>>
 				>,
 				'initialData'
 			>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetPrimaryAnalytics<
-	TData = Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+export function useGetAggregateCounts<
+	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params: GetPrimaryAnalyticsParams,
+	params: GetAggregateCountsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getPrimaryAnalytics>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 
-export function useGetPrimaryAnalytics<
-	TData = Awaited<ReturnType<typeof getPrimaryAnalytics>>,
+export function useGetAggregateCounts<
+	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params: GetPrimaryAnalyticsParams,
+	params: GetAggregateCountsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getPrimaryAnalytics>>, TError, TData>
+			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetPrimaryAnalyticsQueryOptions(params, options)
+	const queryOptions = getGetAggregateCountsQueryOptions(params, options)
 
 	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
 		queryKey: DataTag<QueryKey, TData>
@@ -9018,141 +9401,309 @@ export function useGetPrimaryAnalytics<
 }
 
 /**
- * returns all secondary analytics.
+ * returns aggregate campaign analytics
  */
-export const getSecondaryAnalytics = (
-	params?: GetSecondaryAnalyticsParams,
+export const getAggregateCampaignAnalytics = (
+	params: GetAggregateCampaignAnalyticsParams,
 	signal?: AbortSignal
 ) => {
-	return customInstance<SecondaryAnalyticsDashboardResponseSchema>({
-		url: `/analytics/secondary`,
+	return customInstance<GetAggregateCampaignAnalyticsResponseSchema>({
+		url: `/analytics/campaigns`,
 		method: 'GET',
 		params,
 		signal
 	})
 }
 
-export const getGetSecondaryAnalyticsQueryKey = (params?: GetSecondaryAnalyticsParams) => {
-	return [`/analytics/secondary`, ...(params ? [params] : [])] as const
+export const getGetAggregateCampaignAnalyticsQueryKey = (
+	params: GetAggregateCampaignAnalyticsParams
+) => {
+	return [`/analytics/campaigns`, ...(params ? [params] : [])] as const
 }
 
-export const getGetSecondaryAnalyticsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+export const getGetAggregateCampaignAnalyticsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params?: GetSecondaryAnalyticsParams,
+	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getSecondaryAnalytics>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				TData
+			>
 		>
 	}
 ) => {
 	const { query: queryOptions } = options ?? {}
 
-	const queryKey = queryOptions?.queryKey ?? getGetSecondaryAnalyticsQueryKey(params)
+	const queryKey = queryOptions?.queryKey ?? getGetAggregateCampaignAnalyticsQueryKey(params)
 
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getSecondaryAnalytics>>> = ({
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>> = ({
 		signal
-	}) => getSecondaryAnalytics(params, signal)
+	}) => getAggregateCampaignAnalytics(params, signal)
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-		Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+		Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 		TError,
 		TData
 	> & { queryKey: DataTag<QueryKey, TData> }
 }
 
-export type GetSecondaryAnalyticsQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getSecondaryAnalytics>>
+export type GetAggregateCampaignAnalyticsQueryResult = NonNullable<
+	Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
 >
-export type GetSecondaryAnalyticsQueryError =
+export type GetAggregateCampaignAnalyticsQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
 
-export function useGetSecondaryAnalytics<
-	TData = Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+export function useGetAggregateCampaignAnalytics<
+	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params: undefined | GetSecondaryAnalyticsParams,
+	params: GetAggregateCampaignAnalyticsParams,
 	options: {
 		query: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getSecondaryAnalytics>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				TData
+			>
 		> &
 			Pick<
 				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 					TError,
-					Awaited<ReturnType<typeof getSecondaryAnalytics>>
+					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
 				>,
 				'initialData'
 			>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetSecondaryAnalytics<
-	TData = Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+export function useGetAggregateCampaignAnalytics<
+	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params?: GetSecondaryAnalyticsParams,
+	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getSecondaryAnalytics>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				TData
+			>
 		> &
 			Pick<
 				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 					TError,
-					Awaited<ReturnType<typeof getSecondaryAnalytics>>
+					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
 				>,
 				'initialData'
 			>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetSecondaryAnalytics<
-	TData = Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+export function useGetAggregateCampaignAnalytics<
+	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params?: GetSecondaryAnalyticsParams,
+	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getSecondaryAnalytics>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				TData
+			>
 		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 
-export function useGetSecondaryAnalytics<
-	TData = Awaited<ReturnType<typeof getSecondaryAnalytics>>,
+export function useGetAggregateCampaignAnalytics<
+	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
 		| BadRequestErrorResponseSchema
 		| UnauthorizedErrorResponseSchema
 		| NotFoundErrorResponseSchema
 		| RateLimitErrorResponseSchema
 >(
-	params?: GetSecondaryAnalyticsParams,
+	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
 		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getSecondaryAnalytics>>, TError, TData>
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				TData
+			>
 		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetSecondaryAnalyticsQueryOptions(params, options)
+	const queryOptions = getGetAggregateCampaignAnalyticsQueryOptions(params, options)
+
+	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+		queryKey: DataTag<QueryKey, TData>
+	}
+
+	query.queryKey = queryOptions.queryKey
+
+	return query
+}
+
+/**
+ * returns conversation analytics.
+ */
+export const getConversationAnalytics = (
+	params?: GetConversationAnalyticsParams,
+	signal?: AbortSignal
+) => {
+	return customInstance<GetConversationAnalyticsResponseSchema>({
+		url: `/analytics/conversations`,
+		method: 'GET',
+		params,
+		signal
+	})
+}
+
+export const getGetConversationAnalyticsQueryKey = (params?: GetConversationAnalyticsParams) => {
+	return [`/analytics/conversations`, ...(params ? [params] : [])] as const
+}
+
+export const getGetConversationAnalyticsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema
+>(
+	params?: GetConversationAnalyticsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
+		>
+	}
+) => {
+	const { query: queryOptions } = options ?? {}
+
+	const queryKey = queryOptions?.queryKey ?? getGetConversationAnalyticsQueryKey(params)
+
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof getConversationAnalytics>>> = ({
+		signal
+	}) => getConversationAnalytics(params, signal)
+
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getConversationAnalytics>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetConversationAnalyticsQueryResult = NonNullable<
+	Awaited<ReturnType<typeof getConversationAnalytics>>
+>
+export type GetConversationAnalyticsQueryError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export function useGetConversationAnalytics<
+	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema
+>(
+	params: undefined | GetConversationAnalyticsParams,
+	options: {
+		query: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getConversationAnalytics>>,
+					TError,
+					Awaited<ReturnType<typeof getConversationAnalytics>>
+				>,
+				'initialData'
+			>
+	}
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetConversationAnalytics<
+	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema
+>(
+	params?: GetConversationAnalyticsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getConversationAnalytics>>,
+					TError,
+					Awaited<ReturnType<typeof getConversationAnalytics>>
+				>,
+				'initialData'
+			>
+	}
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetConversationAnalytics<
+	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema
+>(
+	params?: GetConversationAnalyticsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
+		>
+	}
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useGetConversationAnalytics<
+	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema
+>(
+	params?: GetConversationAnalyticsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
+		>
+	}
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+	const queryOptions = getGetConversationAnalyticsQueryOptions(params, options)
 
 	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
 		queryKey: DataTag<QueryKey, TData>
@@ -9295,152 +9846,6 @@ export function useGetCampaignAnalyticsById<
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 	const queryOptions = getGetCampaignAnalyticsByIdQueryOptions(campaignId, options)
-
-	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-/**
- * returns all campaigns analytics.
- */
-export const getCampaignsAnalytics = (
-	params?: GetCampaignsAnalyticsParams,
-	signal?: AbortSignal
-) => {
-	return customInstance<CampaignAnalyticsResponseSchema>({
-		url: `/analytics/campaigns`,
-		method: 'GET',
-		params,
-		signal
-	})
-}
-
-export const getGetCampaignsAnalyticsQueryKey = (params?: GetCampaignsAnalyticsParams) => {
-	return [`/analytics/campaigns`, ...(params ? [params] : [])] as const
-}
-
-export const getGetCampaignsAnalyticsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetCampaignsAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getCampaignsAnalytics>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetCampaignsAnalyticsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getCampaignsAnalytics>>> = ({
-		signal
-	}) => getCampaignsAnalytics(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-		Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetCampaignsAnalyticsQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getCampaignsAnalytics>>
->
-export type GetCampaignsAnalyticsQueryError =
-	| BadRequestErrorResponseSchema
-	| UnauthorizedErrorResponseSchema
-	| NotFoundErrorResponseSchema
-	| RateLimitErrorResponseSchema
-
-export function useGetCampaignsAnalytics<
-	TData = Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: undefined | GetCampaignsAnalyticsParams,
-	options: {
-		query: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getCampaignsAnalytics>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignsAnalytics>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignsAnalytics<
-	TData = Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetCampaignsAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getCampaignsAnalytics>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignsAnalytics>>
-				>,
-				'initialData'
-			>
-	}
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignsAnalytics<
-	TData = Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetCampaignsAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getCampaignsAnalytics>>, TError, TData>
-		>
-	}
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetCampaignsAnalytics<
-	TData = Awaited<ReturnType<typeof getCampaignsAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetCampaignsAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseQueryOptions<Awaited<ReturnType<typeof getCampaignsAnalytics>>, TError, TData>
-		>
-	}
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetCampaignsAnalyticsQueryOptions(params, options)
 
 	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
 		queryKey: DataTag<QueryKey, TData>

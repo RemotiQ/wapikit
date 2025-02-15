@@ -6,13 +6,13 @@ import type React from 'react'
 import { useRef, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react'
 import { toast } from 'sonner'
 import { useLocalStorage, useWindowSize } from 'usehooks-ts'
-import { PaperclipIcon, StopIcon } from './icons'
+import { StopIcon } from './icons'
 import { PreviewAttachment } from './preview-attachment'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '../ui/textarea'
 import { SuggestedActions } from './suggested-actions'
-import { SendIcon } from 'lucide-react'
 import { useAiChatStore } from '~/store/ai-chat-store'
+import { Icons } from '../icons'
 
 const AiChatInput = ({
 	isLoading,
@@ -159,7 +159,7 @@ const AttachmentButton = ({
 			disabled={isLoading}
 			variant="ghost"
 		>
-			<PaperclipIcon size={14} />
+			<Icons.paperclip className="size-5" />
 		</Button>
 	)
 }
@@ -175,8 +175,9 @@ const StopButton = ({ stop }: { stop: () => void }) => {
 				// ! TODO: why do we even need this ???
 				// setMessages(messages => sanitizeUIMessages(messages))
 			}}
+			variant={'secondaryBlack'}
 		>
-			<StopIcon size={14} />
+			<StopIcon size={16} />
 		</Button>
 	)
 }
@@ -184,14 +185,15 @@ const StopButton = ({ stop }: { stop: () => void }) => {
 const SendButton = ({ submitForm, input }: { submitForm: () => void; input: string }) => {
 	return (
 		<Button
-			className="h-fit rounded-full border p-1.5 dark:border-zinc-600"
+			className=""
 			onClick={event => {
 				event.preventDefault()
 				submitForm()
 			}}
+			variant={'secondaryBlack'}
 			disabled={input.length === 0}
 		>
-			<SendIcon size={14} />
+			<Icons.send className="size-5" />
 		</Button>
 	)
 }

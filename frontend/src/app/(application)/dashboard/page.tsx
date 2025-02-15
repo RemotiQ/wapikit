@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Divider } from '@tremor/react'
 import { Toaster } from '~/components/ui/sonner'
-import { useGetCampaigns, useGetPrimaryAnalytics } from 'root/.generated'
+import { useGetAggregateCounts, useGetCampaigns } from 'root/.generated'
 import React from 'react'
 import dayjs from 'dayjs'
 import { useAuthState } from '~/hooks/use-auth-state'
@@ -19,7 +19,7 @@ import Link from 'next/link'
 export default function Page() {
 	const { authState } = useAuthState()
 
-	const { data: primaryAnalyticsData } = useGetPrimaryAnalytics({
+	const { data: aggregateCount } = useGetAggregateCounts({
 		from: dayjs().subtract(7, 'day').startOf('day').toISOString(),
 		to: dayjs().endOf('day').toISOString()
 	})
@@ -35,26 +35,26 @@ export default function Page() {
 
 	const tips: TipCardPropType[] = [
 		// ! TODO: show when the user has no contacts
-		...(primaryAnalyticsData?.aggregateAnalytics &&
-		primaryAnalyticsData.aggregateAnalytics.campaignStats.totalCampaigns === 0
+		...(aggregateCount?.aggregateAnalytics &&
+		aggregateCount.aggregateAnalytics.campaignStats.totalCampaigns === 0
 			? ([
 					{
 						title: 'Send your First Campaign',
 						description: 'Create and send your first campaign to your contacts.',
 						href: '/campaigns/new-or-edit',
-						icon: 'rocket'
+						icon: 'announcement'
 					}
 				] as TipCardPropType[])
 			: []),
 
-		...(primaryAnalyticsData?.aggregateAnalytics &&
-		primaryAnalyticsData.aggregateAnalytics.contactStats.totalContacts === 0
+		...(aggregateCount?.aggregateAnalytics &&
+		aggregateCount.aggregateAnalytics.contactStats.totalContacts === 0
 			? ([
 					{
 						title: 'Bulk Import Contact',
 						description: 'Import your contacts in bulk using a CSV file.',
 						href: '/contacts/bulk-import',
-						icon: 'download'
+						icon: 'contactImport'
 					}
 				] as TipCardPropType[])
 			: []),
@@ -63,31 +63,31 @@ export default function Page() {
 			title: 'Invite Team Member',
 			description: 'Invite your team members to collaborate on your organization.',
 			href: '/team',
-			icon: 'user'
+			icon: 'inviteTeamMember'
 		},
 		{
 			title: 'Ask AI',
 			description:
 				'Ask anything to AI, whether about where to start or how to use the platform.',
 			href: '/ai',
-			icon: 'sparkles'
+			icon: 'aiStar'
 		},
 		{
 			title: 'API Access',
 			description:
 				'Integrate your application using our API. Get started with our API documentation.',
 			href: '/settings?tab=api-access',
-			icon: 'code'
+			icon: 'terminalSquare'
 		},
-		...(primaryAnalyticsData?.aggregateAnalytics &&
-		primaryAnalyticsData.aggregateAnalytics.contactStats.totalContacts > 0
+		...(aggregateCount?.aggregateAnalytics &&
+		aggregateCount.aggregateAnalytics.contactStats.totalContacts > 0
 			? ([
 					{
 						title: 'Check documentation',
 						description:
 							'Get started with our documentation to understand how to use the platform.',
 						href: '/docs',
-						icon: 'page'
+						icon: 'documentation'
 					}
 				] as TipCardPropType[])
 			: [])
@@ -105,8 +105,7 @@ export default function Page() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-start space-y-0 pb-2">
 								<CardTitle className="mx-auto flex w-full flex-row items-center gap-1 text-center text-sm font-medium">
-									{/* <RocketIcon /> */}
-									<Icons.rocket className={`mx-auto size-6`} />
+									<Icons.announcement className={`mx-auto size-6`} />
 								</CardTitle>
 								<Divider className="upper text-sm font-bold">Campaigns</Divider>
 							</CardHeader>
@@ -115,14 +114,14 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Total</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.campaignStats
+											{aggregateCount?.aggregateAnalytics?.campaignStats
 												?.totalCampaigns || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Running</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.campaignStats
+											{aggregateCount?.aggregateAnalytics?.campaignStats
 												.campaignsRunning || 0}
 										</span>
 									</p>
@@ -131,14 +130,14 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Draft</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.campaignStats
+											{aggregateCount?.aggregateAnalytics?.campaignStats
 												.campaignsDraft || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Scheduled</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.campaignStats
+											{aggregateCount?.aggregateAnalytics?.campaignStats
 												.campaignsScheduled || 0}
 										</span>
 									</p>
@@ -157,15 +156,15 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Total</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics
-												?.conversationStats.totalConversations || 0}
+											{aggregateCount?.aggregateAnalytics?.conversationStats
+												.totalConversations || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Active</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics
-												?.conversationStats.conversationsActive || 0}
+											{aggregateCount?.aggregateAnalytics?.conversationStats
+												.conversationsActive || 0}
 										</span>
 									</p>
 								</div>
@@ -173,15 +172,15 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Resolved</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics
-												?.conversationStats.conversationsClosed || 0}
+											{aggregateCount?.aggregateAnalytics?.conversationStats
+												.conversationsClosed || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Awaiting Reply</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics
-												?.conversationStats.conversationsPending || 0}
+											{aggregateCount?.aggregateAnalytics?.conversationStats
+												.conversationsPending || 0}
 										</span>
 									</p>
 								</div>
@@ -199,14 +198,14 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Total</b>:{' '}
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.messageStats
+											{aggregateCount?.aggregateAnalytics?.messageStats
 												.totalMessages || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Sent</b>:
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.messageStats
+											{aggregateCount?.aggregateAnalytics?.messageStats
 												.messagesSent || 0}
 										</span>
 									</p>
@@ -215,14 +214,14 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Read</b>:
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.messageStats
+											{aggregateCount?.aggregateAnalytics?.messageStats
 												.messagesRead || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Undelivered</b>:
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.messageStats
+											{aggregateCount?.aggregateAnalytics?.messageStats
 												.messagesUndelivered || 0}
 										</span>
 									</p>
@@ -241,14 +240,14 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Total</b>:
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.contactStats
+											{aggregateCount?.aggregateAnalytics?.contactStats
 												.totalContacts || 0}
 										</span>
 									</p>
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Active</b>:
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.contactStats
+											{aggregateCount?.aggregateAnalytics?.contactStats
 												.contactsActive || 0}
 										</span>
 									</p>
@@ -257,7 +256,7 @@ export default function Page() {
 									<p className="text-sm font-light text-muted-foreground">
 										<b>Blocked</b>:
 										<span className="font-extrabold">
-											{primaryAnalyticsData?.aggregateAnalytics?.contactStats
+											{aggregateCount?.aggregateAnalytics?.contactStats
 												.contactsBlocked || 0}
 										</span>
 									</p>
@@ -293,7 +292,7 @@ export default function Page() {
 										variant={'secondary'}
 										className="flex items-center gap-2"
 									>
-										<Icons.rocket className="size-4" />
+										<Icons.announcement className="size-4" />
 										Send Campaign
 									</Button>
 								</Link>
@@ -318,7 +317,7 @@ export default function Page() {
 											variant={'secondary'}
 											className="flex items-center gap-2"
 										>
-											<Icons.rocket className="size-4" />
+											<Icons.announcement className="size-4" />
 											Send Campaign
 										</Button>
 									</Link>

@@ -220,6 +220,160 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
+  /auth/reset-password/init:
+    post:
+      tags:
+        - Auth
+      description: reset password init endpoint
+      operationId: resetPasswordInit
+      requestBody:
+        description: email
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        "200":
+          description: reset password init response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordInitResponseBodySchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /auth/reset-password/verify:
+    post:
+      tags:
+        - Auth
+      description: reset password verify endpoint
+      operationId: resetPasswordVerify
+      requestBody:
+        description: reset password verify credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                otp:
+                  type: string
+                email:
+                  type: string
+              required:
+                - otp
+                - email
+      responses:
+        "200":
+          description: reset password verify response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordVerifyResponseBodySchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /auth/reset-password/complete:
+    post:
+      tags:
+        - Auth
+      description: reset password complete endpoint
+      operationId: resetPasswordComplete
+      requestBody:
+        description: reset password complete credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - otp
+                - password
+      responses:
+        "200":
+          description: reset password complete response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordCompleteResponseBodySchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
   /user:
     get:
       tags:
@@ -3204,12 +3358,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
-  /analytics/primary:
+  /analytics/aggregate-counts:
     get:
       tags:
         - Analytics
-      description: returns main analytics dashboard data.
-      operationId: getPrimaryAnalytics
+      description: returns aggregate counts of all analytics.
+      operationId: getAggregateCounts
       parameters:
         - in: query
           name: from
@@ -3231,7 +3385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PrimaryAnalyticsResponseSchema"
+                $ref: "#/components/schemas/DashboardAggregateCountResponseSchema"
         "404":
           description: Not Found
           content:
@@ -3257,12 +3411,65 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
-  /analytics/secondary:
+  /analytics/campaigns:
     get:
       tags:
         - Analytics
-      description: returns all secondary analytics.
-      operationId: getSecondaryAnalytics
+      description: returns aggregate campaign analytics
+      operationId: getAggregateCampaignAnalytics
+      parameters:
+        - in: query
+          name: from
+          description: starting range of time span to get analytics for
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - in: query
+          name: to
+          description: ending range of time span to get analytics for
+          schema:
+            type: string
+            format: date-time
+          required: true
+      responses:
+        "200":
+          description: messaging analytics graph data points
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAggregateCampaignAnalyticsResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /analytics/conversations:
+    get:
+      tags:
+        - Analytics
+      description: returns conversation analytics.
+      operationId: getConversationAnalytics
       parameters:
         - in: query
           name: from
@@ -3283,7 +3490,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SecondaryAnalyticsDashboardResponseSchema"
+                $ref: "#/components/schemas/GetConversationAnalyticsResponseSchema"
         "404":
           description: Not Found
           content:
@@ -3326,58 +3533,6 @@ paths:
       responses:
         "200":
           description: campaign analytics graph data points
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
-        "429":
-          description: Too Many Requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
-
-  /analytics/campaigns:
-    get:
-      tags:
-        - Analytics
-      description: returns all campaigns analytics.
-      operationId: getCampaignsAnalytics
-      parameters:
-        - in: query
-          name: from
-          description: starting range of time span to get analytics for
-          schema:
-            type: string
-            format: date-time
-        - in: query
-          name: to
-          description: ending range of time span to get analytics for
-          schema:
-            type: string
-            format: date-time
-
-      responses:
-        "200":
-          description: list of campaigns analytics
           content:
             application/json:
               schema:
@@ -5003,7 +5158,7 @@ components:
         tags:
           type: array
           items:
-            $ref: "#/components/schemas/TagSchema"
+            type: string
         contactIds:
           type: array
           items:
@@ -5030,7 +5185,7 @@ components:
         tags:
           type: array
           items:
-            $ref: "#/components/schemas/TagSchema"
+            type: string
       required:
         - name
         - tags
@@ -5130,7 +5285,7 @@ components:
           items:
             $ref: "#/components/schemas/TagSchema"
         templateComponentParameters:
-          type: object
+          $ref: "#/components/schemas/TemplateComponentParameters"
         stats:
           $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
         progress:
@@ -5140,6 +5295,9 @@ components:
               type: number
             sent:
               type: number
+          required:
+            - totalMessages
+            - sent
       required:
         - uniqueId
         - name
@@ -5181,6 +5339,66 @@ components:
         - phoneNumberToUse
         - templateMessageId
 
+    TemplateParameterInput:
+      type: object
+      description: >
+        A single template parameter input. It can be either static or dynamic.
+      properties:
+        nameOrIndex:
+          type: string
+          description: "The name or index identifying the parameter."
+        label:
+          type: string
+          description: "The display label for the parameter."
+        parameterType:
+          type: string
+          description: "Specifies whether the parameter is static or dynamic."
+          enum:
+            - static
+            - dynamic
+        dynamicField:
+          type: string
+          description: "For dynamic parameters, the field name to resolve (e.g. 'firstName')."
+        staticValue:
+          type: string
+          description: "The static value to be used if applicable."
+        example:
+          type: string
+          description: "An example value for the parameter."
+        placeholder:
+          type: string
+          description: "Placeholder text to guide the user input."
+      required:
+        - nameOrIndex
+        - label
+        - parameterType
+
+    TemplateComponentParameters:
+      type: object
+      description: >
+        Object representing template component parameters. It consists of separate arrays
+        for header, body, and button parameters.
+      properties:
+        header:
+          type: array
+          description: "Parameters for header components."
+          items:
+            $ref: "#/components/schemas/TemplateParameterInput"
+        body:
+          type: array
+          description: "Parameters for body components."
+          items:
+            $ref: "#/components/schemas/TemplateParameterInput"
+        buttons:
+          type: array
+          description: "Parameters for button components."
+          items:
+            $ref: "#/components/schemas/TemplateParameterInput"
+      required:
+        - header
+        - body
+        - buttons
+
     UpdateCampaignSchema:
       type: object
       properties:
@@ -5205,7 +5423,7 @@ components:
         phoneNumber:
           type: string
         templateComponentParameters:
-          type: object
+          $ref: "#/components/schemas/TemplateComponentParameters"
         scheduledAt:
           type: string
           format: date-time
@@ -5548,6 +5766,8 @@ components:
           type: string
         sent:
           type: integer
+        delivered:
+          type: integer
         replied:
           type: integer
         read:
@@ -5558,6 +5778,7 @@ components:
         - sent
         - replied
         - read
+        - delivered
 
     MessageTypeDistributionGraphDataPointSchema:
       type: object
@@ -5573,7 +5794,7 @@ components:
         - sent
         - received
 
-    LinkClicksGraphDataPointSchema:
+    DateToCountGraphDataPointSchema:
       type: object
       properties:
         date:
@@ -5606,27 +5827,41 @@ components:
         - numberOfActiveConversation
         - numberOfNewConversationOpened
 
-    PrimaryAnalyticsResponseSchema:
+    DashboardAggregateCountResponseSchema:
       type: object
       properties:
         aggregateAnalytics:
           $ref: "#/components/schemas/AggregateAnalyticsSchema"
-        messageAnalytics:
-          type: array
-          items:
-            $ref: "#/components/schemas/MessageAnalyticGraphDataPointSchema"
-        linkClickAnalytics:
-          type: array
-          items:
-            $ref: "#/components/schemas/LinkClicksGraphDataPointSchema"
       required:
         - aggregateAnalytics
-        - messageAnalytics
-        - linkClickAnalytics
 
-    SecondaryAnalyticsDashboardResponseSchema:
+    GetConversationAnalyticsResponseSchema:
       type: object
       properties:
+        analytics:
+          $ref: "#/components/schemas/ConversationAggregateAnalytics"
+      required:
+        - analytics
+
+    ConversationAggregateAnalytics:
+      type: object
+      properties:
+        avgResponseTimeInMinutes:
+          type: number
+          format: double
+        totalConversations:
+          type: integer
+        conversationsActive:
+          type: integer
+        conversationsClosed:
+          type: integer
+        conversationsPending:
+          type: integer
+        serviceConversations:
+          type: integer
+        inboundToOutboundRatio:
+          type: number
+          format: double
         conversationsAnalytics:
           type: array
           items:
@@ -5636,8 +5871,23 @@ components:
           items:
             $ref: "#/components/schemas/MessageTypeDistributionGraphDataPointSchema"
       required:
+        - totalConversations
+        - conversationsActive
+        - conversationsClosed
+        - conversationsPending
+        - serviceConversations
+        - inboundToOutboundRatio
         - conversationsAnalytics
         - messageTypeTrafficDistributionAnalytics
+        - avgResponseTimeInMinutes
+
+    GetAggregateCampaignAnalyticsResponseSchema:
+      type: object
+      properties:
+        analytics:
+          $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
+      required:
+        - analytics
 
     CampaignAnalyticsResponseSchema:
       type: object
@@ -5657,17 +5907,28 @@ components:
         conversationInitiated:
           type: integer
         responseRate:
-          type: integer
+          type: number
+          format: double
         openRate:
-          type: integer
+          type: number
+          format: double
         engagementRate:
-          type: integer
+          type: number
+          format: double
         totalLinkClicks:
           type: integer
+        engagementTrends:
+          type: array
+          items:
+            $ref: "#/components/schemas/DateToCountGraphDataPointSchema"
         linkClicksData:
           type: array
           items:
-            $ref: "#/components/schemas/LinkClicksGraphDataPointSchema"
+            $ref: "#/components/schemas/DateToCountGraphDataPointSchema"
+        messageAnalytics:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageAnalyticGraphDataPointSchema"
       required:
         - messagesSent
         - messagesFailed
@@ -5681,6 +5942,8 @@ components:
         - responseRate
         - openRate
         - engagementRate
+        - messageAnalytics
+        - engagementTrends
 
     GetIntegrationResponseSchema:
       type: object
@@ -5895,16 +6158,55 @@ components:
           type: array
           items:
             type: string
+          description: For media headers (IMAGE, VIDEO, DOCUMENT).
         header_text:
           type: array
           items:
             type: string
+          description: For positional header text examples.
+        header_text_named_params:
+          type: array
+          description: For named parameters in header components.
+          items:
+            type: object
+            properties:
+              param_name:
+                type: string
+              example:
+                type: string
+            required:
+              - param_name
+              - example
         body_text:
           type: array
           items:
             type: array
             items:
               type: string
+          description: For positional examples in body components.
+        body_text_named_params:
+          type: array
+          description: For named parameters in body components.
+          items:
+            type: object
+            properties:
+              param_name:
+                type: string
+              example:
+                type: string
+            required:
+              - param_name
+              - example
+
+    TemplateMessageLimitedTimeOfferParameter:
+      type: object
+      description: Limited time offer parameters, if applicable.
+      properties:
+        # Add fields as required.
+        offer_code:
+          type: string
+        expiry_minutes:
+          type: integer
 
     WhatsAppBusinessHSMWhatsAppHSMComponent:
       type: object
@@ -5926,7 +6228,7 @@ components:
         format:
           $ref: "#/components/schemas/MessageTemplateComponentFormat"
         limited_time_offer:
-          type: object
+          $ref: "#/components/schemas/TemplateMessageLimitedTimeOfferParameter"
         text:
           type: string
         type:
@@ -6265,3 +6567,27 @@ components:
           type: string
       required:
         - message
+
+    ResetPasswordInitResponseBodySchema:
+      type: object
+      properties:
+        isOtpSent:
+          type: boolean
+      required:
+        - isOtpSent
+
+    ResetPasswordVerifyResponseBodySchema:
+      type: object
+      properties:
+        isVerified:
+          type: boolean
+      required:
+        - isVerified
+
+    ResetPasswordCompleteResponseBodySchema:
+      type: object
+      properties:
+        isPasswordReset:
+          type: boolean
+      required:
+        - isPasswordReset

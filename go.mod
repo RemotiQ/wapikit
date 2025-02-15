@@ -23,12 +23,13 @@ require (
 	github.com/nyaruka/phonenumbers v1.5.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/oklog/ulid v1.3.1
-	github.com/oschwald/maxminddb-golang v1.13.1
+	github.com/pariz/gountries v0.1.6
 	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spf13/pflag v1.0.6
 	github.com/tmc/langchaingo v0.1.13-pre.0.0.20250202074804-0672790bb23a
-	github.com/wapikit/wapi.go v0.0.16
+	github.com/vmihailenco/msgpack/v5 v5.4.1
+	github.com/wapikit/wapi.go v0.1.1
 	github.com/wapikit/wapikit-enterprise v0.0.0
 	golang.org/x/crypto v0.32.0
 )
@@ -73,7 +74,6 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/onsi/gomega v1.36.2 // indirect
-	github.com/pariz/gountries v0.1.6 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.7 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -84,6 +84,7 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.51.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.51.0 // indirect

@@ -1,7 +1,7 @@
 import { clsx as cn } from 'clsx'
-import { ChevronRightIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 import React from 'react'
+import { Icons } from './icons'
 
 type BreadCrumbType = {
 	title: string
@@ -20,7 +20,7 @@ export default function BreadCrumb({ items }: BreadCrumbPropsType) {
 			</Link>
 			{items?.map((item: BreadCrumbType, index: number) => (
 				<React.Fragment key={item.title}>
-					<ChevronRightIcon className="h-4 w-4" />
+					<Icons.chevronRight className="h-4 w-4" />
 					<Link
 						href={item.link}
 						className={cn(

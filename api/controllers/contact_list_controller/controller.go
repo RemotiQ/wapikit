@@ -75,7 +75,7 @@ func NewContactListController() *ContactListController {
 					},
 				},
 				{
-					Path:                    "/api/contacts/:id",
+					Path:                    "/api/lists/:id",
 					Method:                  http.MethodDelete,
 					Handler:                 interfaces.HandlerWithSession(DeleteContactListById),
 					IsAuthorizationRequired: true,
@@ -91,7 +91,7 @@ func NewContactListController() *ContactListController {
 					},
 				},
 				{
-					Path:                    "/api/contacts/:id",
+					Path:                    "/api/lists/:id",
 					Method:                  http.MethodPost,
 					Handler:                 interfaces.HandlerWithSession(UpdateContactListById),
 					IsAuthorizationRequired: true,
@@ -240,7 +240,6 @@ func GetContactLists(context interfaces.ContextWithSession) error {
 }
 
 func CreateNewContactLists(context interfaces.ContextWithSession) error {
-
 	payload := new(api_types.NewContactListSchema)
 
 	if err := context.Bind(payload); err != nil {
@@ -250,8 +249,8 @@ func CreateNewContactLists(context interfaces.ContextWithSession) error {
 	orgUuid, _ := uuid.Parse(context.Session.User.OrganizationId)
 
 	var contactList = model.ContactList{
-		Name: payload.Name,
-		// Description:    payload.Description,
+		Name:           payload.Name,
+		Description:    payload.Description,
 		OrganizationId: orgUuid,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
@@ -271,12 +270,71 @@ func CreateNewContactLists(context interfaces.ContextWithSession) error {
 
 	uniqueId := dest.UniqueId.String()
 
+	var tags []model.Tag
+
+	if len(payload.Tags) > 0 {
+		tagIdExpressions := make([]Expression, 0)
+		for _, tagId := range payload.Tags {
+			tagUuid, err := uuid.Parse(tagId)
+			if err != nil {
+				continue
+			}
+			tagIdExpressions = append(tagIdExpressions, UUID(tagUuid))
+		}
+
+		tagFetchQuery := SELECT(table.Tag.AllColumns).
+			FROM(table.Tag).
+			WHERE(table.Tag.UniqueId.IN(tagIdExpressions...))
+
+		err = tagFetchQuery.QueryContext(context.Request().Context(), context.App.Db, &tags)
+
+		if err != nil {
+			return context.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		modelTags := make([]model.ContactListTag, 0)
+		for _, tagId := range payload.Tags {
+			tagUuid, err := uuid.Parse(tagId)
+			if err != nil {
+				continue
+			}
+			modelTags = append(modelTags, model.ContactListTag{
+				TagId:         tagUuid,
+				ContactListId: dest.UniqueId,
+			})
+		}
+
+		if len(modelTags) > 0 {
+			insertQuery := table.ContactListTag.
+				INSERT().
+				MODELS(modelTags).
+				ON_CONFLICT(table.ContactListTag.ContactListId, table.ContactListTag.TagId).
+				DO_NOTHING()
+
+			_, err = insertQuery.ExecContext(context.Request().Context(), context.App.Db)
+
+			if err != nil {
+				return context.JSON(http.StatusInternalServerError, err.Error())
+			}
+		}
+	}
+
+	tagsToReturn := make([]api_types.TagSchema, 0)
+
+	for _, tag := range tags {
+		tagsToReturn = append(tagsToReturn, api_types.TagSchema{
+			UniqueId: tag.UniqueId.String(),
+			Label:    tag.Label,
+		})
+	}
+
 	return context.JSON(http.StatusCreated, api_types.CreateNewListResponseSchema{
 		List: api_types.ContactListSchema{
 			CreatedAt:   dest.CreatedAt,
 			Name:        dest.Name,
 			Description: dest.Name,
 			UniqueId:    uniqueId,
+			Tags:        tagsToReturn,
 		},
 	})
 }
@@ -378,6 +436,7 @@ func DeleteContactListById(context interfaces.ContextWithSession) error {
 }
 
 func UpdateContactListById(context interfaces.ContextWithSession) error {
+	logger := context.App.Logger
 	contactListId := context.Param("id")
 	contactListUuid, err := uuid.Parse(contactListId)
 
@@ -397,10 +456,22 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	var contactList model.ContactList
+	var contactList struct {
+		model.ContactList
+		Tags []model.Tag
+	}
 
-	contactListQuery := SELECT(table.ContactList.AllColumns).
-		FROM(table.ContactList).
+	contactListQuery := SELECT(
+		table.ContactList.AllColumns,
+		table.ContactListTag.AllColumns,
+		table.Tag.AllColumns).
+		FROM(table.ContactList.LEFT_JOIN(
+			table.ContactListTag,
+			table.ContactListTag.ContactListId.EQ(table.ContactList.UniqueId),
+		).LEFT_JOIN(
+			table.Tag,
+			table.Tag.UniqueId.EQ(table.ContactListTag.TagId),
+		)).
 		WHERE(table.ContactList.UniqueId.EQ(UUID(contactListUuid)).
 			AND(table.ContactList.OrganizationId.EQ(UUID(orgUUid))))
 
@@ -418,9 +489,118 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusNotFound, "Contact list not found")
 	}
 
+	// * ==== SYNC TAGS =====
+
+	oldTagsUuids := make([]uuid.UUID, 0)
+	newTagsUuids := make([]uuid.UUID, 0)
+
+	for _, tag := range contactList.Tags {
+		oldTagsUuids = append(oldTagsUuids, tag.UniqueId)
+	}
+
+	for _, tagId := range payload.Tags {
+		tagUuid, err := uuid.Parse(tagId)
+		if err != nil {
+			continue
+		}
+		newTagsUuids = append(newTagsUuids, tagUuid)
+	}
+
+	tagsToBeDeleted := make([]Expression, 0)
+	tagsToBeInserted := make([]model.ContactListTag, 0)
+
+	commonTagIds := make([]uuid.UUID, 0)
+
+	// * the tags ids that are in oldTagsUuids but not in newTagsUuids are needed to be deleted
+	for _, oldTag := range oldTagsUuids {
+		found := false
+		for _, newList := range newTagsUuids {
+			if oldTag == newList {
+				found = true
+				commonTagIds = append(commonTagIds, oldTag)
+				break
+			}
+		}
+		if !found {
+			tagsToBeDeleted = append(tagsToBeDeleted, UUID(oldTag))
+		}
+	}
+
+	// * the tag ids that are in newTagsUuids but not in oldTagsUuids are needed to be inserted
+	for _, newTag := range newTagsUuids {
+		found := false
+		for _, oldList := range oldTagsUuids {
+			if newTag == oldList {
+				found = true
+				commonTagIds = append(commonTagIds, newTag)
+				break
+			}
+		}
+
+		if !found {
+			contactListTag := model.ContactListTag{
+				ContactListId: contactListUuid,
+				TagId:         newTag,
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
+			}
+			tagsToBeInserted = append(tagsToBeInserted, contactListTag)
+		}
+	}
+
+	if len(tagsToBeDeleted) > 0 {
+		deleteQuery := table.ContactListTag.
+			DELETE().
+			WHERE(table.ContactListTag.ContactListId.EQ(UUID(contactListUuid)).
+				AND(table.ContactListTag.TagId.IN(tagsToBeDeleted...)))
+
+		_, err = deleteQuery.ExecContext(context.Request().Context(), context.App.Db)
+
+		if err != nil {
+			return context.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	var insertedTags []model.Tag
+	if len(tagsToBeInserted) > 0 {
+		tagToBeInsertedExpression := make([]Expression, 0)
+		for _, tag := range tagsToBeInserted {
+			tagToBeInsertedExpression = append(tagToBeInsertedExpression, UUID(tag.TagId))
+		}
+
+		tagToBeInsertedCte := CTE("tags_to_be_inserted")
+
+		contactListTagQuery := WITH(
+			tagToBeInsertedCte.AS(
+				SELECT(table.Tag.AllColumns).FROM(
+					table.Tag,
+				).WHERE(
+					table.Tag.UniqueId.IN(tagToBeInsertedExpression...),
+				),
+			),
+			CTE("insert_tag").AS(
+				table.ContactListTag.
+					INSERT().
+					MODELS(tagsToBeInserted).
+					ON_CONFLICT(table.ContactListTag.ContactListId, table.ContactListTag.TagId).
+					DO_NOTHING(),
+			),
+		)(
+			SELECT(tagToBeInsertedCte.AllColumns()).FROM(tagToBeInsertedCte),
+		)
+
+		err = contactListTagQuery.QueryContext(context.Request().Context(), context.App.Db, &insertedTags)
+
+		if err != nil {
+			logger.Error("Error inserting tags:", err.Error(), nil)
+			return context.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+	}
+
 	updateQuery := table.ContactList.
-		UPDATE().
-		SET(table.ContactList.Name.SET(String(payload.Name))).
+		UPDATE(table.ContactList.Name, table.ContactList.Description).
+		SET(payload.Name, payload.Description).
 		WHERE(
 			table.ContactList.UniqueId.EQ(UUID(contactListUuid)).
 				AND(table.ContactList.OrganizationId.EQ(UUID(orgUUid))),
@@ -432,6 +612,24 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	// return renews tags
+	tagsToReturn := make([]api_types.TagSchema, 0)
+	for _, tag := range insertedTags {
+		tagsToReturn = append(tagsToReturn, api_types.TagSchema{
+			UniqueId: tag.UniqueId.String(),
+			Label:    tag.Label,
+		})
+	}
+
+	for _, tag := range contactList.Tags {
+		if utils.Contains(commonTagIds, tag.UniqueId) {
+			tagsToReturn = append(tagsToReturn, api_types.TagSchema{
+				UniqueId: tag.UniqueId.String(),
+				Label:    tag.Label,
+			})
+		}
+	}
+
 	response := api_types.UpdateListByIdResponseSchema{
 		List: api_types.ContactListSchema{
 			CreatedAt:             contactList.CreatedAt,
@@ -439,12 +637,9 @@ func UpdateContactListById(context interfaces.ContextWithSession) error {
 			Description:           payload.Name,
 			NumberOfCampaignsSent: 0,
 			NumberOfContacts:      0,
-			Tags:                  []api_types.TagSchema{},
+			Tags:                  tagsToReturn,
 			UniqueId:              contactList.UniqueId.String(),
 		},
 	}
-
-	// ! TODO: add tags here to
-
 	return context.JSON(http.StatusOK, response)
 }

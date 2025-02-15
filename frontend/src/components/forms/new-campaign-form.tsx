@@ -11,19 +11,23 @@ import {
 import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '~/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Pencil, Trash } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { type z } from 'zod'
-import { errorNotification, materialConfirm, successNotification } from '~/reusable-functions'
-import { NewCampaignSchema, TemplateComponentSchema } from '~/schema'
+import {
+	countParameterCountInTemplateComponent,
+	errorNotification,
+	materialConfirm,
+	parseTemplateComponents,
+	successNotification
+} from '~/reusable-functions'
+import { NewCampaignSchema, TemplateComponentParametersSchema } from '~/schema'
 import {
 	type CampaignSchema,
 	useCreateCampaign,
 	useGetContactLists,
 	useUpdateCampaignById,
-	useGetOrganizationTags,
 	useGetAllPhoneNumbers,
 	useGetAllTemplates,
 	useDeleteCampaignById,
@@ -34,10 +38,8 @@ import {
 import { Textarea } from '../ui/textarea'
 import { Checkbox } from '../ui/checkbox'
 import { type CheckedState } from '@radix-ui/react-checkbox'
-import { DatePicker } from '../ui/date-picker'
 import { MultiSelect } from '../multi-select'
 import { useLayoutStore } from '~/store/layout.store'
-import { ReloadIcon } from '@radix-ui/react-icons'
 import { useAuthState } from '~/hooks/use-auth-state'
 import * as React from 'react'
 import {
@@ -50,10 +52,12 @@ import {
 import { Separator } from '../ui/separator'
 import { ScrollArea } from '../ui/scroll-area'
 import { isPresent } from 'ts-is-present'
-
-import TemplateParameterForm from './template-parameter-form'
 import TemplateMessageRenderer from '../chat/template-message-renderer'
 import { Icons } from '../icons'
+import { clsx } from 'clsx'
+import TemplateParameterForm from './template-parameter-form'
+import { Skeleton } from '../ui/skeleton'
+import { DateTimePicker } from '../ui/date-time-picker/date-time-picker'
 
 interface FormProps {
 	initialData: CampaignSchema | null
@@ -74,7 +78,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		useState(false)
 	const [isScheduled, setIsScheduled] = useState(initialData?.scheduledAt ? true : false)
 
-	const { writeProperty } = useLayoutStore()
+	const { writeProperty, tags } = useLayoutStore()
 
 	const listsResponse = useGetContactLists({
 		order: 'asc',
@@ -82,30 +86,25 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		per_page: 50
 	})
 
-	const { data: phoneNumbersResponse, refetch: refetchPhoneNumbers } = useGetAllPhoneNumbers({
+	const {
+		data: phoneNumbersResponse,
+		refetch: refetchPhoneNumbers,
+		isFetching: isFetchingPhoneNumbers
+	} = useGetAllPhoneNumbers({
 		query: {
 			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
 
-	const { data: templatesResponse, refetch: refetchMessageTemplates } = useGetAllTemplates({
+	const {
+		data: templatesResponse,
+		refetch: refetchMessageTemplates,
+		isFetching: isFetchingTemplates
+	} = useGetAllTemplates({
 		query: {
 			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
-
-	const { data: tags } = useGetOrganizationTags(
-		{
-			page: 1,
-			per_page: 50,
-			sortBy: 'asc'
-		},
-		{
-			query: {
-				enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
-			}
-		}
-	)
 
 	const createNewCampaign = useCreateCampaign()
 	const deleteCampaignById = useDeleteCampaignById()
@@ -115,8 +114,10 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		resolver: zodResolver(NewCampaignSchema)
 	})
 
-	const templateMessageComponentParameterForm = useForm<z.infer<typeof TemplateComponentSchema>>({
-		resolver: zodResolver(TemplateComponentSchema),
+	const templateMessageComponentParameterForm = useForm<
+		z.infer<typeof TemplateComponentParametersSchema>
+	>({
+		resolver: zodResolver(TemplateComponentParametersSchema),
 		defaultValues: {
 			body: [],
 			header: [],
@@ -169,7 +170,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						templateMessageId: data.templateId,
 						phoneNumber: data.phoneNumberToUse,
 						tags: data.tags,
-						status: initialData.status
+						status: isScheduled ? CampaignStatusEnum.Scheduled : initialData.status,
+						scheduledAt: isScheduled ? data.schedule.date : undefined
 					}
 				})
 
@@ -191,7 +193,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						name: data.name,
 						templateMessageId: data.templateId,
 						phoneNumberToUse: data.phoneNumberToUse,
-						tags: data.tags
+						tags: data.tags,
+						scheduledAt: isScheduled ? data.schedule.date : undefined
 					}
 				})
 
@@ -204,7 +207,6 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						// fetch the template here and show the modal
 
 						const templateInuse = await getTemplateById(data.templateId)
-
 						if (!templateInuse) {
 							errorNotification({
 								message:
@@ -235,7 +237,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 	}
 
 	const handleTemplateComponentParameterSubmit = async (
-		data: z.infer<typeof TemplateComponentSchema>
+		data: z.infer<typeof TemplateComponentParametersSchema>
 	) => {
 		try {
 			const campaignId = newCampaignId || initialData?.uniqueId
@@ -356,6 +358,62 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		}
 	}, [hasUnsavedChanges])
 
+	const currentTemplateId = campaignForm.watch('templateId')
+
+	const isSetupDone = useRef(false)
+	// On initial load, use initial data if available
+	useEffect(() => {
+		if (isSetupDone.current || !currentTemplateId || isFetchingTemplates) return
+
+		console.log('setting up form')
+		const currentTemplate = templatesResponse?.find(
+			template => template.id === currentTemplateId
+		)
+
+		// Use saved parameters if available; otherwise, use undefined so defaults are parsed.
+		const defaultValuesForTemplateParameter = parseTemplateComponents(
+			currentTemplate,
+			initialData?.templateComponentParameters ?? undefined
+		)
+
+		console.log({ defaultValuesForTemplateParameter })
+
+		templateMessageComponentParameterForm.reset(defaultValuesForTemplateParameter, {
+			keepDirty: false
+		})
+
+		isSetupDone.current = true
+	}, [
+		templatesResponse,
+		isFetchingTemplates,
+		currentTemplateId,
+		initialData?.templateComponentParameters,
+		templateMessageComponentParameterForm
+	])
+
+	// When the template id changes after initial setup, reset the form with new defaults.
+	useEffect(() => {
+		if (!isSetupDone.current || !campaignForm.formState.dirtyFields.templateId) return
+
+		console.log('resetting form due to template change')
+		const currentTemplate = templatesResponse?.find(
+			template => template.id === currentTemplateId
+		)
+
+		// Always parse defaults for new template; ignore any saved parameters.
+		const defaultValuesForTemplateParameter = parseTemplateComponents(
+			currentTemplate,
+			undefined
+		)
+
+		templateMessageComponentParameterForm.reset(defaultValuesForTemplateParameter)
+	}, [
+		currentTemplateId,
+		templatesResponse,
+		templateMessageComponentParameterForm,
+		campaignForm.formState.dirtyFields.templateId
+	])
+
 	return (
 		<>
 			<Drawer
@@ -386,65 +444,111 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 					}
 				}}
 			>
-				<DrawerContent className="max-h-[80vh] min-h-[80vh] px-10">
-					<div className="mx-auto w-full">
-						<DrawerHeader className="w-full">
-							<DrawerTitle>Fill template components</DrawerTitle>
-							<DrawerDescription>
-								Add the values for the template components parameters. You may use
-								templating variables to add dynamic values. For example, you can use
-								first_name to add the first name of the contact. Check docs here.
-							</DrawerDescription>
-						</DrawerHeader>
-						<Separator />
-						<div className="flex w-full items-start justify-end space-x-2 pt-6">
-							<div className="h-full flex-1">
-								<ScrollArea className="h-full flex-1">
-									<TemplateParameterForm
-										handleTemplateComponentParameterSubmit={
-											handleTemplateComponentParameterSubmit
-										}
-										isBusy={isBusy}
-										setIsTemplateComponentsInputModalOpen={
-											setIsTemplateComponentsInputModalOpen
-										}
-										templateMessageComponentParameterForm={
-											templateMessageComponentParameterForm
-										}
-										key={'template-parameter-form'}
-										template={templatesResponse?.find(template => {
-											return (
-												template.id === campaignForm.getValues('templateId')
-											)
-										})}
-									/>
-								</ScrollArea>
-							</div>
-
-							<Separator orientation="vertical" className="h-full" />
-
-							<div className="h-full flex-1 rounded-md border">
-								<div className="rounded-t-md bg-primary px-2 py-1 text-sm text-primary-foreground">
-									Template Preview
-								</div>
-								<div className="relative h-full w-full rounded-b-md bg-[#ebe5de] p-4 dark:bg-[#202c33]">
-									<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/conversations-canvas-bg.png")] bg-repeat opacity-20' />
-
-									<div className="relative z-30 h-96">
-										<TemplateMessageRenderer
-											templateMessage={templatesResponse?.find(template => {
-												return (
-													template.id ===
-													campaignForm.getValues('templateId')
-												)
-											})}
-											parameterValues={templateMessageComponentParameterForm.getValues()}
+				<DrawerContent
+					className={clsx(
+						'mx-auto max-h-[80vh] min-h-[80vh]',
+						countParameterCountInTemplateComponent(
+							templatesResponse?.find(template => {
+								return template.id === currentTemplateId
+							})
+						) > 0
+							? ''
+							: 'w-2/3 px-20'
+					)}
+				>
+					{countParameterCountInTemplateComponent(
+						templatesResponse?.find(template => {
+							return template.id === currentTemplateId
+						})
+					) > 0 ? (
+						<div className="mx-auto w-full">
+							<DrawerHeader className="w-full">
+								<DrawerTitle>Fill template components</DrawerTitle>
+								<DrawerDescription>
+									Add the values for the template components parameters. You may
+									use templating variables to add dynamic values. For example, you
+									can use first_name to add the first name of the contact. Check
+									docs here.
+								</DrawerDescription>
+							</DrawerHeader>
+							<Separator />
+							<div className="relative flex h-full w-full items-start justify-end space-x-2 pt-6">
+								<div className="h-screen flex-1 pb-72">
+									<ScrollArea className="h-full">
+										<TemplateParameterForm
+											templateParameterForm={
+												templateMessageComponentParameterForm
+											}
+											onSubmit={handleTemplateComponentParameterSubmit}
+											closeModal={() => {
+												setIsTemplateComponentsInputModalOpen(() => false)
+											}}
 										/>
+									</ScrollArea>
+								</div>
+
+								<Separator orientation="vertical" className="h-full" />
+
+								<div className="h-full flex-1 rounded-md border">
+									<div className="rounded-t-md bg-primary px-2 py-1 text-sm text-primary-foreground">
+										Template Preview
+									</div>
+									<div className="relative h-full w-full rounded-b-md bg-[#ebe5de] p-4 dark:bg-[#202c33]">
+										<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/conversations-canvas-bg.png")] bg-repeat opacity-20' />
+
+										<div className="relative z-30 h-96">
+											<TemplateMessageRenderer
+												templateMessage={templatesResponse?.find(
+													template => {
+														return template.id === currentTemplateId
+													}
+												)}
+												parameterValues={templateMessageComponentParameterForm.getValues()}
+											/>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					) : (
+						<div className="mx-auto w-full">
+							<DrawerHeader className="w-full">
+								<DrawerTitle className="text-center">Template Preview</DrawerTitle>
+							</DrawerHeader>
+							<Separator />
+							<div className="mx-auto mt-4 flex h-full w-full max-w-xl flex-1 flex-col gap-4 rounded-md">
+								<div className="flex flex-col">
+									<div className="rounded-t-md bg-primary px-2 py-1 text-sm text-primary-foreground">
+										Template Preview
+									</div>
+									<div className="relative h-full w-full rounded-b-md bg-[#ebe5de] p-4 dark:bg-[#202c33]">
+										<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/conversations-canvas-bg.png")] bg-repeat opacity-20' />
+										<div className="relative z-30 h-96">
+											<TemplateMessageRenderer
+												templateMessage={templatesResponse?.find(
+													template => {
+														return template.id === currentTemplateId
+													}
+												)}
+												parameterValues={templateMessageComponentParameterForm.getValues()}
+											/>
+										</div>
+									</div>
+								</div>
+								<Button
+									size={'medium'}
+									variant={'secondary'}
+									onClick={() => {
+										setIsTemplateComponentsInputModalOpen(() => false)
+									}}
+									className="gap-2"
+								>
+									<Icons.crossCircle className="size-4" />
+									Close
+								</Button>
+							</div>
+						</div>
+					)}
 				</DrawerContent>
 			</Drawer>
 
@@ -508,10 +612,11 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											}
 											onValueChange={e => {
 												campaignForm.setValue('lists', e, {
-													shouldValidate: true
+													shouldValidate: true,
+													shouldDirty: true
 												})
 											}}
-											defaultValue={campaignForm.getValues('lists')}
+											defaultValue={campaignForm.watch('lists')}
 											placeholder="Select lists"
 											variant="default"
 										/>
@@ -528,14 +633,15 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 										<FormLabel>Select the tags to add</FormLabel>
 										<MultiSelect
 											options={
-												tags?.tags?.map(tag => ({
+												tags?.map(tag => ({
 													label: tag.label,
 													value: tag.uniqueId
 												})) || []
 											}
 											onValueChange={e => {
 												campaignForm.setValue('tags', e, {
-													shouldValidate: true
+													shouldValidate: true,
+													shouldDirty: true
 												})
 											}}
 											defaultValue={campaignForm.watch('tags')}
@@ -570,8 +676,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											Message Template
 											<Button
 												disabled={isBusy}
-												size={'sm'}
-												variant={'secondary'}
+												size={'badge'}
+												variant={'outline'}
 												type="button"
 												onClick={e => {
 													e.preventDefault()
@@ -584,7 +690,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 														.catch(error => console.error(error))
 												}}
 											>
-												<ReloadIcon className="size-3" />
+												<Icons.regenerate className="size-3" />
 											</Button>
 										</FormLabel>
 										<FormControl>
@@ -657,9 +763,9 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											Phone Number
 											<Button
 												disabled={isBusy}
-												size={'sm'}
+												variant={'outline'}
+												size={'badge'}
 												type="button"
-												variant={'secondary'}
 												onClick={e => {
 													e.preventDefault()
 													refetchPhoneNumbers()
@@ -671,7 +777,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 														.catch(error => console.error(error))
 												}}
 											>
-												<ReloadIcon className="size-3" />
+												<Icons.regenerate className="size-3" />
 											</Button>
 										</FormLabel>
 										<FormControl>
@@ -766,11 +872,15 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 									name="schedule.date"
 									render={({ field }) => (
 										<FormItem>
-											<DatePicker
-												prefilledDate={
+											<DateTimePicker
+												defaultDate={
 													field.value ? new Date(field.value) : undefined
 												}
+												onChange={() => {
+													field.onChange(new Date())
+												}}
 											/>
+											{/* <DateTimePickerForm /> */}
 											<FormMessage />
 										</FormItem>
 									)}
@@ -778,48 +888,83 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 							) : null}
 						</div>
 
-						<div className="sticky bottom-0 mr-auto flex w-full flex-1 items-start justify-start gap-2 bg-background py-5">
-							<Button
-								disabled={loading || isBusy || !campaignForm.formState.isDirty}
-								className="ml-auto flex-1"
-								type="submit"
-							>
-								{action}
-							</Button>
-							{initialData && (
-								<>
-									<Button
-										disabled={
-											loading ||
-											isBusy ||
-											!campaignForm.getValues('templateId')
-										}
-										variant="secondary"
-										type="button"
-										onClick={() => {
-											setIsTemplateComponentsInputModalOpen(true)
-										}}
-										className="flex flex-1 items-center justify-center gap-1"
-									>
-										<Pencil className="h-4 w-4" />
-										Edit Template Parameters
-									</Button>
+						{isFetchingPhoneNumbers || isFetchingTemplates ? (
+							<div className="sticky bottom-0 mr-auto flex w-full flex-1 items-start justify-start gap-2 bg-background py-5">
+								{Array.from({ length: 3 }).map((_, index) => (
+									<Skeleton className="h-10 w-full flex-1" key={index} />
+								))}
+							</div>
+						) : (
+							<div className="sticky bottom-0 mr-auto flex w-full flex-1 items-start justify-start gap-2 bg-background py-5">
+								<Button
+									disabled={loading || isBusy || !campaignForm.formState.isDirty}
+									className="ml-auto flex-1"
+									type="submit"
+								>
+									{action}
+								</Button>
+								{initialData && (
+									<>
+										{countParameterCountInTemplateComponent(
+											templatesResponse?.find(
+												template =>
+													template.id ===
+													campaignForm.getValues('templateId')
+											)
+										) > 0 ? (
+											<Button
+												disabled={
+													loading ||
+													isBusy ||
+													!campaignForm.getValues('templateId')
+												}
+												variant="secondary"
+												type="button"
+												onClick={() => {
+													setIsTemplateComponentsInputModalOpen(true)
+												}}
+												className="flex flex-1 items-center justify-center gap-1"
+											>
+												<Icons.pencilEdit className="h-4 w-4" />
+												Edit Template Parameters
+											</Button>
+										) : (
+											<Button
+												disabled={
+													loading ||
+													isBusy ||
+													!campaignForm.getValues('templateId')
+												}
+												variant="secondary"
+												type="button"
+												onClick={() => {
+													setIsTemplateComponentsInputModalOpen(true)
+												}}
+												className="flex flex-1 items-center justify-center gap-1"
+											>
+												<Icons.eye className="h-4 w-4" />
+												Preview Template Parameters
+											</Button>
+										)}
 
-									<Button
-										disabled={loading || isBusy}
-										variant="destructive"
-										type="button"
-										onClick={() => {
-											deleteCampaign().catch(error => console.error(error))
-										}}
-										className="flex flex-1 items-center justify-center gap-1"
-									>
-										<Trash className="h-4 w-4" />
-										Delete
-									</Button>
-								</>
-							)}
-						</div>
+										<Button
+											disabled={loading || isBusy}
+											variant="destructive"
+											type="button"
+											onClick={() => {
+												deleteCampaign().catch(error =>
+													console.error(error)
+												)
+											}}
+											className="flex flex-1 items-center justify-center gap-1"
+										>
+											<Icons.trash className="h-4 w-4" />
+											Delete
+										</Button>
+									</>
+								)}
+							</div>
+						)}
 					</div>
 				</form>
 			</Form>

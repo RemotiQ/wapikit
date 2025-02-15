@@ -5,13 +5,11 @@ import { CalendarDateRangePicker } from '~/components/date-range-picker'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { ConversationStatusChart } from '~/components/analytics/conversation-data'
 import { MessageTypeBifurcation } from '~/components/analytics/message-type-distribution'
-import { OrganizationMembers } from '~/components/analytics/org-members'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
 import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Toaster } from '~/components/ui/sonner'
-import { useGetPrimaryAnalytics, useGetSecondaryAnalytics } from 'root/.generated'
+import { useGetAggregateCampaignAnalytics, useGetConversationAnalytics } from 'root/.generated'
 import { type DateRange } from 'react-day-picker'
 import React, { useRef, useState } from 'react'
 import dayjs from 'dayjs'
@@ -33,12 +31,12 @@ export default function Page() {
 		to: dayjs().toDate()
 	})
 
-	const { data: primaryAnalyticsData } = useGetPrimaryAnalytics({
+	const { data: aggregateCampaignAnalytics } = useGetAggregateCampaignAnalytics({
 		from: date.from?.toISOString() || dayjs().subtract(20, 'day').toISOString(),
 		to: date.to?.toISOString() || dayjs().toISOString()
 	})
 
-	const { data: secondaryAnalyticsData } = useGetSecondaryAnalytics({
+	const { data: aggregateConversationAnalytics } = useGetConversationAnalytics({
 		from: date.from?.toISOString() || dayjs().subtract(20, 'day').toISOString(),
 		to: date.to?.toISOString() || dayjs().toISOString()
 	})
@@ -52,9 +50,9 @@ export default function Page() {
 	return (
 		<ScrollArea className="h-full">
 			<Toaster />
-			<div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-				<div className="flex items-center justify-between space-y-2">
-					<h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+			<div className="flex flex-1 flex-col space-y-4 p-4 pt-6 md:p-4">
+				<div className="flex items-center justify-between">
+					<h2 className="text-2xl font-semibold tracking-tight">Analytics</h2>
 					<div className="hidden flex-col items-center gap-2 space-x-2 md:flex">
 						<TooltipProvider>
 							<Tooltip>
@@ -86,7 +84,9 @@ export default function Page() {
 							(tab, index) => {
 								return (
 									<TabsTrigger key={index} value={tab}>
-										{tab}
+										{tab === AnalyticsTabEnum.Campaigns
+											? 'Campaigns'
+											: 'Conversations'}
 									</TabsTrigger>
 								)
 							}
@@ -96,41 +96,37 @@ export default function Page() {
 					{[AnalyticsTabEnum.Campaigns, AnalyticsTabEnum.Conversations].map(
 						(tab, index) => {
 							return (
-								<TabsContent key={index} value={tab}>
+								<TabsContent key={index} value={tab} className="space-y-4">
 									{tab === AnalyticsTabEnum.Campaigns ? (
 										<>
 											<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
 												{[
 													{
-														title: 'Campaigns Sent',
+														title: 'Messages Sent',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsFinished ||
-															0,
+															aggregateCampaignAnalytics?.analytics
+																.messagesSent || 0,
 														isPercentage: false
 													},
 													{
 														title: 'Open Rate',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsRunning ||
-															0,
+															aggregateCampaignAnalytics?.analytics
+																.openRate || 0,
 														isPercentage: true
 													},
 													{
 														title: 'Reply Rate',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsRunning ||
-															0,
+															aggregateCampaignAnalytics?.analytics
+																.responseRate || 0,
 														isPercentage: true
 													},
 													{
 														title: 'Engagement Rate',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsRunning ||
-															0,
+															aggregateCampaignAnalytics?.analytics
+																.engagementRate || 0,
 														isPercentage: true
 													}
 												].map((item, index) => {
@@ -175,7 +171,8 @@ export default function Page() {
 													<CardContent className="pl-2">
 														<MessageAggregateAnalytics
 															data={
-																primaryAnalyticsData?.messageAnalytics ||
+																aggregateCampaignAnalytics
+																	?.analytics.messageAnalytics ||
 																[]
 															}
 														/>
@@ -188,8 +185,8 @@ export default function Page() {
 													<CardContent className="pl-2">
 														<LinkClicks
 															data={
-																primaryAnalyticsData?.linkClickAnalytics ||
-																[]
+																aggregateCampaignAnalytics
+																	?.analytics.linkClicksData || []
 															}
 														/>
 													</CardContent>
@@ -203,32 +200,32 @@ export default function Page() {
 													{
 														title: 'Avg. Response Time',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsFinished ||
-															0,
+															aggregateConversationAnalytics
+																?.analytics
+																.avgResponseTimeInMinutes || 0,
 														isPercentage: false
 													},
 													{
 														title: 'Inbound:Outbound Ratio',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsRunning ||
-															0,
+															aggregateConversationAnalytics
+																?.analytics
+																.inboundToOutboundRatio || 0,
 														isPercentage: false
 													},
 													{
 														title: 'Service Conversations',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsRunning ||
+															aggregateConversationAnalytics
+																?.analytics.serviceConversations ||
 															0,
 														isPercentage: false
 													},
 													{
 														title: 'Total Active Conversations',
 														value:
-															primaryAnalyticsData?.aggregateAnalytics
-																.campaignStats.campaignsRunning ||
+															aggregateConversationAnalytics
+																?.analytics.conversationsActive ||
 															0,
 														isPercentage: false
 													}
@@ -264,28 +261,12 @@ export default function Page() {
 													<CardContent className="pl-2">
 														<MessageTypeBifurcation
 															data={
-																secondaryAnalyticsData?.messageTypeTrafficDistributionAnalytics ||
+																aggregateConversationAnalytics
+																	?.analytics
+																	.messageTypeTrafficDistributionAnalytics ||
 																[]
 															}
 														/>
-													</CardContent>
-												</Card>
-											</div>
-											<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8">
-												<Card className="col-span-3 md:col-span-4">
-													<CardHeader>
-														<CardTitle>Organization Members</CardTitle>
-													</CardHeader>
-													<CardContent className="pl-2">
-														<OrganizationMembers />
-													</CardContent>
-												</Card>
-												<Card className="col-span-3 md:col-span-4">
-													<CardHeader>
-														<CardTitle>Conversation Status</CardTitle>
-													</CardHeader>
-													<CardContent className="pl-2">
-														<ConversationStatusChart />
 													</CardContent>
 												</Card>
 											</div>

@@ -11,7 +11,7 @@ import {
 import { Input } from '~/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { type z } from 'zod'
 import { successNotification, errorNotification } from '~/reusable-functions'
@@ -36,7 +36,9 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 
 	const defaultValues = initialData
 		? {
-				...initialData
+				name: initialData.name,
+				description: initialData.description,
+				tags: initialData.tags.map(tag => tag.uniqueId)
 			}
 		: {
 				name: '',
@@ -58,7 +60,7 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 					id: initialData.uniqueId,
 					data: {
 						name: data.name,
-						tags: [],
+						tags: data.tagIds,
 						description: data.description
 					}
 				})
@@ -77,7 +79,7 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 					{
 						data: {
 							name: data.name,
-							tags: [],
+							tags: data.tagIds,
 							description: data.description
 						}
 					},
@@ -109,6 +111,21 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 			setLoading(false)
 		}
 	}
+
+	useEffect(() => {
+		if (initialData) {
+			form.reset(
+				{
+					name: initialData.name,
+					description: initialData.description,
+					tagIds: initialData.tags.map(tag => tag.uniqueId)
+				},
+				{
+					keepDirty: false
+				}
+			)
+		}
+	}, [form, initialData])
 
 	return (
 		<>
@@ -166,7 +183,8 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 										}
 										onValueChange={e => {
 											form.setValue('tagIds', e, {
-												shouldValidate: true
+												shouldValidate: true,
+												shouldDirty: true
 											})
 										}}
 										defaultValue={form.watch('tagIds')}
@@ -193,7 +211,11 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 						/>
 					</div>
 					<div className="flex w-fit flex-row gap-3 ">
-						<Button disabled={loading} className="ml-auto" type="submit">
+						<Button
+							disabled={loading || !form.formState.isDirty}
+							className="ml-auto"
+							type="submit"
+						>
 							{action}
 						</Button>
 					</div>

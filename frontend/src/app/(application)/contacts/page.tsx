@@ -1,6 +1,5 @@
 'use client'
 
-import BreadCrumb from '~/components/breadcrumb'
 import { ContactTableColumns } from '~/components/tables/columns'
 import { TableComponent } from '~/components/tables/table'
 import { Button, buttonVariants } from '~/components/ui/button'
@@ -29,8 +28,6 @@ import { useRouter } from 'next/navigation'
 import { useLayoutStore } from '~/store/layout.store'
 import ContactDetailsSheet from '~/components/contact-details-sheet'
 import { MultiSelect } from '~/components/multi-select'
-
-const breadcrumbItems = [{ title: 'Contacts', link: '/contacts' }]
 
 const ContactsPage = () => {
 	const searchParams = useSearchParams()
@@ -247,9 +244,7 @@ const ContactsPage = () => {
 				</div>
 			</Modal>
 
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
-
+			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
 				<div className="flex items-start justify-between">
 					<Heading
 						title={totalUsers ? `Contacts (${totalUsers})` : 'Contacts'}
@@ -299,7 +294,7 @@ const ContactsPage = () => {
 							}
 						},
 						{
-							icon: 'plus',
+							icon: 'filePlus',
 							label: 'Add to lists',
 							onClick: (contactId: string) => {
 								setContactToEditListsFor(() => contactId)

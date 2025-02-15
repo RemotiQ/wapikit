@@ -24,10 +24,10 @@ const RenderConversations = ({
 }) => {
 	const router = useRouter()
 	return (
-		<div key={tab}>
+		<div key={tab} className="">
 			{conversations.length === 0 && (
 				<div className="flex h-full flex-col items-center justify-center">
-					<Icons.message className="size-6 font-normal text-muted-foreground" />
+					<Icons.messageChatSquare className="size-6 font-normal text-muted-foreground" />
 					<p className="text-gray-500">
 						No {tab !== ConversationListSidebarTab.All && tab} conversations yet
 					</p>
@@ -93,9 +93,11 @@ const ConversationsSidebar = () => {
 								>
 									{
 										{
-											All: <Icons.message className="size-4" />,
+											All: <Icons.messageChatSquare className="size-4" />,
 											Unread: <Icons.bell className="size-4" />,
-											Unresolved: <Icons.help className="size-4" />
+											Unresolved: (
+												<Icons.messageQuestionSquare className="size-4" />
+											)
 										}[tab]
 									}
 									{tab}

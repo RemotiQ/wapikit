@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Icons } from '~/components/icons'
 import { buttonVariants } from '~/components/ui/button'
-import { OnboardingSteps, type OnboardingStepsEnum } from '~/constants'
+import { OnboardingSteps, OnboardingStepsEnum } from '~/constants'
 import { useLayoutStore } from '~/store/layout.store'
 
 const OnboardingLayout = (props: { children: React.ReactNode }) => {
@@ -150,13 +150,31 @@ const OnboardingLayout = (props: { children: React.ReactNode }) => {
 			</div>
 			<div className="flex h-full items-center p-4 lg:p-8">
 				<div className="mx-auto flex w-full max-w-xl flex-col justify-center space-y-6">
-					<div className="flex flex-col space-y-2 text-left">
-						<h1 className="text-xl font-semibold tracking-tight">
+					<div className="flex flex-col space-y-1 text-left">
+						<h1 className="text-xl font-semibold tracking-tight text-foreground">
 							{currentStep.title}
 						</h1>
-						<p className="text-sm">{currentStep.description}</p>
+						<p className="text-sm font-normal text-muted-foreground">
+							{currentStep.description}
+						</p>
 					</div>
 					{props.children}
+					{currentStep.slug === OnboardingStepsEnum.WhatsappBusinessAccountDetails ? (
+						<div className="flex items-start justify-start gap-1 text-xs font-medium text-muted-foreground md:items-center">
+							<Icons.infoCircle className="size-4" />
+							<p>
+								<Link
+									href="https://javascript.wapikit.com/guide/whatsapp-api-setup/creating-business-app#add-whatsapp-product-to-the-application-created"
+									target="_blank"
+									title="click-here"
+									className="cursor-pointer text-blue-500"
+								>
+									Click here
+								</Link>{' '}
+								to know how to get your WhatsApp Business ID and API Key.
+							</p>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</div>

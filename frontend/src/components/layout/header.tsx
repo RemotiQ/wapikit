@@ -9,10 +9,12 @@ import { useTheme } from 'next-themes'
 import { Notifications } from './notification-dropdown'
 import { useLayoutStore } from '~/store/layout.store'
 import { Badge } from '../ui/badge'
+import { Icons } from '../icons'
+import { Button } from '../ui/button'
 
 export default function Header() {
 	const { resolvedTheme } = useTheme()
-	const { subscriptionDetails } = useLayoutStore()
+	const { subscriptionDetails, writeProperty } = useLayoutStore()
 	return (
 		<div className="supports-backdrop-blur:bg-background/60 fixed left-0 right-0 top-0 z-20 border-b bg-background/95 backdrop-blur">
 			<nav className="flex h-14 items-center justify-between px-4">
@@ -37,8 +39,23 @@ export default function Header() {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<Notifications />
-					<UserNav />
+					<Button
+						variant={'outline'}
+						size={'badge'}
+						onClick={() => {
+							writeProperty({
+								isCommandMenuOpen: true
+							})
+						}}
+						className="gap-1 !text-sm"
+					>
+						<Icons.macoscommand className="size-4" /> K
+					</Button>
+
+					<div className="flex items-center gap-1">
+						<Notifications />
+						<UserNav />
+					</div>
 					{/* <ThemeToggle /> */}
 				</div>
 			</nav>

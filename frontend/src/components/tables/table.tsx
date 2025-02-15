@@ -28,7 +28,6 @@ import {
 	TableRow
 } from '~/components/ui/table'
 import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ScrollArea, ScrollBar } from '~/components/ui/scroll-area'
 import { type TableCellActionProps } from '~/types'
@@ -202,7 +201,6 @@ export function TableComponent<TData, TValue>({
 					}
 					className="w-full md:max-w-sm"
 				/>
-
 				{(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected()) && (
 					<Button
 						variant={'destructive'}
@@ -219,7 +217,7 @@ export function TableComponent<TData, TValue>({
 					</Button>
 				)}
 			</div>
-			<ScrollArea className="h-[calc(80vh-220px)] rounded-md border">
+			<ScrollArea className="h-[calc(90vh-220px)] rounded-md border">
 				{isFetching ? (
 					<div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4">
 						{Array.from({ length: 9 }).map((_, index) => (
@@ -267,16 +265,19 @@ export function TableComponent<TData, TValue>({
 													)}
 												</TableCell>
 											))}
-											<TableCell key={'column_actions'}>
-												<CellAction
-													actions={
-														typeof actions === 'function'
-															? actions(row.original)
-															: actions
-													}
-													data={row.id}
-												/>
-											</TableCell>
+
+											{actions.length ? (
+												<TableCell key={'column_actions'}>
+													<CellAction
+														actions={
+															typeof actions === 'function'
+																? actions(row.original)
+																: actions
+														}
+														data={row.id}
+													/>
+												</TableCell>
+											) : null}
 										</TableRow>
 									)
 								})
@@ -351,7 +352,7 @@ export function TableComponent<TData, TValue>({
 								onClick={() => table.previousPage()}
 								disabled={!table.getCanPreviousPage()}
 							>
-								<ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
+								<Icons.chevronLeft className="h-4 w-4" aria-hidden="true" />
 							</Button>
 							<Button
 								aria-label="Go to next page"
@@ -360,7 +361,7 @@ export function TableComponent<TData, TValue>({
 								onClick={() => table.nextPage()}
 								disabled={!table.getCanNextPage()}
 							>
-								<ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
+								<Icons.chevronRight className="h-4 w-4" aria-hidden="true" />
 							</Button>
 							<Button
 								aria-label="Go to last page"

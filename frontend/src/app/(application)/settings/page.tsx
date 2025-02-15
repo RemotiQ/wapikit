@@ -20,7 +20,7 @@ import {
 } from '~/components/ui/select'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
-import { Plus, EyeIcon, Clipboard } from 'lucide-react'
+import { EyeIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts'
 import {
 	RolePermissionEnum,
@@ -71,7 +71,6 @@ import SubscriptionSettings from '~/components/settings/subscription'
 import { PRODUCTION_WEBHOOK_URL } from '~/constants'
 
 export default function SettingsPage() {
-	console.log('REACT VERSION PUBLIC', React.version)
 	const { user, isOwner, currentOrganization, writeProperty, phoneNumbers, featureFlags } =
 		useLayoutStore()
 
@@ -166,13 +165,12 @@ export default function SettingsPage() {
 
 	const [showWebhookSecret, setShowWebhookSecret] = useState(false)
 	const [showAiApiKey, setShowAiApiKey] = useState(false)
-
 	const createRoleMutation = useCreateOrganizationRole()
 	const updateRoleMutation = useUpdateOrganizationRoleById()
 	const updateWhatsappBusinessAccountDetailsMutation = useUpdateWhatsappBusinessAccountDetails()
 	const updateUserMutation = useUpdateUser()
 	const updateOrganizationMutation = useUpdateOrganization()
-	const { data: roleData } = useGetOrganizationRoleById('', {
+	const { data: roleData } = useGetOrganizationRoleById(roleIdToEdit || '', {
 		query: {
 			enabled: !!roleIdToEdit
 		}
@@ -432,6 +430,13 @@ export default function SettingsPage() {
 							webhookSecret: response.webhookSecret
 						}
 					}
+				})
+				successNotification({
+					message: 'WhatsApp Business Account details updated successfully!!'
+				})
+				whatsappBusinessAccountIdForm.reset({
+					whatsappBusinessAccountId: response.businessAccountId,
+					apiToken: response.accessToken
 				})
 			} else {
 				errorNotification({
@@ -903,7 +908,7 @@ export default function SettingsPage() {
 																					disabled={
 																						isBusy
 																					}
-																					placeholder="whatsapp business account id"
+																					placeholder="Whatsapp Business Account ID"
 																					{...field}
 																					autoComplete="off"
 																					type={
@@ -913,7 +918,7 @@ export default function SettingsPage() {
 																					}
 																				/>
 																				<span
-																					className="rounded-md border p-1 px-2"
+																					className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 																					onClick={() => {
 																						setWhatsAppBusinessAccountDetailsVisibility(
 																							data => ({
@@ -924,7 +929,11 @@ export default function SettingsPage() {
 																						)
 																					}}
 																				>
-																					<EyeIcon className="size-5" />
+																					{whatsAppBusinessAccountDetailsVisibility.whatsappBusinessAccountId ? (
+																						<Icons.eyeOff className="size-5" />
+																					) : (
+																						<Icons.eye className="size-5" />
+																					)}
 																				</span>
 																			</div>
 																		</FormControl>
@@ -948,7 +957,7 @@ export default function SettingsPage() {
 																					disabled={
 																						isBusy
 																					}
-																					placeholder="whatsapp business account api token"
+																					placeholder="Whatsapp Business Account API Token"
 																					{...field}
 																					autoComplete="off"
 																					type={
@@ -958,7 +967,7 @@ export default function SettingsPage() {
 																					}
 																				/>
 																				<span
-																					className="rounded-md border p-1 px-2"
+																					className="flex items-center justify-center rounded-md border p-1 px-2"
 																					onClick={() => {
 																						setWhatsAppBusinessAccountDetailsVisibility(
 																							data => ({
@@ -969,7 +978,11 @@ export default function SettingsPage() {
 																						)
 																					}}
 																				>
-																					<EyeIcon className="size-5" />
+																					{whatsAppBusinessAccountDetailsVisibility.apiToken ? (
+																						<Icons.eyeOff className="size-5" />
+																					) : (
+																						<Icons.eye className="size-5" />
+																					)}
 																				</span>
 																			</div>
 																		</FormControl>
@@ -1018,7 +1031,7 @@ export default function SettingsPage() {
 													disabled
 												/>
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															const secret =
 																currentOrganization
@@ -1036,26 +1049,24 @@ export default function SettingsPage() {
 																})
 															}
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
-														<Clipboard className="size-5" />
-														Copy
-													</Button>
+														<Icons.copy className="size-5" />
+													</span>
 												</span>
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															setShowWebhookSecret(data => !data)
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
-														<EyeIcon className="size-5" />
-														Show
-													</Button>
+														{showWebhookSecret ? (
+															<Icons.eyeOff className="size-5" />
+														) : (
+															<Icons.eye className="size-5" />
+														)}
+													</span>
 												</span>
 											</CardContent>
 										</Card>
@@ -1085,7 +1096,7 @@ export default function SettingsPage() {
 													{PRODUCTION_WEBHOOK_URL}
 												</p>
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															copyToClipboard(
 																PRODUCTION_WEBHOOK_URL
@@ -1096,13 +1107,10 @@ export default function SettingsPage() {
 																	'Secret copied to clipboard'
 															})
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
-														<Clipboard className="size-5" />
-														Copy
-													</Button>
+														<Icons.copy className="size-5" />
+													</span>
 												</span>{' '}
 											</CardContent>
 										</Card>
@@ -1157,9 +1165,6 @@ export default function SettingsPage() {
 											</CardHeader>
 											<CardContent className="flex h-fit items-center justify-center pb-0">
 												<Select
-													onValueChange={e => {
-														console.log(e)
-													}}
 													value={
 														phoneNumbers?.[0]?.display_phone_number ||
 														'no organizations'
@@ -1228,7 +1233,7 @@ export default function SettingsPage() {
 																							disabled={
 																								isBusy
 																							}
-																							placeholder="name"
+																							placeholder="Name"
 																							{...field}
 																							autoComplete="off"
 																							value={userUpdateForm.watch(
@@ -1260,7 +1265,7 @@ export default function SettingsPage() {
 																							disabled={
 																								true
 																							}
-																							placeholder="email"
+																							placeholder="you@youremail.com"
 																							{...field}
 																							autoComplete="off"
 																							value={
@@ -1298,7 +1303,8 @@ export default function SettingsPage() {
 													<SubscriptionSettings />
 												) : null}
 
-												<Card className="flex flex-1 items-center justify-between">
+												{/* ! TODO: ENABLE THIS ONCE BACKEND IS IMPLEMENTED FOR DELETE ACCOUNT */}
+												{/* <Card className="flex flex-1 items-center justify-between">
 													<CardHeader>
 														<CardTitle>Delete Account</CardTitle>
 													</CardHeader>
@@ -1332,7 +1338,7 @@ export default function SettingsPage() {
 															</Tooltip>
 														</TooltipProvider>
 													</CardContent>
-												</Card>
+												</Card> */}
 											</>
 										) : (
 											<LoadingSpinner />
@@ -1352,39 +1358,42 @@ export default function SettingsPage() {
 												{/* ! TODO: show API key on hover of the input the full api key if present */}
 												<Input
 													className="w-fit truncate px-6 disabled:text-slate-600"
-													value={apiKey || '***********************'}
+													value={apiKey || Array(150).fill('*').join('')}
 													disabled
 												/>
 												<span>
-													<Button
+													<span
 														onClick={() => {
-															getApiKey().catch(error =>
-																console.error(error)
-															)
+															if (apiKey) {
+																setApiKey(null)
+															} else {
+																getApiKey().catch(error =>
+																	console.error(error)
+																)
+															}
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
-														<EyeIcon className="size-5" />
-														Show
-													</Button>
+														{apiKey ? (
+															<Icons.eyeOff className="size-5" />
+														) : (
+															<Icons.eye className="size-5" />
+														)}
+														{/* // <Icons.eyeOff className="size-5" /> */}
+													</span>
 												</span>
 
 												<span>
-													<Button
+													<span
 														onClick={() => {
 															copyApiKey().catch(error =>
 																console.error(error)
 															)
 														}}
-														className="ml-2 flex w-fit gap-1"
-														variant={'secondary'}
-														disabled={isBusy}
+														className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													>
-														<Clipboard className="size-5" />
-														Copy
-													</Button>
+														<Icons.copy className="size-5" />
+													</span>
 												</span>
 
 												{/* regenerate button */}
@@ -1398,6 +1407,7 @@ export default function SettingsPage() {
 													variant={'destructive'}
 													disabled={isBusy}
 												>
+													<Icons.regenerate className="size-5" />
 													Regenerate
 												</Button>
 											</CardContent>
@@ -1439,7 +1449,7 @@ export default function SettingsPage() {
 																		<FormControl>
 																			<Input
 																				disabled={isBusy}
-																				placeholder="role name"
+																				placeholder="Role Name"
 																				{...field}
 																				autoComplete="off"
 																			/>
@@ -1460,7 +1470,7 @@ export default function SettingsPage() {
 																		<FormControl>
 																			<Input
 																				disabled={isBusy}
-																				placeholder="role description"
+																				placeholder="Role Description"
 																				{...field}
 																				autoComplete="off"
 																			/>
@@ -1534,7 +1544,7 @@ export default function SettingsPage() {
 													}}
 													disabled={isBusy}
 												>
-													<Plus className="mr-2 h-4 w-4" /> Add New
+													<Icons.plus className="mr-2 h-4 w-4" /> Add New
 												</Button>
 											</div>
 										</div>
@@ -1574,7 +1584,7 @@ export default function SettingsPage() {
 																		<FormItem>
 																			<FormControl>
 																				<Input
-																					placeholder="default organization"
+																					placeholder="Default Organization"
 																					{...field}
 																				/>
 																			</FormControl>
@@ -1600,7 +1610,7 @@ export default function SettingsPage() {
 																		<FormItem>
 																			<FormControl>
 																				<Textarea
-																					placeholder="description..."
+																					placeholder="Description..."
 																					{...field}
 																				/>
 																			</FormControl>
@@ -1687,7 +1697,7 @@ export default function SettingsPage() {
 																	}}
 																	className="flex gap-2"
 																>
-																	<Icons.trash />
+																	<Icons.trash className="size-4" />
 																	Delete
 																</Button>
 															</TooltipTrigger>
@@ -2106,6 +2116,11 @@ export default function SettingsPage() {
 																									isBusy
 																								}
 																							>
+																								{showAiApiKey ? (
+																									<Icons.eyeOff className="size-5" />
+																								) : (
+																									<Icons.eye className="size-5" />
+																								)}
 																								<EyeIcon className="size-5" />
 																							</Button>
 																						</span>

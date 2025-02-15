@@ -1,5 +1,6 @@
 'use client'
 import { Button } from '~/components/ui/button'
+import { useRouter } from 'next/navigation'
 import {
 	Form,
 	FormControl,
@@ -26,6 +27,7 @@ type UserFormValue = z.infer<typeof formSchema>
 
 export default function UserLoginForm() {
 	const setAuthToken = useLocalStorage<string | undefined>(AUTH_TOKEN_LS, undefined)[1]
+	const router = useRouter()
 
 	const [isBusy, setIsBusy] = useState(false)
 
@@ -84,7 +86,7 @@ export default function UserLoginForm() {
 								<FormControl>
 									<Input
 										type="email"
-										placeholder="Enter your email"
+										placeholder="you@youremail.com"
 										disabled={isBusy}
 										{...field}
 									/>
@@ -93,25 +95,37 @@ export default function UserLoginForm() {
 							</FormItem>
 						)}
 					/>
-
-					<FormField
-						control={form.control}
-						name="password"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Password</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										placeholder="Enter your password"
-										disabled={isBusy}
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+					<div className="flex flex-col">
+						<FormField
+							control={form.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password</FormLabel>
+									<FormControl>
+										<Input
+											type="password"
+											placeholder="At least 6 characters"
+											disabled={isBusy}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<Button
+							type="button"
+							variant={'link'}
+							onClick={e => {
+								e.preventDefault()
+								router.push('/reset-password')
+							}}
+							className="ml-auto"
+						>
+							Reset Password
+						</Button>
+					</div>
 
 					<Button disabled={isBusy} className="ml-auto w-full" type="submit">
 						Sign in

@@ -9,7 +9,6 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { type TableCellActionProps } from '~/types'
 import { Icons } from '../icons'
-import { MoreVerticalIcon } from 'lucide-react'
 
 export const CellAction: React.FC<{ actions: TableCellActionProps[]; data: any }> = ({
 	actions,
@@ -19,7 +18,7 @@ export const CellAction: React.FC<{ actions: TableCellActionProps[]; data: any }
 		<>
 			<DropdownMenu modal={false}>
 				<DropdownMenuTrigger asChild>
-					<MoreVerticalIcon className="h-4 w-4 text-secondary-foreground" />
+					<Icons.dotsVertical className="h-4 w-4 cursor-pointer text-secondary-foreground" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>

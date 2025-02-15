@@ -1,8 +1,11 @@
 package analytics_controller
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/wapikit/wapikit/.db-generated/model"
@@ -27,9 +30,9 @@ func NewAnalyticsController() *AnalyticsController {
 			RestApiPath: "/api/analytics",
 			Routes: []interfaces.Route{
 				{
-					Path:                    "/api/analytics/primary",
+					Path:                    "/api/analytics/campaigns",
 					Method:                  http.MethodGet,
-					Handler:                 interfaces.HandlerWithSession(handlePrimaryAnalyticsDashboardData),
+					Handler:                 interfaces.HandlerWithSession(handleAggregateCampaignAnalytics),
 					IsAuthorizationRequired: true,
 					MetaData: interfaces.RouteMetaData{
 						PermissionRoleLevel: api_types.Member,
@@ -39,9 +42,21 @@ func NewAnalyticsController() *AnalyticsController {
 					},
 				},
 				{
-					Path:                    "/api/analytics/secondary",
+					Path:                    "/api/analytics/aggregate-counts",
 					Method:                  http.MethodGet,
-					Handler:                 interfaces.HandlerWithSession(handleSecondaryAnalyticsDashboardData),
+					Handler:                 interfaces.HandlerWithSession(getDashboardAggregateAnalytics),
+					IsAuthorizationRequired: true,
+					MetaData: interfaces.RouteMetaData{
+						PermissionRoleLevel: api_types.Member,
+						RequiredPermission: []api_types.RolePermissionEnum{
+							api_types.GetPrimaryAnalytics,
+						},
+					},
+				},
+				{
+					Path:                    "/api/analytics/conversations",
+					Method:                  http.MethodGet,
+					Handler:                 interfaces.HandlerWithSession(handleAggregateConversationAnalytics),
 					IsAuthorizationRequired: true,
 					MetaData: interfaces.RouteMetaData{
 						PermissionRoleLevel: api_types.Member,
@@ -67,18 +82,11 @@ func NewAnalyticsController() *AnalyticsController {
 	}
 }
 
-func handlePrimaryAnalyticsDashboardData(context interfaces.ContextWithSession) error {
-	params := new(api_types.GetPrimaryAnalyticsParams)
+func getDashboardAggregateAnalytics(context interfaces.ContextWithSession) error {
+	params := new(api_types.GetAggregateCampaignAnalyticsParams)
 	err := utils.BindQueryParams(context, params)
 	if err != nil {
 		return context.JSON(http.StatusBadRequest, err.Error())
-	}
-
-	minDateRange := params.From
-	maxDateRange := params.To
-
-	if minDateRange.IsZero() || maxDateRange.IsZero() {
-		return context.JSON(http.StatusBadRequest, "Invalid date range")
 	}
 
 	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
@@ -87,42 +95,21 @@ func handlePrimaryAnalyticsDashboardData(context interfaces.ContextWithSession) 
 		return context.JSON(http.StatusInternalServerError, "Invalid organization id")
 	}
 
-	responseToReturn := api_types.PrimaryAnalyticsResponseSchema{
-		AggregateAnalytics: api_types.AggregateAnalyticsSchema{
-			CampaignStats: api_types.AggregateCampaignStatsDataPointsSchema{
-				CampaignsCancelled: 0,
-				CampaignsRunning:   0,
-				CampaignsDraft:     0,
-				CampaignsFinished:  0,
-				CampaignsPaused:    0,
-				CampaignsScheduled: 0,
-			},
-			ContactStats: api_types.AggregateContactStatsDataPointsSchema{
-				ContactsActive:  0,
-				ContactsBlocked: 0,
-				TotalContacts:   0,
-			},
-			ConversationStats: api_types.AggregateConversationStatsDataPointsSchema{
-				ConversationsActive:  0,
-				ConversationsClosed:  0,
-				ConversationsPending: 0,
-				TotalConversations:   0,
-			},
-			MessageStats: api_types.AggregateMessageStatsDataPointsSchema{
-				MessagesDelivered:   0,
-				MessagesFailed:      0,
-				MessagesRead:        0,
-				MessagesSent:        0,
-				TotalMessages:       0,
-				MessagesUndelivered: 0,
-				MessagesUnread:      0,
-			},
-		},
-		LinkClickAnalytics: []api_types.LinkClicksGraphDataPointSchema{},
-		MessageAnalytics:   []api_types.MessageAnalyticGraphDataPointSchema{},
+	cacheKey := context.App.Redis.ComputeCacheKey(
+		"getDashboardAggregateAnalytics",
+		orgUuid.String(),
+		"aggregate_counts",
+	)
+
+	var responseToReturn *api_types.DashboardAggregateCountResponseSchema
+	ok, _ := context.App.Redis.GetCachedData(cacheKey, &responseToReturn)
+
+	if ok {
+		fmt.Println("Returning cached data")
+		return context.JSON(http.StatusOK, responseToReturn)
 	}
 
-	var primaryAnalyticsData struct {
+	var aggregateAnalyticsData struct {
 		CampaignsCancelled   int `json:"campaignsCancelled"`
 		CampaignsDraft       int `json:"campaignsDraft"`
 		CampaignsFinished    int `json:"campaignsFinished"`
@@ -261,66 +248,7 @@ func handlePrimaryAnalyticsDashboardData(context interfaces.ContextWithSession) 
 		MessageStatsCte,
 	))
 
-	linkClickDataQuery := SELECT(
-		table.TrackLinkClick.CreatedAt.AS("date"),
-		COALESCE(COUNT(table.TrackLinkClick.UniqueId), Int(0)).AS("count"),
-		TO_CHAR(table.TrackLinkClick.CreatedAt, String("DD-MM-YYYY")).AS("label"),
-	).
-		FROM(table.TrackLinkClick.
-			LEFT_JOIN(table.TrackLink, table.TrackLinkClick.TrackLinkId.EQ(table.TrackLink.UniqueId))).
-		WHERE(table.TrackLink.OrganizationId.EQ(UUID(orgUuid)).
-			AND(table.TrackLinkClick.CreatedAt.
-				BETWEEN(
-					TimestampzExp(Timestamp(minDateRange.Year(), minDateRange.Month(), minDateRange.Day(), minDateRange.Hour(), minDateRange.Minute(), minDateRange.Second())),
-					TimestampzExp(Timestamp(maxDateRange.Year(), maxDateRange.Month(), maxDateRange.Day(), maxDateRange.Hour(), maxDateRange.Minute(), maxDateRange.Second())),
-				),
-			)).
-		GROUP_BY(table.TrackLinkClick.CreatedAt).
-		ORDER_BY(table.TrackLinkClick.CreatedAt)
-
-	messageDataSeriesQuery := SELECT(
-		table.Message.CreatedAt.AS("date"),
-		COALESCE(
-			SUM(CASE().WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_OutBound.String()))).
-				THEN(CAST(Int(1)).AS_INTEGER()).
-				ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("sent"),
-		COALESCE(
-			SUM(CASE().WHEN(table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Read.String()))).
-				THEN(CAST(Int(1)).AS_INTEGER()).
-				ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("read"),
-		COALESCE(
-			SUM(
-				CASE().
-					WHEN(
-						EXISTS(
-							SELECT(table.Message.UniqueId).
-								FROM(table.Message).
-								WHERE(table.Message.RepliedTo.EQ(table.Message.UniqueId)),
-						),
-					).
-					THEN(CAST(Int(1)).AS_INTEGER()).
-					ELSE(CAST(Int(0)).AS_INTEGER()),
-			),
-			Int(0),
-		).AS("replied"),
-		TO_CHAR(table.Message.CreatedAt, String("DD-MM-YYYY")).AS("label"),
-	).FROM(
-		table.Message,
-	).WHERE(
-		table.Message.OrganizationId.EQ(UUID(orgUuid)).
-			AND(table.Message.CreatedAt.
-				BETWEEN(
-					TimestampzExp(Timestamp(minDateRange.Year(), minDateRange.Month(), minDateRange.Day(), minDateRange.Hour(), minDateRange.Minute(), minDateRange.Second())),
-					TimestampzExp(Timestamp(maxDateRange.Year(), maxDateRange.Month(), maxDateRange.Day(), maxDateRange.Hour(), maxDateRange.Minute(), maxDateRange.Second())),
-				),
-			),
-	).GROUP_BY(
-		table.Message.CreatedAt,
-	).ORDER_BY(
-		table.Message.CreatedAt,
-	)
-
-	err = aggregateStatsQuery.QueryContext(context.Request().Context(), context.App.Db, &primaryAnalyticsData)
+	err = aggregateStatsQuery.QueryContext(context.Request().Context(), context.App.Db, &aggregateAnalyticsData)
 
 	if err != nil {
 		fmt.Println("error is", err.Error())
@@ -332,81 +260,318 @@ func handlePrimaryAnalyticsDashboardData(context interfaces.ContextWithSession) 
 		}
 	}
 
-	linkDataSeries := []api_types.LinkClicksGraphDataPointSchema{}
+	responseToReturn = &api_types.DashboardAggregateCountResponseSchema{
+		AggregateAnalytics: api_types.AggregateAnalyticsSchema{
+			CampaignStats: api_types.AggregateCampaignStatsDataPointsSchema{
+				CampaignsCancelled: aggregateAnalyticsData.CampaignsCancelled,
+				CampaignsRunning:   aggregateAnalyticsData.CampaignsRunning,
+				CampaignsDraft:     aggregateAnalyticsData.CampaignsDraft,
+				CampaignsFinished:  aggregateAnalyticsData.CampaignsFinished,
+				CampaignsPaused:    aggregateAnalyticsData.CampaignsPaused,
+				CampaignsScheduled: aggregateAnalyticsData.CampaignsScheduled,
+				TotalCampaigns:     aggregateAnalyticsData.TotalCampaigns,
+			},
+			ContactStats: api_types.AggregateContactStatsDataPointsSchema{
+				ContactsActive:  aggregateAnalyticsData.ContactsActive,
+				ContactsBlocked: aggregateAnalyticsData.ContactsBlocked,
+				TotalContacts:   aggregateAnalyticsData.TotalContacts,
+			},
+			ConversationStats: api_types.AggregateConversationStatsDataPointsSchema{
+				ConversationsActive:  aggregateAnalyticsData.ConversationsActive,
+				ConversationsClosed:  aggregateAnalyticsData.ConversationsClosed,
+				ConversationsPending: 0,
+				TotalConversations:   aggregateAnalyticsData.TotalConversations,
+			},
+			MessageStats: api_types.AggregateMessageStatsDataPointsSchema{
+				MessagesDelivered:   aggregateAnalyticsData.MessagesDelivered,
+				MessagesFailed:      aggregateAnalyticsData.MessagesFailed,
+				MessagesRead:        aggregateAnalyticsData.MessagesRead,
+				MessagesSent:        aggregateAnalyticsData.MessagesSent,
+				TotalMessages:       aggregateAnalyticsData.TotalMessages,
+				MessagesUndelivered: aggregateAnalyticsData.MessagesUndelivered,
+				MessagesUnread:      aggregateAnalyticsData.MessagesUnread,
+			},
+		},
+	}
+
+	// cache the data for 10 minutes
+	context.App.Redis.CacheData(cacheKey, responseToReturn, 10*time.Minute)
+
+	return context.JSON(http.StatusOK, responseToReturn)
+
+}
+
+func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) error {
+	params := new(api_types.GetAggregateCampaignAnalyticsParams)
+	err := utils.BindQueryParams(context, params)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	minDateRange := params.From
+	maxDateRange := params.To
+	if minDateRange.IsZero() || maxDateRange.IsZero() {
+		return context.JSON(http.StatusBadRequest, "Invalid date range")
+	}
+
+	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, "Invalid organization id")
+	}
+
+	cacheKey := context.App.Redis.ComputeCacheKey(
+		"handleAggregateCampaignAnalytics",
+		strings.Join([]string{orgUuid.String(), minDateRange.String(), maxDateRange.String()}, ":"),
+		"campaigns_analytics",
+	)
+
+	var responseToReturn *api_types.GetAggregateCampaignAnalyticsResponseSchema
+	ok, _ := context.App.Redis.GetCachedData(cacheKey, &responseToReturn)
+	if ok {
+		return context.JSON(http.StatusOK, responseToReturn)
+	}
+
+	// Query daily link click data.
+	linkClickDataQuery := SELECT(
+		table.TrackLinkClick.CreatedAt.AS("date"),
+		COALESCE(COUNT(table.TrackLinkClick.UniqueId), Int(0)).AS("count"),
+		TO_CHAR(table.TrackLinkClick.CreatedAt, String("DD-MM-YYYY")).AS("label"),
+	).
+		FROM(
+			table.TrackLinkClick.
+				LEFT_JOIN(table.TrackLink, table.TrackLinkClick.TrackLinkId.EQ(table.TrackLink.UniqueId)),
+		).
+		WHERE(
+			table.TrackLink.OrganizationId.EQ(UUID(orgUuid)).
+				AND(
+					table.TrackLinkClick.CreatedAt.BETWEEN(
+						TimestampzExp(TimestampzT(minDateRange)),
+						TimestampzExp(TimestampzT(maxDateRange)),
+					),
+				),
+		).
+		GROUP_BY(table.TrackLinkClick.CreatedAt).
+		ORDER_BY(table.TrackLinkClick.CreatedAt)
+
+	// Query daily message analytics.
+	messageDataSeriesQuery := SELECT(
+		table.Message.CreatedAt.AS("date"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_OutBound.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("sent"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Read.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("read"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.RepliedTo.IS_NOT_NULL()).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("replied"),
+		TO_CHAR(table.Message.CreatedAt, String("DD-MM-YYYY")).AS("label"),
+	).
+		FROM(table.Message).
+		WHERE(
+			table.Message.OrganizationId.EQ(UUID(orgUuid)).
+				AND(
+					table.Message.CreatedAt.BETWEEN(
+						TimestampzExp(TimestampzT(minDateRange)),
+						TimestampzExp(TimestampzT(maxDateRange)),
+					),
+				),
+		).
+		GROUP_BY(table.Message.CreatedAt).
+		ORDER_BY(table.Message.CreatedAt)
+
+	var linkDataSeries []api_types.DateToCountGraphDataPointSchema
 	err = linkClickDataQuery.QueryContext(context.Request().Context(), context.App.Db, &linkDataSeries)
-
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		fmt.Println("error is", err.Error())
-		if err.Error() == qrm.ErrNoRows.Error() {
-			fmt.Println("No link click data found")
-			// do nothing keep the empty response as defined above in the controller
-		} else {
-			return context.JSON(http.StatusInternalServerError, "Error getting link click data")
-		}
+		return context.JSON(http.StatusInternalServerError, "Error getting link click data")
 	}
 
-	messageDataSeries := []api_types.MessageAnalyticGraphDataPointSchema{}
+	var messageDataSeries []api_types.MessageAnalyticGraphDataPointSchema
 	err = messageDataSeriesQuery.QueryContext(context.Request().Context(), context.App.Db, &messageDataSeries)
-
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		fmt.Println("error is", err.Error())
-		if err.Error() == qrm.ErrNoRows.Error() {
-			fmt.Println("No message data found")
-			// do nothing keep the empty response as defined above in the controller
-		} else {
-			return context.JSON(http.StatusInternalServerError, "Error getting message data")
-		}
+		return context.JSON(http.StatusInternalServerError, "Error getting message data")
 	}
 
-	responseToReturn.AggregateAnalytics = api_types.AggregateAnalyticsSchema{
-		CampaignStats: api_types.AggregateCampaignStatsDataPointsSchema{
-			CampaignsCancelled: primaryAnalyticsData.CampaignsCancelled,
-			CampaignsRunning:   primaryAnalyticsData.CampaignsRunning,
-			CampaignsDraft:     primaryAnalyticsData.CampaignsDraft,
-			CampaignsFinished:  primaryAnalyticsData.CampaignsFinished,
-			CampaignsPaused:    primaryAnalyticsData.CampaignsPaused,
-			CampaignsScheduled: primaryAnalyticsData.CampaignsScheduled,
-			TotalCampaigns:     primaryAnalyticsData.TotalCampaigns,
-		},
-		ContactStats: api_types.AggregateContactStatsDataPointsSchema{
-			ContactsActive:  primaryAnalyticsData.ContactsActive,
-			ContactsBlocked: primaryAnalyticsData.ContactsBlocked,
-			TotalContacts:   primaryAnalyticsData.TotalContacts,
-		},
-		ConversationStats: api_types.AggregateConversationStatsDataPointsSchema{
-			ConversationsActive:  primaryAnalyticsData.ConversationsActive,
-			ConversationsClosed:  primaryAnalyticsData.ConversationsClosed,
-			ConversationsPending: 0,
-			TotalConversations:   primaryAnalyticsData.TotalConversations,
-		},
-		MessageStats: api_types.AggregateMessageStatsDataPointsSchema{
-			MessagesDelivered:   primaryAnalyticsData.MessagesDelivered,
-			MessagesFailed:      primaryAnalyticsData.MessagesFailed,
-			MessagesRead:        primaryAnalyticsData.MessagesRead,
-			MessagesSent:        primaryAnalyticsData.MessagesSent,
-			TotalMessages:       primaryAnalyticsData.TotalMessages,
-			MessagesUndelivered: primaryAnalyticsData.MessagesUndelivered,
-			MessagesUnread:      primaryAnalyticsData.MessagesUnread,
+	// Aggregate totals from daily series.
+	var totalMessagesSent, totalMessagesRead, totalReplies int
+	for _, m := range messageDataSeries {
+		totalMessagesSent += m.Sent
+		totalMessagesRead += m.Read
+		totalReplies += m.Replied
+	}
+	var totalLinkClicks int
+	for _, d := range linkDataSeries {
+		totalLinkClicks += d.Count
+	}
+
+	var openRate, clickRate, engagementRate float64
+	if totalMessagesSent > 0 {
+		openRate = (float64(totalMessagesRead) / float64(totalMessagesSent)) * 100
+		clickRate = (float64(totalLinkClicks) / float64(totalMessagesSent)) * 100
+		engagementRate = (float64(totalLinkClicks+totalReplies) / float64(totalMessagesSent)) * 100
+	}
+
+	fmt.Println("clickRate", clickRate)
+
+	responseToReturn = &api_types.GetAggregateCampaignAnalyticsResponseSchema{
+		Analytics: api_types.CampaignAnalyticsResponseSchema{
+			OpenRate:              openRate,
+			ResponseRate:          0, // ! TODO: implement
+			EngagementRate:        engagementRate,
+			EngagementTrends:      []api_types.DateToCountGraphDataPointSchema{}, // Optionally merge clicks & replies
+			LinkClicksData:        linkDataSeries,
+			MessageAnalytics:      messageDataSeries,
+			MessagesDelivered:     0,
+			MessagesFailed:        0,
+			MessagesRead:          totalMessagesRead,
+			MessagesSent:          totalMessagesSent,
+			MessagesUndelivered:   0,
+			TotalLinkClicks:       totalLinkClicks,
+			TotalMessages:         totalMessagesSent,
+			ConversationInitiated: 0,
 		},
 	}
 
-	if len(linkDataSeries) != 0 {
-		responseToReturn.LinkClickAnalytics = linkDataSeries
-	}
-
-	if len(messageDataSeries) != 0 {
-		responseToReturn.MessageAnalytics = messageDataSeries
-	}
-
+	context.App.Redis.CacheData(cacheKey, responseToReturn, 10*time.Minute)
 	return context.JSON(http.StatusOK, responseToReturn)
 }
 
-func handleSecondaryAnalyticsDashboardData(context interfaces.ContextWithSession) error {
-	// ! TODO: these analytics we will need once the live team inbox will be implemented
+func handleAggregateConversationAnalytics(context interfaces.ContextWithSession) error {
+	logger := context.App.Logger
+	// Compute conversation analytics:
+	// - Average response time (seconds)
+	// - Total active conversations
+	// - Total service conversations (initiated by "Contact")
+	// - Inbound/outbound message ratio
+	// - Message type distribution
 
-	responseToReturn := api_types.SecondaryAnalyticsDashboardResponseSchema{
-		ConversationsAnalytics:                  []api_types.ConversationAnalyticsDataPointSchema{},
-		MessageTypeTrafficDistributionAnalytics: []api_types.MessageTypeDistributionGraphDataPointSchema{},
+	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, "Invalid organization id")
+	}
+
+	// Raw SQL query for average response time:
+	// For each conversation, compute MIN(out.CreatedAt - in.CreatedAt) where out is the first outbound after an inbound.
+	var avgResponseTime sql.NullFloat64
+	rawAvgQuery := `
+		SELECT AVG(diff) 
+			FROM (
+    			SELECT MIN(m_out."CreatedAt" - m_in."CreatedAt") AS diff
+    			FROM "Message" m_in
+    			JOIN "Message" m_out ON m_in."ConversationId" = m_out."ConversationId"
+    			WHERE m_in."OrganizationId" = $1
+      				AND m_in."Direction" = 'InBound'
+      				AND m_out."Direction" = 'OutBound'
+      				AND m_out."CreatedAt" > m_in."CreatedAt"
+    			GROUP BY m_in."ConversationId"
+				) sub;
+	`
+	err = context.App.Db.QueryRowContext(context.Request().Context(), rawAvgQuery, orgUuid).Scan(&avgResponseTime)
+	if err != nil && err != sql.ErrNoRows {
+		logger.Error("Error computing average response time", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, "Error computing average response time")
+	}
+
+	// Active conversations.
+	activeConversationsQuery := SELECT(
+		COUNT(table.Conversation.UniqueId).AS("activeCount"),
+	).
+		FROM(table.Conversation).
+		WHERE(
+			table.Conversation.OrganizationId.EQ(UUID(orgUuid)).
+				AND(table.Conversation.Status.EQ(utils.EnumExpression(model.ConversationStatusEnum_Active.String()))),
+		)
+
+	var activeCountDest struct {
+		ActiveCount int
+	}
+	err = activeConversationsQuery.QueryContext(context.Request().Context(), context.App.Db, &activeCountDest)
+	if err != nil && err != sql.ErrNoRows {
+		return context.JSON(http.StatusInternalServerError, "Error getting active conversations")
+	}
+
+	// Service conversations: initiated by "Contact".
+	serviceConversationsQuery := SELECT(
+		COUNT(table.Conversation.UniqueId).AS("serviceCount"),
+	).
+		FROM(table.Conversation).
+		WHERE(
+			table.Conversation.OrganizationId.EQ(UUID(orgUuid)).
+				AND(table.Conversation.InitiatedBy.EQ(utils.EnumExpression("Contact"))),
+		)
+	var serviceCountDest struct {
+		ServiceCount int
+	}
+	err = serviceConversationsQuery.QueryContext(context.Request().Context(), context.App.Db, &serviceCountDest)
+	if err != nil && err != sql.ErrNoRows {
+		logger.Error("Error getting service conversations", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, "Error getting service conversations")
+	}
+
+	// Inbound and outbound message counts.
+	inboundOutboundQuery := SELECT(
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_InBound.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("inbound"),
+		COALESCE(SUM(CASE().
+			WHEN(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_OutBound.String()))).
+			THEN(CAST(Int(1)).AS_INTEGER()).
+			ELSE(CAST(Int(0)).AS_INTEGER()),
+		), CAST(Int(0)).AS_INTEGER()).AS("outbound"),
+	).
+		FROM(table.Message).
+		WHERE(table.Message.OrganizationId.EQ(UUID(orgUuid)))
+	var dest struct {
+		Inbound  int
+		Outbound int
+	}
+	err = inboundOutboundQuery.QueryContext(context.Request().Context(), context.App.Db, &dest)
+	if err != nil && err != sql.ErrNoRows {
+		logger.Error("Error getting inbound/outbound counts", err.Error(), nil)
+		return context.JSON(http.StatusInternalServerError, "Error getting inbound/outbound counts")
+	}
+	var inboundOutboundRatio float64
+	if dest.Outbound > 0 {
+		inboundOutboundRatio = float64(dest.Inbound) / float64(dest.Outbound)
+	}
+
+	// Message type distribution grouped by MessageType.
+	messageTypeDistributionQuery := SELECT(
+		table.Message.MessageType,
+		COUNT(table.Message.UniqueId).AS("count"),
+	).
+		FROM(table.Message).
+		WHERE(table.Message.OrganizationId.EQ(UUID(orgUuid))).
+		GROUP_BY(table.Message.MessageType).
+		ORDER_BY(table.Message.MessageType)
+	var messageTypeDistribution []api_types.MessageTypeDistributionGraphDataPointSchema
+	err = messageTypeDistributionQuery.QueryContext(context.Request().Context(), context.App.Db, &messageTypeDistribution)
+	if err != nil && err != sql.ErrNoRows {
+		return context.JSON(http.StatusInternalServerError, "Error getting message type distribution")
+	}
+
+	responseToReturn := api_types.GetConversationAnalyticsResponseSchema{
+		Analytics: api_types.ConversationAggregateAnalytics{
+			ConversationsActive:                     activeCountDest.ActiveCount,
+			ConversationsClosed:                     0,
+			ConversationsPending:                    0,
+			InboundToOutboundRatio:                  inboundOutboundRatio,
+			ServiceConversations:                    serviceCountDest.ServiceCount,
+			TotalConversations:                      activeCountDest.ActiveCount, // Optionally add closed count
+			AvgResponseTimeInMinutes:                avgResponseTime.Float64,
+			ConversationsAnalytics:                  []api_types.ConversationAnalyticsDataPointSchema{},
+			MessageTypeTrafficDistributionAnalytics: messageTypeDistribution,
+		},
 	}
 
 	return context.JSON(http.StatusOK, responseToReturn)
@@ -414,15 +579,15 @@ func handleSecondaryAnalyticsDashboardData(context interfaces.ContextWithSession
 
 func handleGetCampaignAnalyticsById(context interfaces.ContextWithSession) error {
 	var campaignAnalyticsData struct {
-		MessagesDelivered     int                                        `json:"messagesDelivered"`
-		MessagesFailed        int                                        `json:"messagesFailed"`
-		MessagesRead          int                                        `json:"messagesRead"`
-		MessagesSent          int                                        `json:"messagesSent"`
-		MessagesUndelivered   int                                        `json:"messagesUndelivered"`
-		TotalMessages         int                                        `json:"totalMessages"`
-		TotalLinkClicks       int                                        `json:"totalLinkClicks"`
-		ConversationInitiated int                                        `json:"conversationInitiated"`
-		LinkClicksData        []api_types.LinkClicksGraphDataPointSchema `json:"linkClicksData"`
+		MessagesDelivered     int                                         `json:"messagesDelivered"`
+		MessagesFailed        int                                         `json:"messagesFailed"`
+		MessagesRead          int                                         `json:"messagesRead"`
+		MessagesSent          int                                         `json:"messagesSent"`
+		MessagesUndelivered   int                                         `json:"messagesUndelivered"`
+		TotalMessages         int                                         `json:"totalMessages"`
+		TotalLinkClicks       int                                         `json:"totalLinkClicks"`
+		ConversationInitiated int                                         `json:"conversationInitiated"`
+		LinkClicksData        []api_types.DateToCountGraphDataPointSchema `json:"linkClicksData"`
 	}
 
 	campaignMessageDataCte := CTE("messageStats")
@@ -531,7 +696,7 @@ func handleGetCampaignAnalyticsById(context interfaces.ContextWithSession) error
 				TotalMessages:         0,
 				ConversationInitiated: 0,
 				TotalLinkClicks:       0,
-				LinkClicksData:        []api_types.LinkClicksGraphDataPointSchema{},
+				LinkClicksData:        []api_types.DateToCountGraphDataPointSchema{},
 			}
 			return context.JSON(http.StatusOK, responseToReturn)
 		} else {

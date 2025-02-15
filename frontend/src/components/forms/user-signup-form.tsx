@@ -178,7 +178,7 @@ export default function UserSignupForm() {
 									<FormControl>
 										<Input
 											type="email"
-											placeholder="Enter your email"
+											placeholder="you@youremail.com"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -196,7 +196,7 @@ export default function UserSignupForm() {
 									<FormLabel>Name</FormLabel>
 									<FormControl>
 										<Input
-											placeholder="Enter your name"
+											placeholder="your name"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -214,7 +214,7 @@ export default function UserSignupForm() {
 									<FormLabel>Username</FormLabel>
 									<FormControl>
 										<Input
-											placeholder="Enter your username"
+											placeholder="your username"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -233,7 +233,7 @@ export default function UserSignupForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="Enter your password"
+											placeholder="At least 6 characters"
 											disabled={isBusy}
 											{...field}
 										/>
@@ -252,7 +252,7 @@ export default function UserSignupForm() {
 									<FormControl>
 										<Input
 											type="password"
-											placeholder="Confirm your password"
+											placeholder="confirm your password"
 											disabled={isBusy}
 											{...field}
 										/>

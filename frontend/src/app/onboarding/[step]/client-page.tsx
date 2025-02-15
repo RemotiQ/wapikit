@@ -18,7 +18,6 @@ import {
 	WhatsappBusinessAccountDetailsFormSchema
 } from '~/schema'
 import { useLayoutStore } from '~/store/layout.store'
-import { EyeIcon } from 'lucide-react'
 import {
 	Form,
 	FormControl,
@@ -32,6 +31,7 @@ import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { AUTH_TOKEN_LS, OnboardingStepsEnum } from '~/constants'
+import { Icons } from '~/components/icons'
 
 const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 	const router = useRouter()
@@ -302,7 +302,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 											<FormLabel>Name</FormLabel>
 											<FormControl>
 												<Input
-													placeholder="name"
+													placeholder="Organization Name"
 													{...field}
 													autoComplete="off"
 													className="w-full"
@@ -406,7 +406,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 											<div className="flex flex-row gap-2">
 												<Input
 													disabled={isBusy}
-													placeholder="whatsapp business account id"
+													placeholder="Whatsapp Business Account ID"
 													{...field}
 													autoComplete="off"
 													type={
@@ -416,7 +416,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 													}
 												/>
 												<span
-													className="rounded-md border p-1 px-2"
+													className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													onClick={() => {
 														setWhatsAppBusinessAccountDetailsVisibility(
 															data => ({
@@ -427,7 +427,11 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 														)
 													}}
 												>
-													<EyeIcon className="size-5" />
+													{whatsAppBusinessAccountDetailsVisibility.whatsappBusinessAccountId ? (
+														<Icons.eyeOff className="size-5" />
+													) : (
+														<Icons.eye className="size-5" />
+													)}
 												</span>
 											</div>
 										</FormControl>
@@ -445,7 +449,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 											<div className="flex flex-row gap-2">
 												<Input
 													disabled={isBusy}
-													placeholder="whatsapp business account api token"
+													placeholder="Whatsapp Business Account API Token"
 													{...field}
 													autoComplete="off"
 													type={
@@ -455,7 +459,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 													}
 												/>
 												<span
-													className="rounded-md border p-1 px-2"
+													className="flex cursor-pointer items-center justify-center rounded-md border p-1 px-2"
 													onClick={() => {
 														setWhatsAppBusinessAccountDetailsVisibility(
 															data => ({
@@ -465,7 +469,11 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 														)
 													}}
 												>
-													<EyeIcon className="size-5" />
+													{whatsAppBusinessAccountDetailsVisibility.apiToken ? (
+														<Icons.eyeOff className="size-5" />
+													) : (
+														<Icons.eye className="size-5" />
+													)}
 												</span>
 											</div>
 										</FormControl>

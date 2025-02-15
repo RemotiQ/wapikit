@@ -5,7 +5,7 @@ import { CardHeader, CardFooter } from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Button } from '~/components/ui/button'
-import { SendIcon, Image as ImageIcon, MoreVerticalIcon } from 'lucide-react'
+import { SendIcon, Image as ImageIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
 	DropdownMenu,
@@ -415,7 +415,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 							</div>
 							<DropdownMenu modal={false}>
 								<DropdownMenuTrigger asChild>
-									<MoreVerticalIcon className="text-bold h-5 w-5  text-secondary-foreground" />
+									<Icons.dotsVertical className="text-bold h-5 w-5 cursor-pointer text-secondary-foreground" />
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
 									{chatActions.map((action, index) => {

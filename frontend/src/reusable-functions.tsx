@@ -3,11 +3,13 @@ import { toast } from 'sonner'
 import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { createRoot } from 'react-dom/client'
 import { AlertModal } from './components/modal/alert-modal'
-import { type MessageTemplateSchema } from 'root/.generated'
+import { type TemplateComponentParameters, type MessageTemplateSchema } from 'root/.generated'
 import { Icons } from './components/icons'
 import { APP_BASE_DOMAIN } from './constants'
 import { type UtmTags } from './types'
 import { type PricingPlan } from 'root/cloud_generated'
+import { type z } from 'zod'
+import { type TemplateComponentParametersSchema } from './schema'
 
 export function generateUniqueId() {
 	return v4()
@@ -87,72 +89,193 @@ export function parseMessageContentForHyperLink(message: string) {
 	return message.replace(urlRegex, '<a href="$1" target="_blank">$1</a>')
 }
 
-/**
- * Calculates the number of parameters required for each component in the template.
- * @param template - The template object.
- * @returns An object with component types as keys and parameter counts as values.
- */
-export function getParametersPerComponent(
-	template?: MessageTemplateSchema
-): Record<string, number> {
-	const parameterCounts: Record<string, number> = {}
+export function countParameterCountInTemplateComponent(template?: MessageTemplateSchema): number {
+	let total = 0
+	const parsedParams = parseTemplateComponents(template)
+	total += parsedParams.header.length
+	total += parsedParams.body.length
+	total += parsedParams.buttons.length
+	return total
+}
 
-	if (!template || !template.components) {
-		return parameterCounts
+type TemplateParameterInputType = z.infer<typeof TemplateComponentParametersSchema>['header'][0]
+
+function extractExampleValueForUrlButton(templateUrl: string, exampleUrl: string): string {
+	// Find the placeholder start
+	console.log({ templateUrl, exampleUrl })
+	const startIndex = templateUrl.indexOf('{{1}}')
+	if (startIndex === -1) {
+		// No placeholder, return full example
+		return exampleUrl
 	}
 
-	template.components.forEach(component => {
-		if (!component.type) {
-			return
+	// The prefix is everything before the placeholder
+	const prefix = templateUrl.substring(0, startIndex)
+	// Find the end of the placeholder (first "}" after the "${")
+	const endIndex = templateUrl.indexOf('}', startIndex)
+	// The suffix is everything after the placeholder, if any
+	const suffix =
+		endIndex !== -1 && endIndex + 1 < templateUrl.length
+			? templateUrl.substring(endIndex + 1)
+			: ''
+
+	let dynamicPart = exampleUrl
+	// Remove prefix if present
+	if (prefix && exampleUrl.startsWith(prefix)) {
+		dynamicPart = dynamicPart.substring(prefix.length)
+	}
+	// Remove suffix if present
+	if (suffix && dynamicPart.endsWith(suffix)) {
+		dynamicPart = dynamicPart.substring(0, dynamicPart.length - suffix.length)
+	}
+	return dynamicPart
+}
+
+export function parseTemplateComponents(
+	template?: MessageTemplateSchema,
+	defaults?: TemplateComponentParameters
+): z.infer<typeof TemplateComponentParametersSchema> {
+	// Initialize arrays to hold parameters for each component type.
+	const headerParams: TemplateParameterInputType[] = []
+	const bodyParams: TemplateParameterInputType[] = []
+	const buttonParams: TemplateParameterInputType[] = []
+
+	console.log({ template, defaults })
+
+	if (defaults) {
+		headerParams.push(...defaults.header)
+		bodyParams.push(...defaults.body)
+		buttonParams.push(...defaults.buttons)
+
+		return defaults
+	}
+
+	if (!template || !template.components) {
+		return {
+			header: headerParams,
+			body: bodyParams,
+			buttons: buttonParams
 		}
+	}
 
-		let parameterCount = 0
+	console.log('template.components', template.components)
 
-		// Check the example field of the main component
-		if (component.example) {
-			switch (component.type) {
-				case 'BODY': {
-					if (component.example.body_text?.length) {
-						// it is an array of array
-						component.example.body_text.forEach(bodyText => {
-							parameterCount += bodyText.length
+	template.components.forEach(comp => {
+		const type = comp.type?.toUpperCase()
+
+		if (type === 'HEADER') {
+			// For HEADER components, check first for named parameters.
+			if (
+				comp.example?.header_text_named_params &&
+				comp.example.header_text_named_params.length > 0
+			) {
+				comp.example.header_text_named_params.forEach(param => {
+					headerParams.push({
+						nameOrIndex: param.param_name,
+						label: `Header parameter`,
+						parameterType: 'static',
+						example: param.example,
+						placeholder: `{{${param.param_name}}}`
+					})
+				})
+			} else if (comp.example?.header_text && comp.example.header_text.length > 0) {
+				// Fallback: use positional parameters from header_text (array of strings).
+				comp.example.header_text.forEach((ex, idx) => {
+					headerParams.push({
+						nameOrIndex: String(idx + 1),
+						label: `Header`,
+						parameterType: 'static',
+						example: ex,
+						placeholder: `{{${idx + 1}}}`
+					})
+				})
+			}
+			// If header is of media type (format !== 'TEXT') and no parameters added, add a default parameter.
+			if (comp.format && comp.format !== 'TEXT' && headerParams.length === 0) {
+				headerParams.push({
+					nameOrIndex: 'media_link',
+					label: 'Header media link',
+					parameterType: 'static',
+					example: 'https://example.com/image.jpg',
+					placeholder: '{{media_link}}'
+				})
+			}
+		} else if (type === 'BODY') {
+			// For BODY components, check for named parameters first.
+			if (
+				comp.example?.body_text_named_params &&
+				comp.example.body_text_named_params.length > 0
+			) {
+				comp.example.body_text_named_params.forEach(param => {
+					bodyParams.push({
+						nameOrIndex: param.param_name,
+						label: `Body parameter {{${param.param_name}}}`,
+						parameterType: 'static',
+						example: param.example,
+						placeholder: `{{${param.param_name}}}`
+					})
+				})
+			} else if (comp.example?.body_text && comp.example.body_text.length > 0) {
+				comp.example.body_text[0].forEach((ex, idx) => {
+					bodyParams.push({
+						nameOrIndex: String(idx + 1),
+						label: `Body placeholder #${idx + 1}`,
+						parameterType: 'static',
+						example: ex,
+						placeholder: `{{${idx + 1}}}`
+					})
+				})
+			}
+		} else if (type === 'BUTTONS') {
+			// For BUTTONS components, iterate over each button.
+			if (comp.buttons && comp.buttons.length > 0) {
+				comp.buttons.forEach((btn, btnIndex) => {
+					// Check if button has an example array (positional example)
+					if (btn.example && Array.isArray(btn.example) && btn.example.length > 0) {
+						btn.example.forEach((example, idx) => {
+							if (btn.type === 'URL') {
+								const actualExample = extractExampleValueForUrlButton(
+									btn.url || '',
+									example
+								)
+
+								buttonParams.push({
+									nameOrIndex: 'url',
+									label: `${btn.type} - parameter for placeholder "{{1}}"`,
+									parameterType: 'static',
+									example: actualExample,
+									placeholder: btn.url
+								})
+							} else {
+								buttonParams.push({
+									nameOrIndex: String(idx + 1),
+									label: `${btn.type} Button #${btnIndex + 1} parameter #${idx + 1}`,
+									parameterType: 'static',
+									example: example,
+									placeholder: `{{${idx + 1}}}`
+								})
+							}
+						})
+					} else if (btn.type && btn.type.toUpperCase() === 'QUICK_REPLY') {
+						// QUICK_REPLY buttons always need a parameter (using dynamic type).
+						buttonParams.push({
+							nameOrIndex: 'payload',
+							label: `Quick Reply Button #${btnIndex + 1} {{payload}}`,
+							parameterType: 'static',
+							example: 'PAYLOAD_VALUE',
+							placeholder: '{{payload}}'
 						})
 					}
-					break
-				}
-
-				case 'HEADER': {
-					if (component.example.header_text) {
-						parameterCount += component.example.header_text.length
-					}
-
-					if (component.format !== 'TEXT') {
-						parameterCount += 1
-					}
-
-					break
-				}
+				})
 			}
 		}
-
-		// Check the example field of any buttons
-		// ! TODO: enable this after fixing the wapi.go object structure for template buttons
-		if (component.buttons) {
-			component.buttons.forEach(button => {
-				if (button.example) {
-					parameterCount += button.example.length
-				}
-			})
-		}
-
-		const keyToUse =
-			component.type === 'BODY' ? 'body' : component.type === 'BUTTONS' ? 'buttons' : 'header'
-
-		// Add the count for this component
-		parameterCounts[keyToUse] = parameterCount
 	})
 
-	return parameterCounts
+	return {
+		header: headerParams,
+		body: bodyParams,
+		buttons: buttonParams
+	}
 }
 
 export const createHref = ({
@@ -230,7 +353,6 @@ export async function displayRazorpayCheckoutModal(params: {
 		description: description,
 		subscription_id: sessionId,
 		handler: function (response: any) {
-			console.log(response)
 			if (response.razorpay_payment_id) {
 				onSuccess(verificationToken)
 			} else {

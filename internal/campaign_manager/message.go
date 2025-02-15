@@ -11,13 +11,21 @@ import (
 	"github.com/wapikit/wapikit/.db-generated/model"
 	table "github.com/wapikit/wapikit/.db-generated/table"
 	"github.com/wapikit/wapikit/services/notification_service"
+	"github.com/wapikit/wapikit/utils"
 )
 
-// templateComponentParameters holds the parameters for each component type
-type templateComponentParameters struct {
-	Header  []string `json:"header"`
-	Body    []string `json:"body"`
-	Buttons []string `json:"buttons"`
+type TemplateParameterInput struct {
+	NameOrIndex   string `json:"nameOrIndex"`
+	Label         string `json:"label"`
+	ParameterType string `json:"parameterType"` // "static" or "dynamic"
+	DynamicField  string `json:"dynamicField,omitempty"`
+	StaticValue   string `json:"staticValue,omitempty"`
+}
+
+type TemplateComponentParameters struct {
+	Header  []TemplateParameterInput `json:"header"`
+	Body    []TemplateParameterInput `json:"body"`
+	Buttons []TemplateParameterInput `json:"buttons"`
 }
 
 // For the purposes of these helper functions, we assume that the fetched template’s
@@ -36,9 +44,37 @@ type BusinessTemplateComponent struct {
 	}
 }
 
-// buildTemplateMessage creates a new template message and adds all components.
-func (cm *CampaignManager) buildTemplateMessage(templateInUse *manager.WhatsAppBusinessMessageTemplateNode, params templateComponentParameters) (*wapiComponents.TemplateMessage, error) {
+func (cm *CampaignManager) resolveParamValue(
+	param TemplateParameterInput,
+	contact *model.Contact,
+) string {
+	if param.ParameterType == "static" {
+		if param.StaticValue != "" {
+			return param.StaticValue
+		}
+		return ""
+	}
 
+	if param.DynamicField == "" {
+		return ""
+	}
+
+	first, last := utils.ParseName(contact.Name)
+
+	switch param.DynamicField {
+	case "firstName":
+		return first
+	case "lastName":
+		return last
+	case "phoneNumber":
+		return contact.PhoneNumber
+	default:
+		return ""
+	}
+}
+
+// buildTemplateMessage creates a new template message and adds all components.
+func (cm *CampaignManager) buildTemplateMessage(templateInUse *manager.WhatsAppBusinessMessageTemplateNode, params TemplateComponentParameters, contact *model.Contact) (*wapiComponents.TemplateMessage, error) {
 	cm.Logger.Info("Building template message", nil)
 	cm.Logger.Info("Template in use", templateInUse)
 	cm.Logger.Info("Template parameters", params)
@@ -51,23 +87,22 @@ func (cm *CampaignManager) buildTemplateMessage(templateInUse *manager.WhatsAppB
 		return nil, fmt.Errorf("error creating new template message: %v", err)
 	}
 
-	// Loop through each component from the fetched template and add to our message.
 	for _, comp := range templateInUse.Components {
-		cm.Logger.Info("Component", comp)
 		switch comp.Type {
 		case manager.MessageTemplateComponentTypeBody:
-			if err := cm.addBodyComponent(templateMessage, comp, params); err != nil {
+			if err := cm.addBodyComponent(templateMessage, comp, params.Body, contact); err != nil {
 				return nil, err
 			}
 		case manager.MessageTemplateComponentTypeHeader:
-			if err := cm.addHeaderComponent(templateMessage, comp, params); err != nil {
+			if err := cm.addHeaderComponent(templateMessage, comp, params.Header, contact); err != nil {
 				return nil, err
 			}
 		case manager.MessageTemplateComponentTypeButtons:
-			if err := cm.addButtonComponents(templateMessage, comp, params); err != nil {
+			if err := cm.addButtonComponents(templateMessage, comp, params.Buttons, contact); err != nil {
 				return nil, err
 			}
 		default:
+			// ignore other types
 		}
 	}
 
@@ -76,31 +111,42 @@ func (cm *CampaignManager) buildTemplateMessage(templateInUse *manager.WhatsAppB
 	return templateMessage, nil
 }
 
-// addBodyComponent builds and adds the BODY component.
-func (cm *CampaignManager) addBodyComponent(templateMessage *wapiComponents.TemplateMessage, comp manager.WhatsAppBusinessHSMWhatsAppHSMComponent, params templateComponentParameters) error {
+func (cm *CampaignManager) addBodyComponent(
+	tmpl *wapiComponents.TemplateMessage,
+	comp manager.WhatsAppBusinessHSMWhatsAppHSMComponent,
+	bodyParams []TemplateParameterInput,
+	contact *model.Contact,
+) error {
 	var bodyParameters []wapiComponents.TemplateMessageParameter
+
 	if len(comp.Example.BodyText) > 0 {
-		// For each stored body parameter, create a text parameter.
-		for _, bodyText := range params.Body {
-			bodyParameters = append(bodyParameters, wapiComponents.TemplateMessageBodyAndHeaderParameter{
-				Type: wapiComponents.TemplateMessageParameterTypeText,
-				Text: &bodyText,
-			})
+		for _, param := range bodyParams {
+			finalVal := cm.resolveParamValue(param, contact)
+			bodyParameters = append(bodyParameters,
+				wapiComponents.TemplateMessageBodyAndHeaderParameter{
+					Type: wapiComponents.TemplateMessageParameterTypeText,
+					Text: &finalVal,
+				},
+			)
 		}
 	}
-	templateMessage.AddBody(wapiComponents.TemplateMessageComponentBodyType{
+
+	tmpl.AddBody(wapiComponents.TemplateMessageComponentBodyType{
 		Type:       wapiComponents.TemplateMessageComponentTypeBody,
 		Parameters: bodyParameters,
 	})
 	return nil
 }
 
-// addHeaderComponent builds and adds the HEADER component.
-// It supports TEXT, IMAGE, VIDEO, DOCUMENT, and LOCATION formats.
-func (cm *CampaignManager) addHeaderComponent(templateMessage *wapiComponents.TemplateMessage, comp manager.WhatsAppBusinessHSMWhatsAppHSMComponent, params templateComponentParameters) error {
-	// If no header examples exist, simply add an empty header.
+func (cm *CampaignManager) addHeaderComponent(
+	tmpl *wapiComponents.TemplateMessage,
+	comp manager.WhatsAppBusinessHSMWhatsAppHSMComponent,
+	headerParams []TemplateParameterInput,
+	contact *model.Contact,
+) error {
+	// If no placeholders, just add an empty header
 	if len(comp.Example.HeaderText) == 0 && len(comp.Example.HeaderHandle) == 0 {
-		templateMessage.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
+		tmpl.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
 			Type: wapiComponents.TemplateMessageComponentTypeHeader,
 		})
 		return nil
@@ -109,66 +155,85 @@ func (cm *CampaignManager) addHeaderComponent(templateMessage *wapiComponents.Te
 	switch comp.Format {
 	case "TEXT":
 		var headerParameters []wapiComponents.TemplateMessageParameter
-		for _, headerText := range params.Header {
-			headerParameters = append(headerParameters, wapiComponents.TemplateMessageBodyAndHeaderParameter{
-				Type: wapiComponents.TemplateMessageParameterTypeText,
-				Text: &headerText,
-			})
+		for _, param := range headerParams {
+			finalVal := cm.resolveParamValue(param, contact)
+			headerParameters = append(headerParameters,
+				wapiComponents.TemplateMessageBodyAndHeaderParameter{
+					Type: wapiComponents.TemplateMessageParameterTypeText,
+					Text: &finalVal,
+				},
+			)
 		}
-		templateMessage.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
+		tmpl.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
 			Type:       wapiComponents.TemplateMessageComponentTypeHeader,
 			Parameters: &headerParameters,
 		})
+
 	case "IMAGE":
+		// Expect each param to be a link
 		var headerParameters []wapiComponents.TemplateMessageParameter
-		for _, mediaUrl := range params.Header {
-			headerParameters = append(headerParameters, wapiComponents.TemplateMessageBodyAndHeaderParameter{
-				Type: wapiComponents.TemplateMessageParameterTypeImage,
-				Image: &wapiComponents.TemplateMessageParameterMedia{
-					Link: mediaUrl,
+		for _, param := range headerParams {
+			link := cm.resolveParamValue(param, contact)
+			headerParameters = append(headerParameters,
+				wapiComponents.TemplateMessageBodyAndHeaderParameter{
+					Type: wapiComponents.TemplateMessageParameterTypeImage,
+					Image: &wapiComponents.TemplateMessageParameterMedia{
+						Link: link,
+					},
 				},
-			})
+			)
 		}
-		templateMessage.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
+		tmpl.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
 			Type:       wapiComponents.TemplateMessageComponentTypeHeader,
 			Parameters: &headerParameters,
 		})
+
 	case "VIDEO":
+		// Similar approach for video link
 		var headerParameters []wapiComponents.TemplateMessageParameter
-		for _, mediaUrl := range params.Header {
-			headerParameters = append(headerParameters, wapiComponents.TemplateMessageBodyAndHeaderParameter{
-				Type: wapiComponents.TemplateMessageParameterTypeVideo,
-				Video: &wapiComponents.TemplateMessageParameterMedia{
-					Link: mediaUrl,
+		for _, param := range headerParams {
+			link := cm.resolveParamValue(param, contact)
+			headerParameters = append(headerParameters,
+				wapiComponents.TemplateMessageBodyAndHeaderParameter{
+					Type: wapiComponents.TemplateMessageParameterTypeVideo,
+					Video: &wapiComponents.TemplateMessageParameterMedia{
+						Link: link,
+					},
 				},
-			})
+			)
 		}
-		templateMessage.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
+		tmpl.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
 			Type:       wapiComponents.TemplateMessageComponentTypeHeader,
 			Parameters: &headerParameters,
 		})
+
 	case "DOCUMENT":
 		var headerParameters []wapiComponents.TemplateMessageParameter
-		for _, mediaUrl := range params.Header {
-			headerParameters = append(headerParameters, wapiComponents.TemplateMessageBodyAndHeaderParameter{
-				Type: wapiComponents.TemplateMessageParameterTypeDocument,
-				Document: &wapiComponents.TemplateMessageParameterMedia{
-					Link: mediaUrl,
+		for _, param := range headerParams {
+			link := cm.resolveParamValue(param, contact)
+			headerParameters = append(headerParameters,
+				wapiComponents.TemplateMessageBodyAndHeaderParameter{
+					Type: wapiComponents.TemplateMessageParameterTypeDocument,
+					Document: &wapiComponents.TemplateMessageParameterMedia{
+						Link: link,
+					},
 				},
-			})
+			)
 		}
-		templateMessage.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
+		tmpl.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
 			Type:       wapiComponents.TemplateMessageComponentTypeHeader,
 			Parameters: &headerParameters,
 		})
+
 	case "LOCATION":
-		// For a location header, we expect a JSON string in the first header parameter.
-		if len(params.Header) == 0 {
+		// If there's a dynamic param, it might be a JSON containing lat/long
+		if len(headerParams) == 0 {
 			return fmt.Errorf("no location parameter provided in header")
 		}
+		firstVal := cm.resolveParamValue(headerParams[0], contact)
 		var loc wapiComponents.TemplateMessageParameterLocation
-		if err := json.Unmarshal([]byte(params.Header[0]), &loc); err != nil {
-			return fmt.Errorf("error unmarshalling location header parameter: %v", err)
+		if err := json.Unmarshal([]byte(firstVal), &loc); err != nil {
+			return fmt.Errorf("error unmarshalling location JSON: %v", err)
 		}
 		headerParameters := []wapiComponents.TemplateMessageParameter{
 			wapiComponents.TemplateMessageBodyAndHeaderParameter{
@@ -176,105 +241,106 @@ func (cm *CampaignManager) addHeaderComponent(templateMessage *wapiComponents.Te
 				Location: &loc,
 			},
 		}
-		templateMessage.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
+		tmpl.AddHeader(wapiComponents.TemplateMessageComponentHeaderType{
 			Type:       wapiComponents.TemplateMessageComponentTypeHeader,
 			Parameters: &headerParameters,
 		})
 	default:
 		return fmt.Errorf("unsupported header format: %s", comp.Format)
 	}
+
 	return nil
 }
 
-// addButtonComponents builds and adds all BUTTON components.
-func (cm *CampaignManager) addButtonComponents(templateMessage *wapiComponents.TemplateMessage, comp manager.WhatsAppBusinessHSMWhatsAppHSMComponent, params templateComponentParameters) error {
-	// Loop over each button in the fetched component.
-	for index, button := range comp.Buttons {
-		cm.Logger.Info("Button type", button.Type)
-
-		switch button.Type {
+func (cm *CampaignManager) addButtonComponents(
+	tmpl *wapiComponents.TemplateMessage,
+	comp manager.WhatsAppBusinessHSMWhatsAppHSMComponent,
+	buttonParams []TemplateParameterInput,
+	contact *model.Contact,
+) error {
+	for index, btn := range comp.Buttons {
+		switch btn.Type {
 		case manager.TemplateMessageButtonTypeUrl:
-			{
-				if len(params.Buttons) > index {
-					templateMessage.AddButton(wapiComponents.TemplateMessageComponentButtonType{
-						Type:    wapiComponents.TemplateMessageComponentTypeButton,
-						SubType: wapiComponents.TemplateMessageButtonComponentTypeUrl,
-						Index:   index,
-						Parameters: &[]wapiComponents.TemplateMessageParameter{
-							wapiComponents.TemplateMessageButtonParameter{
-								Type: wapiComponents.TemplateMessageButtonParameterTypeText,
-								Text: params.Buttons[index],
-							},
+			// Expect a param at index for the URL payload
+			if index < len(buttonParams) {
+				finalVal := cm.resolveParamValue(buttonParams[index], contact)
+				tmpl.AddButton(wapiComponents.TemplateMessageComponentButtonType{
+					Type:    wapiComponents.TemplateMessageComponentTypeButton,
+					SubType: wapiComponents.TemplateMessageButtonComponentTypeUrl,
+					Index:   index,
+					Parameters: &[]wapiComponents.TemplateMessageParameter{
+						wapiComponents.TemplateMessageButtonParameter{
+							Type: wapiComponents.TemplateMessageButtonParameterTypeText,
+							Text: finalVal,
 						},
-					})
-				}
+					},
+				})
 			}
 		case manager.TemplateMessageButtonTypeQuickReply:
-			{
-
-				if len(params.Buttons) > index {
-					templateMessage.AddButton(wapiComponents.TemplateMessageComponentButtonType{
-						Type:    wapiComponents.TemplateMessageComponentTypeButton,
-						SubType: wapiComponents.TemplateMessageButtonComponentTypeQuickReply,
-						Index:   index,
-						Parameters: &[]wapiComponents.TemplateMessageParameter{
-							wapiComponents.TemplateMessageButtonParameter{
-								Type:    wapiComponents.TemplateMessageButtonParameterTypePayload,
-								Payload: params.Buttons[index],
-							},
+			if index < len(buttonParams) {
+				finalVal := cm.resolveParamValue(buttonParams[index], contact)
+				tmpl.AddButton(wapiComponents.TemplateMessageComponentButtonType{
+					Type:    wapiComponents.TemplateMessageComponentTypeButton,
+					SubType: wapiComponents.TemplateMessageButtonComponentTypeQuickReply,
+					Index:   index,
+					Parameters: &[]wapiComponents.TemplateMessageParameter{
+						wapiComponents.TemplateMessageButtonParameter{
+							Type:    wapiComponents.TemplateMessageButtonParameterTypePayload,
+							Payload: finalVal,
 						},
-					})
-				} else {
-					// templateMessage.AddButton(wapiComponents.TemplateMessageComponentButtonType{
-					// 	Type:    wapiComponents.TemplateMessageComponentTypeButton,
-					// 	SubType: wapiComponents.TemplateMessageButtonComponentTypeQuickReply,
-					// 	Index:   index,
-					// })
-				}
+					},
+				})
 			}
-		// case "COPY_CODE", "copy_code":
-		// 	{
-		// 		// Implement the copy code button.
-		// 		// We assume that wapiComponents now defines:
-		// 		//   TemplateMessageButtonComponentTypeCopyCode
-		// 		// and that for copy code buttons the parameter is a text string.
-		// 		if len(params.Buttons) > index {
-		// 			templateMessage.AddButton(wapiComponents.TemplateMessageComponentButtonType{
-		// 				Type:    wapiComponents.TemplateMessageComponentTypeButton,
-		// 				SubType: wapiComponents.TemplateMessageButtonComponentTypeCopyCode,
-		// 				Index:   index,
-		// 				Parameters: []wapiComponents.TemplateMessageParameter{
-		// 					wapiComponents.TemplateMessageButtonParameter{
-		// 						Type: wapiComponents.TemplateMessageButtonParameterTypeText,
-		// 						Text: params.Buttons[index],
-		// 					},
-		// 				},
-		// 			})
-		// 		} else {
-		// 			templateMessage.AddButton(wapiComponents.TemplateMessageComponentButtonType{
-		// 				Type:       wapiComponents.TemplateMessageComponentTypeButton,
-		// 				SubType:    wapiComponents.TemplateMessageButtonComponentTypeCopyCode,
-		// 				Index:      index,
-		// 				Parameters: []wapiComponents.TemplateMessageParameter{},
-		// 			})
-		// 		}
-		// 	}
+		case manager.TemplateMessageButtonTypePhoneNumber:
+			// If you have a phone number button type
+			// Similar approach: finalVal = cm.resolveParamValue(...)
+
+		case manager.TemplateMessageButtonTypeCopyCode:
+			// If you have a custom "copy code" type
+			// finalVal = cm.resolveParamValue(...)
+			// etc.
+
 		default:
-			// * DO NOTHING *
+			// log or ignore
 		}
 	}
 	return nil
 }
 
-// --- Main sendMessage function ---
+func (cm *CampaignManager) doTemplateRequiresParameters(
+	tmpl *manager.WhatsAppBusinessMessageTemplateNode,
+) bool {
+	for _, comp := range tmpl.Components {
+		// Check for positional examples
+		if len(comp.Example.BodyText) > 0 || len(comp.Example.HeaderText) > 0 || len(comp.Example.HeaderHandle) > 0 {
+			return true
+		}
+		// Check for named parameters in header or body
+		if comp.Example != nil {
+			if len(comp.Example.HeaderTextNamedParams) > 0 || len(comp.Example.BodyTextNamedParams) > 0 {
+				return true
+			}
+		}
+		// Check if any button examples exist (positional or potentially named, if applicable)
+		if len(comp.Buttons) > 0 {
+			for _, btn := range comp.Buttons {
+				if len(btn.Example) > 0 {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
 
+// --- Main sendMessage function ---
 func (cm *CampaignManager) sendMessage(message *CampaignMessage) error {
 	// Ensure that the campaign wait group is decremented and update the last contact ID,
 	// irrespective of whether sending succeeds.
 	defer func() {
 		message.Campaign.wg.Done()
 		if err := cm.UpdateLastContactId(message.Campaign.UniqueId, message.Contact.UniqueId); err != nil {
-			cm.Logger.Error("error updating last contact id", err.Error())
+			cm.Logger.Error("error updating last contact id", "error", err.Error())
 		}
 	}()
 
@@ -300,33 +366,21 @@ func (cm *CampaignManager) sendMessage(message *CampaignMessage) error {
 	}
 
 	// Determine if the template requires parameters.
-	doTemplateRequireParameter := false
-	for _, comp := range templateInUse.Components {
-		if len(comp.Example.BodyText) > 0 || len(comp.Example.HeaderText) > 0 || len(comp.Example.HeaderHandle) > 0 {
-			doTemplateRequireParameter = true
-		}
-		if len(comp.Buttons) > 0 {
-			for _, btn := range comp.Buttons {
-				if len(btn.Example) > 0 {
-					doTemplateRequireParameter = true
-				}
-			}
-		}
-	}
+	doTemplateRequireParameter := cm.doTemplateRequiresParameters(templateInUse)
 
-	// Unmarshal stored parameters from the database.
-	var params templateComponentParameters
-	if err = json.Unmarshal([]byte(*message.Campaign.TemplateMessageComponentParameters), &params); err != nil {
+	var params TemplateComponentParameters
+	err = json.Unmarshal([]byte(*message.Campaign.TemplateMessageComponentParameters), &params)
+	if err != nil {
 		return fmt.Errorf("error unmarshalling template parameters: %v", err)
 	}
 
-	if doTemplateRequireParameter && reflect.DeepEqual(params, templateComponentParameters{}) {
+	if doTemplateRequireParameter && reflect.DeepEqual(params, TemplateComponentParameters{}) {
 		cm.StopCampaign(message.Campaign.UniqueId.String())
 		return fmt.Errorf("template requires parameters, but no parameter found in the database")
 	}
 
 	// Build the template message using our helper functions.
-	templateMessage, err := cm.buildTemplateMessage(templateInUse, params)
+	templateMessage, err := cm.buildTemplateMessage(templateInUse, params, &message.Contact)
 	if err != nil {
 		return fmt.Errorf("error building template message: %v", err)
 	}

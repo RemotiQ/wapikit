@@ -14,7 +14,6 @@ import {
 	useGetOrganizationRoles,
 	useGetOrganizationInvites
 } from 'root/.generated'
-import { Plus } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Modal } from '~/components/ui/modal'
@@ -35,6 +34,7 @@ import { NewTeamMemberInviteFormSchema, UpdateOrganizationMemberRolesFormSchema 
 import type { z } from 'zod'
 import { MultiSelect } from '~/components/multi-select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import { Icons } from '~/components/icons'
 
 const tabs = [
 	{
@@ -70,7 +70,11 @@ const MembersPage = () => {
 		sortBy: sortBy ? (sortBy as OrderEnum) : undefined
 	})
 
-	const { data: orgInvites, isFetching: isFetchingInvites } = useGetOrganizationInvites({
+	const {
+		data: orgInvites,
+		isFetching: isFetchingInvites,
+		refetch: refetchInvitations
+	} = useGetOrganizationInvites({
 		page: 1,
 		per_page: 50
 	})
@@ -142,7 +146,7 @@ const MembersPage = () => {
 				})
 				newMemberInviteForm.reset()
 				setIsInvitationModalOpen(false)
-				await refetchMembers()
+				await refetchInvitations()
 			} else {
 				errorNotification({
 					message: 'Something went wrong, While inviting a user. Please try again.'
@@ -220,7 +224,7 @@ const MembersPage = () => {
 			{/* invitation form modal */}
 			<Modal
 				title="Invite Team Member"
-				description="an email would be sent to them."
+				description="An invitation email will be sent to them."
 				isOpen={isInvitationModalOpen}
 				onClose={() => {
 					setIsInvitationModalOpen(false)
@@ -315,7 +319,7 @@ const MembersPage = () => {
 				</div>
 			</Modal>
 
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
+			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
 				<Tabs value={activeTab}>
 					<TabsList>
 						{tabs.map(tab => {
@@ -351,7 +355,8 @@ const MembersPage = () => {
 													buttonVariants({ variant: 'default' })
 												)}
 											>
-												<Plus className="mr-2 h-4 w-4" /> Invite New
+												<Icons.inviteTeamMember className="mr-2 h-4 w-4" />{' '}
+												Invite New
 											</Button>
 										</div>
 										<Separator />
@@ -379,7 +384,7 @@ const MembersPage = () => {
 									<>
 										<div className="flex items-start justify-between">
 											<Heading
-												title={`Invitations (${totalUsers})`}
+												title={`Invitations (${totalInvitations})`}
 												description="Manage members"
 											/>
 											<Button
@@ -390,7 +395,8 @@ const MembersPage = () => {
 													buttonVariants({ variant: 'default' })
 												)}
 											>
-												<Plus className="mr-2 h-4 w-4" /> Add New
+												<Icons.inviteTeamMember className="mr-2 h-4 w-4" />{' '}
+												Add New
 											</Button>
 										</div>
 										<Separator />

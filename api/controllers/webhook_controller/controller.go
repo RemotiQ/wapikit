@@ -180,15 +180,16 @@ func fetchBusinessAccountDetails(businessAccountId string, app interfaces.App) (
 
 	// check for cache here
 	cacheKey := app.Redis.ComputeCacheKey("business_account_details", businessAccountId, "businessAccountData")
-	cachedData, err := app.Redis.GetCachedData(cacheKey)
-	if err != nil {
-		// ! skip this
+
+	var businessAccountDetails BusinessAccountDetails
+	ok, err := app.Redis.GetCachedData(cacheKey, businessAccountDetails)
+
+	if ok {
+		return &businessAccountDetails, nil
 	}
 
-	if cachedData != "" {
-		var businessAccountDetails BusinessAccountDetails
-		json.Unmarshal([]byte(cachedData), &businessAccountDetails)
-		return &businessAccountDetails, nil
+	if err != nil {
+		// ! skip this
 	}
 
 	businessAccountQuery := SELECT(
@@ -207,7 +208,7 @@ func fetchBusinessAccountDetails(businessAccountId string, app interfaces.App) (
 		return nil, err
 	}
 
-	businessAccountDetails := BusinessAccountDetails{
+	businessAccountDetails = BusinessAccountDetails{
 		OrganizationId: dest.Organization.UniqueId.String(),
 		WhatsAppBusinessAccountDetailsSchema: api_types.WhatsAppBusinessAccountDetailsSchema{
 			AccessToken:       dest.WhatsappBusinessAccount.AccessToken,

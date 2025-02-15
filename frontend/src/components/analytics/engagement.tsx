@@ -2,9 +2,9 @@
 
 import { AreaChart } from '@tremor/react'
 import React from 'react'
-import { type LinkClicksGraphDataPointSchema } from 'root/.generated'
+import { type DateToCountGraphDataPointSchema } from 'root/.generated'
 
-export const EngagementTrends: React.FC<{ data: LinkClicksGraphDataPointSchema[] }> = ({
+export const EngagementTrends: React.FC<{ data: DateToCountGraphDataPointSchema[] }> = ({
 	data
 }) => {
 	return (

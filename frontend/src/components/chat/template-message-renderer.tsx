@@ -1,7 +1,7 @@
 import { type MessageTemplateSchema } from 'root/.generated'
 import { Icons } from '../icons'
 import { type z } from 'zod'
-import { type TemplateComponentSchema } from '~/schema'
+import { type TemplateComponentParametersSchema } from '~/schema'
 import { clsx } from 'clsx'
 import dayjs from 'dayjs'
 import { Separator } from '../ui/separator'
@@ -9,36 +9,75 @@ import MessageButtonRenderer from './button-render'
 
 const TemplateMessageRenderer: React.FC<{
 	templateMessage?: MessageTemplateSchema
-	parameterValues: z.infer<typeof TemplateComponentSchema>
+	parameterValues: z.infer<typeof TemplateComponentParametersSchema>
 }> = ({ templateMessage, parameterValues }) => {
 	if (!templateMessage) {
 		return null
 	}
 
-	const header = templateMessage.components?.find(component => component.type === 'HEADER')
-	const body = templateMessage.components?.find(component => component.type === 'BODY')
-	const footer = templateMessage.components?.find(component => component.type === 'FOOTER')
-	const buttons = templateMessage.components?.find(
-		component => component.type === 'BUTTONS'
-	)?.buttons
+	const header = templateMessage.components?.find(c => c.type === 'HEADER')
+	const body = templateMessage.components?.find(c => c.type === 'BODY')
+	const footer = templateMessage.components?.find(c => c.type === 'FOOTER')
+	const buttons = templateMessage.components?.find(c => c.type === 'BUTTONS')?.buttons
 
-	let headerText = header?.text || ''
-	let bodyText = body?.text || ''
+	/**
+	 * A helper to replace placeholders in template text with values
+	 * from parameterValues (header, body, etc.).
+	 * We'll assume placeholders look like {{1}} or {{2}}. If you have
+	 * named placeholders (e.g. {{user_name}}), you'd do a similar approach
+	 * but match param.nameOrIndex = "user_name" instead of the numeric index approach.
+	 */
+	function renderTextWithParams(
+		templateText: string,
+		params: Array<{
+			nameOrIndex: string
+			parameterType: string
+			staticValue?: string
+			dynamicField?: string
+			placeholder?: string
+			example?: string
+		}>
+	): string {
+		if (!templateText.includes('{{')) return templateText
 
-	if (headerText.includes('{{')) {
-		headerText = headerText.replace(/{{(.*?)}}/g, (_, match: string) => {
-			const index = Number(match) - 1
-			const value = parameterValues.header?.[index]
-			return value || `{{${match}}}`
+		// Regex for capturing inside {{...}}
+		return templateText.replace(/{{(.*?)}}/g, (_, match: string) => {
+			// e.g. match might be "1" or "user_name"
+			// find a param whose nameOrIndex === match
+			// but if the original template is numeric, e.g. {{1}},
+			// your param might store "1".
+			const foundParam = params.find(p => p.nameOrIndex === match)
+
+			if (!foundParam) {
+				// fallback if not found
+				return `{{${match}}}`
+			}
+
+			// if found, check parameterType
+			if (foundParam.parameterType === 'static' && foundParam.staticValue) {
+				return foundParam.staticValue || ''
+			} else if (foundParam.parameterType === 'dynamic' && foundParam.dynamicField) {
+				// 'dynamic'
+				// For a preview, you might do something generic like:
+				// e.g. "[contact.firstName]" or we just show dynamicField
+				return `[${foundParam.dynamicField ?? 'dynamic'}]`
+			} else {
+				// fallback if not found
+				return `{{${match}}}`
+			}
 		})
 	}
 
-	if (bodyText.includes('{{')) {
-		bodyText = bodyText.replace(/{{(.*?)}}/g, (_, match: string) => {
-			const index = Number(match) - 1
-			const value = parameterValues.body?.[index]
-			return value || `{{${match}}}`
-		})
+	// 1) Render header text
+	let headerText = header?.text || ''
+	if (headerText) {
+		headerText = renderTextWithParams(headerText, parameterValues.header)
+	}
+
+	// 2) Render body text
+	let bodyText = body?.text || ''
+	if (bodyText) {
+		bodyText = renderTextWithParams(bodyText, parameterValues.body)
 	}
 
 	const MenuIcon = Icons.menu

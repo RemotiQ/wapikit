@@ -212,6 +212,12 @@ const (
 	URL         TemplateMessageButtonType = "URL"
 )
 
+// Defines values for TemplateParameterInputParameterType.
+const (
+	Dynamic TemplateParameterInputParameterType = "dynamic"
+	Static  TemplateParameterInputParameterType = "static"
+)
+
 // Defines values for UserPermissionLevelEnum.
 const (
 	Member UserPermissionLevelEnum = "Member"
@@ -367,36 +373,44 @@ type BulkImportSchema struct {
 
 // CampaignAnalyticsResponseSchema defines model for CampaignAnalyticsResponseSchema.
 type CampaignAnalyticsResponseSchema struct {
-	ConversationInitiated int                              `json:"conversationInitiated"`
-	EngagementRate        int                              `json:"engagementRate"`
-	LinkClicksData        []LinkClicksGraphDataPointSchema `json:"linkClicksData"`
-	MessagesDelivered     int                              `json:"messagesDelivered"`
-	MessagesFailed        int                              `json:"messagesFailed"`
-	MessagesRead          int                              `json:"messagesRead"`
-	MessagesSent          int                              `json:"messagesSent"`
-	MessagesUndelivered   int                              `json:"messagesUndelivered"`
-	OpenRate              int                              `json:"openRate"`
-	ResponseRate          int                              `json:"responseRate"`
-	TotalLinkClicks       int                              `json:"totalLinkClicks"`
-	TotalMessages         int                              `json:"totalMessages"`
+	ConversationInitiated int                                   `json:"conversationInitiated"`
+	EngagementRate        float64                               `json:"engagementRate"`
+	EngagementTrends      []DateToCountGraphDataPointSchema     `json:"engagementTrends"`
+	LinkClicksData        []DateToCountGraphDataPointSchema     `json:"linkClicksData"`
+	MessageAnalytics      []MessageAnalyticGraphDataPointSchema `json:"messageAnalytics"`
+	MessagesDelivered     int                                   `json:"messagesDelivered"`
+	MessagesFailed        int                                   `json:"messagesFailed"`
+	MessagesRead          int                                   `json:"messagesRead"`
+	MessagesSent          int                                   `json:"messagesSent"`
+	MessagesUndelivered   int                                   `json:"messagesUndelivered"`
+	OpenRate              float64                               `json:"openRate"`
+	ResponseRate          float64                               `json:"responseRate"`
+	TotalLinkClicks       int                                   `json:"totalLinkClicks"`
+	TotalMessages         int                                   `json:"totalMessages"`
 }
 
 // CampaignSchema defines model for CampaignSchema.
 type CampaignSchema struct {
-	CreatedAt                   time.Time                        `json:"createdAt"`
-	Description                 *string                          `json:"description,omitempty"`
-	IsLinkTrackingEnabled       bool                             `json:"isLinkTrackingEnabled"`
-	Lists                       []ContactListSchema              `json:"lists"`
-	Name                        string                           `json:"name"`
-	PhoneNumberInUse            *string                          `json:"phoneNumberInUse,omitempty"`
-	ScheduledAt                 *time.Time                       `json:"scheduledAt,omitempty"`
-	SentAt                      *time.Time                       `json:"sentAt,omitempty"`
-	Stats                       *CampaignAnalyticsResponseSchema `json:"stats,omitempty"`
-	Status                      CampaignStatusEnum               `json:"status"`
-	Tags                        []TagSchema                      `json:"tags"`
-	TemplateComponentParameters *map[string]interface{}          `json:"templateComponentParameters,omitempty"`
-	TemplateMessageId           *string                          `json:"templateMessageId,omitempty"`
-	UniqueId                    string                           `json:"uniqueId"`
+	CreatedAt             time.Time           `json:"createdAt"`
+	Description           *string             `json:"description,omitempty"`
+	IsLinkTrackingEnabled bool                `json:"isLinkTrackingEnabled"`
+	Lists                 []ContactListSchema `json:"lists"`
+	Name                  string              `json:"name"`
+	PhoneNumberInUse      *string             `json:"phoneNumberInUse,omitempty"`
+	Progress              *struct {
+		Sent          float32 `json:"sent"`
+		TotalMessages float32 `json:"totalMessages"`
+	} `json:"progress,omitempty"`
+	ScheduledAt *time.Time                       `json:"scheduledAt,omitempty"`
+	SentAt      *time.Time                       `json:"sentAt,omitempty"`
+	Stats       *CampaignAnalyticsResponseSchema `json:"stats,omitempty"`
+	Status      CampaignStatusEnum               `json:"status"`
+	Tags        []TagSchema                      `json:"tags"`
+
+	// TemplateComponentParameters Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+	TemplateComponentParameters *TemplateComponentParameters `json:"templateComponentParameters,omitempty"`
+	TemplateMessageId           *string                      `json:"templateMessageId,omitempty"`
+	UniqueId                    string                       `json:"uniqueId"`
 }
 
 // CampaignStatusEnum defines model for CampaignStatusEnum.
@@ -436,6 +450,19 @@ type ContactWithoutConversationSchema struct {
 	Phone      string                 `json:"phone"`
 	Status     ContactStatusEnum      `json:"status"`
 	UniqueId   string                 `json:"uniqueId"`
+}
+
+// ConversationAggregateAnalytics defines model for ConversationAggregateAnalytics.
+type ConversationAggregateAnalytics struct {
+	AvgResponseTimeInMinutes                float64                                       `json:"avgResponseTimeInMinutes"`
+	ConversationsActive                     int                                           `json:"conversationsActive"`
+	ConversationsAnalytics                  []ConversationAnalyticsDataPointSchema        `json:"conversationsAnalytics"`
+	ConversationsClosed                     int                                           `json:"conversationsClosed"`
+	ConversationsPending                    int                                           `json:"conversationsPending"`
+	InboundToOutboundRatio                  float64                                       `json:"inboundToOutboundRatio"`
+	MessageTypeTrafficDistributionAnalytics []MessageTypeDistributionGraphDataPointSchema `json:"messageTypeTrafficDistributionAnalytics"`
+	ServiceConversations                    int                                           `json:"serviceConversations"`
+	TotalConversations                      int                                           `json:"totalConversations"`
 }
 
 // ConversationAnalyticsDataPointSchema defines model for ConversationAnalyticsDataPointSchema.
@@ -526,6 +553,18 @@ type CreateNewRoleResponseSchema struct {
 	Role OrganizationRoleSchema `json:"role"`
 }
 
+// DashboardAggregateCountResponseSchema defines model for DashboardAggregateCountResponseSchema.
+type DashboardAggregateCountResponseSchema struct {
+	AggregateAnalytics AggregateAnalyticsSchema `json:"aggregateAnalytics"`
+}
+
+// DateToCountGraphDataPointSchema defines model for DateToCountGraphDataPointSchema.
+type DateToCountGraphDataPointSchema struct {
+	Count int       `json:"count"`
+	Date  time.Time `json:"date"`
+	Label string    `json:"label"`
+}
+
 // DeleteContactByIdResponseSchema defines model for DeleteContactByIdResponseSchema.
 type DeleteContactByIdResponseSchema struct {
 	Data bool `json:"data"`
@@ -564,6 +603,11 @@ type FullAiConfiguration struct {
 	ApiKey    string      `json:"apiKey"`
 	IsEnabled bool        `json:"isEnabled"`
 	Model     AiModelEnum `json:"model"`
+}
+
+// GetAggregateCampaignAnalyticsResponseSchema defines model for GetAggregateCampaignAnalyticsResponseSchema.
+type GetAggregateCampaignAnalyticsResponseSchema struct {
+	Analytics CampaignAnalyticsResponseSchema `json:"analytics"`
 }
 
 // GetAiChatByIdResponseSchema defines model for GetAiChatByIdResponseSchema.
@@ -636,6 +680,11 @@ type GetContactListResponseSchema struct {
 type GetContactsResponseSchema struct {
 	Contacts       []ContactSchema `json:"contacts"`
 	PaginationMeta PaginationMeta  `json:"paginationMeta"`
+}
+
+// GetConversationAnalyticsResponseSchema defines model for GetConversationAnalyticsResponseSchema.
+type GetConversationAnalyticsResponseSchema struct {
+	Analytics ConversationAggregateAnalytics `json:"analytics"`
 }
 
 // GetConversationByIdResponseSchema defines model for GetConversationByIdResponseSchema.
@@ -782,13 +831,6 @@ type JoinOrganizationResponseBodySchema struct {
 	Token string `json:"token"`
 }
 
-// LinkClicksGraphDataPointSchema defines model for LinkClicksGraphDataPointSchema.
-type LinkClicksGraphDataPointSchema struct {
-	Count int       `json:"count"`
-	Date  time.Time `json:"date"`
-	Label string    `json:"label"`
-}
-
 // LoginRequestBodySchema defines model for LoginRequestBodySchema.
 type LoginRequestBodySchema struct {
 	Password string `json:"password"`
@@ -803,11 +845,12 @@ type LoginResponseBodySchema struct {
 
 // MessageAnalyticGraphDataPointSchema defines model for MessageAnalyticGraphDataPointSchema.
 type MessageAnalyticGraphDataPointSchema struct {
-	Date    time.Time `json:"date"`
-	Label   string    `json:"label"`
-	Read    int       `json:"read"`
-	Replied int       `json:"replied"`
-	Sent    int       `json:"sent"`
+	Date      time.Time `json:"date"`
+	Delivered int       `json:"delivered"`
+	Label     string    `json:"label"`
+	Read      int       `json:"read"`
+	Replied   int       `json:"replied"`
+	Sent      int       `json:"sent"`
 }
 
 // MessageDirectionEnum defines model for MessageDirectionEnum.
@@ -880,10 +923,10 @@ type NewCampaignSchema struct {
 
 // NewContactListSchema defines model for NewContactListSchema.
 type NewContactListSchema struct {
-	ContactIds  *[]string   `json:"contactIds,omitempty"`
-	Description *string     `json:"description,omitempty"`
-	Name        string      `json:"name"`
-	Tags        []TagSchema `json:"tags"`
+	ContactIds  *[]string `json:"contactIds,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	Name        string    `json:"name"`
+	Tags        []string  `json:"tags"`
 }
 
 // NewContactSchema defines model for NewContactSchema.
@@ -1003,13 +1046,6 @@ type PhoneNumberSchema struct {
 	VerifiedName       string `json:"verified_name"`
 }
 
-// PrimaryAnalyticsResponseSchema defines model for PrimaryAnalyticsResponseSchema.
-type PrimaryAnalyticsResponseSchema struct {
-	AggregateAnalytics AggregateAnalyticsSchema              `json:"aggregateAnalytics"`
-	LinkClickAnalytics []LinkClicksGraphDataPointSchema      `json:"linkClickAnalytics"`
-	MessageAnalytics   []MessageAnalyticGraphDataPointSchema `json:"messageAnalytics"`
-}
-
 // RateLimitErrorResponseSchema defines model for RateLimitErrorResponseSchema.
 type RateLimitErrorResponseSchema struct {
 	Message   string `json:"message"`
@@ -1036,6 +1072,21 @@ type RegisterRequestResponseBodySchema struct {
 	IsOtpSent bool `json:"isOtpSent"`
 }
 
+// ResetPasswordCompleteResponseBodySchema defines model for ResetPasswordCompleteResponseBodySchema.
+type ResetPasswordCompleteResponseBodySchema struct {
+	IsPasswordReset bool `json:"isPasswordReset"`
+}
+
+// ResetPasswordInitResponseBodySchema defines model for ResetPasswordInitResponseBodySchema.
+type ResetPasswordInitResponseBodySchema struct {
+	IsOtpSent bool `json:"isOtpSent"`
+}
+
+// ResetPasswordVerifyResponseBodySchema defines model for ResetPasswordVerifyResponseBodySchema.
+type ResetPasswordVerifyResponseBodySchema struct {
+	IsVerified bool `json:"isVerified"`
+}
+
 // RolePermissionEnum defines model for RolePermissionEnum.
 type RolePermissionEnum string
 
@@ -1044,12 +1095,6 @@ type RoleUpdateSchema struct {
 	Description *string              `json:"description,omitempty"`
 	Name        string               `json:"name"`
 	Permissions []RolePermissionEnum `json:"permissions"`
-}
-
-// SecondaryAnalyticsDashboardResponseSchema defines model for SecondaryAnalyticsDashboardResponseSchema.
-type SecondaryAnalyticsDashboardResponseSchema struct {
-	ConversationsAnalytics                  []ConversationAnalyticsDataPointSchema        `json:"conversationsAnalytics"`
-	MessageTypeTrafficDistributionAnalytics []MessageTypeDistributionGraphDataPointSchema `json:"messageTypeTrafficDistributionAnalytics"`
 }
 
 // SegmentationRecommendation defines model for SegmentationRecommendation.
@@ -1091,6 +1136,18 @@ type TagSchema struct {
 	UniqueId string `json:"uniqueId"`
 }
 
+// TemplateComponentParameters Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+type TemplateComponentParameters struct {
+	// Body Parameters for body components.
+	Body []TemplateParameterInput `json:"body"`
+
+	// Buttons Parameters for button components.
+	Buttons []TemplateParameterInput `json:"buttons"`
+
+	// Header Parameters for header components.
+	Header []TemplateParameterInput `json:"header"`
+}
+
 // TemplateMessageButtonType defines model for TemplateMessageButtonType.
 type TemplateMessageButtonType string
 
@@ -1105,9 +1162,32 @@ type TemplateMessageComponentButton struct {
 
 // TemplateMessageComponentExample defines model for TemplateMessageComponentExample.
 type TemplateMessageComponentExample struct {
-	BodyText     *[][]string `json:"body_text,omitempty"`
-	HeaderHandle *[]string   `json:"header_handle,omitempty"`
-	HeaderText   *[]string   `json:"header_text,omitempty"`
+	// BodyText For positional examples in body components.
+	BodyText *[][]string `json:"body_text,omitempty"`
+
+	// BodyTextNamedParams For named parameters in body components.
+	BodyTextNamedParams *[]struct {
+		Example   string `json:"example"`
+		ParamName string `json:"param_name"`
+	} `json:"body_text_named_params,omitempty"`
+
+	// HeaderHandle For media headers (IMAGE, VIDEO, DOCUMENT).
+	HeaderHandle *[]string `json:"header_handle,omitempty"`
+
+	// HeaderText For positional header text examples.
+	HeaderText *[]string `json:"header_text,omitempty"`
+
+	// HeaderTextNamedParams For named parameters in header components.
+	HeaderTextNamedParams *[]struct {
+		Example   string `json:"example"`
+		ParamName string `json:"param_name"`
+	} `json:"header_text_named_params,omitempty"`
+}
+
+// TemplateMessageLimitedTimeOfferParameter Limited time offer parameters, if applicable.
+type TemplateMessageLimitedTimeOfferParameter struct {
+	ExpiryMinutes *int    `json:"expiry_minutes,omitempty"`
+	OfferCode     *string `json:"offer_code,omitempty"`
 }
 
 // TemplateMessageQualityScore defines model for TemplateMessageQualityScore.
@@ -1116,6 +1196,33 @@ type TemplateMessageQualityScore struct {
 	Reasons *[]string `json:"reasons,omitempty"`
 	Score   *int      `json:"score,omitempty"`
 }
+
+// TemplateParameterInput A single template parameter input. It can be either static or dynamic.
+type TemplateParameterInput struct {
+	// DynamicField For dynamic parameters, the field name to resolve (e.g. 'firstName').
+	DynamicField *string `json:"dynamicField,omitempty"`
+
+	// Example An example value for the parameter.
+	Example *string `json:"example,omitempty"`
+
+	// Label The display label for the parameter.
+	Label string `json:"label"`
+
+	// NameOrIndex The name or index identifying the parameter.
+	NameOrIndex string `json:"nameOrIndex"`
+
+	// ParameterType Specifies whether the parameter is static or dynamic.
+	ParameterType TemplateParameterInputParameterType `json:"parameterType"`
+
+	// Placeholder Placeholder text to guide the user input.
+	Placeholder *string `json:"placeholder,omitempty"`
+
+	// StaticValue The static value to be used if applicable.
+	StaticValue *string `json:"staticValue,omitempty"`
+}
+
+// TemplateParameterInputParameterType Specifies whether the parameter is static or dynamic.
+type TemplateParameterInputParameterType string
 
 // TemplateSchema defines model for TemplateSchema.
 type TemplateSchema struct {
@@ -1169,16 +1276,18 @@ type UpdateCampaignByIdResponseSchema struct {
 
 // UpdateCampaignSchema defines model for UpdateCampaignSchema.
 type UpdateCampaignSchema struct {
-	Description                 *string                 `json:"description,omitempty"`
-	EnableLinkTracking          bool                    `json:"enableLinkTracking"`
-	ListIds                     []string                `json:"listIds"`
-	Name                        string                  `json:"name"`
-	PhoneNumber                 *string                 `json:"phoneNumber,omitempty"`
-	ScheduledAt                 *time.Time              `json:"scheduledAt,omitempty"`
-	Status                      *CampaignStatusEnum     `json:"status,omitempty"`
-	Tags                        []string                `json:"tags"`
-	TemplateComponentParameters *map[string]interface{} `json:"templateComponentParameters,omitempty"`
-	TemplateMessageId           *string                 `json:"templateMessageId,omitempty"`
+	Description        *string             `json:"description,omitempty"`
+	EnableLinkTracking bool                `json:"enableLinkTracking"`
+	ListIds            []string            `json:"listIds"`
+	Name               string              `json:"name"`
+	PhoneNumber        *string             `json:"phoneNumber,omitempty"`
+	ScheduledAt        *time.Time          `json:"scheduledAt,omitempty"`
+	Status             *CampaignStatusEnum `json:"status,omitempty"`
+	Tags               []string            `json:"tags"`
+
+	// TemplateComponentParameters Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+	TemplateComponentParameters *TemplateComponentParameters `json:"templateComponentParameters,omitempty"`
+	TemplateMessageId           *string                      `json:"templateMessageId,omitempty"`
 }
 
 // UpdateContactByIdResponseSchema defines model for UpdateContactByIdResponseSchema.
@@ -1188,9 +1297,9 @@ type UpdateContactByIdResponseSchema struct {
 
 // UpdateContactListSchema defines model for UpdateContactListSchema.
 type UpdateContactListSchema struct {
-	Description *string     `json:"description,omitempty"`
-	Name        string      `json:"name"`
-	Tags        []TagSchema `json:"tags"`
+	Description *string  `json:"description,omitempty"`
+	Name        string   `json:"name"`
+	Tags        []string `json:"tags"`
 }
 
 // UpdateContactSchema defines model for UpdateContactSchema.
@@ -1320,9 +1429,11 @@ type WhatsAppBusinessHSMWhatsAppHSMComponent struct {
 	CodeExpirationMinutes     *int                              `json:"code_expiration_minutes,omitempty"`
 	Example                   *TemplateMessageComponentExample  `json:"example,omitempty"`
 	Format                    *MessageTemplateComponentFormat   `json:"format,omitempty"`
-	LimitedTimeOffer          *map[string]interface{}           `json:"limited_time_offer,omitempty"`
-	Text                      *string                           `json:"text,omitempty"`
-	Type                      *MessageTemplateComponentType     `json:"type,omitempty"`
+
+	// LimitedTimeOffer Limited time offer parameters, if applicable.
+	LimitedTimeOffer *TemplateMessageLimitedTimeOfferParameter `json:"limited_time_offer,omitempty"`
+	Text             *string                                   `json:"text,omitempty"`
+	Type             *MessageTemplateComponentType             `json:"type,omitempty"`
 }
 
 // GetAiChatMessagesParams defines parameters for GetAiChatMessages.
@@ -1376,17 +1487,8 @@ type GetAiChatSegmentRecommendationsParams struct {
 	ContactId *int64 `form:"contactId,omitempty" json:"contactId,omitempty"`
 }
 
-// GetCampaignsAnalyticsParams defines parameters for GetCampaignsAnalytics.
-type GetCampaignsAnalyticsParams struct {
-	// From starting range of time span to get analytics for
-	From *time.Time `form:"from,omitempty" json:"from,omitempty"`
-
-	// To ending range of time span to get analytics for
-	To *time.Time `form:"to,omitempty" json:"to,omitempty"`
-}
-
-// GetPrimaryAnalyticsParams defines parameters for GetPrimaryAnalytics.
-type GetPrimaryAnalyticsParams struct {
+// GetAggregateCountsParams defines parameters for GetAggregateCounts.
+type GetAggregateCountsParams struct {
 	// From starting range of time span to get analytics for
 	From time.Time `form:"from" json:"from"`
 
@@ -1394,13 +1496,39 @@ type GetPrimaryAnalyticsParams struct {
 	To time.Time `form:"to" json:"to"`
 }
 
-// GetSecondaryAnalyticsParams defines parameters for GetSecondaryAnalytics.
-type GetSecondaryAnalyticsParams struct {
+// GetAggregateCampaignAnalyticsParams defines parameters for GetAggregateCampaignAnalytics.
+type GetAggregateCampaignAnalyticsParams struct {
+	// From starting range of time span to get analytics for
+	From time.Time `form:"from" json:"from"`
+
+	// To ending range of time span to get analytics for
+	To time.Time `form:"to" json:"to"`
+}
+
+// GetConversationAnalyticsParams defines parameters for GetConversationAnalytics.
+type GetConversationAnalyticsParams struct {
 	// From starting range of time span to get analytics for
 	From *time.Time `form:"from,omitempty" json:"from,omitempty"`
 
 	// To ending range of time span to get analytics for
 	To *time.Time `form:"to,omitempty" json:"to,omitempty"`
+}
+
+// ResetPasswordCompleteJSONBody defines parameters for ResetPasswordComplete.
+type ResetPasswordCompleteJSONBody struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// ResetPasswordInitJSONBody defines parameters for ResetPasswordInit.
+type ResetPasswordInitJSONBody struct {
+	Email string `json:"email"`
+}
+
+// ResetPasswordVerifyJSONBody defines parameters for ResetPasswordVerify.
+type ResetPasswordVerifyJSONBody struct {
+	Email string `json:"email"`
+	Otp   string `json:"otp"`
 }
 
 // SwitchOrganizationJSONBody defines parameters for SwitchOrganization.
@@ -1641,6 +1769,15 @@ type LoginJSONRequestBody = LoginRequestBodySchema
 
 // RegisterJSONRequestBody defines body for Register for application/json ContentType.
 type RegisterJSONRequestBody = RegisterRequestBodySchema
+
+// ResetPasswordCompleteJSONRequestBody defines body for ResetPasswordComplete for application/json ContentType.
+type ResetPasswordCompleteJSONRequestBody ResetPasswordCompleteJSONBody
+
+// ResetPasswordInitJSONRequestBody defines body for ResetPasswordInit for application/json ContentType.
+type ResetPasswordInitJSONRequestBody ResetPasswordInitJSONBody
+
+// ResetPasswordVerifyJSONRequestBody defines body for ResetPasswordVerify for application/json ContentType.
+type ResetPasswordVerifyJSONRequestBody ResetPasswordVerifyJSONBody
 
 // SwitchOrganizationJSONRequestBody defines body for SwitchOrganization for application/json ContentType.
 type SwitchOrganizationJSONRequestBody SwitchOrganizationJSONBody

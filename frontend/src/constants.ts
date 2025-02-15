@@ -12,7 +12,7 @@ export const REDIRECT_URL_LS = '__redirect_url'
 
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
-		return 'http://192.168.29.20:8000/api'
+		return 'http://127.0.0.1:8000/api'
 	}
 
 	if (IS_MANAGED_CLOUD_EDITION) {
@@ -28,14 +28,14 @@ export const navItems: NavItem[] = [
 	{
 		title: 'Dashboard',
 		href: '/dashboard',
-		icon: 'dashboard',
+		icon: 'grid',
 		label: 'Dashboard',
 		status: 'default'
 	},
 	{
 		title: 'WapiKit AI',
 		href: '/ai',
-		icon: 'sparkles',
+		icon: 'aiStar',
 		label: 'WapiKit AI',
 		requiredFeatureFlag: ['isAiIntegrationEnabled'],
 		status: 'beta'
@@ -48,37 +48,37 @@ export const navItems: NavItem[] = [
 		status: 'default'
 	},
 	{
-		title: 'Conversations',
+		title: 'Inbox',
 		href: '/conversations',
-		icon: 'message',
+		icon: 'messageChatSquare',
 		label: 'Conversations',
 		status: 'default'
 	},
 	{
 		title: 'Campaigns',
 		href: '/campaigns',
-		icon: 'rocket',
+		icon: 'announcement',
 		label: 'Campaigns',
 		status: 'default'
 	},
 	{
 		title: 'Contacts',
 		href: '/contacts',
-		icon: 'user',
+		icon: 'contacts',
 		label: 'profile',
 		status: 'default'
 	},
 	{
 		title: 'Lists',
 		href: '/lists',
-		icon: 'rows',
+		icon: 'file',
 		label: 'employee',
 		status: 'default'
 	},
 	{
 		title: 'Team',
 		href: '/team',
-		icon: 'laptop',
+		icon: 'team',
 		label: 'Teams',
 		status: 'default'
 	},
@@ -92,7 +92,7 @@ export const navItems: NavItem[] = [
 	{
 		title: 'Integrations',
 		href: '/integrations',
-		icon: 'link',
+		icon: 'zapFast',
 		label: 'Integrations',
 		status: 'coming-soon'
 	}

@@ -1,15 +1,13 @@
 'use client'
 
 import { type IntegrationSchema, IntegrationStatusEnum } from 'root/.generated'
-import BreadCrumb from '~/components/breadcrumb'
+
 import IntegrationCard from '~/components/integration/card'
 import { Heading } from '~/components/ui/heading'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Separator } from '~/components/ui/separator'
 
 const IntegrationsPage = () => {
-	const breadcrumbItems = [{ title: 'Integrations', link: '/integrations' }]
-
 	// const { data } = useGetIntegrations({
 	// 	order: OrderEnum.asc,
 	// 	page: 1,
@@ -135,8 +133,7 @@ const IntegrationsPage = () => {
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
+			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
 				<div className="flex items-start justify-between">
 					<Heading title={`Integrations`} description="" />
 				</div>

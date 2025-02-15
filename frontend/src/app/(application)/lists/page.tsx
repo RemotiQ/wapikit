@@ -1,6 +1,5 @@
 'use client'
 
-import BreadCrumb from '~/components/breadcrumb'
 import { ContactListTableColumns } from '~/components/tables/columns'
 import { TableComponent } from '~/components/tables/table'
 import { buttonVariants } from '~/components/ui/button'
@@ -12,8 +11,6 @@ import { clsx } from 'clsx'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { errorNotification, materialConfirm, successNotification } from '~/reusable-functions'
 import { Icons } from '~/components/icons'
-
-const breadcrumbItems = [{ title: 'lists', link: '/lists' }]
 
 const ListsPage = () => {
 	// * 1. Create a page for lists
@@ -75,9 +72,7 @@ const ListsPage = () => {
 
 	return (
 		<>
-			<div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-				<BreadCrumb items={breadcrumbItems} />
-
+			<div className="flex-1 space-y-4  p-4 pt-6 md:px-6">
 				<div className="flex items-start justify-between">
 					<Heading title={`Lists (${lists.length})`} description="Manage lists" />
 
