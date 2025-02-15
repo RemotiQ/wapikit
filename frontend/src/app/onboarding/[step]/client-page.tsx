@@ -406,7 +406,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 											<div className="flex flex-row gap-2">
 												<Input
 													disabled={isBusy}
-													placeholder="whatsapp business account id"
+													placeholder="Whatsapp Business Account ID"
 													{...field}
 													autoComplete="off"
 													type={
@@ -449,7 +449,7 @@ const OnboardingStepClientPage = ({ stepSlug }: { stepSlug: string }) => {
 											<div className="flex flex-row gap-2">
 												<Input
 													disabled={isBusy}
-													placeholder="whatsapp business account api token"
+													placeholder="Whatsapp Business Account API Token"
 													{...field}
 													autoComplete="off"
 													type={
