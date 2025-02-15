@@ -307,8 +307,33 @@ func (cm *CampaignManager) addButtonComponents(
 	return nil
 }
 
-// --- Main sendMessage function ---
+func (cm *CampaignManager) doTemplateRequiresParameters(
+	tmpl *manager.WhatsAppBusinessMessageTemplateNode,
+) bool {
+	for _, comp := range tmpl.Components {
+		// Check for positional examples
+		if len(comp.Example.BodyText) > 0 || len(comp.Example.HeaderText) > 0 || len(comp.Example.HeaderHandle) > 0 {
+			return true
+		}
+		// Check for named parameters in header or body
+		if comp.Example != nil {
+			if len(comp.Example.HeaderTextNamedParams) > 0 || len(comp.Example.BodyTextNamedParams) > 0 {
+				return true
+			}
+		}
+		// Check if any button examples exist (positional or potentially named, if applicable)
+		if len(comp.Buttons) > 0 {
+			for _, btn := range comp.Buttons {
+				if len(btn.Example) > 0 {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
 
+// --- Main sendMessage function ---
 func (cm *CampaignManager) sendMessage(message *CampaignMessage) error {
 	// Ensure that the campaign wait group is decremented and update the last contact ID,
 	// irrespective of whether sending succeeds.
@@ -341,19 +366,7 @@ func (cm *CampaignManager) sendMessage(message *CampaignMessage) error {
 	}
 
 	// Determine if the template requires parameters.
-	doTemplateRequireParameter := false
-	for _, comp := range templateInUse.Components {
-		if len(comp.Example.BodyText) > 0 || len(comp.Example.HeaderText) > 0 || len(comp.Example.HeaderHandle) > 0 {
-			doTemplateRequireParameter = true
-		}
-		if len(comp.Buttons) > 0 {
-			for _, btn := range comp.Buttons {
-				if len(btn.Example) > 0 {
-					doTemplateRequireParameter = true
-				}
-			}
-		}
-	}
+	doTemplateRequireParameter := cm.doTemplateRequiresParameters(templateInUse)
 
 	var params TemplateComponentParameters
 	err = json.Unmarshal([]byte(*message.Campaign.TemplateMessageComponentParameters), &params)
