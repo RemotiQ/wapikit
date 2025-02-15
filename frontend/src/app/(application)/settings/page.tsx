@@ -901,7 +901,7 @@ export default function SettingsPage() {
 																					disabled={
 																						isBusy
 																					}
-																					placeholder="whatsapp business account id"
+																					placeholder="Whatsapp Business Account ID"
 																					{...field}
 																					autoComplete="off"
 																					type={
@@ -950,7 +950,7 @@ export default function SettingsPage() {
 																					disabled={
 																						isBusy
 																					}
-																					placeholder="whatsapp business account api token"
+																					placeholder="Whatsapp Business Account API Token"
 																					{...field}
 																					autoComplete="off"
 																					type={
@@ -1226,7 +1226,7 @@ export default function SettingsPage() {
 																							disabled={
 																								isBusy
 																							}
-																							placeholder="name"
+																							placeholder="Name"
 																							{...field}
 																							autoComplete="off"
 																							value={userUpdateForm.watch(
@@ -1258,7 +1258,7 @@ export default function SettingsPage() {
 																							disabled={
 																								true
 																							}
-																							placeholder="email"
+																							placeholder="you@youremail.com"
 																							{...field}
 																							autoComplete="off"
 																							value={
@@ -1442,7 +1442,7 @@ export default function SettingsPage() {
 																		<FormControl>
 																			<Input
 																				disabled={isBusy}
-																				placeholder="role name"
+																				placeholder="Role Name"
 																				{...field}
 																				autoComplete="off"
 																			/>
@@ -1463,7 +1463,7 @@ export default function SettingsPage() {
 																		<FormControl>
 																			<Input
 																				disabled={isBusy}
-																				placeholder="role description"
+																				placeholder="Role Description"
 																				{...field}
 																				autoComplete="off"
 																			/>
@@ -1577,7 +1577,7 @@ export default function SettingsPage() {
 																		<FormItem>
 																			<FormControl>
 																				<Input
-																					placeholder="default organization"
+																					placeholder="Default Organization"
 																					{...field}
 																				/>
 																			</FormControl>
@@ -1603,7 +1603,7 @@ export default function SettingsPage() {
 																		<FormItem>
 																			<FormControl>
 																				<Textarea
-																					placeholder="description..."
+																					placeholder="Description..."
 																					{...field}
 																				/>
 																			</FormControl>

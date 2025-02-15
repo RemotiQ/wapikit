@@ -14,7 +14,6 @@ import {
 	useGetOrganizationRoles,
 	useGetOrganizationInvites
 } from 'root/.generated'
-import { Plus } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Modal } from '~/components/ui/modal'
@@ -35,6 +34,7 @@ import { NewTeamMemberInviteFormSchema, UpdateOrganizationMemberRolesFormSchema 
 import type { z } from 'zod'
 import { MultiSelect } from '~/components/multi-select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import { Icons } from '~/components/icons'
 
 const tabs = [
 	{
@@ -355,7 +355,7 @@ const MembersPage = () => {
 													buttonVariants({ variant: 'default' })
 												)}
 											>
-												<Plus className="mr-2 h-4 w-4" /> Invite New
+												<Icons.inviteTeamMember className="mr-2 h-4 w-4" /> Invite New
 											</Button>
 										</div>
 										<Separator />
@@ -394,7 +394,7 @@ const MembersPage = () => {
 													buttonVariants({ variant: 'default' })
 												)}
 											>
-												<Plus className="mr-2 h-4 w-4" /> Add New
+												<Icons.inviteTeamMember className="mr-2 h-4 w-4" /> Add New
 											</Button>
 										</div>
 										<Separator />

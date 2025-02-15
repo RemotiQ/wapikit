@@ -255,7 +255,7 @@ export default function UserResetPasswordForm() {
 									<FormControl>
 										<Input
 											id="otp"
-											placeholder="enter otp"
+											placeholder="Enter OTP"
 											disabled={isBusy}
 											{...field}
 										/>

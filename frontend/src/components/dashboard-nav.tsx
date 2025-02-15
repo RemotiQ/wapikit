@@ -145,7 +145,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 											<FormLabel>Name</FormLabel>
 											<FormControl>
 												<Input
-													placeholder="name"
+													placeholder="Name"
 													{...field}
 													autoComplete="off"
 												/>
