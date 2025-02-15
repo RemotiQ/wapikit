@@ -510,7 +510,7 @@ func (service *WebhookController) handleWebhookPostRequest(context interfaces.Co
 	return context.JSON(http.StatusOK, "Success")
 }
 
-func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber events.BusinessPhoneNumber, sentByContactNumber string) (*event_service.ConversationWithAllDetails, error) {
+func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber events.BusinessPhoneNumber, sentByContactNumber, sentByName string) (*event_service.ConversationWithAllDetails, error) {
 	conversationDetailsToReturn := &event_service.ConversationWithAllDetails{}
 	businessAccount, err := fetchBusinessAccountDetails(businessAccountId, app)
 	if err != nil {
@@ -542,9 +542,8 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 				UpdatedAt:      time.Now(),
 				OrganizationId: uuid.MustParse(businessAccount.OrganizationId),
 				Status:         model.ContactStatusEnum_Active,
-				// ! TODO: add this to wapi.go and then use here
-				Name:       "",
-				Attributes: &emptyAttributes,
+				Name:           sentByName,
+				Attributes:     &emptyAttributes,
 			}
 
 			var insertedContact model.Contact
@@ -633,8 +632,6 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 				Tags:                   []api_types.TagSchema{},
 			}
 
-			fmt.Println("EVENT TO BE SENT HERE")
-
 			conversationDetailsToReturn.OrganizationId = businessAccount.OrganizationId
 
 			// * send an event to the client for creating new conversation
@@ -655,7 +652,6 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	businessAccountId := textMessageEvent.BusinessAccountId
 	phoneNumber := textMessageEvent.PhoneNumber
 	sentAt := textMessageEvent.BaseMessageEvent.Timestamp // this is unix timestamp in string, convert this to time.Time
-
 	unixTimestamp, err := strconv.ParseInt(sentAt, 10, 64)
 	if err != nil {
 		app.Logger.Error("error parsing timestamp", err.Error(), nil)
@@ -665,9 +661,12 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	sentAtTime := time.Unix(unixTimestamp, 0)
 	sentByContactNumber := textMessageEvent.BaseMessageEvent.From
 
+	app.Logger.Debug("details", "SenderName", textMessageEvent.BaseMessageEvent.SenderName)
+	sentByName := textMessageEvent.BaseMessageEvent.SenderName
+
 	app.Logger.Debug("details", "businessAccountId", businessAccountId, "phoneNumber", phoneNumber, "sentByContactNumber", sentByContactNumber)
 
-	conversationDetails, err := preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber)
+	conversationDetails, err := preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber, sentByName)
 
 	if err != nil {
 		app.Logger.Error("error fetching conversation details", err.Error(), nil)
@@ -688,8 +687,6 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 
 	conversationUuid := uuid.MustParse(conversationDetails.UniqueId)
 	contactUuid := uuid.MustParse(conversationDetails.Contact.UniqueId)
-
-	fmt.Println("conversationDetails", conversationDetails)
 
 	// ! TODO: handle the reply to message here
 
@@ -718,7 +715,6 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	err = insertQuery.Query(app.Db, &insertedMessage)
 
 	if err != nil {
-		fmt.Println("error inserting message in the database", err)
 		app.Logger.Error("error inserting message in the database", err.Error(), nil)
 	}
 
@@ -727,7 +723,7 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisApiServerEventChannelName, messageEvent.ToJson())
 
 	if err != nil {
-		fmt.Println("error sending api server event", err)
+		app.Logger.Error("error sending api server event", err)
 	}
 
 	// ! TODO: quick actions, AI automation replies and other stuff will be added in the future version here
@@ -740,8 +736,9 @@ func handleVideoMessageEvent(event events.BaseEvent, app interfaces.App) {
 	businessAccountId := videoMessageEvent.BusinessAccountId
 	phoneNumber := videoMessageEvent.PhoneNumber
 	sentByContactNumber := videoMessageEvent.BaseMessageEvent.From
+	sentByName := videoMessageEvent.BaseMessageEvent.SenderName
 
-	conversationDetails, err := preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber)
+	conversationDetails, err := preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber, sentByName)
 
 	if err != nil {
 		app.Logger.Error("error fetching conversation details", err.Error(), nil)
