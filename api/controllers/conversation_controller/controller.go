@@ -641,6 +641,8 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 }
 
 func handleSendMessage(context interfaces.ContextWithSession) error {
+	logger := context.App.Logger
+
 	// 1. Validate conversationId
 	conversationId := context.Param("id")
 	if conversationId == "" {
@@ -689,6 +691,8 @@ func handleSendMessage(context interfaces.ContextWithSession) error {
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
+
+	logger.Info("discriminator: %v", discriminator)
 
 	messageComponent, err := context.App.ConversationService.BuildSendMessagePayload(discriminator, payload.MessageData)
 	if err != nil {

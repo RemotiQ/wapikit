@@ -1,6 +1,16 @@
 import { clsx } from 'clsx'
 import dayjs from 'dayjs'
-import { MessageDirectionEnum, type MessageSchema } from 'root/.generated'
+import {
+	type AudioMessage,
+	type DocumentMessage,
+	type ImageMessage,
+	type LocationMessage,
+	MessageDirectionEnum,
+	MessageTypeEnum,
+	type TextMessage,
+	type VideoMessage,
+	type MessageSchema
+} from 'root/.generated'
 import { ChevronDown } from 'lucide-react'
 import {
 	DropdownMenu,
@@ -9,8 +19,40 @@ import {
 	DropdownMenuItem
 } from '../ui/dropdown-menu'
 import { Icons } from '../icons'
-import { successNotification } from '~/reusable-functions'
 import { useCopyToClipboard } from 'usehooks-ts'
+import { successNotification } from '~/reusable-functions'
+
+const TextMessage = (message: TextMessage) => {
+	return <p className="text-wrap text-sm">{message.messageData.text}</p>
+}
+
+const VideoMessage = (message: VideoMessage) => {
+	return <video src={message.messageData.link} controls />
+}
+
+const ImageMessage = (message: ImageMessage) => {
+	return <img src={message.messageData.link} alt="image" />
+}
+
+const DocumentMessage = (message: DocumentMessage) => {
+	return (
+		<a href={message.messageData.link} download>
+			{message.messageData.link}
+		</a>
+	)
+}
+
+const AudioMessage = (message: AudioMessage) => {
+	return <audio src={message.messageData.link} controls />
+}
+
+const LocationMessage = (message: LocationMessage) => {
+	return (
+		<p>
+			Location: {message.messageData.latitude}, {message.messageData.longitude}
+		</p>
+	)
+}
 
 const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: boolean }> = ({
 	message,
@@ -39,14 +81,34 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 			label: 'Copy',
 			icon: 'clipboard',
 			onClick: () => {
-				copyToClipboard((message.messageData || '') as string).catch(error =>
-					console.error(error)
-				)
+				if (message.messageType === MessageTypeEnum.Text) {
+					copyToClipboard((message.messageData.text || '') as string).catch(error =>
+						console.error(error)
+					)
+				} else if (message.messageType === MessageTypeEnum.Document) {
+					copyToClipboard((message.messageData.link || '') as string).catch(error =>
+						console.error(error)
+					)
+				} else {
+					// do nothing
+				}
 				successNotification({
 					message: 'Copied'
 				})
 			}
 		}
+		// {
+		// 	label: 'React',
+		// 	icon: 'clipboard',
+		// 	onClick: () => {
+		// 		copyToClipboard((message.messageData || '') as string).catch(error =>
+		// 			console.error(error)
+		// 		)
+		// 		successNotification({
+		// 			message: 'Copied'
+		// 		})
+		// 	}
+		// }
 	]
 
 	return (
@@ -58,9 +120,19 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 					: 'ml-auto bg-[#d9fdd3]  text-secondary-foreground dark:bg-[#005c4b]'
 			)}
 		>
-			{message.message_type === 'Text' ? (
-				<p className="text-wrap text-sm">{message.messageData?.text as any}</p>
-			) : null}
+			{message.messageType === MessageTypeEnum.Text
+				? TextMessage(message)
+				: message.messageType === MessageTypeEnum.Video
+					? VideoMessage(message)
+					: message.messageType === MessageTypeEnum.Document
+						? DocumentMessage(message)
+						: message.messageType === MessageTypeEnum.Image
+							? ImageMessage(message)
+							: message.messageType === MessageTypeEnum.Audio
+								? AudioMessage(message)
+								: message.messageType === MessageTypeEnum.Location
+									? LocationMessage(message)
+									: null}
 
 			<div className="flex flex-col items-center  justify-end gap-1">
 				{isActionsEnabled ? (

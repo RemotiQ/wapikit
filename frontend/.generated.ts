@@ -830,7 +830,7 @@ export interface BaseMessage {
 	/** Message status. */
 	status: MessageStatusEnum
 	/** Discriminator field used to determine the concrete message type. */
-	message_type: string
+	messageType: string
 	/** Time when the message was created. */
 	createdAt: string
 }
@@ -849,6 +849,40 @@ export interface TextMessageData {
 	messageType: TextMessageDataMessageType
 }
 
+export type TextMessageAllOfMessageType =
+	(typeof TextMessageAllOfMessageType)[keyof typeof TextMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TextMessageAllOfMessageType = {
+	Text: 'Text'
+} as const
+
+export type TextMessageAllOf = {
+	messageType?: TextMessageAllOfMessageType
+	messageData: TextMessageData
+}
+
+export type TextMessageMessageType =
+	(typeof TextMessageMessageType)[keyof typeof TextMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TextMessageMessageType = {
+	Text: 'Text'
+} as const
+
+export type TextMessage = BaseMessage &
+	TextMessageAllOf & {
+		messageType: TextMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				TextMessageAllOf & {
+					messageType: TextMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
 export type AudioMessageDataMessageType =
 	(typeof AudioMessageDataMessageType)[keyof typeof AudioMessageDataMessageType]
 
@@ -865,6 +899,40 @@ export interface AudioMessageData {
 	messageType: AudioMessageDataMessageType
 }
 
+export type AudioMessageAllOfMessageType =
+	(typeof AudioMessageAllOfMessageType)[keyof typeof AudioMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AudioMessageAllOfMessageType = {
+	Audio: 'Audio'
+} as const
+
+export type AudioMessageAllOf = {
+	messageType?: AudioMessageAllOfMessageType
+	messageData: AudioMessageData
+}
+
+export type AudioMessageMessageType =
+	(typeof AudioMessageMessageType)[keyof typeof AudioMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AudioMessageMessageType = {
+	Audio: 'Audio'
+} as const
+
+export type AudioMessage = BaseMessage &
+	AudioMessageAllOf & {
+		messageType: AudioMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				AudioMessageAllOf & {
+					messageType: AudioMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
 export type VideoMessageDataMessageType =
 	(typeof VideoMessageDataMessageType)[keyof typeof VideoMessageDataMessageType]
 
@@ -880,6 +948,40 @@ export interface VideoMessageData {
 	link: string
 	messageType: VideoMessageDataMessageType
 }
+
+export type VideoMessageAllOfMessageType =
+	(typeof VideoMessageAllOfMessageType)[keyof typeof VideoMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VideoMessageAllOfMessageType = {
+	Video: 'Video'
+} as const
+
+export type VideoMessageAllOf = {
+	messageType?: VideoMessageAllOfMessageType
+	messageData: VideoMessageData
+}
+
+export type VideoMessageMessageType =
+	(typeof VideoMessageMessageType)[keyof typeof VideoMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VideoMessageMessageType = {
+	Video: 'Video'
+} as const
+
+export type VideoMessage = BaseMessage &
+	VideoMessageAllOf & {
+		messageType: VideoMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				VideoMessageAllOf & {
+					messageType: VideoMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
 
 export type ImageMessageDataMessageType =
 	(typeof ImageMessageDataMessageType)[keyof typeof ImageMessageDataMessageType]
@@ -898,6 +1000,40 @@ export interface ImageMessageData {
 	messageType: ImageMessageDataMessageType
 }
 
+export type ImageMessageAllOfMessageType =
+	(typeof ImageMessageAllOfMessageType)[keyof typeof ImageMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ImageMessageAllOfMessageType = {
+	Image: 'Image'
+} as const
+
+export type ImageMessageAllOf = {
+	messageType?: ImageMessageAllOfMessageType
+	messageData: ImageMessageData
+}
+
+export type ImageMessageMessageType =
+	(typeof ImageMessageMessageType)[keyof typeof ImageMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ImageMessageMessageType = {
+	Image: 'Image'
+} as const
+
+export type ImageMessage = BaseMessage &
+	ImageMessageAllOf & {
+		messageType: ImageMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				ImageMessageAllOf & {
+					messageType: ImageMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
 export type DocumentMessageDataMessageType =
 	(typeof DocumentMessageDataMessageType)[keyof typeof DocumentMessageDataMessageType]
 
@@ -913,6 +1049,40 @@ export interface DocumentMessageData {
 	link: string
 	messageType: DocumentMessageDataMessageType
 }
+
+export type DocumentMessageAllOfMessageType =
+	(typeof DocumentMessageAllOfMessageType)[keyof typeof DocumentMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DocumentMessageAllOfMessageType = {
+	Document: 'Document'
+} as const
+
+export type DocumentMessageAllOf = {
+	messageType?: DocumentMessageAllOfMessageType
+	messageData: DocumentMessageData
+}
+
+export type DocumentMessageMessageType =
+	(typeof DocumentMessageMessageType)[keyof typeof DocumentMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DocumentMessageMessageType = {
+	Document: 'Document'
+} as const
+
+export type DocumentMessage = BaseMessage &
+	DocumentMessageAllOf & {
+		messageType: DocumentMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				DocumentMessageAllOf & {
+					messageType: DocumentMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
 
 export type StickerMessageDataMessageType =
 	(typeof StickerMessageDataMessageType)[keyof typeof StickerMessageDataMessageType]
@@ -930,6 +1100,40 @@ export interface StickerMessageData {
 	messageType: StickerMessageDataMessageType
 }
 
+export type StickerMessageAllOfMessageType =
+	(typeof StickerMessageAllOfMessageType)[keyof typeof StickerMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StickerMessageAllOfMessageType = {
+	Sticker: 'Sticker'
+} as const
+
+export type StickerMessageAllOf = {
+	messageType?: StickerMessageAllOfMessageType
+	messageData: StickerMessageData
+}
+
+export type StickerMessageMessageType =
+	(typeof StickerMessageMessageType)[keyof typeof StickerMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StickerMessageMessageType = {
+	Sticker: 'Sticker'
+} as const
+
+export type StickerMessage = BaseMessage &
+	StickerMessageAllOf & {
+		messageType: StickerMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				StickerMessageAllOf & {
+					messageType: StickerMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
 export type ReactionMessageDataMessageType =
 	(typeof ReactionMessageDataMessageType)[keyof typeof ReactionMessageDataMessageType]
 
@@ -945,6 +1149,40 @@ export interface ReactionMessageData {
 	messageId?: string
 	messageType: ReactionMessageDataMessageType
 }
+
+export type ReactionMessageAllOfMessageType =
+	(typeof ReactionMessageAllOfMessageType)[keyof typeof ReactionMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReactionMessageAllOfMessageType = {
+	Reaction: 'Reaction'
+} as const
+
+export type ReactionMessageAllOf = {
+	messageType?: ReactionMessageAllOfMessageType
+	messageData: ReactionMessageData
+}
+
+export type ReactionMessageMessageType =
+	(typeof ReactionMessageMessageType)[keyof typeof ReactionMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReactionMessageMessageType = {
+	Reaction: 'Reaction'
+} as const
+
+export type ReactionMessage = BaseMessage &
+	ReactionMessageAllOf & {
+		messageType: ReactionMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				ReactionMessageAllOf & {
+					messageType: ReactionMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
 
 export type LocationMessageDataMessageType =
 	(typeof LocationMessageDataMessageType)[keyof typeof LocationMessageDataMessageType]
@@ -966,244 +1204,6 @@ export interface LocationMessageData {
 	messageType: LocationMessageDataMessageType
 }
 
-export type TextMessageAllOfMessageType =
-	(typeof TextMessageAllOfMessageType)[keyof typeof TextMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TextMessageAllOfMessageType = {
-	Text: 'Text'
-} as const
-
-export type TextMessageAllOf = {
-	message_type?: TextMessageAllOfMessageType
-	messageData: TextMessageData
-}
-
-export type TextMessageMessageType =
-	(typeof TextMessageMessageType)[keyof typeof TextMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TextMessageMessageType = {
-	Text: 'Text'
-} as const
-
-export type TextMessage = BaseMessage &
-	TextMessageAllOf & {
-		message_type: TextMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				TextMessageAllOf & {
-					message_type: TextMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
-export type AudioMessageAllOfMessageType =
-	(typeof AudioMessageAllOfMessageType)[keyof typeof AudioMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AudioMessageAllOfMessageType = {
-	Audio: 'Audio'
-} as const
-
-export type AudioMessageAllOf = {
-	message_type?: AudioMessageAllOfMessageType
-	messageData: AudioMessageData
-}
-
-export type AudioMessageMessageType =
-	(typeof AudioMessageMessageType)[keyof typeof AudioMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AudioMessageMessageType = {
-	Audio: 'Audio'
-} as const
-
-export type AudioMessage = BaseMessage &
-	AudioMessageAllOf & {
-		message_type: AudioMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				AudioMessageAllOf & {
-					message_type: AudioMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
-export type VideoMessageAllOfMessageType =
-	(typeof VideoMessageAllOfMessageType)[keyof typeof VideoMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VideoMessageAllOfMessageType = {
-	Video: 'Video'
-} as const
-
-export type VideoMessageAllOf = {
-	message_type?: VideoMessageAllOfMessageType
-	messageData: VideoMessageData
-}
-
-export type VideoMessageMessageType =
-	(typeof VideoMessageMessageType)[keyof typeof VideoMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VideoMessageMessageType = {
-	Video: 'Video'
-} as const
-
-export type VideoMessage = BaseMessage &
-	VideoMessageAllOf & {
-		message_type: VideoMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				VideoMessageAllOf & {
-					message_type: VideoMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
-export type ImageMessageAllOfMessageType =
-	(typeof ImageMessageAllOfMessageType)[keyof typeof ImageMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ImageMessageAllOfMessageType = {
-	Image: 'Image'
-} as const
-
-export type ImageMessageAllOf = {
-	message_type?: ImageMessageAllOfMessageType
-	messageData: ImageMessageData
-}
-
-export type ImageMessageMessageType =
-	(typeof ImageMessageMessageType)[keyof typeof ImageMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ImageMessageMessageType = {
-	Image: 'Image'
-} as const
-
-export type ImageMessage = BaseMessage &
-	ImageMessageAllOf & {
-		message_type: ImageMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				ImageMessageAllOf & {
-					message_type: ImageMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
-export type DocumentMessageAllOfMessageType =
-	(typeof DocumentMessageAllOfMessageType)[keyof typeof DocumentMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const DocumentMessageAllOfMessageType = {
-	Document: 'Document'
-} as const
-
-export type DocumentMessageAllOf = {
-	message_type?: DocumentMessageAllOfMessageType
-	messageData: DocumentMessageData
-}
-
-export type DocumentMessageMessageType =
-	(typeof DocumentMessageMessageType)[keyof typeof DocumentMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const DocumentMessageMessageType = {
-	Document: 'Document'
-} as const
-
-export type DocumentMessage = BaseMessage &
-	DocumentMessageAllOf & {
-		message_type: DocumentMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				DocumentMessageAllOf & {
-					message_type: DocumentMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
-export type StickerMessageAllOfMessageType =
-	(typeof StickerMessageAllOfMessageType)[keyof typeof StickerMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const StickerMessageAllOfMessageType = {
-	Sticker: 'Sticker'
-} as const
-
-export type StickerMessageAllOf = {
-	message_type?: StickerMessageAllOfMessageType
-	messageData: StickerMessageData
-}
-
-export type StickerMessageMessageType =
-	(typeof StickerMessageMessageType)[keyof typeof StickerMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const StickerMessageMessageType = {
-	Sticker: 'Sticker'
-} as const
-
-export type StickerMessage = BaseMessage &
-	StickerMessageAllOf & {
-		message_type: StickerMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				StickerMessageAllOf & {
-					message_type: StickerMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
-export type ReactionMessageAllOfMessageType =
-	(typeof ReactionMessageAllOfMessageType)[keyof typeof ReactionMessageAllOfMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ReactionMessageAllOfMessageType = {
-	Reaction: 'Reaction'
-} as const
-
-export type ReactionMessageAllOf = {
-	message_type?: ReactionMessageAllOfMessageType
-	messageData: ReactionMessageData
-}
-
-export type ReactionMessageMessageType =
-	(typeof ReactionMessageMessageType)[keyof typeof ReactionMessageMessageType]
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ReactionMessageMessageType = {
-	Reaction: 'Reaction'
-} as const
-
-export type ReactionMessage = BaseMessage &
-	ReactionMessageAllOf & {
-		message_type: ReactionMessageMessageType
-	} & Required<
-		Pick<
-			BaseMessage &
-				ReactionMessageAllOf & {
-					message_type: ReactionMessageMessageType
-				},
-			'message_type' | 'messageData' | 'messageData'
-		>
-	>
-
 export type LocationMessageAllOfMessageType =
 	(typeof LocationMessageAllOfMessageType)[keyof typeof LocationMessageAllOfMessageType]
 
@@ -1213,7 +1213,7 @@ export const LocationMessageAllOfMessageType = {
 } as const
 
 export type LocationMessageAllOf = {
-	message_type?: LocationMessageAllOfMessageType
+	messageType?: LocationMessageAllOfMessageType
 	messageData: LocationMessageData
 }
 
@@ -1227,14 +1227,14 @@ export const LocationMessageMessageType = {
 
 export type LocationMessage = BaseMessage &
 	LocationMessageAllOf & {
-		message_type: LocationMessageMessageType
+		messageType: LocationMessageMessageType
 	} & Required<
 		Pick<
 			BaseMessage &
 				LocationMessageAllOf & {
-					message_type: LocationMessageMessageType
+					messageType: LocationMessageMessageType
 				},
-			'message_type' | 'messageData' | 'messageData'
+			'messageType' | 'messageData' | 'messageData'
 		>
 	>
 
@@ -1252,15 +1252,43 @@ export type MessageSchema =
 	| StickerMessage
 	| ReactionMessage
 
+/**
+ * OneOf-based union for new message data, distinguished by `messageType`.
+
+ */
 export type NewMessageDataSchema =
-	| AudioMessageData
-	| TextMessageData
-	| LocationMessageData
-	| VideoMessageData
-	| ImageMessageData
-	| DocumentMessageData
-	| StickerMessageData
-	| ReactionMessageData
+	| (TextMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (AudioMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (VideoMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (ImageMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (DocumentMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (StickerMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (ReactionMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (LocationMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
 
 /**
  * Request payload for sending a new message. The payload includes the messageType, createdAt date, and a messageData field whose structure depends on the messageType.

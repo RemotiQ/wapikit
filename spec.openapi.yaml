@@ -5582,7 +5582,7 @@ components:
         status:
           $ref: "#/components/schemas/MessageStatusEnum"
           description: Message status.
-        message_type:
+        messageType:
           type: string
           description: Discriminator field used to determine the concrete message type.
         createdAt:
@@ -5594,7 +5594,7 @@ components:
         - conversationId
         - direction
         - status
-        - message_type
+        - messageType
         - createdAt
 
     TextMessageData:
@@ -5603,13 +5603,22 @@ components:
         text:
           type: string
           description: The actual text message.
-        messageType:
-          type: string
-          enum:
-            - Text
-          description: Type of the message
       required:
         - text
+
+    TextMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Text
+            messageData:
+              $ref: "#/components/schemas/TextMessageData"
+          required:
+            - messageData
 
     AudioMessageData:
       type: object
@@ -5621,14 +5630,23 @@ components:
           type: string
           format: uri
           description: URL for the audio file.
-        messageType:
-          type: string
-          enum:
-            - Audio
-          description: Type of the message.
       required:
         - id
         - link
+
+    AudioMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Audio
+            messageData:
+              $ref: "#/components/schemas/AudioMessageData"
+          required:
+            - messageData
 
     VideoMessageData:
       type: object
@@ -5640,14 +5658,23 @@ components:
           type: string
           format: uri
           description: URL for the video file.
-        messageType:
-          type: string
-          enum:
-            - Video
-          description: Type of the message
       required:
         - id
         - link
+
+    VideoMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Video
+            messageData:
+              $ref: "#/components/schemas/VideoMessageData"
+          required:
+            - messageData
 
     ImageMessageData:
       type: object
@@ -5661,14 +5688,23 @@ components:
           description: URL for the image file.
         caption:
           type: string
-        messageType:
-          type: string
-          enum:
-            - Image
-          description: Type of the message
       required:
         - id
         - link
+
+    ImageMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Image
+            messageData:
+              $ref: "#/components/schemas/ImageMessageData"
+          required:
+            - messageData
 
     DocumentMessageData:
       type: object
@@ -5680,14 +5716,23 @@ components:
           type: string
           format: uri
           description: URL for the document file.
-        messageType:
-          type: string
-          enum:
-            - Document
-          description: Type of the message
       required:
         - id
         - link
+
+    DocumentMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Document
+            messageData:
+              $ref: "#/components/schemas/DocumentMessageData"
+          required:
+            - messageData
 
     StickerMessageData:
       type: object
@@ -5699,14 +5744,23 @@ components:
           type: string
           format: uri
           description: URL for the sticker file.
-        messageType:
-          type: string
-          enum:
-            - Sticker
-          description: Type of the message
       required:
         - id
         - link
+
+    StickerMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Sticker
+            messageData:
+              $ref: "#/components/schemas/StickerMessageData"
+          required:
+            - messageData
 
     ReactionMessageData:
       type: object
@@ -5717,13 +5771,22 @@ components:
         messageId:
           type: string
           description: ID of the message to which the reaction was added.
-        messageType:
-          type: string
-          enum:
-            - Reaction
-          description: Type of the message
       required:
         - reaction
+
+    ReactionMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Reaction
+            messageData:
+              $ref: "#/components/schemas/ReactionMessageData"
+          required:
+            - messageData
 
     LocationMessageData:
       type: object
@@ -5742,119 +5805,16 @@ components:
         name:
           type: string
           description: (Optional) Name of the location.
-        messageType:
-          type: string
-          enum:
-            - Location
-          description: Type of the message
       required:
         - latitude
         - longitude
-
-    TextMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Text
-            messageData:
-              $ref: "#/components/schemas/TextMessageData"
-          required:
-            - messageData
-
-    AudioMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Audio
-            messageData:
-              $ref: "#/components/schemas/AudioMessageData"
-          required:
-            - messageData
-
-    VideoMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Video
-            messageData:
-              $ref: "#/components/schemas/VideoMessageData"
-          required:
-            - messageData
-
-    ImageMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Image
-            messageData:
-              $ref: "#/components/schemas/ImageMessageData"
-          required:
-            - messageData
-
-    DocumentMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Document
-            messageData:
-              $ref: "#/components/schemas/DocumentMessageData"
-          required:
-            - messageData
-
-    StickerMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Sticker
-            messageData:
-              $ref: "#/components/schemas/StickerMessageData"
-          required:
-            - messageData
-
-    ReactionMessage:
-      allOf:
-        - $ref: "#/components/schemas/BaseMessage"
-        - type: object
-          properties:
-            message_type:
-              type: string
-              enum:
-                - Reaction
-            messageData:
-              $ref: "#/components/schemas/ReactionMessageData"
-          required:
-            - messageData
 
     LocationMessage:
       allOf:
         - $ref: "#/components/schemas/BaseMessage"
         - type: object
           properties:
-            message_type:
+            messageType:
               type: string
               enum:
                 - Location
@@ -5877,7 +5837,7 @@ components:
         - $ref: "#/components/schemas/StickerMessage"
         - $ref: "#/components/schemas/ReactionMessage"
       discriminator:
-        propertyName: message_type
+        propertyName: messageType
         mapping:
           Text: "#/components/schemas/TextMessage"
           Audio: "#/components/schemas/AudioMessage"
@@ -5890,26 +5850,34 @@ components:
 
     NewMessageDataSchema:
       type: object
+      description: >
+        OneOf-based union for new message data, distinguished by `messageType`.
       discriminator:
         propertyName: messageType
         mapping:
-          Audio: "#/components/schemas/AudioMessageData"
           Text: "#/components/schemas/TextMessageData"
-          Location: "#/components/schemas/LocationMessageData"
+          Audio: "#/components/schemas/AudioMessageData"
           Video: "#/components/schemas/VideoMessageData"
           Image: "#/components/schemas/ImageMessageData"
           Document: "#/components/schemas/DocumentMessageData"
           Sticker: "#/components/schemas/StickerMessageData"
           Reaction: "#/components/schemas/ReactionMessageData"
+          Location: "#/components/schemas/LocationMessageData"
+      required:
+        - messageType
+      properties:
+        messageType:
+          type: string
+          description: The type for this new message data.
       oneOf:
-        - $ref: "#/components/schemas/AudioMessageData"
         - $ref: "#/components/schemas/TextMessageData"
-        - $ref: "#/components/schemas/LocationMessageData"
+        - $ref: "#/components/schemas/AudioMessageData"
         - $ref: "#/components/schemas/VideoMessageData"
         - $ref: "#/components/schemas/ImageMessageData"
         - $ref: "#/components/schemas/DocumentMessageData"
         - $ref: "#/components/schemas/StickerMessageData"
         - $ref: "#/components/schemas/ReactionMessageData"
+        - $ref: "#/components/schemas/LocationMessageData"
 
     NewMessageSchema:
       description: >

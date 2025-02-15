@@ -47,6 +47,8 @@ import { clsx } from 'clsx'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { useUploadMedia } from '~/hooks/use-upload-media'
 import dayjs from 'dayjs'
+import { PreviewAttachment } from './file-attachment-preview'
+import { type ConversationFileAttachmentType } from '~/types'
 
 const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const [isBusy, setIsBusy] = useState(false)
@@ -56,7 +58,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const fileInputRef = useRef<HTMLInputElement>(null)
 	const textInputRef = useRef<HTMLInputElement>(null)
 
-	const [mediaFiles, setMediaFiles] = useState<File[]>([])
+	const [attachedFiles, setAttachedFiles] = useState<ConversationFileAttachmentType[]>([])
 
 	const currentConversation = conversations.find(
 		conversation => conversation.uniqueId === conversationId
@@ -239,12 +241,22 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 				setIsBusy(true)
 
 				// * user can select multiple files at a time, but will be sent as separate messages only
-				if (mediaFiles.length) {
-					const mediaFilesArray = Array.from(mediaFiles)
+				if (attachedFiles.length) {
+					const mediaFilesArray = Array.from(attachedFiles)
 
 					for (const file of mediaFilesArray) {
-						const messageType = determineMessageType(file)
-						const { mediaId, mediaUrl } = await uploadMedia(file)
+						setAttachedFiles(files =>
+							files.map(f => {
+								if (f.fileName === file.fileName) {
+									return {
+										...f,
+										isUploading: true
+									}
+								}
+								return f
+							})
+						)
+						const { mediaId, mediaUrl } = await uploadMedia(file.file)
 
 						if (error) {
 							errorNotification({
@@ -256,7 +268,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 						let messageData: NewMessageDataSchema | null = null
 
-						switch (messageType) {
+						switch (file.mediaType) {
 							case MessageTypeEnum.Audio:
 								messageData = {
 									messageType: MessageTypeEnum.Audio,
@@ -320,7 +332,9 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						if (sendMessageResponse.message) {
 							pushMessageToConversation(sendMessageResponse.message)
 							setMessageContent(() => null)
-							setMediaFiles(files => files.filter(f => f !== file))
+							setAttachedFiles(files =>
+								files.filter(f => f.fileName !== file.fileName)
+							)
 						} else {
 							errorNotification({
 								message: 'Failed to send message'
@@ -328,7 +342,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						}
 					}
 
-					setMediaFiles(() => [])
+					setAttachedFiles(() => [])
 					return
 				} else {
 					// TEXT MESSAGE
@@ -357,7 +371,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		},
 		[
 			currentConversation,
-			mediaFiles,
+			attachedFiles,
 			uploadMedia,
 			error,
 			sendMessageInConversation,
@@ -621,6 +635,25 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						) : null}
 						<CardFooter className="flex w-full flex-col items-center gap-2 bg-white dark:bg-[#202c33]">
 							<Separator />
+							<div className="flex w-full items-center justify-start gap-2 px-2">
+								{attachedFiles.length > 0 && (
+									<div className="flex flex-row items-end gap-2 overflow-x-scroll">
+										{attachedFiles.map(file => (
+											<PreviewAttachment
+												key={file.fileName}
+												attachment={file}
+												removeFile={() => {
+													setAttachedFiles(files =>
+														files.filter(
+															f => f.fileName !== file.fileName
+														)
+													)
+												}}
+											/>
+										))}
+									</div>
+								)}
+							</div>
 							<form
 								className="flex h-full w-full items-center gap-2"
 								onSubmit={e => {
@@ -643,11 +676,21 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 								<input
 									type="file"
 									ref={fileInputRef}
+									multiple={true}
 									className="hidden"
 									onChange={e => {
-										const files = e.target.files?.item
-										if (!files) return
-										setMediaFiles(() => files)
+										const files = e.target.files
+											? Array.from(e.target.files)
+											: []
+										if (files.length === 0) return
+										setAttachedFiles(
+											files.map(file => ({
+												file,
+												isUploading: false,
+												fileName: file.name,
+												mediaType: determineMessageType(file)
+											}))
+										)
 									}}
 								/>
 

@@ -54,7 +54,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.TextMessageMessageTypeText,
+			MessageType:    api_types.Text,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *textMessageData,
 		}
@@ -71,7 +71,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.AudioMessageMessageTypeAudio,
+			MessageType:    api_types.Audio,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *audioMessageData,
 		}
@@ -88,7 +88,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.VideoMessageMessageTypeVideo,
+			MessageType:    api_types.Video,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *videoMessageData,
 		}
@@ -105,7 +105,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.ImageMessageMessageTypeImage,
+			MessageType:    api_types.Image,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *imageMessageData,
 		}
@@ -122,7 +122,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.DocumentMessageMessageTypeDocument,
+			MessageType:    api_types.Document,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *documentMessageData,
 		}
@@ -139,7 +139,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.StickerMessageMessageTypeSticker,
+			MessageType:    api_types.Sticker,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *stickerMessageData,
 		}
@@ -157,7 +157,7 @@ func (service *ConversationService) ParseDbMessageToApiMessage(message model.Mes
 			ConversationId: message.ConversationId.String(),
 			CreatedAt:      message.CreatedAt,
 			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageType:    api_types.ReactionMessageMessageTypeReaction,
+			MessageType:    api_types.Reaction,
 			Status:         api_types.MessageStatusEnum(message.Status.String()),
 			MessageData:    *reactionMessageData,
 		}
@@ -182,7 +182,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 	}
 
 	switch messageType {
-	case string(api_types.TextMessageDataMessageTypeText):
+	case string(api_types.Text):
 		textData, err := utils.ConvertMapToStruct[api_types.TextMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -195,7 +195,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return textMsg, nil
 
-	case string(api_types.AudioMessageDataMessageTypeAudio):
+	case string(api_types.Audio):
 		audioData, err := utils.ConvertMapToStruct[api_types.AudioMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -209,7 +209,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return audioMsg, nil
 
-	case string(api_types.LocationMessageDataMessageTypeLocation):
+	case string(api_types.Location):
 		locationData, err := utils.ConvertMapToStruct[api_types.LocationMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -226,7 +226,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return locationMsg, nil
 
-	case string(api_types.VideoMessageDataMessageTypeVideo):
+	case string(api_types.Video):
 		videoData, err := utils.ConvertMapToStruct[api_types.VideoMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -240,7 +240,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return videoMsg, nil
 
-	case string(api_types.ImageMessageDataMessageTypeImage):
+	case string(api_types.Image):
 		imageData, err := utils.ConvertMapToStruct[api_types.ImageMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -255,7 +255,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return imageMsg, nil
 
-	case string(api_types.DocumentMessageDataMessageTypeDocument):
+	case string(api_types.Document):
 		// documentData, err := utils.ConvertMapToStruct[api_types.DocumentMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -268,7 +268,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return documentMsg, nil
 
-	case string(api_types.StickerMessageDataMessageTypeSticker):
+	case string(api_types.Sticker):
 		stickerData, err := utils.ConvertMapToStruct[api_types.StickerMessageData](dataMap)
 		if err != nil {
 			return nil, err
@@ -282,7 +282,7 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		}
 		return stickerMsg, nil
 
-	case string(api_types.ReactionMessageDataMessageTypeReaction):
+	case string(api_types.Reaction):
 		reactionData, err := utils.ConvertMapToStruct[api_types.ReactionMessageData](dataMap)
 		if err != nil {
 			return nil, err
