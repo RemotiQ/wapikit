@@ -67,7 +67,7 @@ export const PreviewAttachment: React.FC<PreviewAttachmentProps> = ({ removeFile
 
 				{isUploading && (
 					<div className="absolute animate-spin text-zinc-500">
-						<Icons.reload />
+						<Icons.regenerate />
 					</div>
 				)}
 			</div>
