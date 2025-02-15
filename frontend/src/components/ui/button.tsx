@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { clsx as cn } from 'clsx'
 
 const buttonVariants = cva(
-	'inline-flex min-w-max items-center justify-center flex-shrink-0 border font-semibold focus:outline-none disabled:shadow-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer transform transition-colors',
+	'inline-flex min-w-max  items-center justify-center flex-shrink-0 border font-semibold focus:outline-none disabled:shadow-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer transform transition-colors',
 	{
 		variants: {
 			variant: {
@@ -29,11 +29,11 @@ const buttonVariants = cva(
 				default: 'px-4 py-2 text-sm rounded-lg gap-2',
 				xSmallForGraphics: 'rounded-[4px] px-1.5 py-[2px] text-[5px] gap-1',
 				smallForGraphics: 'rounded-md px-1.5 py-1 text-[6px] gap-1',
-				sm: 'rounded-lg px-2.5 py-1.5 text-xs',
-				medium: 'rounded-lg px-3 py-1.5 text-sm',
-				lg: 'rounded-lg px-4 py-2 text-sm',
-				xLarge: 'rounded-lg px-6 py-1.5 text-base',
-				badge: 'rounded-lg px-2 py-1 text-xs ',
+				sm: 'rounded-lg px-2.5 py-1.5 text-xs gap-2',
+				medium: 'rounded-lg px-3 py-1.5 text-sm gap-2',
+				lg: 'rounded-lg px-4 py-2 text-sm gap-2',
+				xLarge: 'rounded-lg px-6 py-1.5 text-base gap-2',
+				badge: 'rounded-lg px-2 py-1 text-xs gap-1',
 				icon: 'rounded-full p-2'
 			}
 		},

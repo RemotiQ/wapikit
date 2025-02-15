@@ -20,7 +20,7 @@ export function DashboardCampaignCard({
 		<Card className="min-h- flex h-full max-w-md flex-1 flex-col">
 			<CardHeader className="flex !flex-row !items-center justify-between p-2 !pb-2 !pt-4 ">
 				<div className="flex flex-col gap-2">
-					<CardTitle className="truncate text-base !font-semibold">{name}</CardTitle>
+					<CardTitle className="truncate text-base py-0.5 !font-semibold">{name}</CardTitle>
 					<div className="flex flex-col items-start justify-start gap-2">
 						<p className="max-w-[20rem] text-sm text-muted-foreground">{description}</p>
 					</div>
@@ -120,7 +120,7 @@ export function DashboardCampaignCard({
 
 						<Link href={`/campaigns?id=${campaign.uniqueId}`} className="ml-auto">
 							<Button
-								variant={'text'}
+								variant={'secondary'}
 								className="hover:underline-none my-2 flex w-fit items-center  bg-secondary"
 								size={'sm'}
 							>
