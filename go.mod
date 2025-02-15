@@ -110,5 +110,3 @@ require (
 )
 
 replace github.com/wapikit/wapikit-enterprise => ./.enterprise
-
-replace github.com/wapikit/wapi.go => ../wapi.go
