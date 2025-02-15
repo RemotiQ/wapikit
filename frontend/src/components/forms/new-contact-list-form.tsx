@@ -183,7 +183,8 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 										}
 										onValueChange={e => {
 											form.setValue('tagIds', e, {
-												shouldValidate: true
+												shouldValidate: true,
+												shouldDirty: true
 											})
 										}}
 										defaultValue={form.watch('tagIds')}
@@ -210,7 +211,11 @@ const NewContactListForm: React.FC<FormProps> = ({ initialData }) => {
 						/>
 					</div>
 					<div className="flex w-fit flex-row gap-3 ">
-						<Button disabled={loading} className="ml-auto" type="submit">
+						<Button
+							disabled={loading || !form.formState.isDirty}
+							className="ml-auto"
+							type="submit"
+						>
 							{action}
 						</Button>
 					</div>

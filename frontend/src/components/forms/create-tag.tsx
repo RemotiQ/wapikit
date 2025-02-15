@@ -40,10 +40,14 @@ const CreateTagModal = () => {
 				}
 			})
 
-			if (res) {
+			if (res && res.tag) {
 				writeProperty({
 					isCreateTagModalOpen: false,
 					tags: [...existingTags, res.tag]
+				})
+			} else {
+				errorNotification({
+					message: 'Failed to create tag'
 				})
 			}
 		} catch (error) {

@@ -46,7 +46,6 @@ const TemplateMessageRenderer: React.FC<{
 			// find a param whose nameOrIndex === match
 			// but if the original template is numeric, e.g. {{1}},
 			// your param might store "1".
-			console.log({ match })
 			const foundParam = params.find(p => p.nameOrIndex === match)
 
 			if (!foundParam) {

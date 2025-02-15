@@ -12,7 +12,7 @@ import { Input } from '~/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '~/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { type z } from 'zod'
 import {
@@ -28,7 +28,6 @@ import {
 	useCreateCampaign,
 	useGetContactLists,
 	useUpdateCampaignById,
-	useGetOrganizationTags,
 	useGetAllPhoneNumbers,
 	useGetAllTemplates,
 	useDeleteCampaignById,
@@ -79,7 +78,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 		useState(false)
 	const [isScheduled, setIsScheduled] = useState(initialData?.scheduledAt ? true : false)
 
-	const { writeProperty } = useLayoutStore()
+	const { writeProperty, tags } = useLayoutStore()
 
 	const listsResponse = useGetContactLists({
 		order: 'asc',
@@ -106,19 +105,6 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 			enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
 		}
 	})
-
-	const { data: tags } = useGetOrganizationTags(
-		{
-			page: 1,
-			per_page: 50,
-			sortBy: 'asc'
-		},
-		{
-			query: {
-				enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
-			}
-		}
-	)
 
 	const createNewCampaign = useCreateCampaign()
 	const deleteCampaignById = useDeleteCampaignById()
@@ -219,7 +205,6 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						// fetch the template here and show the modal
 
 						const templateInuse = await getTemplateById(data.templateId)
-
 						if (!templateInuse) {
 							errorNotification({
 								message:
@@ -373,17 +358,50 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 
 	const currentTemplateId = campaignForm.watch('templateId')
 
+	const isSetupDone = useRef(false)
+	// On initial load, use initial data if available
 	useEffect(() => {
-		const defaultValuesForTemplateParameter = parseTemplateComponents(
-			templatesResponse?.find(template => {
-				return template.id === currentTemplateId
-			})
+		if (isSetupDone.current) return
+
+		console.log('setting up form')
+		const currentTemplate = templatesResponse?.find(
+			template => template.id === currentTemplateId
 		)
 
-		templateMessageComponentParameterForm.reset({
-			...defaultValuesForTemplateParameter
+		// Use saved parameters if available; otherwise, use undefined so defaults are parsed.
+		const defaultValuesForTemplateParameter = parseTemplateComponents(
+			currentTemplate,
+			initialData?.templateComponentParameters ?? undefined
+		)
+
+		templateMessageComponentParameterForm.reset(defaultValuesForTemplateParameter, {
+			keepDirty: false
 		})
-	}, [templatesResponse, campaignForm, templateMessageComponentParameterForm, currentTemplateId])
+		isSetupDone.current = true
+	}, [
+		templatesResponse,
+		currentTemplateId,
+		initialData?.templateComponentParameters,
+		templateMessageComponentParameterForm
+	])
+
+	// When the template id changes after initial setup, reset the form with new defaults.
+	useEffect(() => {
+		if (!isSetupDone.current || !campaignForm.formState.dirtyFields.templateId) return
+
+		console.log('resetting form due to template change')
+		const currentTemplate = templatesResponse?.find(
+			template => template.id === currentTemplateId
+		)
+
+		// Always parse defaults for new template; ignore any saved parameters.
+		const defaultValuesForTemplateParameter = parseTemplateComponents(
+			currentTemplate,
+			undefined
+		)
+
+		templateMessageComponentParameterForm.reset(defaultValuesForTemplateParameter)
+	}, [currentTemplateId, templatesResponse, templateMessageComponentParameterForm])
 
 	return (
 		<>
@@ -583,7 +601,8 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											}
 											onValueChange={e => {
 												campaignForm.setValue('lists', e, {
-													shouldValidate: true
+													shouldValidate: true,
+													shouldDirty: true
 												})
 											}}
 											defaultValue={campaignForm.watch('lists')}
@@ -603,14 +622,15 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 										<FormLabel>Select the tags to add</FormLabel>
 										<MultiSelect
 											options={
-												tags?.tags?.map(tag => ({
+												tags?.map(tag => ({
 													label: tag.label,
 													value: tag.uniqueId
 												})) || []
 											}
 											onValueChange={e => {
 												campaignForm.setValue('tags', e, {
-													shouldValidate: true
+													shouldValidate: true,
+													shouldDirty: true
 												})
 											}}
 											defaultValue={campaignForm.watch('tags')}

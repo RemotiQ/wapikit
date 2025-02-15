@@ -228,15 +228,13 @@ func getCampaigns(context interfaces.ContextWithSession) error {
 				}
 			}
 
-			// convert string to *map[string]interface{} for template component parameters
-			var templateComponentParameters *map[string]interface{}
+			var templateComponentParameters *api_types.TemplateComponentParameters
 			if campaign.TemplateMessageComponentParameters != nil {
-				var unmarshalled map[string]interface{}
-				err := json.Unmarshal([]byte(*campaign.TemplateMessageComponentParameters), &unmarshalled)
+				templateComponentParameters = new(api_types.TemplateComponentParameters)
+				err := json.Unmarshal([]byte(*campaign.TemplateMessageComponentParameters), templateComponentParameters)
 				if err != nil {
-					context.App.Logger.Error("error unmarshalling template component parameters: %v", err.Error())
+					context.App.Logger.Error("error unmarshalling template component parameters: %v", "error", err.Error())
 				}
-				templateComponentParameters = &unmarshalled
 			}
 
 			cmpgn := api_types.CampaignSchema{
@@ -460,14 +458,13 @@ func getCampaignById(context interfaces.ContextWithSession) error {
 	stringUniqueId := campaignResponse.UniqueId.String()
 
 	// convert string to *map[string]interface{} for template component parameters
-	var templateComponentParameters *map[string]interface{}
+	var templateComponentParameters *api_types.TemplateComponentParameters
 	if campaignResponse.TemplateMessageComponentParameters != nil {
-		var unmarshalled map[string]interface{}
-		err := json.Unmarshal([]byte(*campaignResponse.TemplateMessageComponentParameters), &unmarshalled)
+		templateComponentParameters = new(api_types.TemplateComponentParameters)
+		err := json.Unmarshal([]byte(*campaignResponse.TemplateMessageComponentParameters), templateComponentParameters)
 		if err != nil {
-			context.App.Logger.Error("error unmarshalling template component parameters: %v", err.Error())
+			context.App.Logger.Error("error unmarshalling template component parameters: %v", "error", err.Error())
 		}
-		templateComponentParameters = &unmarshalled
 	}
 
 	tags := []api_types.TagSchema{}

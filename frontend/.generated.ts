@@ -708,8 +708,6 @@ export interface TemplateSchema {
 	createdAt: string
 }
 
-export type CampaignSchemaTemplateComponentParameters = { [key: string]: unknown }
-
 export type CampaignSchemaProgress = {
 	totalMessages: number
 	sent: number
@@ -728,7 +726,7 @@ export interface CampaignSchema {
 	isLinkTrackingEnabled: boolean
 	phoneNumberInUse?: string
 	tags: TagSchema[]
-	templateComponentParameters?: CampaignSchemaTemplateComponentParameters
+	templateComponentParameters?: TemplateComponentParameters
 	stats?: CampaignAnalyticsResponseSchema
 	progress?: CampaignSchemaProgress
 }
@@ -744,7 +742,51 @@ export interface NewCampaignSchema {
 	tags: string[]
 }
 
-export type UpdateCampaignSchemaTemplateComponentParameters = { [key: string]: unknown }
+/**
+ * Specifies whether the parameter is static or dynamic.
+ */
+export type TemplateParameterInputParameterType =
+	(typeof TemplateParameterInputParameterType)[keyof typeof TemplateParameterInputParameterType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TemplateParameterInputParameterType = {
+	static: 'static',
+	dynamic: 'dynamic'
+} as const
+
+/**
+ * A single template parameter input. It can be either static or dynamic.
+
+ */
+export interface TemplateParameterInput {
+	/** The name or index identifying the parameter. */
+	nameOrIndex: string
+	/** The display label for the parameter. */
+	label: string
+	/** Specifies whether the parameter is static or dynamic. */
+	parameterType: TemplateParameterInputParameterType
+	/** For dynamic parameters, the field name to resolve (e.g. 'firstName'). */
+	dynamicField?: string
+	/** The static value to be used if applicable. */
+	staticValue?: string
+	/** An example value for the parameter. */
+	example?: string
+	/** Placeholder text to guide the user input. */
+	placeholder?: string
+}
+
+/**
+ * Object representing template component parameters. It consists of separate arrays for header, body, and button parameters.
+
+ */
+export interface TemplateComponentParameters {
+	/** Parameters for header components. */
+	header: TemplateParameterInput[]
+	/** Parameters for body components. */
+	body: TemplateParameterInput[]
+	/** Parameters for button components. */
+	buttons: TemplateParameterInput[]
+}
 
 export interface UpdateCampaignSchema {
 	name: string
@@ -755,7 +797,7 @@ export interface UpdateCampaignSchema {
 	tags: string[]
 	status?: CampaignStatusEnum
 	phoneNumber?: string
-	templateComponentParameters?: UpdateCampaignSchemaTemplateComponentParameters
+	templateComponentParameters?: TemplateComponentParameters
 	scheduledAt?: string
 }
 
