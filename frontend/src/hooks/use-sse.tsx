@@ -15,6 +15,7 @@ import { SseEventSourceStateEnum } from '~/types'
 import { useLayoutStore } from '~/store/layout.store'
 import { errorNotification } from '~/reusable-functions'
 import { type z } from 'zod'
+import { decode } from 'msgpack-lite'
 
 const MAX_RECONNECT_ATTEMPTS = 5
 const RECONNECT_INTERVAL = 5000
@@ -68,17 +69,24 @@ const useServerSideEvents = () => {
 				if (!eventSourceRef.current) return
 
 				eventSourceRef.current.addEventListener(eventName, event => {
-					console.log('Received event:', event.data, typeof event.data)
-					const jsonParsedData = JSON.parse(event.data)
-					console.log({ jsonParsedData })
-					const result = schema.safeParse(JSON.parse(event.data))
+					const base64String = event.data as string
+					// Decode base64 to a binary string, then to a Uint8Array
+					const binaryString = atob(base64String)
+					const len = binaryString.length
+					const bytes = new Uint8Array(len)
+					for (let i = 0; i < len; i++) {
+						bytes[i] = binaryString.charCodeAt(i)
+					}
+
+					// Decode the MessagePack binary into an object
+					const eventData = decode(bytes)
+					console.log('Decoded event data:', eventData)
+					const result = schema.safeParse(eventData)
 
 					if (!result.success) {
 						console.error('Invalid event format:', result.error)
 						return
 					}
-
-					console.log('eventData', result.data)
 
 					switch (eventName) {
 						case String(ApiServerEventEnum.NewMessage):
@@ -96,7 +104,11 @@ const useServerSideEvents = () => {
 						case String(ApiServerEventEnum.ConversationClosed):
 							return conversationClosedEventHandler(event.data)
 						case String(ApiServerEventEnum.NewConversation):
-							return newConversationEventHandler(event.data)
+							return newConversationEventHandler(
+								conversationsRef.current,
+								event.data,
+								writeProperty
+							)
 						case String(ApiServerEventEnum.CampaignProgress):
 							return campaignProgressEventHandler(event.data)
 						case String(ApiServerEventEnum.Error): {

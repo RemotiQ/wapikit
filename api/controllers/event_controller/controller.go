@@ -1,7 +1,7 @@
 package event_controller
 
 import (
-	"encoding/json"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,6 +11,7 @@ import (
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
+	"github.com/vmihailenco/msgpack/v5"
 	"github.com/wapikit/wapikit/.db-generated/model"
 	table "github.com/wapikit/wapikit/.db-generated/table"
 	controller "github.com/wapikit/wapikit/api/controllers"
@@ -102,15 +103,14 @@ func handleEventsSubscription(context interfaces.ContextWithoutSession) error {
 				}
 			}
 
-			message, err := json.Marshal(data)
+			binaryData, err := msgpack.Marshal(data)
 			if err != nil {
-				logger.Error("Error marshalling event data: %v", err)
+				logger.Error("Error marshalling event data with MessagePack: %v", err)
 				continue
 			}
-
-			logger.Info("Sending event: %s", message)
-
-			fmt.Fprintf(context.Response(), "event: %s\ndata: %s\n\n", eventType, message)
+			// Encode the binary data in base64 so it can be sent via SSE
+			encoded := base64.StdEncoding.EncodeToString(binaryData)
+			fmt.Fprintf(context.Response(), "event: %s\ndata: %s\n\n", eventType, encoded)
 			context.Response().Flush()
 
 		case <-context.Request().Context().Done():
