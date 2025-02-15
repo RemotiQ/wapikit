@@ -431,6 +431,13 @@ export default function SettingsPage() {
 						}
 					}
 				})
+				successNotification({
+					message: 'WhatsApp Business Account details updated successfully!!'
+				})
+				whatsappBusinessAccountIdForm.reset({
+					whatsappBusinessAccountId: response.businessAccountId,
+					apiToken: response.accessToken
+				})
 			} else {
 				errorNotification({
 					message: 'Error updating WhatsApp Business Account ID'
@@ -1351,7 +1358,7 @@ export default function SettingsPage() {
 												{/* ! TODO: show API key on hover of the input the full api key if present */}
 												<Input
 													className="w-fit truncate px-6 disabled:text-slate-600"
-													value={apiKey || '***********************'}
+													value={apiKey || Array(150).fill('*').join('')}
 													disabled
 												/>
 												<span>

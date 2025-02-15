@@ -41,11 +41,13 @@ export function messageEventHandler(params: {
 export function conversationAssignedEventHandler(
 	message: z.infer<
 		(typeof ApiServerEventDataMap)[ApiServerEventEnum.ChatAssignment]['shape']['data']
-	>
+	>,
 ): boolean {
 	try {
 		const { conversationId } = message
 		console.log({ conversationId })
+
+
 
 		// ! get the conversation from the store
 		// ! update the conversation with the new assignee
@@ -94,14 +96,17 @@ export function conversationClosedEventHandler(
 }
 
 export function newConversationEventHandler(
+	conversations: ConversationSchema[],
 	message: z.infer<
 		(typeof ApiServerEventDataMap)[ApiServerEventEnum.NewConversation]['shape']['data']
-	>
+	>,
+	writeProperty: ConversationInboxStoreType['writeProperty']
 ) {
 	try {
 		const { conversation } = message
-		console.log({ conversation })
-
+		writeProperty({
+			conversations: [conversation as ConversationSchema, ...conversations]
+		})
 		return true
 	} catch (error) {
 		console.error(error)
