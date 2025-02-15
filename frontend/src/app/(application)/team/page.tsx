@@ -224,7 +224,7 @@ const MembersPage = () => {
 			{/* invitation form modal */}
 			<Modal
 				title="Invite Team Member"
-				description="an email would be sent to them."
+				description="An invitation email will be sent to them."
 				isOpen={isInvitationModalOpen}
 				onClose={() => {
 					setIsInvitationModalOpen(false)

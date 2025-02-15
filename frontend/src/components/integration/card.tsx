@@ -30,7 +30,7 @@ const IntegrationCard: React.FC<{
 
 			<Link href={`/integrations/${slug}`} className="mr-auto">
 				{/* <Button>Install</Button> */}
-				<Badge>Coming Soon</Badge>
+				<Badge className=''>Coming Soon</Badge>
 			</Link>
 		</Card>
 	)
