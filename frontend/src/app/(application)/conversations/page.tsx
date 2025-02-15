@@ -30,10 +30,10 @@ const ChatDashboard = () => {
 	return (
 		<div className="flex h-full flex-1 flex-col">
 			<div className="grid h-screen gap-2 px-4 md:grid-cols-8 lg:grid-cols-7">
-				<Card className="h-full rounded-md md:col-span-4 lg:col-span-3 xl:col-span-2">
+				<Card className="h-full rounded-md md:col-span-4 lg:col-span-2 xl:col-span-2">
 					<ConversationsSidebar />
 				</Card>
-				<Card className=" h-full w-full rounded-md md:col-span-4 lg:col-span-4 xl:col-span-5">
+				<Card className=" h-full w-full rounded-md md:col-span-4 lg:col-span-5 xl:col-span-5">
 					<ChatCanvas conversationId={conversationId || undefined} />
 				</Card>
 			</div>

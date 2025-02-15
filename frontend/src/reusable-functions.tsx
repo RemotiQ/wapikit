@@ -3,13 +3,14 @@ import { toast } from 'sonner'
 import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { createRoot } from 'react-dom/client'
 import { AlertModal } from './components/modal/alert-modal'
-import { type MessageTemplateSchema } from 'root/.generated'
+import { MessageTypeEnum, type MessageTemplateSchema } from 'root/.generated'
 import { Icons } from './components/icons'
 import { APP_BASE_DOMAIN } from './constants'
 import { type UtmTags } from './types'
 import { type PricingPlan } from 'root/cloud_generated'
 import { type z } from 'zod'
 import { type TemplateComponentParametersSchema } from './schema'
+import mime from 'mime-types'
 
 export function generateUniqueId() {
 	return v4()
@@ -327,4 +328,59 @@ export async function displayRazorpayCheckoutModal(params: {
 	// @ts-ignore - Razorpay is loaded in the global scope
 	const paymentObject = new window.Razorpay(options)
 	paymentObject.open()
+}
+
+/**
+ * Determines the message type based on the file's MIME type, extension, and size.
+ *
+ * @param file The File object selected by the user.
+ * @returns A string representing the message type.
+ */
+export function determineMessageType(file: File): MessageTypeEnum {
+	// Use file.type if provided, otherwise fall back to looking it up by extension.
+	const mimeTypeFromFile = file.type || (mime.lookup(file.name) as string) || ''
+	const mimeType = mimeTypeFromFile.toLowerCase()
+	const fileName = file.name.toLowerCase()
+
+	// Check for audio types.
+	if (mimeType.startsWith('audio/')) {
+		return MessageTypeEnum.Audio
+	}
+
+	// Check for video types.
+	if (mimeType.startsWith('video/')) {
+		return MessageTypeEnum.Video
+	}
+
+	// Check for image types.
+	if (mimeType.startsWith('image/')) {
+		// For WebP images, decide whether to treat them as stickers based on file size.
+		if (mimeType === 'image/webp' || fileName.endsWith('.webp')) {
+			// If the file size is small (e.g., ≤ 100KB), treat it as a sticker.
+			if (file.size <= 100 * 1024) {
+				return MessageTypeEnum.Sticker
+			}
+			// Otherwise, treat as a normal image.
+			return MessageTypeEnum.Image
+		}
+		return MessageTypeEnum.Image
+	}
+
+	// Check for common document types.
+	const documentMimeTypes = [
+		'application/pdf',
+		'application/msword',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.ms-excel',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/vnd.ms-powerpoint',
+		'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+		'text/plain'
+	]
+
+	if (documentMimeTypes.includes(mimeType)) {
+		return MessageTypeEnum.Document
+	}
+
+	throw new Error('Unsupported file type')
 }

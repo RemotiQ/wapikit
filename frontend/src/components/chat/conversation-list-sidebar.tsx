@@ -24,7 +24,7 @@ const RenderConversations = ({
 }) => {
 	const router = useRouter()
 	return (
-		<div key={tab} className="mt-20 flex items-center justify-center">
+		<div key={tab}>
 			{conversations.length === 0 && (
 				<div className="flex h-full flex-col items-center justify-center">
 					<Icons.messageChatSquare className="size-6 font-normal text-muted-foreground" />
@@ -80,7 +80,10 @@ const ConversationsSidebar = () => {
 	const { conversations } = useConversationInboxStore()
 
 	return (
-		<ScrollArea className="flex h-full flex-col gap-2 px-4 py-4" key={`${generateUniqueId()}`}>
+		<ScrollArea
+			className="flex  h-full max-w-sm flex-col gap-2 px-4 py-4"
+			key={`${generateUniqueId()}`}
+		>
 			<Tabs defaultValue="All" className="w-full space-y-6">
 				<TabsList className="flex w-full flex-row " defaultValue={'All'}>
 					{listStringEnumMembers(ConversationListSidebarTab).map(

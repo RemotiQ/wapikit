@@ -5,7 +5,7 @@ import { CardHeader, CardFooter } from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Button } from '~/components/ui/button'
-import { SendIcon, Image as ImageIcon } from 'lucide-react'
+import { SendIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
 	DropdownMenu,
@@ -17,7 +17,9 @@ import { Icons } from '../icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
 	type ConversationSchema,
+	type MessageSchema,
 	MessageTypeEnum,
+	type NewMessageDataSchema,
 	useAssignConversation,
 	useGetConversationResponseSuggestions,
 	useGetOrganizationMembers,
@@ -26,7 +28,7 @@ import {
 } from 'root/.generated'
 import MessageRenderer from './message-renderer'
 import { useRouter } from 'next/navigation'
-import { errorNotification, successNotification } from '~/reusable-functions'
+import { determineMessageType, errorNotification, successNotification } from '~/reusable-functions'
 import { Modal } from '../ui/modal'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select'
@@ -43,13 +45,18 @@ import { useScrollToBottom } from '~/hooks/use-scroll-to-bottom'
 import { SparklesIcon } from '../ai/icons'
 import { clsx } from 'clsx'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
+import { useUploadMedia } from '~/hooks/use-upload-media'
+import dayjs from 'dayjs'
 
 const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const [isBusy, setIsBusy] = useState(false)
 	const [isConversationAssignModalOpen, setIsConversationAssignModalOpen] = useState(false)
 	const { conversations } = useConversationInboxStore()
 
-	const inputRef = useRef<HTMLInputElement>(null)
+	const fileInputRef = useRef<HTMLInputElement>(null)
+	const textInputRef = useRef<HTMLInputElement>(null)
+
+	const [mediaFiles, setMediaFiles] = useState<File[]>([])
 
 	const currentConversation = conversations.find(
 		conversation => conversation.uniqueId === conversationId
@@ -194,6 +201,32 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		}
 	)
 
+	const { error, uploadMedia } = useUploadMedia()
+
+	const pushMessageToConversation = useCallback(
+		(message: MessageSchema) => {
+			const conversation = conversations.find(
+				convo => convo.uniqueId === message.conversationId
+			)
+
+			if (!conversation) {
+				return false
+			}
+
+			const updatedConversation: ConversationSchema = {
+				...conversation,
+				messages: [...conversation.messages, message]
+			}
+
+			writeConversationInboxStoreProperty({
+				conversations: conversations.map(convo =>
+					convo.uniqueId === conversation.uniqueId ? updatedConversation : convo
+				)
+			})
+		},
+		[conversations, writeConversationInboxStoreProperty]
+	)
+
 	const sendMessage = useCallback(
 		async (message: string) => {
 			try {
@@ -203,46 +236,115 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 				})
 
 				if (!currentConversation || !message) return
-
 				setIsBusy(true)
 
-				const sendMessageResponse = await sendMessageInConversation.mutateAsync({
-					data: {
-						messageData: {
-							text: message
-						},
-						messageType: MessageTypeEnum.Text
-					},
-					id: currentConversation.uniqueId
-				})
+				// * user can select multiple files at a time, but will be sent as separate messages only
+				if (mediaFiles.length) {
+					const mediaFilesArray = Array.from(mediaFiles)
 
-				if (sendMessageResponse.message) {
-					const conversation = conversations.find(
-						convo => convo.uniqueId === sendMessageResponse.message.conversationId
-					)
+					for (const file of mediaFilesArray) {
+						const messageType = determineMessageType(file)
+						const { mediaId, mediaUrl } = await uploadMedia(file)
 
-					if (!conversation) {
-						return false
+						if (error) {
+							errorNotification({
+								message: error
+							})
+							return
+						}
+
+						// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+						let messageData: NewMessageDataSchema | null = null
+
+						switch (messageType) {
+							case MessageTypeEnum.Audio:
+								messageData = {
+									messageType: MessageTypeEnum.Audio,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							case MessageTypeEnum.Image:
+								messageData = {
+									messageType: MessageTypeEnum.Image,
+									id: mediaId,
+									link: mediaUrl,
+									caption: textInputRef.current?.value
+								}
+								break
+
+							case MessageTypeEnum.Document:
+								messageData = {
+									messageType: MessageTypeEnum.Document,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							case MessageTypeEnum.Video:
+								messageData = {
+									messageType: MessageTypeEnum.Video,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							case MessageTypeEnum.Sticker:
+								messageData = {
+									messageType: MessageTypeEnum.Sticker,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							default:
+								break
+						}
+
+						if (!messageData) {
+							errorNotification({
+								message: 'Failed to send message'
+							})
+							return
+						}
+
+						const sendMessageResponse = await sendMessageInConversation.mutateAsync({
+							data: {
+								createdAt: dayjs().toISOString(),
+								messageData: messageData
+							},
+							id: currentConversation.uniqueId
+						})
+
+						if (sendMessageResponse.message) {
+							pushMessageToConversation(sendMessageResponse.message)
+							setMessageContent(() => null)
+							setMediaFiles(files => files.filter(f => f !== file))
+						} else {
+							errorNotification({
+								message: 'Failed to send message'
+							})
+						}
 					}
 
-					const updatedConversation: ConversationSchema = {
-						...conversation,
-						messages: [...conversation.messages, sendMessageResponse.message]
-					}
-
-					writeConversationInboxStoreProperty({
-						conversations: conversations.map(convo =>
-							convo.uniqueId === conversation.uniqueId ? updatedConversation : convo
-						)
-					})
-
-					console.log('Message sent successfully')
-
-					setMessageContent(() => null)
+					setMediaFiles(() => [])
+					return
 				} else {
-					errorNotification({
-						message: 'Failed to send message'
+					// TEXT MESSAGE
+					const sendMessageResponse = await sendMessageInConversation.mutateAsync({
+						data: {
+							messageData: {
+								messageType: 'Text',
+								text: message
+							},
+							createdAt: dayjs().toISOString()
+						},
+						id: currentConversation.uniqueId
 					})
+
+					pushMessageToConversation(sendMessageResponse.message)
+					setMessageContent(() => null)
 				}
 			} catch (error) {
 				console.error(error)
@@ -255,9 +357,11 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		},
 		[
 			currentConversation,
+			mediaFiles,
+			uploadMedia,
+			error,
 			sendMessageInConversation,
-			conversations,
-			writeConversationInboxStoreProperty
+			pushMessageToConversation
 		]
 	)
 
@@ -265,7 +369,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		// check if input is focussed, on enter sendMessage function should be called
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (
-				document.activeElement === inputRef.current &&
+				document.activeElement === textInputRef.current &&
 				event.key === 'Enter' &&
 				messageContent
 			) {
@@ -273,7 +377,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 			}
 		}
 
-		inputRef.current?.addEventListener('keydown', handleKeyDown)
+		textInputRef.current?.addEventListener('keydown', handleKeyDown)
 	}, [messageContent, sendMessage])
 
 	return (
@@ -526,12 +630,32 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									)
 								}}
 							>
-								<div className="flex items-center">
-									<ImageIcon className="size-6" />
+								<div
+									className=""
+									onClick={() => {
+										fileInputRef.current?.click()
+									}}
+								>
+									<Icons.media className="size-6" />
 								</div>
+
+								{/* file input */}
+								<input
+									type="file"
+									ref={fileInputRef}
+									className="hidden"
+									onChange={e => {
+										const files = e.target.files?.item
+										if (!files) return
+										setMediaFiles(() => files)
+									}}
+								/>
+
+								{/* text input */}
 								<Input
 									placeholder="Type Message here"
 									className="w-full"
+									ref={textInputRef}
 									type="text"
 									// defaultValue={messageContent || undefined}
 									value={messageContent || ''}

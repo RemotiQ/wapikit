@@ -397,19 +397,8 @@ func fetchConversation(businessAccountId, sentByContactNumber string, app interf
 	}
 
 	for _, message := range conversation.Messages {
-		messageData := map[string]interface{}{}
-		json.Unmarshal([]byte(*message.MessageData), &messageData)
-		message := api_types.MessageSchema{
-			UniqueId:       message.UniqueId.String(),
-			ConversationId: message.ConversationId.String(),
-			CreatedAt:      message.CreatedAt,
-			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageData:    &messageData,
-			MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-			Status:         api_types.MessageStatusEnum(message.Status.String()),
-		}
-
-		conversationDetails.Messages = append(conversationDetails.Messages, message)
+		apiMessage := app.ConversationService.ParseDbMessageToApiMessage(message)
+		conversationDetails.Messages = append(conversationDetails.Messages, apiMessage)
 	}
 
 	if err != nil {
@@ -579,7 +568,7 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 					Status:     api_types.ContactStatusEnum(insertedContact.Status),
 					UniqueId:   insertedContact.UniqueId.String(),
 				},
-				OrganizationId: contact.OrganizationId,
+				OrganizationId: insertedContact.OrganizationId.String(),
 			}
 		} else {
 			// ! TODO: send notification to the team
@@ -732,16 +721,7 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 		app.Logger.Error("error inserting message in the database", err.Error(), nil)
 	}
 
-	message := api_types.MessageSchema{
-		ConversationId: conversationDetails.UniqueId,
-		Direction:      api_types.InBound,
-		MessageType:    api_types.Text,
-		Status:         api_types.MessageStatusEnumSent,
-		MessageData:    &messageData,
-		UniqueId:       insertedMessage.UniqueId.String(),
-		CreatedAt:      sentAtTime,
-	}
-
+	message := app.ConversationService.ParseDbMessageToApiMessage(insertedMessage)
 	fmt.Println("conversationDetails", conversationDetails)
 
 	messageEvent := event_service.NewNewMessageEvent(*conversationDetails, message, nil, &conversationDetails.OrganizationId)

@@ -12,8 +12,6 @@ import { Icons } from '../icons'
 import { successNotification } from '~/reusable-functions'
 import { useCopyToClipboard } from 'usehooks-ts'
 
-// ! TODO complete this component, right now only supports text messages
-
 const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: boolean }> = ({
 	message,
 	isActionsEnabled

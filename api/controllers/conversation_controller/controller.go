@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/wapikit/wapi.go/pkg/components"
 	"github.com/wapikit/wapikit/.db-generated/model"
 	"github.com/wapikit/wapikit/.db-generated/table"
 	"github.com/wapikit/wapikit/api/api_types"
@@ -158,13 +158,28 @@ func NewConversationController() *ConversationController {
 						},
 					},
 				},
+				{
+					Path:                    "/api/conversation/:id/media",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithSession(handleMediaUpload),
+					IsAuthorizationRequired: true,
+					MetaData: interfaces.RouteMetaData{
+						PermissionRoleLevel: api_types.Member,
+						RateLimitConfig: interfaces.RateLimitConfig{
+							MaxRequests:    30,
+							WindowTimeInMs: time.Minute.Milliseconds(),
+						},
+						RequiredPermission: []api_types.RolePermissionEnum{
+							api_types.GetConversation,
+						},
+					},
+				},
 			},
 		},
 	}
 }
 
 func handleGetConversations(context interfaces.ContextWithSession) error {
-
 	orgId := context.Session.User.OrganizationId
 	orgUuid := uuid.MustParse(orgId)
 
@@ -189,7 +204,6 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 	// ! always keep the unresolved conversation with unread messages on top, sorted by the latest messages
 	// ! always fetch the last 20 messages from each conversation
 	// ! fetch the user assigned to the conversation
-
 	type FetchedConversation struct {
 		model.Conversation
 		Contact struct {
@@ -340,22 +354,11 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 		}
 
 		for _, message := range conversation.Messages {
-			messageData := map[string]interface{}{}
-			json.Unmarshal([]byte(*message.MessageData), &messageData)
-			message := api_types.MessageSchema{
-				UniqueId:       message.UniqueId.String(),
-				ConversationId: message.ConversationId.String(),
-				CreatedAt:      message.CreatedAt,
-				Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-				MessageData:    &messageData,
-				MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-				Status:         api_types.MessageStatusEnum(message.Status.String()),
-			}
-			conversationToAppend.Messages = append(conversationToAppend.Messages, message)
+			apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message)
+			conversationToAppend.Messages = append(conversationToAppend.Messages, apiMessage)
 		}
 
 		response.Conversations = append(response.Conversations, conversationToAppend)
-
 	}
 
 	return context.JSON(http.StatusOK, response)
@@ -496,18 +499,8 @@ func handleGetConversationById(context interfaces.ContextWithSession) error {
 	}
 
 	for _, message := range conversation.Messages {
-		messageData := map[string]interface{}{}
-		json.Unmarshal([]byte(*message.MessageData), &messageData)
-		message := api_types.MessageSchema{
-			UniqueId:       message.UniqueId.String(),
-			ConversationId: message.ConversationId.String(),
-			CreatedAt:      message.CreatedAt,
-			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageData:    &messageData,
-			MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-			Status:         api_types.MessageStatusEnum(message.Status.String()),
-		}
-		response.Conversation.Messages = append(response.Conversation.Messages, message)
+		apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message)
+		response.Conversation.Messages = append(response.Conversation.Messages, apiMessage)
 	}
 
 	return context.JSON(http.StatusOK, response)
@@ -628,18 +621,8 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 
 	if len(dest) > 0 {
 		for _, message := range dest {
-			messageData := map[string]interface{}{}
-			json.Unmarshal([]byte(*message.MessageData), &messageData)
-			message := api_types.MessageSchema{
-				UniqueId:       message.UniqueId.String(),
-				ConversationId: message.ConversationId.String(),
-				CreatedAt:      message.CreatedAt,
-				Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-				MessageData:    &messageData,
-				MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-				Status:         api_types.MessageStatusEnum(message.Status.String()),
-			}
-			messagesToReturn = append(messagesToReturn, message)
+			apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message.Message)
+			messagesToReturn = append(messagesToReturn, apiMessage)
 		}
 
 		totalMessages = dest[0].TotalMessages
@@ -658,6 +641,7 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 }
 
 func handleSendMessage(context interfaces.ContextWithSession) error {
+	// 1. Validate conversationId
 	conversationId := context.Param("id")
 	if conversationId == "" {
 		return context.JSON(http.StatusBadRequest, "conversation id is required")
@@ -667,33 +651,31 @@ func handleSendMessage(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusBadRequest, "invalid conversation id")
 	}
 
+	// 2. Bind request payload
 	payload := new(api_types.NewMessageSchema)
-
 	if err := context.Bind(payload); err != nil {
 		return context.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	var conversationWithContact struct {
+	// 3. Fetch conversation + contact + business account
+	var convoData struct {
 		model.Conversation
-		Contact                 model.Contact                 `json:"contact"`
-		WhatsappBusinessAccount model.WhatsappBusinessAccount `json:"whatsappBusinessAccount"`
+		Contact                 model.Contact
+		WhatsappBusinessAccount model.WhatsappBusinessAccount
 	}
-
-	conversationFetchQuery := SELECT(
+	err = SELECT(
 		table.Conversation.AllColumns,
 		table.Contact.AllColumns,
 		table.WhatsappBusinessAccount.AllColumns,
-	).FROM(
-		table.Conversation.LEFT_JOIN(
-			table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId),
-		).LEFT_JOIN(
-			table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Conversation.OrganizationId),
-		),
-	).WHERE(
-		table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
-	).LIMIT(1)
-
-	err = conversationFetchQuery.QueryContext(context.Request().Context(), context.App.Db, &conversationWithContact)
+	).
+		FROM(
+			table.Conversation.
+				LEFT_JOIN(table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId)).
+				LEFT_JOIN(table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Conversation.OrganizationId)),
+		).
+		WHERE(table.Conversation.UniqueId.EQ(UUID(conversationUuid))).
+		LIMIT(1).
+		QueryContext(context.Request().Context(), context.App.Db, &convoData)
 
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
@@ -702,98 +684,61 @@ func handleSendMessage(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	messageData, err := json.Marshal(payload.MessageData)
+	// 4. Build & send the message
+	discriminator, err := payload.MessageData.Discriminator()
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	messageComponent, err := context.App.ConversationService.BuildSendMessagePayload(discriminator, payload.MessageData)
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	messagingClient := context.App.WapiClient.NewMessagingClient(
-		conversationWithContact.PhoneNumberUsed,
-	)
-
-	var whatsappMessageId string
-
-	//  ! handle all the message type to send here
-	switch *payload.MessageType {
-	case api_types.Text:
-		if payload.MessageData != nil {
-			messageData, err = json.Marshal(payload.MessageData)
-			if err != nil {
-				return context.JSON(http.StatusInternalServerError, err.Error())
-			}
-		}
-
-		textMessageData := *payload.MessageData
-
-		{
-			textMessage, err := components.NewTextMessage(components.TextMessageConfigs{
-				Text: textMessageData["text"].(string),
-			})
-
-			if err != nil {
-				return context.JSON(http.StatusInternalServerError, err.Error())
-			}
-
-			response, err := messagingClient.Message.Send(textMessage, conversationWithContact.Contact.PhoneNumber)
-
-			if err != nil {
-				return context.JSON(http.StatusInternalServerError, err.Error())
-			}
-
-			context.App.Logger.Info("response: %v", response)
-
-			whatsappMessageId = response.Messages[0].ID
-		}
+	messagingClient := context.App.WapiClient.NewMessagingClient(convoData.PhoneNumberUsed)
+	resp, err := messagingClient.Message.Send(messageComponent, convoData.Contact.PhoneNumber)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
+	context.App.Logger.Info("response: %v", resp)
+	whatsappMessageId := resp.Messages[0].ID
 
-	stringMessageData := string(messageData)
+	// 5. Store the message in DB
+	messageDataJSON, err := json.Marshal(payload.MessageData)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+	stringMessageData := string(messageDataJSON)
 
 	messageToInsert := model.Message{
-		ConversationId:            &conversationWithContact.UniqueId,
+		ConversationId:            &convoData.UniqueId,
+		ContactId:                 convoData.ContactId,
 		Direction:                 model.MessageDirectionEnum_OutBound,
-		WhatsAppMessageId:         &whatsappMessageId,
-		WhatsappBusinessAccountId: &conversationWithContact.WhatsappBusinessAccount.AccountId,
-		CampaignId:                nil,
-		ContactId:                 conversationWithContact.ContactId,
-		MessageType:               model.MessageTypeEnum_Text,
 		Status:                    model.MessageStatusEnum_Sent,
+		MessageType:               model.MessageTypeEnum_Text, // override if needed
+		OrganizationId:            convoData.OrganizationId,
+		WhatsAppMessageId:         &whatsappMessageId,
+		WhatsappBusinessAccountId: &convoData.WhatsappBusinessAccount.AccountId,
+		PhoneNumberUsed:           convoData.PhoneNumberUsed,
 		MessageData:               &stringMessageData,
-		OrganizationId:            conversationWithContact.OrganizationId,
 		CreatedAt:                 time.Now(),
 		UpdatedAt:                 time.Now(),
-		PhoneNumberUsed:           conversationWithContact.PhoneNumberUsed,
 	}
 
 	var insertedMessage model.Message
-
-	insertQuery := table.Message.
+	if err := table.Message.
 		INSERT(table.Message.MutableColumns).
 		MODEL(messageToInsert).
-		RETURNING(table.Message.AllColumns)
-
-	err = insertQuery.QueryContext(context.Request().Context(), context.App.Db, &insertedMessage)
-
-	if err != nil {
+		RETURNING(table.Message.AllColumns).
+		QueryContext(context.Request().Context(), context.App.Db, &insertedMessage); err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	responseToReturn := api_types.SendMessageInConversationResponseSchema{
-		Message: api_types.MessageSchema{
-			UniqueId:       insertedMessage.UniqueId.String(),
-			ConversationId: insertedMessage.ConversationId.String(),
-			CreatedAt:      insertedMessage.CreatedAt,
-			Direction:      api_types.MessageDirectionEnum(insertedMessage.Direction.String()),
-			MessageData:    payload.MessageData,
-			MessageType:    api_types.MessageTypeEnum(insertedMessage.MessageType.String()),
-			Status:         api_types.MessageStatusEnum(insertedMessage.Status.String()),
-		},
+	// 6. Return the new message
+	response := api_types.SendMessageInConversationResponseSchema{
+		Message: context.App.ConversationService.ParseDbMessageToApiMessage(insertedMessage),
 	}
-
-	return context.JSON(http.StatusOK, responseToReturn)
+	return context.JSON(http.StatusOK, response)
 }
 
 func handleAssignConversation(context interfaces.ContextWithSession) error {
@@ -1016,4 +961,82 @@ func handleUnassignConversation(context interfaces.ContextWithSession) error {
 	}
 
 	return context.JSON(http.StatusOK, responseToReturn)
+}
+
+func handleMediaUpload(context interfaces.ContextWithSession) error {
+	conversationId := context.Param("id")
+	if conversationId == "" {
+		return context.JSON(http.StatusBadRequest, "conversation id is required")
+	}
+
+	conversationUuid, err := uuid.Parse(conversationId)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "invalid conversation id")
+	}
+
+	conversationQuery := SELECT(
+		table.Conversation.AllColumns,
+	).FROM(
+		table.Conversation,
+	).WHERE(
+		table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
+	).LIMIT(1)
+
+	var conversation model.Conversation
+
+	err = conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &conversation)
+
+	if err != nil {
+		if err.Error() == qrm.ErrNoRows.Error() {
+			return context.JSON(http.StatusNotFound, "conversation not found")
+		}
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	// Parse the multipart form (here we allow up to 32 MB in memory)
+	if err := context.Request().ParseMultipartForm(32 << 20); err != nil {
+		return context.JSON(http.StatusBadRequest, "failed to parse multipart form")
+	}
+
+	// Retrieve the file (expecting field name "file")
+	file, fileHeader, err := context.Request().FormFile("file")
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "file is required")
+	}
+	defer file.Close()
+
+	// Extract MIME type from header; fallback if needed.
+	mimeType := fileHeader.Header.Get("Content-Type")
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	// Get the filename (ensure a safe basename)
+	filename := filepath.Base(fileHeader.Filename)
+
+	phoneNumberId := conversation.PhoneNumberUsed
+	if phoneNumberId == "" {
+		return context.JSON(http.StatusInternalServerError, "phone number id not configured")
+	}
+
+	// Use MediaManager to upload the media file to WhatsApp.
+	messagingClient := context.App.WapiClient.NewMessagingClient(phoneNumberId)
+	mediaManager := messagingClient.Media
+	mediaID, err := mediaManager.UploadMedia(phoneNumberId, file, filename, mimeType)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, fmt.Sprintf("upload failed: %v", err))
+	}
+
+	// Optionally, retrieve a temporary media URL.
+	mediaURL, err := mediaManager.GetMediaUrlById(mediaID)
+	if err != nil {
+		// Log the error but we can still proceed with mediaID.
+		context.App.Logger.Error("failed to retrieve media URL", err.Error(), nil)
+	}
+
+	// Return the media ID and URL to the frontend.
+	return context.JSON(http.StatusOK, map[string]interface{}{
+		"mediaId":  mediaID,
+		"mediaUrl": mediaURL,
+	})
 }

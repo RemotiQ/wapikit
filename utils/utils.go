@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	mathRandom "math/rand"
@@ -200,3 +201,16 @@ func ParseName(fullName string) (string, string) {
 	lastName := strings.Join(parts[1:], " ")
 	return firstName, lastName
 }
+
+func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal data: %w", err)
+	}
+	var result T
+	if err := json.Unmarshal(b, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal data into target struct: %w", err)
+	}
+	return &result, nil
+}
+
