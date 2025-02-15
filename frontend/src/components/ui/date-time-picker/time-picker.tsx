@@ -7,7 +7,7 @@ import { TimePickerInput } from './time-picker-inputs'
 
 interface TimePickerProps {
 	date: Date | undefined
-	setDate: (date: Date | undefined) => void
+	setDate: React.Dispatch<React.SetStateAction<Date>>
 }
 
 export function TimePicker({ date, setDate }: TimePickerProps) {
@@ -16,7 +16,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 	const secondRef = React.useRef<HTMLInputElement>(null)
 
 	return (
-		<div className="flex items-end gap-2">
+		<div className="flex items-center justify-start gap-2">
 			<div className="grid gap-1 text-center">
 				<Label htmlFor="hours" className="text-xs">
 					Hours
@@ -26,7 +26,9 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 					date={date}
 					setDate={setDate}
 					ref={hourRef}
+					type="number"
 					onRightFocus={() => minuteRef.current?.focus()}
+					className="max-w-20"
 				/>
 			</div>
 			<div className="grid gap-1 text-center">
@@ -38,8 +40,10 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 					date={date}
 					setDate={setDate}
 					ref={minuteRef}
+					type="number"
 					onLeftFocus={() => hourRef.current?.focus()}
 					onRightFocus={() => secondRef.current?.focus()}
+					className="max-w-20"
 				/>
 			</div>
 			<div className="grid gap-1 text-center">
@@ -50,11 +54,13 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 					picker="seconds"
 					date={date}
 					setDate={setDate}
+					type="number"
 					ref={secondRef}
 					onLeftFocus={() => minuteRef.current?.focus()}
+					className="max-w-20"
 				/>
 			</div>
-			<div className="flex h-10 items-center">
+			<div className="flex items-center">
 				<Clock className="ml-2 h-4 w-4" />
 			</div>
 		</div>

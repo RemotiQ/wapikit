@@ -28,7 +28,8 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spf13/pflag v1.0.6
 	github.com/tmc/langchaingo v0.1.13-pre.0.0.20250202074804-0672790bb23a
-	github.com/wapikit/wapi.go v0.1.0
+	github.com/vmihailenco/msgpack/v5 v5.4.1
+	github.com/wapikit/wapi.go v0.1.1
 	github.com/wapikit/wapikit-enterprise v0.0.0
 	golang.org/x/crypto v0.32.0
 )
@@ -83,6 +84,7 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.51.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.51.0 // indirect

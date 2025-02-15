@@ -213,4 +213,3 @@ func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
 	}
 	return &result, nil
 }
-

@@ -228,15 +228,13 @@ func getCampaigns(context interfaces.ContextWithSession) error {
 				}
 			}
 
-			// convert string to *map[string]interface{} for template component parameters
-			var templateComponentParameters *map[string]interface{}
+			var templateComponentParameters *api_types.TemplateComponentParameters
 			if campaign.TemplateMessageComponentParameters != nil {
-				var unmarshalled map[string]interface{}
-				err := json.Unmarshal([]byte(*campaign.TemplateMessageComponentParameters), &unmarshalled)
+				templateComponentParameters = new(api_types.TemplateComponentParameters)
+				err := json.Unmarshal([]byte(*campaign.TemplateMessageComponentParameters), templateComponentParameters)
 				if err != nil {
-					context.App.Logger.Error("error unmarshalling template component parameters: %v", err.Error())
+					context.App.Logger.Error("error unmarshalling template component parameters: %v", "error", err.Error())
 				}
-				templateComponentParameters = &unmarshalled
 			}
 
 			cmpgn := api_types.CampaignSchema{
@@ -311,24 +309,28 @@ func createNewCampaign(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	defer tx.Rollback()
+
+	status := model.CampaignStatusEnum_Draft
+	if payload.ScheduledAt != nil {
+		status = model.CampaignStatusEnum_Scheduled
+	}
 	// 1. Insert Campaign
+
 	insertQuery := table.Campaign.INSERT(table.Campaign.MutableColumns).
 		MODEL(model.Campaign{
-			Name:                          payload.Name,
-			Description:                   payload.Description,
-			Status:                        model.CampaignStatusEnum_Draft,
-			OrganizationId:                organizationUuid,
-			MessageTemplateId:             &payload.TemplateMessageId,
-			PhoneNumber:                   payload.PhoneNumberToUse,
-			IsLinkTrackingEnabled:         payload.IsLinkTrackingEnabled,
-			CreatedByOrganizationMemberId: orgMember.UniqueId,
-			CreatedAt:                     time.Now(),
-			UpdatedAt:                     time.Now(),
-			// ScheduledAt:                   payload.ScheduledAt,
+			Name:                               payload.Name,
+			Description:                        payload.Description,
+			Status:                             status,
+			OrganizationId:                     organizationUuid,
+			MessageTemplateId:                  &payload.TemplateMessageId,
+			PhoneNumber:                        payload.PhoneNumberToUse,
+			IsLinkTrackingEnabled:              payload.IsLinkTrackingEnabled,
+			CreatedByOrganizationMemberId:      orgMember.UniqueId,
+			CreatedAt:                          time.Now(),
+			UpdatedAt:                          time.Now(),
+			ScheduledAt:                        payload.ScheduledAt,
+			TemplateMessageComponentParameters: nil,
 		}).RETURNING(table.Campaign.AllColumns)
-
-	debugSql := insertQuery.DebugSql()
-	context.App.Logger.Debug("Debug SQL: %v", debugSql)
 
 	err = insertQuery.QueryContext(context.Request().Context(), tx, &newCampaign)
 
@@ -460,15 +462,18 @@ func getCampaignById(context interfaces.ContextWithSession) error {
 	stringUniqueId := campaignResponse.UniqueId.String()
 
 	// convert string to *map[string]interface{} for template component parameters
-	var templateComponentParameters *map[string]interface{}
+	var templateComponentParameters *api_types.TemplateComponentParameters
 	if campaignResponse.TemplateMessageComponentParameters != nil {
-		var unmarshalled map[string]interface{}
-		err := json.Unmarshal([]byte(*campaignResponse.TemplateMessageComponentParameters), &unmarshalled)
+		templateComponentParameters = new(api_types.TemplateComponentParameters)
+		err := json.Unmarshal([]byte(*campaignResponse.TemplateMessageComponentParameters), templateComponentParameters)
 		if err != nil {
-			context.App.Logger.Error("error unmarshalling template component parameters: %v", err.Error())
+			context.App.Logger.Error("error unmarshalling template component parameters: %v", "error", err.Error())
 		}
-		templateComponentParameters = &unmarshalled
+	} else {
+		templateComponentParameters = nil
 	}
+
+	context.App.Logger.Info("templateComponentParameters: %v", templateComponentParameters)
 
 	tags := []api_types.TagSchema{}
 	lists := []api_types.ContactListSchema{}
@@ -587,6 +592,10 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 				return context.JSON(http.StatusInternalServerError, err.Error())
 			}
 
+			response := api_types.UpdateCampaignByIdResponseSchema{
+				IsUpdated: true,
+			}
+			return context.JSON(http.StatusOK, response)
 		} else if *payload.Status == api_types.Paused || *payload.Status == api_types.Cancelled {
 			if campaign.Status != model.CampaignStatusEnum_Running {
 				return context.JSON(http.StatusBadRequest, "Cannot pause a campaign that is not running")
@@ -602,11 +611,18 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 
 			cmCommand := campaign_manager.NewStopCampaignCommand(campaign.UniqueId.String())
 			context.App.Redis.PublishMessageToRedisChannel(context.App.Constants.RedisCampaignManagerChannelName, cmCommand.ToJson())
-		}
+			response := api_types.UpdateCampaignByIdResponseSchema{
+				IsUpdated: true,
+			}
 
-		return context.JSON(http.StatusOK, api_types.UpdateCampaignByIdResponseSchema{
-			IsUpdated: true,
-		})
+			return context.JSON(http.StatusOK, response)
+		} else if *payload.Status == api_types.Scheduled {
+			updateStatusQuery.SET(table.Campaign.Status.SET(utils.EnumExpression(model.CampaignStatusEnum_Scheduled.String())))
+			_, err := updateStatusQuery.ExecContext(context.Request().Context(), context.App.Db)
+			if err != nil {
+				return context.JSON(http.StatusInternalServerError, err.Error())
+			}
+		}
 	}
 
 	if campaign.Status == model.CampaignStatusEnum_Finished || campaign.Status == model.CampaignStatusEnum_Cancelled {
@@ -709,7 +725,7 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 			),
 			CTE("insert_tag").AS(
 				table.CampaignTag.
-					INSERT(table.CampaignTag.MutableColumns).
+					INSERT().
 					MODELS(tagsToBeInserted).
 					ON_CONFLICT(table.CampaignTag.CampaignId, table.CampaignTag.TagId).
 					DO_NOTHING(),
@@ -838,12 +854,7 @@ func updateCampaignById(context interfaces.ContextWithSession) error {
 	var stringifiedParameters []byte
 	stringifiedParameters, err = json.Marshal(payload.TemplateComponentParameters)
 	if err != nil {
-		context.App.Logger.Error("Error marshalling template component parameters: %v", err.Error())
-	}
-
-	// pitch in default if no parameters are provided
-	if stringifiedParameters == nil {
-		stringifiedParameters = []byte("{}")
+		context.App.Logger.Error("Error marshalling template component parameters: %v", "error", err.Error())
 	}
 
 	finalParameters := string(stringifiedParameters)

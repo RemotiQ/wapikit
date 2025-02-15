@@ -34,6 +34,8 @@ const TemplateMessageRenderer: React.FC<{
 			parameterType: string
 			staticValue?: string
 			dynamicField?: string
+			placeholder?: string
+			example?: string
 		}>
 	): string {
 		if (!templateText.includes('{{')) return templateText
@@ -52,13 +54,16 @@ const TemplateMessageRenderer: React.FC<{
 			}
 
 			// if found, check parameterType
-			if (foundParam.parameterType === 'static') {
+			if (foundParam.parameterType === 'static' && foundParam.staticValue) {
 				return foundParam.staticValue || ''
-			} else {
+			} else if (foundParam.parameterType === 'dynamic' && foundParam.dynamicField) {
 				// 'dynamic'
 				// For a preview, you might do something generic like:
 				// e.g. "[contact.firstName]" or we just show dynamicField
 				return `[${foundParam.dynamicField ?? 'dynamic'}]`
+			} else {
+				// fallback if not found
+				return `{{${match}}}`
 			}
 		})
 	}

@@ -1,7 +1,14 @@
 import { Input } from '~/components/ui/input'
 
 import { clsx as cn } from 'clsx'
-import React, { useEffect, useMemo, useState, forwardRef, type InputHTMLAttributes } from 'react'
+import React, {
+	useEffect,
+	useMemo,
+	useState,
+	forwardRef,
+	type InputHTMLAttributes,
+	type Dispatch
+} from 'react'
 import {
 	type Period,
 	type TimePickerType,
@@ -13,7 +20,7 @@ import {
 export interface TimePickerInputProps extends InputHTMLAttributes<HTMLInputElement> {
 	picker: TimePickerType
 	date: Date | undefined
-	setDate: (date: Date | undefined) => void
+	setDate: Dispatch<React.SetStateAction<Date>>
 	period?: Period
 	onRightFocus?: () => void
 	onLeftFocus?: () => void
@@ -101,10 +108,6 @@ const TimePickerInput = forwardRef<HTMLInputElement, TimePickerInputProps>(
 				ref={ref}
 				id={id || picker}
 				name={name || picker}
-				className={cn(
-					'w-[48px] text-center font-mono text-base tabular-nums caret-transparent focus:bg-accent focus:text-accent-foreground [&::-webkit-inner-spin-button]:appearance-none',
-					className
-				)}
 				value={value || calculatedValue}
 				onChange={e => {
 					e.preventDefault()
@@ -117,6 +120,11 @@ const TimePickerInput = forwardRef<HTMLInputElement, TimePickerInputProps>(
 					handleKeyDown(e)
 				}}
 				{...props}
+				className={cn(
+					'text-center font-mono text-base tabular-nums caret-transparent focus:bg-accent focus:text-accent-foreground [&::-webkit-inner-spin-button]:appearance-none',
+					className,
+					'!w-fit'
+				)}
 			/>
 		)
 	}

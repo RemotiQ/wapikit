@@ -94,14 +94,17 @@ export function conversationClosedEventHandler(
 }
 
 export function newConversationEventHandler(
+	conversations: ConversationSchema[],
 	message: z.infer<
 		(typeof ApiServerEventDataMap)[ApiServerEventEnum.NewConversation]['shape']['data']
-	>
+	>,
+	writeProperty: ConversationInboxStoreType['writeProperty']
 ) {
 	try {
 		const { conversation } = message
-		console.log({ conversation })
-
+		writeProperty({
+			conversations: [conversation as ConversationSchema, ...conversations]
+		})
 		return true
 	} catch (error) {
 		console.error(error)

@@ -5342,7 +5342,7 @@ components:
           items:
             $ref: "#/components/schemas/TagSchema"
         templateComponentParameters:
-          type: object
+          $ref: "#/components/schemas/TemplateComponentParameters"
         stats:
           $ref: "#/components/schemas/CampaignAnalyticsResponseSchema"
         progress:
@@ -5396,6 +5396,66 @@ components:
         - phoneNumberToUse
         - templateMessageId
 
+    TemplateParameterInput:
+      type: object
+      description: >
+        A single template parameter input. It can be either static or dynamic.
+      properties:
+        nameOrIndex:
+          type: string
+          description: "The name or index identifying the parameter."
+        label:
+          type: string
+          description: "The display label for the parameter."
+        parameterType:
+          type: string
+          description: "Specifies whether the parameter is static or dynamic."
+          enum:
+            - static
+            - dynamic
+        dynamicField:
+          type: string
+          description: "For dynamic parameters, the field name to resolve (e.g. 'firstName')."
+        staticValue:
+          type: string
+          description: "The static value to be used if applicable."
+        example:
+          type: string
+          description: "An example value for the parameter."
+        placeholder:
+          type: string
+          description: "Placeholder text to guide the user input."
+      required:
+        - nameOrIndex
+        - label
+        - parameterType
+
+    TemplateComponentParameters:
+      type: object
+      description: >
+        Object representing template component parameters. It consists of separate arrays
+        for header, body, and button parameters.
+      properties:
+        header:
+          type: array
+          description: "Parameters for header components."
+          items:
+            $ref: "#/components/schemas/TemplateParameterInput"
+        body:
+          type: array
+          description: "Parameters for body components."
+          items:
+            $ref: "#/components/schemas/TemplateParameterInput"
+        buttons:
+          type: array
+          description: "Parameters for button components."
+          items:
+            $ref: "#/components/schemas/TemplateParameterInput"
+      required:
+        - header
+        - body
+        - buttons
+
     UpdateCampaignSchema:
       type: object
       properties:
@@ -5420,7 +5480,7 @@ components:
         phoneNumber:
           type: string
         templateComponentParameters:
-          type: object
+          $ref: "#/components/schemas/TemplateComponentParameters"
         scheduledAt:
           type: string
           format: date-time
@@ -6446,16 +6506,55 @@ components:
           type: array
           items:
             type: string
+          description: For media headers (IMAGE, VIDEO, DOCUMENT).
         header_text:
           type: array
           items:
             type: string
+          description: For positional header text examples.
+        header_text_named_params:
+          type: array
+          description: For named parameters in header components.
+          items:
+            type: object
+            properties:
+              param_name:
+                type: string
+              example:
+                type: string
+            required:
+              - param_name
+              - example
         body_text:
           type: array
           items:
             type: array
             items:
               type: string
+          description: For positional examples in body components.
+        body_text_named_params:
+          type: array
+          description: For named parameters in body components.
+          items:
+            type: object
+            properties:
+              param_name:
+                type: string
+              example:
+                type: string
+            required:
+              - param_name
+              - example
+
+    TemplateMessageLimitedTimeOfferParameter:
+      type: object
+      description: Limited time offer parameters, if applicable.
+      properties:
+        # Add fields as required.
+        offer_code:
+          type: string
+        expiry_minutes:
+          type: integer
 
     WhatsAppBusinessHSMWhatsAppHSMComponent:
       type: object
@@ -6477,7 +6576,7 @@ components:
         format:
           $ref: "#/components/schemas/MessageTemplateComponentFormat"
         limited_time_offer:
-          type: object
+          $ref: "#/components/schemas/TemplateMessageLimitedTimeOfferParameter"
         text:
           type: string
         type:

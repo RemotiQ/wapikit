@@ -13,7 +13,7 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
 			</h2>
 			<div className="flex gap-4">
 				<Button onClick={() => reset()} size={'medium'}>
-					<Icons.reload className="size-6 text-white" /> Try again
+					<Icons.arrowClockwise className="size-6 text-white" /> Try again
 				</Button>
 				<Link title="contact-support" href={`${WEBSITE_URL}/contact-us`} rel="">
 					<Button size={'medium'} variant={'outline'}>

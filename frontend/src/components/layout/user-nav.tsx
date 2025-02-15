@@ -49,7 +49,7 @@ export function UserNav() {
 							onClick={() => {
 								router.push('/settings')
 							}}
-							className="flex items-center gap-2 cursor-pointer"
+							className="flex cursor-pointer items-center gap-2"
 						>
 							<Icons.settings className="size-4" />
 							Settings
@@ -58,7 +58,7 @@ export function UserNav() {
 							onClick={() => {
 								router.push('/settings?tab=api-key')
 							}}
-							className="flex items-center gap-2 cursor-pointer"
+							className="flex cursor-pointer items-center gap-2"
 						>
 							<Icons.terminalSquare className="size-4" />
 							API Access
@@ -67,7 +67,7 @@ export function UserNav() {
 							onClick={() => {
 								window.open('https://docs.wapikit.com', '_blank')
 							}}
-							className="flex items-center gap-2 cursor-pointer"
+							className="flex cursor-pointer items-center gap-2"
 						>
 							<Icons.documentation className="size-4" />
 							Documentation
@@ -78,7 +78,7 @@ export function UserNav() {
 						onClick={() => {
 							router.push('/logout')
 						}}
-						className="flex items-center justify-between cursor-pointer"
+						className="flex cursor-pointer items-center justify-between"
 					>
 						Log out
 						<Icons.logout className="size-4" />
