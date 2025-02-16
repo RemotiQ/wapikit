@@ -2,7 +2,6 @@ import { type GetCampaignsQueryResult } from 'root/.generated'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { clsx } from 'clsx'
 import { Badge } from '../ui/badge'
-import { format } from 'date-fns'
 import { Icons } from '../icons'
 import { Separator } from '../ui/separator'
 import { Button } from '../ui/button'
@@ -19,40 +18,42 @@ export function DashboardCampaignCard({
 	return (
 		<Card className="min-h- flex h-full max-w-md flex-1 flex-col">
 			<CardHeader className="flex !flex-row !items-center justify-between p-2 !pb-2 !pt-4 ">
-				<div className="flex flex-col gap-2">
-					<CardTitle className="truncate text-base py-0.5 !font-semibold">{name}</CardTitle>
+				<div className="flex flex-col items-start justify-center gap-2">
+					<CardTitle className="truncate py-0.5 text-base !font-semibold">
+						{name}
+					</CardTitle>
 					<div className="flex flex-col items-start justify-start gap-2">
 						<p className="max-w-[20rem] text-sm text-muted-foreground">{description}</p>
 					</div>
 				</div>
 			</CardHeader>
 			<CardContent className="flex flex-1 flex-col items-start justify-between gap-2 !py-2">
-				<div className="mt-2 flex flex-col gap-2">
+				<div className="mt-2 flex flex-col justify-between gap-2">
 					{scheduledAt && (
 						<p className="text-xs text-muted-foreground">
-							Scheduled: {format(new Date(scheduledAt), 'PPpp')}
+							Scheduled for {dayjs(scheduledAt).format('DD MMM, YYYY, hh:mm A')}
 						</p>
 					)}
 					{sentAt && (
 						<p className="text-xs text-muted-foreground">
-							Sent: {format(new Date(sentAt), 'PPpp')}
+							Sent {dayjs(sentAt).format('DD MMM, YYYY, hh:mm A')}
 						</p>
 					)}
 
 					<div className="flex flex-col gap-2">
-						<div className="flex flex-row items-center gap-2">
+						<div className="flex flex-row items-center justify-between gap-2">
 							<span className="flex items-center gap-2 text-sm">
 								<Icons.calendar className="size-4" />
-								Created On:
+								Created On
 							</span>
 							<span className="text-sm font-semibold">
-								{dayjs(createdAt).format('DD MMM, YYYY')}
+								{dayjs(createdAt).format('DD MMM, YYYY, hh:mm A')}
 							</span>
 						</div>
 						<div className="flex flex-row items-center gap-2">
-							<span className="flex items-center gap-2 text-sm">
+							<span className="flex items-center justify-between gap-2 text-sm">
 								<Icons.contacts className="size-4" />
-								Total Recipients:
+								Total Recipients
 							</span>
 							<span>
 								{stats?.totalMessages ? <>{stats.totalMessages}Messages</> : <>-</>}

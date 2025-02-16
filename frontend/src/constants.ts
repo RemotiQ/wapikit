@@ -141,6 +141,8 @@ export const APP_BASE_DOMAIN = 'app.wapikit.com'
 
 export const APP_URL = `https://${APP_BASE_DOMAIN}`
 
+export const OFFICIAL_DOCUMENTATION_URL = 'https://docs.wapikit.com'
+
 export const ProductDescription =
 	'WapiKit is an AI-powered WhatsApp marketing & customer engagement platform that automates campaigns, enhances conversations, and drives business growth effortlessly with automation.'
 
