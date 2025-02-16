@@ -423,7 +423,7 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 
 	var openRate, clickRate, engagementRate float64
 	if totalMessagesSent > 0 {
-		openRate = (float64(totalMessagesRead) / float64(totalMessagesSent)) * 100
+		openRate = math.Round(((float64(totalMessagesRead)/float64(totalMessagesSent))*100)*10) / 10
 		clickRate = (float64(totalLinkClicks) / float64(totalMessagesSent)) * 100
 		engagementRate = (float64(totalLinkClicks+totalReplies) / float64(totalMessagesSent)) * 100
 	}
