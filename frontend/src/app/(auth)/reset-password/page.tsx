@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { GitHubLogoIcon, StarFilledIcon } from '@radix-ui/react-icons'
 import UserResetPasswordForm from '~/components/forms/user-reset-password-form'
+import { Icons } from '~/components/icons'
 
 export default function AuthenticationPage() {
 	return (
@@ -28,9 +28,9 @@ export default function AuthenticationPage() {
 					className="group relative z-10 mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
 				>
 					<blockquote className=" flex items-center gap-2">
-						<GitHubLogoIcon className="text-gray-400" />
+						<Icons.github className="text-gray-400" />
 						<p className="text-sm font-bold text-gray-400">Star us on Github</p>
-						<StarFilledIcon className="size-4 text-yellow-400" />
+						<Icons.starfilled className="size-4 text-yellow-400" />
 					</blockquote>
 				</Link>
 			</div>

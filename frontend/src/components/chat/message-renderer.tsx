@@ -8,7 +8,6 @@ import {
 	type TextMessage,
 	type MessageSchema
 } from 'root/.generated'
-import { ChevronDown } from 'lucide-react'
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
@@ -83,7 +82,7 @@ function LoadMedia({
 	} else {
 		return (
 			<div>
-				<Icons.info className="size-4" />
+				<Icons.infoCircle className="size-4" />
 				Unsupported media type
 			</div>
 		)
@@ -203,7 +202,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 					<div className="ml-auto">
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>
-								<ChevronDown
+								<Icons.chevronDown
 									className={clsx(
 										'text-bold h-5 w-5',
 										message.direction === MessageDirectionEnum.InBound

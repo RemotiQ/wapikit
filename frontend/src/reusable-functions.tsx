@@ -1,6 +1,5 @@
 import { v4 } from 'uuid'
 import { toast } from 'sonner'
-import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { createRoot } from 'react-dom/client'
 import { AlertModal } from './components/modal/alert-modal'
 import {
@@ -25,7 +24,7 @@ export function generateUniqueId() {
 export function infoNotification(params: { message: string; darkMode?: true; duration?: string }) {
 	return toast.error(
 		<div className="flex flex-row items-center justify-start gap-2">
-			<InfoCircledIcon className="h-5 w-5" color="#3b82f6" />
+			<Icons.infoCircle className="h-5 w-5" color="#3b82f6" />
 			<span>{params.message}</span>
 		</div>
 	)
@@ -47,7 +46,7 @@ export function successNotification(params: {
 }) {
 	return toast.success(
 		<div className="flex flex-row items-center justify-start gap-2">
-			<CheckCircledIcon className="h-5 w-5" color="#22c55e" />
+			<Icons.checkCircle className="h-5 w-5" color="#22c55e" />
 			<span>{params.message}</span>
 		</div>
 	)

@@ -7,7 +7,6 @@ import { ScrollArea } from '~/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { MessageTypeBifurcation } from '~/components/analytics/message-type-distribution'
 import { MessageAggregateAnalytics } from '~/components/analytics/message-aggregate-stats'
-import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Toaster } from '~/components/ui/sonner'
 import { useGetAggregateCampaignAnalytics, useGetConversationAnalytics } from 'root/.generated'
 import { type DateRange } from 'react-day-picker'
@@ -17,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/comp
 import { useAuthState } from '~/hooks/use-auth-state'
 import LoadingSpinner from '~/components/loader'
 import { EngagementTrends } from '~/components/analytics/engagement'
+import { Icons } from '~/components/icons'
 
 enum AnalyticsTabEnum {
 	Campaigns = 'campaigns',
@@ -70,7 +70,7 @@ export default function Page() {
 									className="inline-block"
 								>
 									<p>
-										<InfoCircledIcon /> Select a date range to view analytics
+										<Icons.infoCircle /> Select a date range to view analytics
 										data
 									</p>
 								</TooltipContent>

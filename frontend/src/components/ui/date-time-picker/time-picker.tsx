@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { Clock } from 'lucide-react'
 import { Label } from '~/components/ui/label'
 import { TimePickerInput } from './time-picker-inputs'
+import { Icons } from '~/components/icons'
 
 interface TimePickerProps {
 	date: Date | undefined
@@ -61,7 +61,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 				/>
 			</div>
 			<div className="flex items-center">
-				<Clock className="ml-2 h-4 w-4" />
+				<Icons.clock className="ml-2 h-4 w-4" />
 			</div>
 		</div>
 	)

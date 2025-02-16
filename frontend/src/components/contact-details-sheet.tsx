@@ -100,7 +100,7 @@ const ContactDetailsSheet = () => {
 													k as keyof typeof contactData
 
 												if (key === 'conversations') return null
-												let IconToRender: any = Icons.user
+												let IconToRender: any = Icons.messageChatSquare
 
 												if (key === 'createdAt') {
 													IconToRender = Icons.calendar

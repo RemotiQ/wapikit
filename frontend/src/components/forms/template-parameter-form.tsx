@@ -135,7 +135,7 @@ const TemplateParameterForm = (props: TemplateParameterFormProps) => {
 									</TooltipTrigger>
 
 									<TooltipContent className="flex flex-row items-center gap-1">
-										<Icons.info className="size-4" />
+										<Icons.infoCircle className="size-4" />
 										{field.value === 'dynamic'
 											? 'Change to static'
 											: 'Change to dynamic'}

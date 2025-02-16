@@ -12,7 +12,6 @@ import {
 	useUpdateContactById,
 	type ContactSchema
 } from 'root/.generated'
-import { ArrowDownIcon, PlusIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 import { clsx } from 'clsx'
 import { useSearchParams } from 'next/navigation'
@@ -28,6 +27,7 @@ import { useRouter } from 'next/navigation'
 import { useLayoutStore } from '~/store/layout.store'
 import ContactDetailsSheet from '~/components/contact-details-sheet'
 import { MultiSelect } from '~/components/multi-select'
+import { Icons } from '~/components/icons'
 
 const ContactsPage = () => {
 	const searchParams = useSearchParams()
@@ -257,13 +257,13 @@ const ContactsPage = () => {
 								router.push('/contacts/bulk-import')
 							}}
 						>
-							<ArrowDownIcon className="mr-2 h-4 w-4" /> Import
+							<Icons.download className="mr-2 h-4 w-4" /> Import
 						</Button>
 						<Link
 							href={'/contacts/new-or-edit'}
 							className={clsx(buttonVariants({ variant: 'default' }))}
 						>
-							<PlusIcon className="mr-2 h-4 w-4" /> Add New
+							<Icons.inviteTeamMember className="mr-2 h-4 w-4" /> Add New
 						</Link>
 					</div>
 				</div>

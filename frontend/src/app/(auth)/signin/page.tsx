@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 import LoadingSpinner from '~/components/loader'
 import { createHref } from '~/reusable-functions'
 import { WEBSITE_URL } from '~/constants'
-import { GitHubLogoIcon, StarFilledIcon } from '@radix-ui/react-icons'
+import { Icons } from '~/components/icons'
 
 export default function AuthenticationPage() {
 	const { authState } = useAuthState()
@@ -39,9 +39,9 @@ export default function AuthenticationPage() {
 						className="group relative z-10 mt-auto w-fit cursor-pointer rounded-lg border border-gray-500 px-2.5 py-1.5"
 					>
 						<blockquote className=" flex items-center gap-2">
-							<GitHubLogoIcon className="text-gray-400" />
+							<Icons.github className="text-gray-400" />
 							<p className="text-sm font-bold text-gray-400">Star us on Github</p>
-							<StarFilledIcon className="size-4 text-yellow-400" />
+							<Icons.starfilled className="size-4 text-yellow-400" />
 						</blockquote>
 					</Link>
 				</div>
