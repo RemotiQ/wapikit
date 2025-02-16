@@ -29,8 +29,9 @@ export default function Header() {
 					</Link>
 
 					{subscriptionDetails ? (
-						<Badge variant={'highlighted'}>
-							<span className="h-fit w-fit">Premium</span>
+						<Badge variant={'highlighted'} className="gap-1">
+							<Icons.star className="size-4" />
+							<span className="h-fit w-fit">{subscriptionDetails.tier} Plan</span>
 						</Badge>
 					) : null}
 				</div>

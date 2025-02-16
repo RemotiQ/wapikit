@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { add, format } from 'date-fns'
 import { TimePicker } from './time-picker'
 import { Icons } from '~/components/icons'
@@ -19,10 +19,14 @@ export function DateTimePicker(props: Props) {
 	const { onChange, defaultDate } = props
 	const [date, setDate] = useState<Date>(defaultDate || dayjs().add(1, 'day').toDate())
 
+	const onChangeDate = useCallback((newDate: Date) => {
+		onChange(newDate)
+	}, [onChange])
+
 	useEffect(() => {
 		if (!date) return
-		onChange(date)
-	}, [date, onChange])
+		onChangeDate(date)
+	}, [date, onChangeDate])
 
 	/**
 	 * carry over the current time when a user clicks a new day

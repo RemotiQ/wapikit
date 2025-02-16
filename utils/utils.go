@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"reflect"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -212,4 +213,43 @@ func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
 		return nil, fmt.Errorf("failed to unmarshal data into target struct: %w", err)
 	}
 	return &result, nil
+}
+
+// SortByDateField sorts a slice of structs by a given date field name
+func SortByDateField(slice interface{}, dateField string, ascending bool) error {
+	// Get the reflect value of the slice
+	val := reflect.ValueOf(slice)
+	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Slice {
+		return fmt.Errorf("slice must be a pointer to a slice")
+	}
+
+	// Dereference slice pointer
+	sliceVal := val.Elem()
+
+	// Check if slice is empty
+	if sliceVal.Len() == 0 {
+		return nil
+	}
+
+	// Check if field exists
+	firstElem := sliceVal.Index(0)
+	field := firstElem.FieldByName(dateField)
+	if !field.IsValid() || field.Type() != reflect.TypeOf(time.Time{}) {
+		return fmt.Errorf("field '%s' not found or not of type time.Time", dateField)
+	}
+
+	// Perform sorting
+	sort.SliceStable(sliceVal.Interface(), func(i, j int) bool {
+		// Get date field values
+		dateI := sliceVal.Index(i).FieldByName(dateField).Interface().(time.Time)
+		dateJ := sliceVal.Index(j).FieldByName(dateField).Interface().(time.Time)
+
+		// Sort based on ascending/descending flag
+		if ascending {
+			return dateI.Before(dateJ)
+		}
+		return dateI.After(dateJ)
+	})
+
+	return nil
 }

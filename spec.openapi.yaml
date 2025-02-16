@@ -4766,7 +4766,7 @@ components:
       type: object
       properties:
         template:
-          $ref: "#/components/schemas/TemplateSchema"
+          $ref: "#/components/schemas/MessageTemplateSchema"
       required:
         - template
 
@@ -5279,34 +5279,6 @@ components:
       required:
         - email
 
-    TemplateSchema:
-      type: object
-      properties:
-        templateId:
-          type: string
-        bodyText:
-          type: string
-        header:
-          type: object
-          properties:
-            headerType:
-              type: string
-            content:
-              type: string
-        footer:
-          type: object
-        content:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - templateId
-        - bodyText
-        - header
-        - content
-        - createdAt
-
     CampaignSchema:
       type: object
       properties:
@@ -5721,7 +5693,7 @@ components:
           type: string
       required:
         - id
-      
+
     VideoMessage:
       allOf:
         - $ref: "#/components/schemas/BaseMessage"

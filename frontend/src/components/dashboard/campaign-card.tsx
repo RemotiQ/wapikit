@@ -29,11 +29,6 @@ export function DashboardCampaignCard({
 			</CardHeader>
 			<CardContent className="flex flex-1 flex-col items-start justify-between gap-2 !py-2">
 				<div className="mt-2 flex flex-col justify-between gap-2">
-					{scheduledAt && (
-						<p className="text-xs text-muted-foreground">
-							Scheduled for {dayjs(scheduledAt).format('DD MMM, YYYY, hh:mm A')}
-						</p>
-					)}
 					{sentAt && (
 						<p className="text-xs text-muted-foreground">
 							Sent {dayjs(sentAt).format('DD MMM, YYYY, hh:mm A')}
@@ -41,15 +36,28 @@ export function DashboardCampaignCard({
 					)}
 
 					<div className="flex flex-col gap-2">
-						<div className="flex flex-row items-center justify-between gap-2">
-							<span className="flex items-center gap-2 text-sm">
-								<Icons.calendar className="size-4" />
-								Created On
-							</span>
-							<span className="text-sm font-semibold">
-								{dayjs(createdAt).format('DD MMM, YYYY, hh:mm A')}
-							</span>
-						</div>
+						{scheduledAt ? (
+							<div className="flex flex-row items-center justify-between gap-2">
+								<span className="flex items-center gap-2 text-sm">
+									<Icons.clock className="size-4" />
+									Scheduled for
+								</span>
+								<span className="text-sm font-semibold">
+									{dayjs(createdAt).format('DD MMM, YYYY, hh:mm A')}
+								</span>
+							</div>
+						) : (
+							<div className="flex flex-row items-center justify-between gap-2">
+								<span className="flex items-center gap-2 text-sm">
+									<Icons.calendar className="size-4" />
+									Created On
+								</span>
+								<span className="text-sm font-semibold">
+									{dayjs(createdAt).format('DD MMM, YYYY, hh:mm A')}
+								</span>
+							</div>
+						)}
+
 						<div className="flex flex-row items-center gap-2">
 							<span className="flex items-center justify-between gap-2 text-sm">
 								<Icons.contacts className="size-4" />
@@ -108,13 +116,15 @@ export function DashboardCampaignCard({
 											: 'default'
 								}
 								className={clsx(
+									'gap-1',
 									status === 'Paused' || status === 'Scheduled'
-										? 'bg-yellow-500'
+										? 'bg-yellow-50 text-yellow-900'
 										: status === 'Cancelled'
 											? 'bg-red-300'
 											: ''
 								)}
 							>
+								{status === 'Scheduled' ? <Icons.clock className="size-3" /> : null}
 								{status}
 							</Badge>
 						</div>

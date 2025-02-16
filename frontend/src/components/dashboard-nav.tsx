@@ -248,7 +248,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
 											<div className="mr-2 flex flex-row gap-4 truncate">
 												{item.title}
 												{item.status === 'beta' ? (
-													<Badge variant={'highlighted'}>Beta</Badge>
+													<Badge variant={'default'}>Beta</Badge>
 												) : item.status === 'new' ? (
 													<Badge variant={'highlighted'}>
 														New Launch

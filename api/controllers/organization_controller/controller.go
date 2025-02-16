@@ -1849,14 +1849,14 @@ func getAllMessageTemplates(context interfaces.ContextWithSession) error {
 
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
-			return context.JSON(http.StatusOK, []api_types.TemplateSchema{})
+			return context.JSON(http.StatusOK, []api_types.MessageTemplateSchema{})
 		}
 		return context.JSON(http.StatusInternalServerError, "Error fetching business account details")
 	}
 
 	if businessAccount.UniqueId.String() == "" || businessAccount.AccessToken == "" || businessAccount.AccountId == "" {
 		// return empty response
-		return context.JSON(http.StatusOK, []api_types.TemplateSchema{})
+		return context.JSON(http.StatusOK, []api_types.MessageTemplateSchema{})
 	}
 
 	// initialize a wapi client and fetch the templates

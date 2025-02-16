@@ -8,7 +8,7 @@ export const MessageTypeBifurcation: React.FC<{
 		<div className="w-full rounded-lg">
 			<BarChart
 				data={data}
-				index="label"
+				index="type"
 				categories={['sent', 'received']}
 				colors={['green', 'indigo']}
 				yAxisWidth={48}

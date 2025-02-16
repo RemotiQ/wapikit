@@ -45,6 +45,7 @@ export const CalendarDateRangePicker: React.FC<{
 					<Calendar
 						initialFocus
 						mode="range"
+						showOutsideDays={false}
 						defaultMonth={dateRange?.from}
 						selected={dateRange}
 						onSelect={selectedRange => {
