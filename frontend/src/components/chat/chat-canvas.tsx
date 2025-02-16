@@ -573,12 +573,15 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 					{/* ! TODO: this should always open at the end of scroll container */}
 					<ScrollArea
 						className={clsx(
-							'h-screen bg-[#ebe5de] px-2 dark:bg-[#111b21]',
+							'relative h-screen bg-[#ebe5de] px-2 dark:bg-[#111b21]',
 							suggestions?.suggestions.length ? '!pb-64' : '!pb-44'
 						)}
 					>
 						<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/chat-canvas-bg.png")] bg-repeat opacity-20' />
-						<div className="flex h-full flex-col gap-2" ref={messagesContainerRef}>
+						<div
+							className="relative flex h-full flex-col  gap-2"
+							ref={messagesContainerRef}
+						>
 							{groupedMessages.map((group, groupIndex) => (
 								<div
 									key={groupIndex}
@@ -606,13 +609,14 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 					</ScrollArea>
 
 					<div className="sticky bottom-0 z-30 ">
+						<div className="pointer-events-none inset-x-px  bottom-0 h-12 bg-gradient-to-t from-[#ebe5de] opacity-50 transition-opacity"></div>
 						{suggestions?.suggestions?.length ? (
 							<motion.div
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 20 }}
 								transition={{ duration: 0.5 }}
-								className="relative z-30 w-full"
+								className="relative z-30 w-full overflow-hidden"
 							>
 								<div className="flex flex-1 flex-row justify-start gap-4 overflow-scroll px-5 pb-4">
 									{suggestions?.suggestions.map((response, index) => {
@@ -651,7 +655,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						) : null}
 						<CardFooter className="flex w-full flex-col items-center gap-2 bg-white dark:bg-[#202c33]">
 							<Separator />
-							<div className="flex w-full items-center justify-start gap-2 px-2">
+							<div className="flex w-full items-center justify-start gap-2 px-2 mt-2 overflow-visible">
 								{attachedFiles.length > 0 && (
 									<div className="flex flex-row items-end gap-2 overflow-x-scroll">
 										{attachedFiles.map(file => (
@@ -685,7 +689,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 										fileInputRef.current?.click()
 									}}
 								>
-									<Icons.media className="size-6" />
+									<Icons.plus className="size-6" />
 								</div>
 
 								{/* file input */}
@@ -699,14 +703,15 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 											? Array.from(e.target.files)
 											: []
 										if (files.length === 0) return
-										setAttachedFiles(
-											files.map(file => ({
+										setAttachedFiles(data => [
+											...data,
+											...files.map(file => ({
 												file,
 												isUploading: false,
 												fileName: file.name,
 												mediaType: determineMessageType(file)
 											}))
-										)
+										])
 									}}
 								/>
 

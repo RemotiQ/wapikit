@@ -9,6 +9,7 @@ import { type ConversationSchema, ConversationStatusEnum } from 'root/.generated
 import { listStringEnumMembers } from 'ts-enum-utils'
 import { useRouter } from 'next/navigation'
 import LastMessagePreview from './last-message-preview'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 
 enum ConversationListSidebarTab {
 	All = 'All',
@@ -94,7 +95,7 @@ const ConversationsSidebar = () => {
 									className="flex flex-1 items-center gap-1"
 									key={index}
 								>
-									{
+									{/* {
 										{
 											All: <Icons.messageChatSquare className="size-4" />,
 											Unread: <Icons.bell className="size-4" />,
@@ -103,7 +104,28 @@ const ConversationsSidebar = () => {
 											)
 										}[tab]
 									}
-									{tab}
+									<p className='hidden xl:flex'>{tab}</p> */}
+									<TooltipProvider delayDuration={200}>
+										<Tooltip>
+											<TooltipTrigger className="flex items-center gap-1">
+												{
+													{
+														All: (
+															<Icons.messageChatSquare className="size-4" />
+														),
+														Unread: <Icons.bell className="size-4" />,
+														Unresolved: (
+															<Icons.messageQuestionSquare className="size-4" />
+														)
+													}[tab]
+												}
+												<p className="hidden 2xl:flex">{tab}</p>
+											</TooltipTrigger>
+											<TooltipContent  className="xl:hidden">
+												{tab}
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
 								</TabsTrigger>
 							)
 						}

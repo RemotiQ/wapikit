@@ -6,7 +6,8 @@ import {
 	MessageDirectionEnum,
 	MessageTypeEnum,
 	type TextMessage,
-	type MessageSchema
+	type MessageSchema,
+	MessageStatusEnum
 } from 'root/.generated'
 import {
 	DropdownMenu,
@@ -29,11 +30,13 @@ const TextMessage = (message: TextMessage) => {
 function LoadMedia({
 	conversationId,
 	mediaId,
-	mediaType
+	mediaType,
+	showControls
 }: {
 	mediaType: MessageTypeEnum
 	mediaId: string
 	conversationId: string
+	showControls?: boolean
 }) {
 	const [blobUrl, setBlobUrl] = useState<string | null>(null)
 	const { authState } = useAuthState()
@@ -70,13 +73,38 @@ function LoadMedia({
 	}, [authState, conversationId, mediaId, mediaType])
 
 	if (!blobUrl) {
-		return <Skeleton className="size-44" />
+		return (
+			<Skeleton
+				className={
+					mediaType === MessageTypeEnum.Video
+						? 'aspect-video'
+						: mediaType === MessageTypeEnum.Image
+							? 'aspect-square size-72'
+							: ''
+				}
+			/>
+		)
 	}
 
 	if (mediaType === MessageTypeEnum.Image) {
-		return <img src={blobUrl} alt="image message" />
+		return (
+			<img
+				src={blobUrl}
+				className="h-auto max-w-72  rounded-md object-contain"
+				alt="image message"
+			/>
+		)
 	} else if (mediaType === MessageTypeEnum.Video) {
-		return <video src={blobUrl} controls={true} />
+		return (
+			<video
+				className="h-auto max-w-60 rounded-md object-contain"
+				src={blobUrl}
+				disablePictureInPicture
+				disableRemotePlayback
+				controlsList="nodownload noplaybackrate"
+				controls={showControls}
+			/>
+		)
 	} else if (mediaType === MessageTypeEnum.Audio) {
 		return <audio src={blobUrl} controls />
 	} else {
@@ -110,6 +138,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 	isActionsEnabled
 }) => {
 	const copyToClipboard = useCopyToClipboard()[1]
+	const [showControls, setShowControls] = useState(false)
 
 	const messageActions: {
 		label: string
@@ -130,7 +159,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 		},
 		{
 			label: 'Copy',
-			icon: 'clipboard',
+			icon: 'copy',
 			onClick: () => {
 				if (message.messageType === MessageTypeEnum.Text) {
 					copyToClipboard((message.messageData.text || '') as string).catch(error =>
@@ -165,86 +194,165 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 	return (
 		<div
 			className={clsx(
-				'flex  w-fit max-w-md gap-1  rounded-md p-1 px-3',
+				'group relative w-fit gap-1 overflow-hidden rounded-md max-w-[45%] md:max-w-[55%] 2xl:max-w-[75%]',
+				message.messageType === MessageTypeEnum.Text
+					? 'pb-2 pl-[9px] pr-[7px] pt-[6px]'
+					: message.messageType === MessageTypeEnum.Location
+						? 'p-[5px]'
+						: 'p-[3px]',
 				message.direction === MessageDirectionEnum.InBound
 					? 'mr-auto bg-white dark:bg-[#202c33]'
 					: 'ml-auto bg-[#d9fdd3]  text-secondary-foreground dark:bg-[#005c4b]'
 			)}
+			onMouseEnter={() => {
+				if (message.messageType === MessageTypeEnum.Video) {
+					setShowControls(true)
+				}
+			}}
+			onMouseLeave={() => {
+				if (message.messageType === MessageTypeEnum.Video) {
+					setShowControls(false)
+				}
+			}}
 		>
-			{message.messageType === MessageTypeEnum.Text ? (
-				TextMessage(message)
-			) : message.messageType === MessageTypeEnum.Video ? (
-				<LoadMedia
-					conversationId={message.conversationId}
-					mediaId={message.messageData.id}
-					mediaType={message.messageType}
-				/>
-			) : message.messageType === MessageTypeEnum.Document ? (
-				DocumentMessage(message)
-			) : message.messageType === MessageTypeEnum.Image ? (
-				<LoadMedia
-					conversationId={message.conversationId}
-					mediaId={message.messageData.id}
-					mediaType={message.messageType}
-				/>
-			) : message.messageType === MessageTypeEnum.Audio ? (
-				<LoadMedia
-					conversationId={message.conversationId}
-					mediaId={message.messageData.id}
-					mediaType={message.messageType}
-				/>
-			) : message.messageType === MessageTypeEnum.Location ? (
-				LocationMessage(message)
-			) : null}
-
-			<div className="flex flex-col items-center  justify-end gap-1">
-				{isActionsEnabled ? (
-					<div className="ml-auto">
-						<DropdownMenu modal={false}>
-							<DropdownMenuTrigger asChild>
-								<Icons.chevronDown
-									className={clsx(
-										'text-bold h-5 w-5',
-										message.direction === MessageDirectionEnum.InBound
+			{isActionsEnabled ? (
+				<div className="absolute top-0 right-2 z-50 h-fit">
+					<DropdownMenu modal={false}>
+						<DropdownMenuTrigger asChild className='invisible group-hover:visible inline-block'>
+							<Icons.chevronDown
+								className={clsx(
+									'h-[22px] w-[22px] font-bold',
+									message.messageType === MessageTypeEnum.Image ||
+										message.messageType === MessageTypeEnum.Video
+										? 'text-white'
+										: message.direction === MessageDirectionEnum.InBound
 											? ''
-											: ' text-secondary-foreground'
-									)}
-								/>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" side="right">
-								{messageActions.map((action, index) => {
-									const Icon = Icons[action.icon]
-									return (
-										<DropdownMenuItem
-											key={index}
-											onClick={() => {
-												if (action.onClick) {
-													action.onClick()
-												}
-											}}
-											className="flex flex-row items-center gap-2"
-										>
-											<Icon className="size-4" />
-											{action.label}
-										</DropdownMenuItem>
-									)
-								})}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+											: 'text-secondary-foreground'
+								)}
+							/>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" side="right">
+							{messageActions.map((action, index) => {
+								const Icon = Icons[action.icon]
+								return (
+									<DropdownMenuItem
+										key={index}
+										onClick={() => {
+											if (action.onClick) {
+												action.onClick()
+											}
+										}}
+										className="flex  flex-row items-center gap-2"
+									>
+										<Icon className="size-4" />
+										{action.label}
+									</DropdownMenuItem>
+								)
+							})}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			) : null}
+			<div className="relative w-fit overflow-hidden">
+				<div className="flex w-full items-center justify-between">
+					{message.messageType === MessageTypeEnum.Text ? (
+						TextMessage(message)
+					) : message.messageType === MessageTypeEnum.Video ? (
+						<LoadMedia
+							conversationId={message.conversationId}
+							mediaId={message.messageData.id}
+							mediaType={message.messageType}
+							showControls={showControls}
+						/>
+					) : message.messageType === MessageTypeEnum.Document ? (
+						DocumentMessage(message)
+					) : message.messageType === MessageTypeEnum.Image ? (
+						<LoadMedia
+							conversationId={message.conversationId}
+							mediaId={message.messageData.id}
+							mediaType={message.messageType}
+						/>
+					) : message.messageType === MessageTypeEnum.Audio ? (
+						<LoadMedia
+							conversationId={message.conversationId}
+							mediaId={message.messageData.id}
+							mediaType={message.messageType}
+						/>
+					) : message.messageType === MessageTypeEnum.Location ? (
+						LocationMessage(message)
+					) : null}
+					{message.messageType === MessageTypeEnum.Text ? (
+						<span className="min-h-0">
+							<span className="invisible inline-flex h-0 px-2 py-0">
+								{' '}
+								{message.createdAt ? (
+									<span className={clsx(' text-[11px] font-semibold')}>
+										{dayjs(message.createdAt).format('hh:mm A')}
+									</span>
+								) : null}
+								{message.direction === MessageDirectionEnum.OutBound ? (
+									<div className="">
+										{message.status === MessageStatusEnum.Delivered ? (
+											<Icons.doubleCheck className="h-4 w-4 text-muted-foreground" />
+										) : message.status === MessageStatusEnum.Sent ? (
+											<Icons.check className="h-4 w-4 text-muted-foreground" />
+										) : message.status === MessageStatusEnum.Read ? (
+											<Icons.doubleCheck className="h-4 w-4 text-green-500" />
+										) : null}
+									</div>
+								) : null}
+							</span>
+						</span>
+					) : null}
+				</div>
+				{message.messageType === MessageTypeEnum.Image ||
+				message.messageType === MessageTypeEnum.Video ? (
+					<div
+						className={`absolute bottom-0 left-0 z-[2] h-7 w-full rounded-md bg-gradient-to-t from-[rgba(11,20,26,0.5)] to-[rgba(11,20,26,0)]`}
+					></div>
 				) : null}
-
+			</div>
+			<div
+				className={clsx(
+					'flex flex-row items-center gap-[1px] whitespace-nowrap',
+					message.messageType === MessageTypeEnum.Image ||
+						message.messageType === MessageTypeEnum.Video
+						? 'absolute bottom-2 right-[9px] p-[2] text-white'
+						: 'relative z-10 float-right mb-[-5px] ml-2 mt-[-10px] text-muted-foreground'
+				)}
+			>
 				{message.createdAt ? (
-					<span
-						className={clsx(
-							'ml-auto text-[10px]',
-							message.direction === MessageDirectionEnum.InBound
-								? ''
-								: 'text-secondary-foreground'
-						)}
-					>
+					<span className={clsx(' text-[11px] font-semibold')}>
 						{dayjs(message.createdAt).format('hh:mm A')}
 					</span>
+				) : null}
+
+				{message.direction === MessageDirectionEnum.OutBound ? (
+					<div className="">
+						{message.status === MessageStatusEnum.Delivered ? (
+							<Icons.doubleCheck
+								className={clsx(
+									'h-4 w-4',
+									message.messageType === MessageTypeEnum.Image ||
+										message.messageType === MessageTypeEnum.Video
+										? 'text-white'
+										: 'text-muted-foreground'
+								)}
+							/>
+						) : message.status === MessageStatusEnum.Sent ? (
+							<Icons.check
+								className={clsx(
+									'h-4 w-4',
+									message.messageType === MessageTypeEnum.Image ||
+										message.messageType === MessageTypeEnum.Video
+										? 'text-white'
+										: 'text-muted-foreground'
+								)}
+							/>
+						) : message.status === MessageStatusEnum.Read ? (
+							<Icons.doubleCheck className="h-4 w-4 text-green-500" />
+						) : null}
+					</div>
 				) : null}
 			</div>
 		</div>

@@ -26,17 +26,14 @@ export const PreviewAttachment: React.FC<PreviewAttachmentProps> = ({ removeFile
 	const isAudio = mediaType === MessageTypeEnum.Audio
 
 	return (
-		<div className="flex flex-col gap-2">
-			<div className="flex items-center gap-2">
-				<button
-					className="text-xs text-red-500"
-					onClick={() => removeFile()}
-					disabled={isUploading}
-				>
-					Remove
-				</button>
-			</div>
-
+		<div className="relative flex flex-col gap-2">
+			<button
+				className="absolute right-0 top-0 z-20 rounded-full bg-white text-xs text-red-500 "
+				onClick={() => removeFile()}
+				disabled={isUploading}
+			>
+				<Icons.cross className="h-4 w-4 text-secondary-foreground" />
+			</button>
 			<div className="relative flex aspect-video h-12 w-16 items-center justify-center rounded-md bg-muted">
 				{isImage ? (
 					// eslint-disable-next-line @next/next/no-img-element
@@ -71,8 +68,6 @@ export const PreviewAttachment: React.FC<PreviewAttachmentProps> = ({ removeFile
 					</div>
 				)}
 			</div>
-
-			<div className="max-w-[5rem] truncate text-xs text-zinc-500">{fileName}</div>
 		</div>
 	)
 }
