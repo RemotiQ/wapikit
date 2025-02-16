@@ -564,6 +564,7 @@ type ConversationSchema struct {
 	OrganizationId         string                           `json:"organizationId"`
 	Status                 ConversationStatusEnum           `json:"status"`
 	Tags                   []TagSchema                      `json:"tags"`
+	TotalMessages          *int                             `json:"totalMessages,omitempty"`
 	UniqueId               string                           `json:"uniqueId"`
 }
 

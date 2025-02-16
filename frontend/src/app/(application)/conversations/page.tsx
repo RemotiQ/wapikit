@@ -29,7 +29,7 @@ const ChatDashboard = () => {
 
 	return (
 		<div className="flex h-full flex-1 flex-col">
-			<div className="grid h-screen gap-2 px-4 grid-cols-7">
+			<div className="grid h-screen grid-cols-7 gap-2 px-4">
 				<Card className="h-full rounded-md md:col-span-2 xl:col-span-2">
 					<ConversationsSidebar />
 				</Card>

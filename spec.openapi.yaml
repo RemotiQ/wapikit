@@ -5555,6 +5555,8 @@ components:
           format: date-time
         numberOfUnreadMessages:
           type: integer
+        totalMessages:
+          type: integer
         status:
           $ref: "#/components/schemas/ConversationStatusEnum"
         assignedTo:

@@ -23,6 +23,62 @@ import React, { useEffect, useState } from 'react'
 import { useAuthState } from '~/hooks/use-auth-state'
 import { Skeleton } from '../ui/skeleton'
 
+type MediaCacheEntry = {
+	blobUrl: string
+	refCount: number
+}
+
+const mediaCache = new Map<string, MediaCacheEntry>()
+
+const fetchMedia = async (
+	mediaId: string,
+	conversationId: string,
+	authToken: string
+): Promise<string> => {
+	const cacheKey = `${conversationId}-${mediaId}`
+	const existingEntry = mediaCache.get(cacheKey)
+
+	if (existingEntry) {
+		existingEntry.refCount += 1
+		mediaCache.set(cacheKey, existingEntry)
+		return existingEntry.blobUrl
+	}
+
+	const response = await fetch(
+		`${getBackendUrl()}/conversation/${conversationId}/media/${mediaId}`,
+		{
+			headers: {
+				'x-access-token': authToken
+			},
+			credentials: 'include',
+			mode: 'cors',
+			cache: 'no-cache'
+		}
+	)
+
+	if (!response.ok) throw new Error('Failed to fetch media')
+
+	const blob = await response.blob()
+	const blobUrl = URL.createObjectURL(blob)
+	mediaCache.set(cacheKey, { blobUrl, refCount: 1 })
+	return blobUrl
+}
+
+const releaseMedia = (mediaId: string, conversationId: string) => {
+	const cacheKey = `${conversationId}-${mediaId}`
+	const entry = mediaCache.get(cacheKey)
+
+	if (entry) {
+		entry.refCount -= 1
+		if (entry.refCount <= 0) {
+			URL.revokeObjectURL(entry.blobUrl)
+			mediaCache.delete(cacheKey)
+		} else {
+			mediaCache.set(cacheKey, entry)
+		}
+	}
+}
+
 function downloadDocument(params: { url: string; fileName?: string }) {
 	const { url, fileName } = params
 	const a = document.createElement('a')
@@ -52,33 +108,26 @@ function LoadMedia({
 	const { authState } = useAuthState()
 
 	useEffect(() => {
-		if (!authState.isAuthenticated) {
-			return
+		if (!authState.isAuthenticated) return
+
+		let isMounted = true
+
+		const loadMedia = async () => {
+			try {
+				const url = await fetchMedia(mediaId, conversationId, authState.data.token)
+				if (isMounted) setBlobUrl(url)
+			} catch (error) {
+				console.error('Failed to load media', error)
+			}
 		}
-		let url: string | null = null
-		// Our authenticated fetch to the backend:
-		fetch(`${getBackendUrl()}/conversation/${conversationId}/media/${mediaId}`, {
-			headers: {
-				'x-access-token': `${authState.data.token}`
-			},
-			credentials: 'include',
-			mode: 'cors',
-			cache: 'no-cache'
+
+		loadMedia().catch(error => {
+			console.error(error)
 		})
-			.then(res => res.blob())
-			.then(blob => {
-				url = URL.createObjectURL(blob)
-				setBlobUrl(url)
-			})
-			.catch(err => {
-				console.error('Failed to load image', err)
-			})
 
 		return () => {
-			// Cleanup
-			if (url) {
-				URL.revokeObjectURL(url)
-			}
+			isMounted = false
+			releaseMedia(mediaId, conversationId)
 		}
 	}, [authState, conversationId, mediaId, mediaType])
 
@@ -103,7 +152,7 @@ function LoadMedia({
 			// eslint-disable-next-line @next/next/no-img-element
 			<img
 				src={blobUrl}
-				className="h-auto max-w-72  rounded-md object-contain"
+				className="h-auto max-w-72 rounded-md object-contain"
 				alt="image message"
 			/>
 		)
@@ -132,84 +181,38 @@ function LoadMedia({
 
 const DocumentMessageComponent: React.FC<{ message: DocumentMessage }> = ({ message }) => {
 	const { authState } = useAuthState()
-	const { fileName } = message.messageData
-	const [blobUrl, setBlobUrl] = useState<string | null>(null)
+	const { fileName, id: mediaId } = message.messageData
+	const conversationId = message.conversationId
 
-	const documentLink = `${getBackendUrl()}/conversation/${message.conversationId}/media/${message.messageData.id}`
-
-	const onViewClick = async (e: React.MouseEvent<HTMLDivElement>) => {
-		e.preventDefault()
-		try {
-			if (!authState.isAuthenticated) return
-			infoNotification({
-				message: 'Viewing document'
-			})
-			if (blobUrl) {
-				window.open(blobUrl, '_blank')
-				return
-			}
-			// Fetch the document with the auth header
-			const response = await fetch(documentLink, {
-				headers: {
-					'x-access-token': authState.data.token
-				},
-				credentials: 'include',
-				mode: 'cors',
-				cache: 'no-cache'
-			})
-			if (!response.ok) {
-				console.error('Failed to fetch document for viewing:', response.statusText)
-				return
-			}
-			const blob = await response.blob()
-			setBlobUrl(URL.createObjectURL(blob))
-			const url = window.URL.createObjectURL(blob)
-			window.open(url, '_blank')
-			// Optionally revoke the blob URL after a minute
-			setTimeout(() => window.URL.revokeObjectURL(url), 60000)
-		} catch (error) {
-			console.error('Error viewing document:', error)
-		}
-	}
-	// Download the document when user clicks "Download"
-	const onDownloadClick = async (e: React.MouseEvent<HTMLSpanElement>) => {
-		e.preventDefault()
+	const handleMediaAction = async (action: 'view' | 'download') => {
+		if (!authState.isAuthenticated) return
 
 		try {
-			if (!authState.isAuthenticated) return
-
 			infoNotification({
-				message: 'Downloading document'
+				message: action === 'view' ? 'Viewing document' : 'Downloading document'
 			})
 
-			if (blobUrl) {
-				downloadDocument({ url: blobUrl, fileName })
-				return
+			const url = await fetchMedia(mediaId, conversationId, authState.data.token)
+
+			if (action === 'view') {
+				window.open(url, '_blank')
+			} else {
+				downloadDocument({ url, fileName })
 			}
 
-			const response = await fetch(documentLink, {
-				headers: {
-					'x-access-token': `${authState.data.token}`
-				},
-				credentials: 'include',
-				mode: 'cors',
-				cache: 'no-cache'
-			})
-			const blob = await response.blob()
-			const url = window.URL.createObjectURL(blob)
-			setBlobUrl(url)
-			downloadDocument({ url: url, fileName })
+			// Schedule cleanup after 1 minute
+			setTimeout(() => {
+				releaseMedia(mediaId, conversationId)
+			}, 60000)
 		} catch (error) {
-			console.error('Error downloading document:', error)
+			console.error(`Error ${action}ing document:`, error)
 		}
 	}
 
 	return (
 		<div
 			className="group relative flex cursor-pointer flex-row items-center gap-3 rounded-md p-3"
-			onClick={e => {
-				onViewClick(e).catch(error => console.error(error))
-			}}
+			onClick={() => handleMediaAction('view')}
 		>
 			<div className="flex flex-row gap-2 py-3">
 				<Icons.file className="h-8 w-8 text-primary" />
@@ -220,9 +223,11 @@ const DocumentMessageComponent: React.FC<{ message: DocumentMessage }> = ({ mess
 				</div>
 			</div>
 
-			{/* Download link */}
 			<span
-				onClick={onDownloadClick}
+				onClick={e => {
+					e.stopPropagation()
+					handleMediaAction('download')
+				}}
 				className="cursor-pointer rounded-full border border-muted-foreground text-xs text-muted-foreground group-hover:underline"
 			>
 				<Icons.arrowDown className="size-5 font-bold" />
@@ -245,6 +250,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 }) => {
 	const copyToClipboard = useCopyToClipboard()[1]
 	const [showControls, setShowControls] = useState(false)
+	const { authState } = useAuthState()
 
 	const messageActions: {
 		label: string
@@ -254,47 +260,73 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 		{
 			label: 'Delete',
 			icon: 'trash',
-			// ! TODO: implement delete message
 			onClick: () => {}
 		},
 		{
 			label: 'Reply',
 			icon: 'reply',
-			// ! TODO: implement reply message
 			onClick: () => {}
 		},
 		{
 			label: 'Copy',
 			icon: 'copy',
 			onClick: () => {
-				if (message.messageType === MessageTypeEnum.Text) {
-					copyToClipboard((message.messageData.text || '') as string).catch(error =>
-						console.error(error)
-					)
-				} else if (message.messageType === MessageTypeEnum.Document) {
-					copyToClipboard((message.messageData.link || '') as string).catch(error =>
-						console.error(error)
-					)
-				} else {
-					// do nothing
-				}
-				successNotification({
-					message: 'Copied'
-				})
+				const content =
+					message.messageType === MessageTypeEnum.Text
+						? ((message.messageData.text || '') as string)
+						: message.messageType === MessageTypeEnum.Document
+							? ((message.messageData.link || '') as string)
+							: ''
+
+				copyToClipboard(content)
+				successNotification({ message: 'Copied' })
 			}
-		}
-		// {
-		// 	label: 'React',
-		// 	icon: 'clipboard',
-		// 	onClick: () => {
-		// 		copyToClipboard((message.messageData || '') as string).catch(error =>
-		// 			console.error(error)
-		// 		)
-		// 		successNotification({
-		// 			message: 'Copied'
-		// 		})
-		// 	}
-		// }
+		},
+		...(message.messageType !== MessageTypeEnum.Text &&
+		message.messageType !== MessageTypeEnum.Location &&
+		message.messageType !== MessageTypeEnum.Reaction
+			? [
+					{
+						label: 'Download',
+						icon: 'download' as const,
+						onClick: async () => {
+							try {
+								if (!authState.isAuthenticated) return
+
+								let filename = ''
+
+								if (message.messageType === MessageTypeEnum.Document) {
+									filename =
+										message.messageData.fileName ||
+										`${message.messageData.id}.pdf`
+								}
+
+								if (message.messageType === MessageTypeEnum.Image) {
+									filename = `${message.messageData.id}.png`
+								}
+
+								if (message.messageType === MessageTypeEnum.Video) {
+									filename = `${message.messageData.id}.mp4`
+								}
+
+								if (message.messageType === MessageTypeEnum.Audio) {
+									filename = `${message.messageData.id}.mp3`
+								}
+
+								const url = await fetchMedia(
+									message.messageData.id,
+									message.conversationId,
+									authState.data.token
+								)
+
+								downloadDocument({ url, fileName: filename })
+							} catch (error) {
+								console.error('Download failed:', error)
+							}
+						}
+					}
+				]
+			: [])
 	]
 
 	return (
@@ -308,20 +340,16 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 						: 'p-[3px]',
 				message.direction === MessageDirectionEnum.InBound
 					? 'mr-auto bg-white dark:bg-[#202c33]'
-					: 'ml-auto bg-[#d9fdd3]  text-secondary-foreground dark:bg-[#005c4b]'
+					: 'ml-auto bg-[#d9fdd3] text-secondary-foreground dark:bg-[#005c4b]'
 			)}
 			onMouseEnter={() => {
-				if (message.messageType === MessageTypeEnum.Video) {
-					setShowControls(true)
-				}
+				if (message.messageType === MessageTypeEnum.Video) setShowControls(true)
 			}}
 			onMouseLeave={() => {
-				if (message.messageType === MessageTypeEnum.Video) {
-					setShowControls(false)
-				}
+				if (message.messageType === MessageTypeEnum.Video) setShowControls(false)
 			}}
 		>
-			{isActionsEnabled ? (
+			{isActionsEnabled && (
 				<div className="absolute right-2 top-0 z-50 h-fit">
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger
@@ -342,16 +370,12 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" side="right">
 							{messageActions.map((action, index) => {
-								const Icon = Icons[action.icon]
+								const Icon = Icons[action.icon] as any
 								return (
 									<DropdownMenuItem
 										key={index}
-										onClick={() => {
-											if (action.onClick) {
-												action.onClick()
-											}
-										}}
-										className="flex  flex-row items-center gap-2"
+										onClick={action.onClick}
+										className="flex items-center gap-2"
 									>
 										<Icon className="size-4" />
 										{action.label}
@@ -361,7 +385,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
-			) : null}
+			)}
 			<div className="relative w-fit overflow-hidden">
 				<div className="flex w-full items-center justify-between">
 					{message.messageType === MessageTypeEnum.Text ? (
@@ -430,14 +454,13 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 						: 'relative z-10 float-right mb-[-5px] ml-2 mt-[-10px] text-muted-foreground'
 				)}
 			>
-				{message.createdAt ? (
-					<span className={clsx(' text-[11px] font-semibold')}>
+				{message.createdAt && (
+					<span className="text-[11px] font-semibold">
 						{dayjs(message.createdAt).format('hh:mm A')}
 					</span>
-				) : null}
-
-				{message.direction === MessageDirectionEnum.OutBound ? (
-					<div className="">
+				)}
+				{message.direction === MessageDirectionEnum.OutBound && (
+					<div>
 						{message.status === MessageStatusEnum.Delivered ? (
 							<Icons.doubleCheck
 								className={clsx(
@@ -462,7 +485,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 							<Icons.doubleCheck className="h-4 w-4 text-green-500" />
 						) : null}
 					</div>
-				) : null}
+				)}
 			</div>
 		</div>
 	)

@@ -19,9 +19,12 @@ export function DateTimePicker(props: Props) {
 	const { onChange, defaultDate } = props
 	const [date, setDate] = useState<Date>(defaultDate || dayjs().add(1, 'day').toDate())
 
-	const onChangeDate = useCallback((newDate: Date) => {
-		onChange(newDate)
-	}, [onChange])
+	const onChangeDate = useCallback(
+		(newDate: Date) => {
+			onChange(newDate)
+		},
+		[onChange]
+	)
 
 	useEffect(() => {
 		if (!date) return

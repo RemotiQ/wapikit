@@ -208,16 +208,11 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 	campaignId := queryParams.CampaignId
 	status := queryParams.Status
 	// listIds := queryParams.ListId
-	// order := queryParams.Order
 
 	if page == 0 || limit > 50 {
 		return context.JSON(http.StatusBadRequest, "Invalid page or perPage value")
 	}
 
-	// ! fetch conversations from the database paginated
-	// ! always keep the unresolved conversation with unread messages on top, sorted by the latest messages
-	// ! always fetch the last 20 messages from each conversation
-	// ! fetch the user assigned to the conversation
 	type FetchedConversation struct {
 		model.Conversation
 		Contact struct {
@@ -233,6 +228,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 			User model.User `json:"user"`
 		} `json:"assignedTo"`
 		NumberOfUnreadMessages int `json:"numberOfUnreadMessages"`
+		TotalMessages          int `json:"totalMessages"`
 	}
 
 	var fetchedConversations []FetchedConversation
@@ -259,6 +255,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 	conversationCte := CTE("conversations")
 	messagesCte := CTE("messages")
 	unreadCountCte := CTE("numberOfUnreadMessages")
+	paginationMetaCte := CTE("paginationMeta")
 
 	conversationIdColumn := table.Conversation.UniqueId.From(conversationCte)
 	createdAtMessageColumn := table.Message.CreatedAt.From(messagesCte)
@@ -306,6 +303,14 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 				table.Message.ConversationId.EQ(conversationIdColumn),
 			),
 		),
+		paginationMetaCte.AS(
+			SELECT(
+				COUNT(table.Message.UniqueId).AS("totalMessages"),
+			).FROM(table.Message, conversationCte).
+				WHERE(
+					table.Message.ConversationId.EQ(conversationIdColumn),
+				),
+		),
 		messagesCte.AS(
 			SELECT(
 				table.Message.AllColumns,
@@ -316,13 +321,14 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 				ORDER_BY(
 					table.Message.CreatedAt.DESC(),
 				).
-				LIMIT(100)),
+				LIMIT(10)),
 	)(
 		SELECT(
 			conversationCte.AllColumns(),
 			messagesCte.AllColumns(),
 			unreadCountCte.AllColumns().As("FetchedConversation"),
-		).FROM(conversationCte, messagesCte, unreadCountCte).
+			paginationMetaCte.AllColumns().As("FetchedConversation"),
+		).FROM(conversationCte, messagesCte, unreadCountCte, paginationMetaCte).
 			ORDER_BY(
 				createdAtMessageColumn.ASC(),
 			),
@@ -372,6 +378,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 			Status:                 api_types.ConversationStatusEnum(conversation.Status.String()),
 			Messages:               []api_types.MessageSchema{},
 			NumberOfUnreadMessages: conversation.NumberOfUnreadMessages,
+			TotalMessages:          &conversation.TotalMessages,
 			Contact: api_types.ContactWithoutConversationSchema{
 				UniqueId:   conversation.Contact.UniqueId.String(),
 				Name:       conversation.Contact.Name,
@@ -626,12 +633,8 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 	page := queryParams.Page
 	limit := queryParams.PerPage
 
-	if page == 0 || limit > 50 {
+	if page == 0 || limit > 200 {
 		return context.JSON(http.StatusBadRequest, "Invalid page or perPage value")
-	}
-
-	type FetchedMessage struct {
-		model.Message
 	}
 
 	var dest []struct {
@@ -639,18 +642,40 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 		model.Message
 	}
 
-	messageQuery := SELECT(
-		table.Message.AllColumns,
-		COUNT(table.Contact.UniqueId).OVER().AS("totalMessages"),
-	).FROM(table.Message).
-		WHERE(
-			table.Message.ConversationId.EQ(UUID(conversationUuid)),
-		).
-		ORDER_BY(
-			table.Message.CreatedAt.ASC(),
-		).
-		LIMIT(limit).
-		OFFSET((page - 1) * limit)
+	messagesCte := CTE("messages")
+	paginationMetaCte := CTE("paginationMeta")
+
+	createdAtMessageColumn := table.Message.CreatedAt.From(messagesCte)
+
+	messageQuery := WITH(
+		messagesCte.AS(
+			SELECT(
+				table.Message.AllColumns,
+			).FROM(table.Message).
+				WHERE(
+					table.Message.ConversationId.EQ(UUID(conversationUuid)),
+				).
+				ORDER_BY(
+					table.Message.CreatedAt.DESC(),
+				).
+				LIMIT(limit).
+				OFFSET((page-1)*limit),
+		),
+		paginationMetaCte.AS(
+			SELECT(
+				COUNT(table.Message.UniqueId).AS("totalMessages"),
+			).FROM(table.Message).
+				WHERE(
+					table.Message.ConversationId.EQ(UUID(conversationUuid)),
+				),
+		),
+	)(
+		SELECT(
+			messagesCte.AllColumns(),
+			paginationMetaCte.AllColumns(),
+		).FROM(messagesCte, paginationMetaCte).
+			ORDER_BY(createdAtMessageColumn.ASC()),
+	)
 
 	err = messageQuery.QueryContext(context.Request().Context(), context.App.Db, &dest)
 

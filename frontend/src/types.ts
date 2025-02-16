@@ -52,7 +52,6 @@ export type TipCardPropType = {
 	description: string
 	href: string
 	ctaText: string
-
 }
 
 export const UtmTags = [

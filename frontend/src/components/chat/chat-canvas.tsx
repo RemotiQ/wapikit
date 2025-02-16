@@ -20,6 +20,7 @@ import {
 	MessageTypeEnum,
 	type NewMessageDataSchema,
 	useAssignConversation,
+	useGetConversationMessages,
 	useGetConversationResponseSuggestions,
 	useGetOrganizationMembers,
 	useMarkConversationAsRead,
@@ -69,6 +70,36 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const currentConversation = conversations.find(
 		conversation => conversation.uniqueId === conversationId
 	)
+
+	const pageSize = 100
+
+	const [page, setPage] = useState(1)
+	const [messages, setMessages] = useState<MessageSchema[]>([])
+
+	useEffect(() => {
+		setPage(1)
+		setMessages([])
+	}, [currentConversation?.uniqueId])
+
+	const { data: conversationMessages, isLoading } = useGetConversationMessages(
+		currentConversation?.uniqueId || '',
+		{ page, per_page: pageSize },
+		{ query: { enabled: !!currentConversation } }
+	)
+
+	useEffect(() => {
+		if (conversationMessages && conversationMessages.messages) {
+			if (page === 1) {
+				setMessages(conversationMessages.messages)
+			} else {
+				setMessages(prev => [...conversationMessages.messages, ...prev])
+			}
+		}
+	}, [conversationMessages, page])
+
+	const loadMore = () => {
+		setPage(prev => prev + 1)
+	}
 
 	const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>()
 
@@ -268,11 +299,6 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const sendMessage = useCallback(
 		async (message: string) => {
 			try {
-				console.log('sendMessage', {
-					currentConversation,
-					message
-				})
-
 				if (!currentConversation || (!message && !attachedFiles.length)) return
 				setIsBusy(true)
 
@@ -421,7 +447,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		]
 	)
 
-	const groupedMessages = groupMessagesByDate(currentConversation?.messages || [])
+	const groupedMessages = groupMessagesByDate(messages)
 
 	return (
 		<div className="relative flex h-full flex-col justify-between">
@@ -600,6 +626,24 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 							className="relative flex h-full flex-col  gap-2"
 							ref={messagesContainerRef}
 						>
+							{currentConversation.totalMessages &&
+							messages.length < currentConversation.totalMessages ? (
+								<div className="my-2 flex w-full justify-center">
+									<span
+										className="z-50 cursor-pointer rounded bg-gray-200 px-2 py-0.5 text-sm text-gray-700 dark:bg-[#2a3942] dark:text-gray-300"
+										onClick={() => {
+											if (isLoading) return
+											loadMore()
+										}}
+									>
+										{isLoading ? (
+											<div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-l-primary" />
+										) : (
+											<> Load More</>
+										)}
+									</span>
+								</div>
+							) : null}
 							{groupedMessages.map((group, groupIndex) => (
 								<div
 									key={groupIndex}

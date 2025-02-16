@@ -401,22 +401,22 @@ export default function Page() {
 												</div>
 											</div>
 
-											<div className="object-fit h-full w-full flex items-center justify-center rounded-lg bg-accent">
+											<div className="object-fit flex h-full w-full items-center justify-center rounded-lg bg-accent">
 												<Image
 													src={'/assets/dashboard/campaign.svg'}
 													height={200}
 													width={250}
 													alt="campaigns"
-													className='opacity-75'
+													className="opacity-75"
 												/>
 											</div>
 										</div>
-										<div className='flex flex-col w-full'>
+										<div className="flex w-full flex-col">
 											<Separator orientation="horizontal" className="" />
 											<Link
 												key={'send_more_cta'}
 												href={'/campaigns/new-or-edit'}
-												className="pl-3 hover:cursor-pointer mt-2"
+												className="mt-2 pl-3 hover:cursor-pointer"
 											>
 												<Button
 													variant={'link'}

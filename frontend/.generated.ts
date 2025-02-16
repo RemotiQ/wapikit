@@ -806,6 +806,7 @@ export interface ConversationSchema {
 	messages: MessageSchema[]
 	createdAt: string
 	numberOfUnreadMessages: number
+	totalMessages?: number
 	status: ConversationStatusEnum
 	assignedTo?: OrganizationMemberSchema
 	tags: TagSchema[]
