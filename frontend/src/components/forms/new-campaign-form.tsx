@@ -206,7 +206,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 					if (data.templateId) {
 						// fetch the template here and show the modal
 
-						const templateInuse = await getTemplateById(data.templateId)
+						const templateInuse = (await getTemplateById(data.templateId)).template
 						if (!templateInuse) {
 							errorNotification({
 								message:
@@ -215,6 +215,12 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						}
 
 						setIsTemplateComponentsInputModalOpen(true)
+
+						const parameterCount = countParameterCountInTemplateComponent(templateInuse)
+
+						if (parameterCount === 0) {
+							router.push(`/campaigns`)
+						}
 					} else {
 						router.push(`/campaigns`)
 					}
@@ -834,7 +840,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 							/>
 
 							<div className="flex items-center gap-6">
-								<FormField
+								{/* <FormField
 									control={campaignForm.control}
 									name="isLinkTrackingEnabled"
 									render={({ field }) => (
@@ -850,7 +856,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											<FormMessage />
 										</FormItem>
 									)}
-								/>
+								/> */}
 								<div className="">
 									<FormItem className="flex items-center gap-2">
 										<Checkbox

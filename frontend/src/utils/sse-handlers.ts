@@ -14,14 +14,13 @@ export function messageEventHandler(params: {
 			convo => convo.uniqueId === eventData.message.conversationId
 		)
 
-		console.log({ conversation })
-
 		if (!conversation) {
 			return false
 		}
 
 		const updatedConversation: ConversationSchema = {
 			...conversation,
+			numberOfUnreadMessages: conversation.numberOfUnreadMessages + 1,
 			messages: [...conversation.messages, eventData.message as MessageSchema]
 		}
 

@@ -1,8 +1,6 @@
 import {
-	ArrowRight,
 	CircuitBoardIcon,
 	Command,
-	CreditCard,
 	HelpCircle,
 	Loader2,
 	LogIn,
@@ -16,15 +14,11 @@ import {
 import {
 	CodeIcon,
 	ExternalLinkIcon,
-	DotsVerticalIcon,
-	InfoCircledIcon,
 	ClipboardCopyIcon,
 	Cross2Icon,
 	ImageIcon,
 	FileIcon,
 	FileTextIcon,
-	MoonIcon,
-	SunIcon,
 	Link2Icon,
 	CrossCircledIcon,
 	PauseIcon,
@@ -34,31 +28,28 @@ import {
 	TwitterLogoIcon,
 	RowsIcon,
 	MinusCircledIcon,
-	DownloadIcon,
 	ExitIcon,
-	ClockIcon,
 	RotateCounterClockwiseIcon,
 	CheckCircledIcon,
-	ArrowUpIcon,
-	DotFilledIcon
+	DotFilledIcon,
+	StarFilledIcon,
+	GitHubLogoIcon,
+	CaretSortIcon
 } from '@radix-ui/react-icons'
 import { Avatar } from '@radix-ui/react-avatar'
 export type Icon = LucideIcon
 
 export const Icons = {
-	arrowUp: ArrowUpIcon,
+	caretSort: CaretSortIcon,
+	github: GitHubLogoIcon,
+	starfilled: StarFilledIcon,
 	checkCircle: CheckCircledIcon,
 	arrowClockwise: RotateCounterClockwiseIcon,
-
-	clock: ClockIcon,
-	download: DownloadIcon,
 	brain: Brain,
 	pointer: Pointer,
 	code: CodeIcon,
 	exit: ExitIcon,
 	externalLink: ExternalLinkIcon,
-	menu: DotsVerticalIcon,
-	info: InfoCircledIcon,
 	forward: Forward,
 	reply: Reply,
 	clipboard: ClipboardCopyIcon,
@@ -73,13 +64,9 @@ export const Icons = {
 	page: FileIcon,
 	dotFilled: DotFilledIcon,
 	media: ImageIcon,
-	billing: CreditCard,
 	warning: ExclamationTriangleIcon,
-	user: PersonIcon,
-	arrowRight: ArrowRight,
 	help: HelpCircle,
-	sun: SunIcon,
-	moon: MoonIcon,
+
 	laptop: PersonIcon,
 	link: Link2Icon,
 	xCircle: CrossCircledIcon,
@@ -87,23 +74,23 @@ export const Icons = {
 	play: PlayIcon,
 	removeUser: MinusCircledIcon,
 	rows: RowsIcon,
-	gitHub: ({ ...props }: LucideProps) => (
-		<svg
-			aria-hidden="true"
-			focusable="false"
-			data-prefix="fab"
-			data-icon="github"
-			role="img"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 496 512"
-			{...props}
-		>
-			<path
-				fill="currentColor"
-				d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
-			></path>
-		</svg>
-	),
+	// gitHub: ({ ...props }: LucideProps) => (
+	// 	<svg
+	// 		aria-hidden="true"
+	// 		focusable="false"
+	// 		data-prefix="fab"
+	// 		data-icon="github"
+	// 		role="img"
+	// 		xmlns="http://www.w3.org/2000/svg"
+	// 		viewBox="0 0 496 512"
+	// 		{...props}
+	// 	>
+	// 		<path
+	// 			fill="currentColor"
+	// 			d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+	// 		></path>
+	// 	</svg>
+	// ),
 	whatsapp: ({ ...props }: LucideProps) => (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -351,6 +338,60 @@ export const Icons = {
 			/>
 		</svg>
 	),
+	arrowCircleRight: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M12 16L16 12M16 12L12 8M16 12H8M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	arrowCircleDown: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M8 12L12 16M12 16L16 12M12 16V8M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	arrowCircleUp: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M16 12L12 8M12 8L8 12M12 8V16M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
 	arrowLeft: ({ ...props }: LucideProps) => (
 		<svg
 			width="24"
@@ -369,7 +410,7 @@ export const Icons = {
 			/>
 		</svg>
 	),
-	arrowNarrowLeft: ({ ...props }: LucideProps) => (
+	arrowRight: ({ ...props }: LucideProps) => (
 		<svg
 			width="24"
 			height="24"
@@ -379,7 +420,205 @@ export const Icons = {
 			{...props}
 		>
 			<path
-				d="M20 12H4M4 12L10 18M4 12L10 6"
+				d="M5 12H19M19 12L12 5M19 12L12 19"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	arrowDown: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M12 5V19M12 19L19 12M12 19L5 12"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	arrowUp: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M12 19V5M12 5L5 12M12 5L19 12"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	chevronLeft: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M15 18L9 12L15 6"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	chevronRight: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M9 18L15 12L9 6"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	chevronUp: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M18 15L12 9L6 15"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	chevronDown: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M6 9L12 15L18 9"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	doubleArrowRight: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M6 17L11 12L6 7M13 17L18 12L13 7"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	doubleArrowLeft: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M18 17L13 12L18 7M11 17L6 12L11 7"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	doubleArrowUp: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M17 18L12 13L7 18M17 11L12 6L7 11"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	doubleArrowDown: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M7 13L12 18L17 13M7 6L12 11L17 6"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	download: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M8 12.0001L12 16.0001M12 16.0001L16 12.0001M12 16.0001V6.80006C12 5.40935 12 4.714 11.4495 3.93546C11.0837 3.41818 10.0306 2.77974 9.40278 2.69468C8.45789 2.56666 8.09907 2.75384 7.38143 3.1282C4.18333 4.79649 2 8.14331 2 12.0001C2 17.5229 6.47715 22.0001 12 22.0001C17.5228 22.0001 22 17.5229 22 12.0001C22 8.29865 19.989 5.06693 17 3.33788"
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
@@ -399,7 +638,7 @@ export const Icons = {
 			<path
 				d="M12 14V10.5M12 7H12.01M9.9 19.2L11.36 21.1467C11.5771 21.4362 11.6857 21.5809 11.8188 21.6327C11.9353 21.678 12.0647 21.678 12.1812 21.6327C12.3143 21.5809 12.4229 21.4362 12.64 21.1467L14.1 19.2C14.3931 18.8091 14.5397 18.6137 14.7185 18.4645C14.9569 18.2656 15.2383 18.1248 15.5405 18.0535C15.7671 18 16.0114 18 16.5 18C17.8978 18 18.5967 18 19.1481 17.7716C19.8831 17.4672 20.4672 16.8831 20.7716 16.1481C21 15.5967 21 14.8978 21 13.5V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V13.5C3 14.8978 3 15.5967 3.22836 16.1481C3.53284 16.8831 4.11687 17.4672 4.85195 17.7716C5.40326 18 6.10218 18 7.5 18C7.98858 18 8.23287 18 8.45951 18.0535C8.76169 18.1248 9.04312 18.2656 9.2815 18.4645C9.46028 18.6137 9.60685 18.8091 9.9 19.2Z"
 				stroke="currentColor"
-				strokeWidth="2"
+				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
 			/>
@@ -470,6 +709,42 @@ export const Icons = {
 		>
 			<path
 				d="M18 20V10M12 20V4M6 20V14"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	sun: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M12 2V4M12 20V22M4 12H2M6.31412 6.31412L4.8999 4.8999M17.6859 6.31412L19.1001 4.8999M6.31412 17.69L4.8999 19.1042M17.6859 17.69L19.1001 19.1042M22 12H20M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	moon: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M21.9548 12.9566C20.5779 15.3719 17.9791 17.0003 15 17.0003C10.5817 17.0003 7 13.4186 7 9.00033C7 6.02096 8.62867 3.42199 11.0443 2.04517C5.96975 2.52631 2 6.79961 2 12.0001C2 17.5229 6.47715 22.0001 12 22.0001C17.2002 22.0001 21.4733 18.0308 21.9548 12.9566Z"
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
@@ -574,6 +849,112 @@ export const Icons = {
 			/>
 			<path
 				d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	dotsHorizontal: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	dotsGrid: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M19 6C19.5523 6 20 5.55228 20 5C20 4.44772 19.5523 4 19 4C18.4477 4 18 4.44772 18 5C18 5.55228 18.4477 6 19 6Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M19 20C19.5523 20 20 19.5523 20 19C20 18.4477 19.5523 18 19 18C18.4477 18 18 18.4477 18 19C18 19.5523 18.4477 20 19 20Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5 6C5.55228 6 6 5.55228 6 5C6 4.44772 5.55228 4 5 4C4.44772 4 4 4.44772 4 5C4 5.55228 4.44772 6 5 6Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M5 20C5.55228 20 6 19.5523 6 19C6 18.4477 5.55228 18 5 18C4.44772 18 4 18.4477 4 19C4 19.5523 4.44772 20 5 20Z"
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
@@ -974,17 +1355,17 @@ export const Icons = {
 			/>
 		</svg>
 	),
-	chevronLeft: ({ ...props }: LucideProps) => (
+	clock: ({ ...props }: LucideProps) => (
 		<svg
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
+			width="22"
+			height="22"
+			viewBox="0 0 22 22"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			{...props}
 		>
 			<path
-				d="M15 18L9 12L15 6"
+				d="M11 5V11L15 13M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
@@ -992,7 +1373,7 @@ export const Icons = {
 			/>
 		</svg>
 	),
-	chevronRight: ({ ...props }: LucideProps) => (
+	menu: ({ ...props }: LucideProps) => (
 		<svg
 			width="24"
 			height="24"
@@ -1002,43 +1383,7 @@ export const Icons = {
 			{...props}
 		>
 			<path
-				d="M9 18L15 12L9 6"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-		</svg>
-	),
-	chevronUp: ({ ...props }: LucideProps) => (
-		<svg
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			{...props}
-		>
-			<path
-				d="M18 15L12 9L6 15"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-		</svg>
-	),
-	chevronDown: ({ ...props }: LucideProps) => (
-		<svg
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			{...props}
-		>
-			<path
-				d="M6 9L12 15L18 9"
+				d="M3 12H21M3 6H21M3 18H21"
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
@@ -1408,6 +1753,156 @@ export const Icons = {
 				d="M6.2381 10.4805L12.3333 16.4545L23 6M1 10.4805L8.03401 17.5M17.7619 6L11.3619 12.2727"
 				stroke="currentColor"
 				strokeWidth="1.5"
+			/>
+		</svg>
+	),
+	headphone: ({ ...props }: LucideProps) => (
+		<svg
+			width="20"
+			height="20"
+			viewBox="0 0 20 20"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M17 15H17.4C17.9601 15 18.2401 15 18.454 14.891C18.6422 14.7951 18.7951 14.6422 18.891 14.454C19 14.2401 19 13.9601 19 13.4V10C19 5.02944 14.9706 1 10 1C5.02944 1 1 5.02944 1 10V13.4C1 13.9601 1 14.2401 1.10899 14.454C1.20487 14.6422 1.35785 14.7951 1.54601 14.891C1.75992 15 2.03995 15 2.6 15H3M5 19C3.89543 19 3 18.1046 3 17V13C3 11.8954 3.89543 11 5 11C6.10457 11 7 11.8954 7 13V17C7 18.1046 6.10457 19 5 19ZM15 19C13.8954 19 13 18.1046 13 17V13C13 11.8954 13.8954 11 15 11C16.1046 11 17 11.8954 17 13V17C17 18.1046 16.1046 19 15 19Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	filterFunnel: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M2 4.6C2 4.03995 2 3.75992 2.10899 3.54601C2.20487 3.35785 2.35785 3.20487 2.54601 3.10899C2.75992 3 3.03995 3 3.6 3H20.4C20.9601 3 21.2401 3 21.454 3.10899C21.6422 3.20487 21.7951 3.35785 21.891 3.54601C22 3.75992 22 4.03995 22 4.6V5.26939C22 5.53819 22 5.67259 21.9672 5.79756C21.938 5.90831 21.8901 6.01323 21.8255 6.10776C21.7526 6.21443 21.651 6.30245 21.4479 6.4785L15.0521 12.0215C14.849 12.1975 14.7474 12.2856 14.6745 12.3922C14.6099 12.4868 14.562 12.5917 14.5328 12.7024C14.5 12.8274 14.5 12.9618 14.5 13.2306V18.4584C14.5 18.6539 14.5 18.7517 14.4685 18.8363C14.4406 18.911 14.3953 18.9779 14.3363 19.0315C14.2695 19.0922 14.1787 19.1285 13.9971 19.2012L10.5971 20.5612C10.2296 20.7082 10.0458 20.7817 9.89827 20.751C9.76927 20.7242 9.65605 20.6476 9.58325 20.5377C9.5 20.4122 9.5 20.2142 9.5 19.8184V13.2306C9.5 12.9618 9.5 12.8274 9.46715 12.7024C9.43805 12.5917 9.39014 12.4868 9.32551 12.3922C9.25258 12.2856 9.15102 12.1975 8.94789 12.0215L2.55211 6.4785C2.34898 6.30245 2.24742 6.21443 2.17449 6.10776C2.10986 6.01323 2.06195 5.90831 2.03285 5.79756C2 5.67259 2 5.53819 2 5.26939V4.6Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	filterLines: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M6 12H18M3 6H21M9 18H15"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	barChart: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M3 11L3 21M15 11L15 21M9 3L9 21M21 3V21"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	intersectSquare: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M2 5.2C2 4.07989 2 3.51984 2.21799 3.09202C2.40973 2.71569 2.71569 2.40973 3.09202 2.21799C3.51984 2 4.0799 2 5.2 2H12.8C13.9201 2 14.4802 2 14.908 2.21799C15.2843 2.40973 15.5903 2.71569 15.782 3.09202C16 3.51984 16 4.0799 16 5.2V12.8C16 13.9201 16 14.4802 15.782 14.908C15.5903 15.2843 15.2843 15.5903 14.908 15.782C14.4802 16 13.9201 16 12.8 16H5.2C4.07989 16 3.51984 16 3.09202 15.782C2.71569 15.5903 2.40973 15.2843 2.21799 14.908C2 14.4802 2 13.9201 2 12.8V5.2Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M8 11.2C8 10.0799 8 9.51984 8.21799 9.09202C8.40973 8.71569 8.71569 8.40973 9.09202 8.21799C9.51984 8 10.0799 8 11.2 8H18.8C19.9201 8 20.4802 8 20.908 8.21799C21.2843 8.40973 21.5903 8.71569 21.782 9.09202C22 9.51984 22 10.0799 22 11.2V18.8C22 19.9201 22 20.4802 21.782 20.908C21.5903 21.2843 21.2843 21.5903 20.908 21.782C20.4802 22 19.9201 22 18.8 22H11.2C10.0799 22 9.51984 22 9.09202 21.782C8.71569 21.5903 8.40973 21.2843 8.21799 20.908C8 20.4802 8 19.9201 8 18.8V11.2Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	layersThwo: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M2 14.5L11.6422 19.3211C11.7734 19.3867 11.839 19.4195 11.9078 19.4324C11.9687 19.4438 12.0313 19.4438 12.0922 19.4324C12.161 19.4195 12.2266 19.3867 12.3578 19.3211L22 14.5M2 9.5L11.6422 4.67889C11.7734 4.6133 11.839 4.5805 11.9078 4.5676C11.9687 4.55616 12.0313 4.55616 12.0922 4.5676C12.161 4.5805 12.2266 4.6133 12.3578 4.67889L22 9.5L12.3578 14.3211C12.2266 14.3867 12.161 14.4195 12.0922 14.4324C12.0313 14.4438 11.9687 14.4438 11.9078 14.4324C11.839 14.4195 11.7734 14.3867 11.6422 14.3211L2 9.5Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	layersThree: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M2 12L11.6422 16.8211C11.7734 16.8867 11.839 16.9195 11.9078 16.9324C11.9687 16.9438 12.0313 16.9438 12.0922 16.9324C12.161 16.9195 12.2266 16.8867 12.3578 16.8211L22 12M2 17L11.6422 21.8211C11.7734 21.8867 11.839 21.9195 11.9078 21.9324C11.9687 21.9438 12.0313 21.9438 12.0922 21.9324C12.161 21.9195 12.2266 21.8867 12.3578 21.8211L22 17M2 7L11.6422 2.17889C11.7734 2.1133 11.839 2.0805 11.9078 2.0676C11.9687 2.05616 12.0313 2.05616 12.0922 2.0676C12.161 2.0805 12.2266 2.1133 12.3578 2.17889L22 7L12.3578 11.8211C12.2266 11.8867 12.161 11.9195 12.0922 11.9324C12.0313 11.9438 11.9687 11.9438 11.9078 11.9324C11.839 11.9195 11.7734 11.8867 11.6422 11.8211L2 7Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	),
+	layout: ({ ...props }: LucideProps) => (
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path
+				d="M3 9H21M9 9L9 21M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
 			/>
 		</svg>
 	),

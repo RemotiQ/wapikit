@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	mathRandom "math/rand"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"reflect"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -199,4 +201,55 @@ func ParseName(fullName string) (string, string) {
 	firstName := parts[0]
 	lastName := strings.Join(parts[1:], " ")
 	return firstName, lastName
+}
+
+func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal data: %w", err)
+	}
+	var result T
+	if err := json.Unmarshal(b, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal data into target struct: %w", err)
+	}
+	return &result, nil
+}
+
+// SortByDateField sorts a slice of structs by a given date field name
+func SortByDateField(slice interface{}, dateField string, ascending bool) error {
+	// Get the reflect value of the slice
+	val := reflect.ValueOf(slice)
+	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Slice {
+		return fmt.Errorf("slice must be a pointer to a slice")
+	}
+
+	// Dereference slice pointer
+	sliceVal := val.Elem()
+
+	// Check if slice is empty
+	if sliceVal.Len() == 0 {
+		return nil
+	}
+
+	// Check if field exists
+	firstElem := sliceVal.Index(0)
+	field := firstElem.FieldByName(dateField)
+	if !field.IsValid() || field.Type() != reflect.TypeOf(time.Time{}) {
+		return fmt.Errorf("field '%s' not found or not of type time.Time", dateField)
+	}
+
+	// Perform sorting
+	sort.SliceStable(sliceVal.Interface(), func(i, j int) bool {
+		// Get date field values
+		dateI := sliceVal.Index(i).FieldByName(dateField).Interface().(time.Time)
+		dateJ := sliceVal.Index(j).FieldByName(dateField).Interface().(time.Time)
+
+		// Sort based on ascending/descending flag
+		if ascending {
+			return dateI.Before(dateJ)
+		}
+		return dateI.After(dateJ)
+	})
+
+	return nil
 }

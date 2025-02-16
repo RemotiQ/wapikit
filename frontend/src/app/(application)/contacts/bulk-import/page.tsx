@@ -50,7 +50,7 @@ const Logs = (props: {
 					)}
 				>
 					{log.type === 'error' ? (
-						<Icons.info className="size-4 text-red-500" />
+						<Icons.infoCircle className="size-4 text-red-500" />
 					) : (
 						<Icons.check className="size-4 text-primary" />
 					)}

@@ -5,7 +5,6 @@ import { CardHeader, CardFooter } from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Button } from '~/components/ui/button'
-import { SendIcon, Image as ImageIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
 	DropdownMenu,
@@ -17,16 +16,26 @@ import { Icons } from '../icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
 	type ConversationSchema,
+	type MessageSchema,
 	MessageTypeEnum,
+	type NewMessageDataSchema,
 	useAssignConversation,
+	useGetConversationMessages,
 	useGetConversationResponseSuggestions,
 	useGetOrganizationMembers,
+	useMarkConversationAsRead,
 	useSendMessageInConversation,
 	useUnassignConversation
 } from 'root/.generated'
 import MessageRenderer from './message-renderer'
 import { useRouter } from 'next/navigation'
-import { errorNotification, successNotification } from '~/reusable-functions'
+import {
+	determineMessageType,
+	errorNotification,
+	getDayLabel,
+	groupMessagesByDate,
+	successNotification
+} from '~/reusable-functions'
 import { Modal } from '../ui/modal'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select'
@@ -43,17 +52,54 @@ import { useScrollToBottom } from '~/hooks/use-scroll-to-bottom'
 import { SparklesIcon } from '../ai/icons'
 import { clsx } from 'clsx'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
+import { useUploadMedia } from '~/hooks/use-upload-media'
+import dayjs from 'dayjs'
+import { PreviewAttachment } from './file-attachment-preview'
+import { type ConversationFileAttachmentType } from '~/types'
 
 const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const [isBusy, setIsBusy] = useState(false)
 	const [isConversationAssignModalOpen, setIsConversationAssignModalOpen] = useState(false)
 	const { conversations } = useConversationInboxStore()
 
-	const inputRef = useRef<HTMLInputElement>(null)
+	const fileInputRef = useRef<HTMLInputElement>(null)
+	const textInputRef = useRef<HTMLInputElement>(null)
+
+	const [attachedFiles, setAttachedFiles] = useState<ConversationFileAttachmentType[]>([])
 
 	const currentConversation = conversations.find(
 		conversation => conversation.uniqueId === conversationId
 	)
+
+	const pageSize = 100
+
+	const [page, setPage] = useState(1)
+	const [messages, setMessages] = useState<MessageSchema[]>([])
+
+	useEffect(() => {
+		setPage(1)
+		setMessages([])
+	}, [currentConversation?.uniqueId])
+
+	const { data: conversationMessages, isLoading } = useGetConversationMessages(
+		currentConversation?.uniqueId || '',
+		{ page, per_page: pageSize },
+		{ query: { enabled: !!currentConversation } }
+	)
+
+	useEffect(() => {
+		if (conversationMessages && conversationMessages.messages) {
+			if (page === 1) {
+				setMessages(conversationMessages.messages)
+			} else {
+				setMessages(prev => [...conversationMessages.messages, ...prev])
+			}
+		}
+	}, [conversationMessages, page])
+
+	const loadMore = () => {
+		setPage(prev => prev + 1)
+	}
 
 	const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>()
 
@@ -64,6 +110,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const assignConversationMutation = useAssignConversation()
 	const unassignConversationMutation = useUnassignConversation()
 	const sendMessageInConversation = useSendMessageInConversation()
+	const { mutateAsync: markAsRead, isPending } = useMarkConversationAsRead()
 
 	const assignConversationForm = useForm<z.infer<typeof AssignConversationForm>>({
 		resolver: zodResolver(AssignConversationForm)
@@ -167,7 +214,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		},
 		{
 			label: 'Info',
-			icon: 'info',
+			icon: 'infoCircle',
 			onClick: () => {
 				writeProperty({
 					contactSheetContactId: currentConversation?.contact.uniqueId
@@ -177,6 +224,35 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	]
 
 	const [messageContent, setMessageContent] = useState<string | null>(null)
+
+	useEffect(() => {
+		if (!isPending && currentConversation && currentConversation.numberOfUnreadMessages > 0) {
+			markAsRead({
+				id: currentConversation.uniqueId
+			})
+				.then(data => {
+					if (data.isRead) {
+						writeConversationInboxStoreProperty({
+							conversations: conversations.map(convo =>
+								convo.uniqueId === currentConversation.uniqueId
+									? {
+											...convo,
+											numberOfUnreadMessages: 0
+										}
+									: convo
+							)
+						})
+					}
+				})
+				.catch(error => console.error(error))
+		}
+	}, [
+		conversations,
+		currentConversation,
+		isPending,
+		markAsRead,
+		writeConversationInboxStoreProperty
+	])
 
 	const {
 		data: suggestions,
@@ -194,55 +270,163 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		}
 	)
 
+	const { error, uploadMedia } = useUploadMedia(conversationId)
+
+	const pushMessageToConversation = useCallback(
+		(message: MessageSchema) => {
+			const conversation = conversations.find(
+				convo => convo.uniqueId === message.conversationId
+			)
+
+			if (!conversation) {
+				return false
+			}
+
+			const updatedConversation: ConversationSchema = {
+				...conversation,
+				messages: [...conversation.messages, message]
+			}
+
+			writeConversationInboxStoreProperty({
+				conversations: conversations.map(convo =>
+					convo.uniqueId === conversation.uniqueId ? updatedConversation : convo
+				)
+			})
+		},
+		[conversations, writeConversationInboxStoreProperty]
+	)
+
 	const sendMessage = useCallback(
 		async (message: string) => {
 			try {
-				console.log('sendMessage', {
-					currentConversation,
-					message
-				})
-
-				if (!currentConversation || !message) return
-
+				if (!currentConversation || (!message && !attachedFiles.length)) return
 				setIsBusy(true)
 
-				const sendMessageResponse = await sendMessageInConversation.mutateAsync({
-					data: {
-						messageData: {
-							text: message
-						},
-						messageType: MessageTypeEnum.Text
-					},
-					id: currentConversation.uniqueId
-				})
+				// * user can select multiple files at a time, but will be sent as separate messages only
+				if (attachedFiles.length) {
+					const mediaFilesArray = Array.from(attachedFiles)
 
-				if (sendMessageResponse.message) {
-					const conversation = conversations.find(
-						convo => convo.uniqueId === sendMessageResponse.message.conversationId
-					)
-
-					if (!conversation) {
-						return false
-					}
-
-					const updatedConversation: ConversationSchema = {
-						...conversation,
-						messages: [...conversation.messages, sendMessageResponse.message]
-					}
-
-					writeConversationInboxStoreProperty({
-						conversations: conversations.map(convo =>
-							convo.uniqueId === conversation.uniqueId ? updatedConversation : convo
+					for (const file of mediaFilesArray) {
+						setAttachedFiles(files =>
+							files.map(f => {
+								if (f.fileName === file.fileName) {
+									return {
+										...f,
+										isUploading: true
+									}
+								}
+								return f
+							})
 						)
-					})
+						const response = await uploadMedia(file.file)
 
-					console.log('Message sent successfully')
+						if (error || !response) {
+							errorNotification({
+								message: error || 'Failed to upload media'
+							})
+							return
+						}
 
-					setMessageContent(() => null)
+						const { mediaId, mediaUrl } = response
+
+						console.log('mediaUrl', mediaUrl)
+
+						// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+						let messageData: NewMessageDataSchema | null = null
+
+						switch (file.mediaType) {
+							case MessageTypeEnum.Audio:
+								messageData = {
+									messageType: MessageTypeEnum.Audio,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							case MessageTypeEnum.Image:
+								messageData = {
+									messageType: MessageTypeEnum.Image,
+									id: mediaId,
+									link: mediaUrl,
+									caption: textInputRef.current?.value
+								}
+								break
+
+							case MessageTypeEnum.Document:
+								messageData = {
+									messageType: MessageTypeEnum.Document,
+									id: mediaId,
+									link: mediaUrl,
+									fileName: file.fileName,
+									caption: textInputRef.current?.value
+								}
+								break
+
+							case MessageTypeEnum.Video:
+								messageData = {
+									messageType: MessageTypeEnum.Video,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							case MessageTypeEnum.Sticker:
+								messageData = {
+									messageType: MessageTypeEnum.Sticker,
+									id: mediaId,
+									link: mediaUrl
+								}
+								break
+
+							default:
+								break
+						}
+
+						if (!messageData) {
+							errorNotification({
+								message: 'Failed to send message'
+							})
+							return
+						}
+
+						const sendMessageResponse = await sendMessageInConversation.mutateAsync({
+							data: {
+								createdAt: dayjs().toISOString(),
+								messageData: messageData
+							},
+							id: currentConversation.uniqueId
+						})
+
+						if (sendMessageResponse.message) {
+							pushMessageToConversation(sendMessageResponse.message)
+							setMessageContent(() => null)
+							setAttachedFiles(files =>
+								files.filter(f => f.fileName !== file.fileName)
+							)
+						} else {
+							errorNotification({
+								message: 'Failed to send message'
+							})
+						}
+					}
+
+					setAttachedFiles(() => [])
+					return
 				} else {
-					errorNotification({
-						message: 'Failed to send message'
+					// TEXT MESSAGE
+					const sendMessageResponse = await sendMessageInConversation.mutateAsync({
+						data: {
+							messageData: {
+								messageType: 'Text',
+								text: message
+							},
+							createdAt: dayjs().toISOString()
+						},
+						id: currentConversation.uniqueId
 					})
+
+					pushMessageToConversation(sendMessageResponse.message)
+					setMessageContent(() => null)
 				}
 			} catch (error) {
 				console.error(error)
@@ -255,26 +439,15 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		},
 		[
 			currentConversation,
+			attachedFiles,
+			uploadMedia,
+			error,
 			sendMessageInConversation,
-			conversations,
-			writeConversationInboxStoreProperty
+			pushMessageToConversation
 		]
 	)
 
-	useEffect(() => {
-		// check if input is focussed, on enter sendMessage function should be called
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (
-				document.activeElement === inputRef.current &&
-				event.key === 'Enter' &&
-				messageContent
-			) {
-				sendMessage(messageContent).catch(error => console.error(error))
-			}
-		}
-
-		inputRef.current?.addEventListener('keydown', handleKeyDown)
-	}, [messageContent, sendMessage])
+	const groupedMessages = groupMessagesByDate(messages)
 
 	return (
 		<div className="relative flex h-full flex-col justify-between">
@@ -444,41 +617,68 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 					{/* ! TODO: this should always open at the end of scroll container */}
 					<ScrollArea
 						className={clsx(
-							'h-screen bg-[#ebe5de] !py-4 px-2 dark:bg-[#111b21]',
+							'relative h-screen bg-[#ebe5de] px-2 dark:bg-[#111b21]',
 							suggestions?.suggestions.length ? '!pb-64' : '!pb-44'
 						)}
 					>
 						<div className='absolute inset-0 z-20 h-full w-full  bg-[url("/assets/chat-canvas-bg.png")] bg-repeat opacity-20' />
-						<div className="flex h-full flex-col gap-1">
-							{currentConversation.messages.map((message, index) => {
-								return (
-									<div
-										className="relative z-30 w-full"
-										key={index}
-										ref={messagesContainerRef}
+						<div
+							className="relative flex h-full flex-col  gap-2"
+							ref={messagesContainerRef}
+						>
+							{currentConversation.totalMessages &&
+							messages.length < currentConversation.totalMessages ? (
+								<div className="my-2 flex w-full justify-center">
+									<span
+										className="z-50 cursor-pointer rounded bg-gray-200 px-2 py-0.5 text-sm text-gray-700 dark:bg-[#2a3942] dark:text-gray-300"
+										onClick={() => {
+											if (isLoading) return
+											loadMore()
+										}}
 									>
+										{isLoading ? (
+											<div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-l-primary" />
+										) : (
+											<> Load More</>
+										)}
+									</span>
+								</div>
+							) : null}
+							{groupedMessages.map((group, groupIndex) => (
+								<div
+									key={groupIndex}
+									className="relative z-30 flex w-full flex-col gap-1"
+								>
+									{/* Date Header */}
+									<div className="my-2 flex w-full justify-center">
+										<span className="rounded bg-gray-200 px-2 py-0.5 text-sm text-gray-700 dark:bg-[#2a3942] dark:text-gray-300">
+											{getDayLabel(group.date)}
+										</span>
+									</div>
+
+									{/* All messages for this date */}
+									{group.messages.map((message, index) => (
 										<MessageRenderer
+											key={message.uniqueId || index}
 											message={message}
 											isActionsEnabled={true}
 										/>
-										<div
-											ref={messagesEndRef}
-											className="min-h-[24px] min-w-[24px] shrink-0"
-										/>
-									</div>
-								)
-							})}
+									))}
+								</div>
+							))}
+							<div ref={messagesEndRef} />
 						</div>
 					</ScrollArea>
 
 					<div className="sticky bottom-0 z-30 ">
+						<div className="pointer-events-none inset-x-px  bottom-0 h-12 bg-gradient-to-t from-[#ebe5de] opacity-50 transition-opacity"></div>
 						{suggestions?.suggestions?.length ? (
 							<motion.div
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 20 }}
 								transition={{ duration: 0.5 }}
-								className="relative z-30 w-full"
+								className="relative z-30 w-full overflow-hidden"
 							>
 								<div className="flex flex-1 flex-row justify-start gap-4 overflow-scroll px-5 pb-4">
 									{suggestions?.suggestions.map((response, index) => {
@@ -517,6 +717,25 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						) : null}
 						<CardFooter className="flex w-full flex-col items-center gap-2 bg-white dark:bg-[#202c33]">
 							<Separator />
+							<div className="mt-2 flex w-full items-center justify-start gap-2 overflow-visible px-2">
+								{attachedFiles.length > 0 && (
+									<div className="flex flex-row items-end gap-2 overflow-x-scroll">
+										{attachedFiles.map(file => (
+											<PreviewAttachment
+												key={file.fileName}
+												attachment={file}
+												removeFile={() => {
+													setAttachedFiles(files =>
+														files.filter(
+															f => f.fileName !== file.fileName
+														)
+													)
+												}}
+											/>
+										))}
+									</div>
+								)}
+							</div>
 							<form
 								className="flex h-full w-full items-center gap-2"
 								onSubmit={e => {
@@ -526,12 +745,43 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									)
 								}}
 							>
-								<div className="flex items-center">
-									<ImageIcon className="size-6" />
+								<div
+									className=""
+									onClick={() => {
+										fileInputRef.current?.click()
+									}}
+								>
+									<Icons.plus className="size-6" />
 								</div>
+
+								{/* file input */}
+								<input
+									type="file"
+									ref={fileInputRef}
+									multiple={true}
+									className="hidden"
+									onChange={e => {
+										const files = e.target.files
+											? Array.from(e.target.files)
+											: []
+										if (files.length === 0) return
+										setAttachedFiles(data => [
+											...data,
+											...files.map(file => ({
+												file,
+												isUploading: false,
+												fileName: file.name,
+												mediaType: determineMessageType(file)
+											}))
+										])
+									}}
+								/>
+
+								{/* text input */}
 								<Input
 									placeholder="Type Message here"
 									className="w-full"
+									ref={textInputRef}
 									type="text"
 									// defaultValue={messageContent || undefined}
 									value={messageContent || ''}
@@ -558,7 +808,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 								)}
 
 								<Button type="submit" className="rounded-lg" disabled={isBusy}>
-									<SendIcon className="size-4" />
+									<Icons.send className="size-4" />
 								</Button>
 							</form>
 						</CardFooter>

@@ -240,18 +240,8 @@ func getContacts(context interfaces.ContextWithSession) error {
 				messages := []api_types.MessageSchema{}
 
 				for _, message := range conversation.Messages {
-					messageData := map[string]interface{}{}
-					json.Unmarshal([]byte(*message.MessageData), &messageData)
-					messageToAppend := api_types.MessageSchema{
-						UniqueId:       message.UniqueId.String(),
-						ConversationId: message.ConversationId.String(),
-						CreatedAt:      message.CreatedAt,
-						Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-						MessageData:    &messageData,
-						MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-						Status:         api_types.MessageStatusEnum(message.Status.String()),
-					}
-					messages = append(messages, messageToAppend)
+					apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message)
+					messages = append(messages, apiMessage)
 				}
 
 				campaignId := ""
@@ -476,18 +466,8 @@ func getContactById(context interfaces.ContextWithSession) error {
 		messages := []api_types.MessageSchema{}
 
 		for _, message := range conversation.Messages {
-			messageData := map[string]interface{}{}
-			json.Unmarshal([]byte(*message.MessageData), &messageData)
-			messageToAppend := api_types.MessageSchema{
-				UniqueId:       message.UniqueId.String(),
-				ConversationId: message.ConversationId.String(),
-				CreatedAt:      message.CreatedAt,
-				Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-				MessageData:    &messageData,
-				MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-				Status:         api_types.MessageStatusEnum(message.Status.String()),
-			}
-			messages = append(messages, messageToAppend)
+			apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message)
+			messages = append(messages, apiMessage)
 		}
 
 		campaignId := ""

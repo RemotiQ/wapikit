@@ -64,7 +64,7 @@ const DocumentationPitch: React.FC<{ type: DocumentationPitchType; className?: s
 					<Icon className={`size-5 group-hover:text-primary`} />
 					<h2 className="text-lg font-semibold ">{title}</h2>
 				</div>
-				<p className="">{description}</p>
+				<p className="text-sm">{description}</p>
 				<Link href={ctaUrl}>
 					<Button>{ctaText}</Button>
 				</Link>

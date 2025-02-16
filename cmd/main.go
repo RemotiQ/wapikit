@@ -14,6 +14,7 @@ import (
 	"github.com/wapikit/wapikit/interfaces"
 	"github.com/wapikit/wapikit/internal/campaign_manager"
 	"github.com/wapikit/wapikit/internal/database"
+	"github.com/wapikit/wapikit/services/conversation_service"
 	"github.com/wapikit/wapikit/services/encryption_service"
 	"github.com/wapikit/wapikit/services/event_service"
 	cache_service "github.com/wapikit/wapikit/services/redis_service"
@@ -125,8 +126,8 @@ func main() {
 		koa.String("app.encryption_key"),
 	)
 
+	app.ConversationService = conversation_service.NewConversationService(dbInstance, logger, redisClient)
 	app.EventService = event_service.NewEventService(dbInstance, logger, redisClient, app.Constants.RedisApiServerEventChannelName)
-
 	app.CampaignManager = campaign_manager.NewCampaignManager(dbInstance, *logger, redisClient, nil, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
 
 	MountServices(app)

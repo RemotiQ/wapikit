@@ -12,7 +12,7 @@ export const REDIRECT_URL_LS = '__redirect_url'
 
 export function getBackendUrl() {
 	if (IS_DEVELOPMENT) {
-		return 'http://127.0.0.1:8000/api'
+		return 'http://192.168.29.32:8000/api'
 	}
 
 	if (IS_MANAGED_CLOUD_EDITION) {
@@ -140,6 +140,8 @@ export const pathAtWhichSidebarShouldBeCollapsedByDefault = ['/conversations']
 export const APP_BASE_DOMAIN = 'app.wapikit.com'
 
 export const APP_URL = `https://${APP_BASE_DOMAIN}`
+
+export const OFFICIAL_DOCUMENTATION_URL = 'https://docs.wapikit.com'
 
 export const ProductDescription =
 	'WapiKit is an AI-powered WhatsApp marketing & customer engagement platform that automates campaigns, enhances conversations, and drives business growth effortlessly with automation.'

@@ -147,7 +147,7 @@ const SubscriptionSettings = () => {
 									variant={'secondary'}
 									className="flex w-full flex-row gap-2"
 								>
-									<Icons.user className="size-4" />
+									<Icons.headphone className="size-4" />
 									Contact Support
 								</Button>
 							</Link>

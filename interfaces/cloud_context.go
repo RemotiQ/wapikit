@@ -19,6 +19,7 @@ import (
 	subscription_service "github.com/wapikit/wapikit-enterprise/services/subscription"
 	"github.com/wapikit/wapikit/api/api_types"
 	"github.com/wapikit/wapikit/internal/campaign_manager"
+	"github.com/wapikit/wapikit/services/conversation_service"
 	"github.com/wapikit/wapikit/services/encryption_service"
 	"github.com/wapikit/wapikit/services/event_service"
 	"github.com/wapikit/wapikit/services/notification_service"
@@ -41,6 +42,7 @@ type App struct {
 	AiService           *ai_service.AiService
 	EncryptionService   *encryption_service.EncryptionService
 	NotificationService *notification_service.NotificationService
+	ConversationService *conversation_service.ConversationService
 	EventService        *event_service.EventService
 }
 

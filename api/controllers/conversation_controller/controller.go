@@ -3,11 +3,13 @@ package conversation_controller
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/wapikit/wapi.go/pkg/components"
 	"github.com/wapikit/wapikit/.db-generated/model"
 	"github.com/wapikit/wapikit/.db-generated/table"
 	"github.com/wapikit/wapikit/api/api_types"
@@ -158,13 +160,40 @@ func NewConversationController() *ConversationController {
 						},
 					},
 				},
+				{
+					Path:                    "/api/conversation/:id/media",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithSession(handleMediaUpload),
+					IsAuthorizationRequired: true,
+					MetaData: interfaces.RouteMetaData{
+						PermissionRoleLevel: api_types.Member,
+						RateLimitConfig: interfaces.RateLimitConfig{
+							MaxRequests:    30,
+							WindowTimeInMs: time.Minute.Milliseconds(),
+						},
+						RequiredPermission: []api_types.RolePermissionEnum{
+							api_types.GetConversation,
+						},
+					},
+				},
+				{
+					Path:                    "/api/conversation/:id/media/:mediaId",
+					Method:                  http.MethodGet,
+					Handler:                 interfaces.HandlerWithSession(handleProxyWhatsAppMedia),
+					IsAuthorizationRequired: true,
+				},
+				{
+					Path:                    "/api/conversation/:id/read",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithSession(markConversationAsRead),
+					IsAuthorizationRequired: true,
+				},
 			},
 		},
 	}
 }
 
 func handleGetConversations(context interfaces.ContextWithSession) error {
-
 	orgId := context.Session.User.OrganizationId
 	orgUuid := uuid.MustParse(orgId)
 
@@ -179,16 +208,10 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 	campaignId := queryParams.CampaignId
 	status := queryParams.Status
 	// listIds := queryParams.ListId
-	// order := queryParams.Order
 
 	if page == 0 || limit > 50 {
 		return context.JSON(http.StatusBadRequest, "Invalid page or perPage value")
 	}
-
-	// ! fetch conversations from the database paginated
-	// ! always keep the unresolved conversation with unread messages on top, sorted by the latest messages
-	// ! always fetch the last 20 messages from each conversation
-	// ! fetch the user assigned to the conversation
 
 	type FetchedConversation struct {
 		model.Conversation
@@ -205,6 +228,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 			User model.User `json:"user"`
 		} `json:"assignedTo"`
 		NumberOfUnreadMessages int `json:"numberOfUnreadMessages"`
+		TotalMessages          int `json:"totalMessages"`
 	}
 
 	var fetchedConversations []FetchedConversation
@@ -228,36 +252,87 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 		conversationWhereQuery = conversationWhereQuery.AND(table.Conversation.InitiatedByCampaignId.EQ(UUID(uuid.MustParse(*campaignId))))
 	}
 
-	conversationQuery := SELECT(
-		table.Conversation.AllColumns,
-		table.Contact.AllColumns,
-		table.ContactListContact.AllColumns,
-		table.ContactList.AllColumns,
-		table.ConversationAssignment.AllColumns,
-		table.OrganizationMember.AllColumns,
-		table.User.AllColumns,
-		table.Message.AllColumns,
-		table.Tag.AllColumns,
-		table.ConversationTag.AllColumns,
-	).FROM(table.Conversation.
-		LEFT_JOIN(table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId)).
-		LEFT_JOIN(table.ContactListContact, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
-		LEFT_JOIN(table.ContactList, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
-		LEFT_JOIN(table.ConversationAssignment, table.Conversation.UniqueId.EQ(table.ConversationAssignment.ConversationId)).
-		LEFT_JOIN(table.OrganizationMember, table.ConversationAssignment.AssignedToOrganizationMemberId.EQ(table.OrganizationMember.UniqueId)).
-		LEFT_JOIN(table.User, table.OrganizationMember.UserId.EQ(table.User.UniqueId)).
-		LEFT_JOIN(table.Message, table.Conversation.UniqueId.EQ(table.Message.ConversationId)).
-		LEFT_JOIN(table.ConversationTag, table.Conversation.UniqueId.EQ(table.ConversationTag.ConversationId)).
-		LEFT_JOIN(table.Tag, table.ConversationTag.TagId.EQ(table.Tag.UniqueId)),
-	).
-		WHERE(conversationWhereQuery).
-		ORDER_BY(
-			Raw(` MAX("Message"."CreatedAt") OVER (PARTITION BY "Conversation"."UniqueId") DESC,
-			     "Message"."CreatedAt" ASC`,
+	conversationCte := CTE("conversations")
+	messagesCte := CTE("messages")
+	unreadCountCte := CTE("numberOfUnreadMessages")
+	paginationMetaCte := CTE("paginationMeta")
+
+	conversationIdColumn := table.Conversation.UniqueId.From(conversationCte)
+	createdAtMessageColumn := table.Message.CreatedAt.From(messagesCte)
+
+	conversationQuery := WITH(
+		conversationCte.AS(
+			SELECT(
+				table.Conversation.AllColumns,
+				table.Contact.AllColumns,
+				table.ContactListContact.AllColumns,
+				table.ContactList.AllColumns,
+				table.ConversationAssignment.AllColumns,
+				table.OrganizationMember.AllColumns,
+				table.User.AllColumns,
+				table.Tag.AllColumns,
+				table.ConversationTag.AllColumns,
+			).FROM(table.Conversation.
+				LEFT_JOIN(table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId)).
+				LEFT_JOIN(table.ContactListContact, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
+				LEFT_JOIN(table.ContactList, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
+				LEFT_JOIN(table.ConversationAssignment, table.Conversation.UniqueId.EQ(table.ConversationAssignment.ConversationId)).
+				LEFT_JOIN(table.OrganizationMember, table.ConversationAssignment.AssignedToOrganizationMemberId.EQ(table.OrganizationMember.UniqueId)).
+				LEFT_JOIN(table.User, table.OrganizationMember.UserId.EQ(table.User.UniqueId)).
+				LEFT_JOIN(table.ConversationTag, table.Conversation.UniqueId.EQ(table.ConversationTag.ConversationId)).
+				LEFT_JOIN(table.Tag, table.ConversationTag.TagId.EQ(table.Tag.UniqueId)),
+			).
+				WHERE(conversationWhereQuery).
+				LIMIT(limit).
+				OFFSET((page-1)*limit),
+		),
+		unreadCountCte.AS(
+			SELECT(
+				COALESCE(
+					SUM(CASE().
+						WHEN(
+							table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Sent.String())).
+								AND(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_InBound.String()))),
+						).
+						THEN(CAST(Int(1)).AS_INTEGER()).
+						ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("numberOfUnreadMessages"),
+			).FROM(
+				table.Message,
+				conversationCte,
+			).WHERE(
+				table.Message.ConversationId.EQ(conversationIdColumn),
 			),
-		).
-		LIMIT(limit).
-		OFFSET((page - 1) * limit)
+		),
+		paginationMetaCte.AS(
+			SELECT(
+				COUNT(table.Message.UniqueId).AS("totalMessages"),
+			).FROM(table.Message, conversationCte).
+				WHERE(
+					table.Message.ConversationId.EQ(conversationIdColumn),
+				),
+		),
+		messagesCte.AS(
+			SELECT(
+				table.Message.AllColumns,
+			).FROM(table.Message, conversationCte).
+				WHERE(
+					table.Message.ConversationId.EQ(conversationIdColumn),
+				).
+				ORDER_BY(
+					table.Message.CreatedAt.DESC(),
+				).
+				LIMIT(10)),
+	)(
+		SELECT(
+			conversationCte.AllColumns(),
+			messagesCte.AllColumns(),
+			unreadCountCte.AllColumns().As("FetchedConversation"),
+			paginationMetaCte.AllColumns().As("FetchedConversation"),
+		).FROM(conversationCte, messagesCte, unreadCountCte, paginationMetaCte).
+			ORDER_BY(
+				createdAtMessageColumn.ASC(),
+			),
+	)
 
 	err := conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &fetchedConversations)
 
@@ -303,6 +378,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 			Status:                 api_types.ConversationStatusEnum(conversation.Status.String()),
 			Messages:               []api_types.MessageSchema{},
 			NumberOfUnreadMessages: conversation.NumberOfUnreadMessages,
+			TotalMessages:          &conversation.TotalMessages,
 			Contact: api_types.ContactWithoutConversationSchema{
 				UniqueId:   conversation.Contact.UniqueId.String(),
 				Name:       conversation.Contact.Name,
@@ -340,22 +416,11 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 		}
 
 		for _, message := range conversation.Messages {
-			messageData := map[string]interface{}{}
-			json.Unmarshal([]byte(*message.MessageData), &messageData)
-			message := api_types.MessageSchema{
-				UniqueId:       message.UniqueId.String(),
-				ConversationId: message.ConversationId.String(),
-				CreatedAt:      message.CreatedAt,
-				Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-				MessageData:    &messageData,
-				MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-				Status:         api_types.MessageStatusEnum(message.Status.String()),
-			}
-			conversationToAppend.Messages = append(conversationToAppend.Messages, message)
+			apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message)
+			conversationToAppend.Messages = append(conversationToAppend.Messages, apiMessage)
 		}
 
 		response.Conversations = append(response.Conversations, conversationToAppend)
-
 	}
 
 	return context.JSON(http.StatusOK, response)
@@ -496,18 +561,8 @@ func handleGetConversationById(context interfaces.ContextWithSession) error {
 	}
 
 	for _, message := range conversation.Messages {
-		messageData := map[string]interface{}{}
-		json.Unmarshal([]byte(*message.MessageData), &messageData)
-		message := api_types.MessageSchema{
-			UniqueId:       message.UniqueId.String(),
-			ConversationId: message.ConversationId.String(),
-			CreatedAt:      message.CreatedAt,
-			Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-			MessageData:    &messageData,
-			MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-			Status:         api_types.MessageStatusEnum(message.Status.String()),
-		}
-		response.Conversation.Messages = append(response.Conversation.Messages, message)
+		apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message)
+		response.Conversation.Messages = append(response.Conversation.Messages, apiMessage)
 	}
 
 	return context.JSON(http.StatusOK, response)
@@ -578,12 +633,8 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 	page := queryParams.Page
 	limit := queryParams.PerPage
 
-	if page == 0 || limit > 50 {
+	if page == 0 || limit > 200 {
 		return context.JSON(http.StatusBadRequest, "Invalid page or perPage value")
-	}
-
-	type FetchedMessage struct {
-		model.Message
 	}
 
 	var dest []struct {
@@ -591,18 +642,40 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 		model.Message
 	}
 
-	messageQuery := SELECT(
-		table.Message.AllColumns,
-		COUNT(table.Contact.UniqueId).OVER().AS("totalMessages"),
-	).FROM(table.Message).
-		WHERE(
-			table.Message.ConversationId.EQ(UUID(conversationUuid)),
-		).
-		ORDER_BY(
-			table.Message.CreatedAt.ASC(),
-		).
-		LIMIT(limit).
-		OFFSET((page - 1) * limit)
+	messagesCte := CTE("messages")
+	paginationMetaCte := CTE("paginationMeta")
+
+	createdAtMessageColumn := table.Message.CreatedAt.From(messagesCte)
+
+	messageQuery := WITH(
+		messagesCte.AS(
+			SELECT(
+				table.Message.AllColumns,
+			).FROM(table.Message).
+				WHERE(
+					table.Message.ConversationId.EQ(UUID(conversationUuid)),
+				).
+				ORDER_BY(
+					table.Message.CreatedAt.DESC(),
+				).
+				LIMIT(limit).
+				OFFSET((page-1)*limit),
+		),
+		paginationMetaCte.AS(
+			SELECT(
+				COUNT(table.Message.UniqueId).AS("totalMessages"),
+			).FROM(table.Message).
+				WHERE(
+					table.Message.ConversationId.EQ(UUID(conversationUuid)),
+				),
+		),
+	)(
+		SELECT(
+			messagesCte.AllColumns(),
+			paginationMetaCte.AllColumns(),
+		).FROM(messagesCte, paginationMetaCte).
+			ORDER_BY(createdAtMessageColumn.ASC()),
+	)
 
 	err = messageQuery.QueryContext(context.Request().Context(), context.App.Db, &dest)
 
@@ -628,18 +701,8 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 
 	if len(dest) > 0 {
 		for _, message := range dest {
-			messageData := map[string]interface{}{}
-			json.Unmarshal([]byte(*message.MessageData), &messageData)
-			message := api_types.MessageSchema{
-				UniqueId:       message.UniqueId.String(),
-				ConversationId: message.ConversationId.String(),
-				CreatedAt:      message.CreatedAt,
-				Direction:      api_types.MessageDirectionEnum(message.Direction.String()),
-				MessageData:    &messageData,
-				MessageType:    api_types.MessageTypeEnum(message.MessageType.String()),
-				Status:         api_types.MessageStatusEnum(message.Status.String()),
-			}
-			messagesToReturn = append(messagesToReturn, message)
+			apiMessage := context.App.ConversationService.ParseDbMessageToApiMessage(message.Message)
+			messagesToReturn = append(messagesToReturn, apiMessage)
 		}
 
 		totalMessages = dest[0].TotalMessages
@@ -658,6 +721,9 @@ func handleGetConversationMessages(context interfaces.ContextWithSession) error 
 }
 
 func handleSendMessage(context interfaces.ContextWithSession) error {
+	logger := context.App.Logger
+
+	// 1. Validate conversationId
 	conversationId := context.Param("id")
 	if conversationId == "" {
 		return context.JSON(http.StatusBadRequest, "conversation id is required")
@@ -667,33 +733,31 @@ func handleSendMessage(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusBadRequest, "invalid conversation id")
 	}
 
+	// 2. Bind request payload
 	payload := new(api_types.NewMessageSchema)
-
 	if err := context.Bind(payload); err != nil {
 		return context.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	var conversationWithContact struct {
+	// 3. Fetch conversation + contact + business account
+	var convoData struct {
 		model.Conversation
-		Contact                 model.Contact                 `json:"contact"`
-		WhatsappBusinessAccount model.WhatsappBusinessAccount `json:"whatsappBusinessAccount"`
+		Contact                 model.Contact
+		WhatsappBusinessAccount model.WhatsappBusinessAccount
 	}
-
-	conversationFetchQuery := SELECT(
+	err = SELECT(
 		table.Conversation.AllColumns,
 		table.Contact.AllColumns,
 		table.WhatsappBusinessAccount.AllColumns,
-	).FROM(
-		table.Conversation.LEFT_JOIN(
-			table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId),
-		).LEFT_JOIN(
-			table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Conversation.OrganizationId),
-		),
-	).WHERE(
-		table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
-	).LIMIT(1)
-
-	err = conversationFetchQuery.QueryContext(context.Request().Context(), context.App.Db, &conversationWithContact)
+	).
+		FROM(
+			table.Conversation.
+				LEFT_JOIN(table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId)).
+				LEFT_JOIN(table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Conversation.OrganizationId)),
+		).
+		WHERE(table.Conversation.UniqueId.EQ(UUID(conversationUuid))).
+		LIMIT(1).
+		QueryContext(context.Request().Context(), context.App.Db, &convoData)
 
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
@@ -702,98 +766,63 @@ func handleSendMessage(context interfaces.ContextWithSession) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	messageData, err := json.Marshal(payload.MessageData)
+	// 4. Build & send the message
+	discriminator, err := payload.MessageData.Discriminator()
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	logger.Info("discriminator: %v", discriminator)
+
+	messageComponent, err := context.App.ConversationService.BuildSendMessagePayload(discriminator, payload.MessageData)
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	messagingClient := context.App.WapiClient.NewMessagingClient(
-		conversationWithContact.PhoneNumberUsed,
-	)
-
-	var whatsappMessageId string
-
-	//  ! handle all the message type to send here
-	switch *payload.MessageType {
-	case api_types.Text:
-		if payload.MessageData != nil {
-			messageData, err = json.Marshal(payload.MessageData)
-			if err != nil {
-				return context.JSON(http.StatusInternalServerError, err.Error())
-			}
-		}
-
-		textMessageData := *payload.MessageData
-
-		{
-			textMessage, err := components.NewTextMessage(components.TextMessageConfigs{
-				Text: textMessageData["text"].(string),
-			})
-
-			if err != nil {
-				return context.JSON(http.StatusInternalServerError, err.Error())
-			}
-
-			response, err := messagingClient.Message.Send(textMessage, conversationWithContact.Contact.PhoneNumber)
-
-			if err != nil {
-				return context.JSON(http.StatusInternalServerError, err.Error())
-			}
-
-			context.App.Logger.Info("response: %v", response)
-
-			whatsappMessageId = response.Messages[0].ID
-		}
+	messagingClient := context.App.WapiClient.NewMessagingClient(convoData.PhoneNumberUsed)
+	resp, err := messagingClient.Message.Send(messageComponent, convoData.Contact.PhoneNumber)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
+	context.App.Logger.Info("response: %v", resp)
+	whatsappMessageId := resp.Messages[0].ID
 
-	stringMessageData := string(messageData)
+	// 5. Store the message in DB
+	messageDataJSON, err := json.Marshal(payload.MessageData)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+	stringMessageData := string(messageDataJSON)
 
 	messageToInsert := model.Message{
-		ConversationId:            &conversationWithContact.UniqueId,
+		ConversationId:            &convoData.UniqueId,
+		ContactId:                 convoData.ContactId,
 		Direction:                 model.MessageDirectionEnum_OutBound,
-		WhatsAppMessageId:         &whatsappMessageId,
-		WhatsappBusinessAccountId: &conversationWithContact.WhatsappBusinessAccount.AccountId,
-		CampaignId:                nil,
-		ContactId:                 conversationWithContact.ContactId,
-		MessageType:               model.MessageTypeEnum_Text,
 		Status:                    model.MessageStatusEnum_Sent,
+		MessageType:               model.MessageTypeEnum(discriminator), // override if needed
+		OrganizationId:            convoData.OrganizationId,
+		WhatsAppMessageId:         &whatsappMessageId,
+		WhatsappBusinessAccountId: &convoData.WhatsappBusinessAccount.AccountId,
+		PhoneNumberUsed:           convoData.PhoneNumberUsed,
 		MessageData:               &stringMessageData,
-		OrganizationId:            conversationWithContact.OrganizationId,
 		CreatedAt:                 time.Now(),
 		UpdatedAt:                 time.Now(),
-		PhoneNumberUsed:           conversationWithContact.PhoneNumberUsed,
 	}
 
 	var insertedMessage model.Message
-
-	insertQuery := table.Message.
+	if err := table.Message.
 		INSERT(table.Message.MutableColumns).
 		MODEL(messageToInsert).
-		RETURNING(table.Message.AllColumns)
-
-	err = insertQuery.QueryContext(context.Request().Context(), context.App.Db, &insertedMessage)
-
-	if err != nil {
+		RETURNING(table.Message.AllColumns).
+		QueryContext(context.Request().Context(), context.App.Db, &insertedMessage); err != nil {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	responseToReturn := api_types.SendMessageInConversationResponseSchema{
-		Message: api_types.MessageSchema{
-			UniqueId:       insertedMessage.UniqueId.String(),
-			ConversationId: insertedMessage.ConversationId.String(),
-			CreatedAt:      insertedMessage.CreatedAt,
-			Direction:      api_types.MessageDirectionEnum(insertedMessage.Direction.String()),
-			MessageData:    payload.MessageData,
-			MessageType:    api_types.MessageTypeEnum(insertedMessage.MessageType.String()),
-			Status:         api_types.MessageStatusEnum(insertedMessage.Status.String()),
-		},
+	// 6. Return the new message
+	response := api_types.SendMessageInConversationResponseSchema{
+		Message: context.App.ConversationService.ParseDbMessageToApiMessage(insertedMessage),
 	}
-
-	return context.JSON(http.StatusOK, responseToReturn)
+	return context.JSON(http.StatusOK, response)
 }
 
 func handleAssignConversation(context interfaces.ContextWithSession) error {
@@ -1016,4 +1045,234 @@ func handleUnassignConversation(context interfaces.ContextWithSession) error {
 	}
 
 	return context.JSON(http.StatusOK, responseToReturn)
+}
+
+func handleMediaUpload(context interfaces.ContextWithSession) error {
+	conversationId := context.Param("id")
+	if conversationId == "" {
+		return context.JSON(http.StatusBadRequest, "conversation id is required")
+	}
+
+	conversationUuid, err := uuid.Parse(conversationId)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "invalid conversation id")
+	}
+
+	conversationQuery := SELECT(
+		table.Conversation.AllColumns,
+	).FROM(
+		table.Conversation,
+	).WHERE(
+		table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
+	).LIMIT(1)
+
+	var conversation model.Conversation
+
+	err = conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &conversation)
+
+	if err != nil {
+		if err.Error() == qrm.ErrNoRows.Error() {
+			return context.JSON(http.StatusNotFound, "conversation not found")
+		}
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	// Parse the multipart form (here we allow up to 32 MB in memory)
+	if err := context.Request().ParseMultipartForm(32 << 20); err != nil {
+		return context.JSON(http.StatusBadRequest, "failed to parse multipart form")
+	}
+
+	// Retrieve the file (expecting field name "file")
+	file, fileHeader, err := context.Request().FormFile("file")
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "file is required")
+	}
+	defer file.Close()
+
+	// Extract MIME type from header; fallback if needed.
+	mimeType := fileHeader.Header.Get("Content-Type")
+
+	if mimeType == "image/gif" {
+		mimeType = "video/mp4"
+	}
+
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	// Get the filename (ensure a safe basename)
+	filename := filepath.Base(fileHeader.Filename)
+
+	phoneNumberId := conversation.PhoneNumberUsed
+	if phoneNumberId == "" {
+		return context.JSON(http.StatusInternalServerError, "phone number id not configured")
+	}
+
+	// Use MediaManager to upload the media file to WhatsApp.
+	messagingClient := context.App.WapiClient.NewMessagingClient(phoneNumberId)
+	mediaManager := messagingClient.Media
+	mediaID, err := mediaManager.UploadMedia(phoneNumberId, file, filename, mimeType)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, fmt.Sprintf("upload failed: %v", err))
+	}
+
+	// Optionally, retrieve a temporary media URL.
+	mediaUrl, err := mediaManager.GetMediaUrlById(mediaID)
+	if err != nil {
+		// Log the error but we can still proceed with mediaID.
+		context.App.Logger.Error("failed to retrieve media URL", err.Error(), nil)
+	}
+
+	// Return the media ID and URL to the frontend.
+	return context.JSON(http.StatusOK, api_types.UploadFileInConversationResponseSchema{
+		MediaId:  mediaID,
+		MediaUrl: mediaUrl,
+	})
+}
+
+func handleProxyWhatsAppMedia(context interfaces.ContextWithSession) error {
+	redis := context.App.Redis
+	// logger := context.App.Logger
+
+	// 0. Validate conversationId
+	conversationId := context.Param("id")
+	if conversationId == "" {
+		return context.JSON(http.StatusBadRequest, "conversation id is required")
+	}
+
+	conversationUuid, err := uuid.Parse(conversationId)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "invalid conversation id")
+	}
+
+	conversationQuery := SELECT(
+		table.Conversation.AllColumns,
+		table.Organization.AllColumns,
+		table.WhatsappBusinessAccount.AllColumns,
+	).FROM(
+		table.Conversation.LEFT_JOIN(
+			table.Organization, table.Conversation.OrganizationId.EQ(table.Organization.UniqueId),
+		).LEFT_JOIN(
+			table.WhatsappBusinessAccount, table.WhatsappBusinessAccount.OrganizationId.EQ(table.Organization.UniqueId),
+		),
+	).WHERE(
+		table.Conversation.UniqueId.EQ(UUID(conversationUuid)),
+	).LIMIT(1)
+
+	var conversation struct {
+		model.Conversation
+		Organization            model.Organization
+		WhatsappBusinessAccount model.WhatsappBusinessAccount
+	}
+
+	err = conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &conversation)
+
+	if err != nil {
+		if err.Error() == qrm.ErrNoRows.Error() {
+			return context.JSON(http.StatusNotFound, "conversation not found")
+		}
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	mediaId := context.Param("mediaId")
+	if mediaId == "" {
+		return context.JSON(http.StatusBadRequest, "Missing mediaId")
+	}
+
+	// Use MediaManager to upload the media file to WhatsApp.
+	messagingClient := context.App.WapiClient.NewMessagingClient(conversation.PhoneNumberUsed)
+	mediaManager := messagingClient.Media
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, fmt.Sprintf("upload failed: %v", err))
+	}
+
+	cacheKey := redis.ComputeCacheKey("media", mediaId, "url")
+	var mediaUrl string
+	ok, err := redis.GetCachedData(cacheKey, &mediaUrl)
+
+	if !ok || err != nil {
+		mediaUrl, err = mediaManager.GetMediaUrlById(mediaId)
+		if err != nil {
+			return context.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to get media url: %v", err))
+		}
+		redis.CacheData(cacheKey, mediaUrl, time.Minute*4)
+	}
+
+	if mediaUrl == "" {
+		return context.JSON(http.StatusNotFound, "media url is empty or not found")
+	}
+
+	// 3. Build an HTTP GET request to that ephemeral URL, adding your bearer token if needed.
+	req, err := http.NewRequest(http.MethodGet, mediaUrl, nil)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, fmt.Sprintf("failed to create request: %v", err))
+	}
+
+	// Possibly set an Authorization header, if the ephemeral URL requires your token.
+	// For example:
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", conversation.WhatsappBusinessAccount.AccessToken))
+
+	// 4. Execute the request.
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return context.JSON(http.StatusBadGateway, fmt.Sprintf("failed to fetch media from WhatsApp: %v", err))
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return context.JSON(resp.StatusCode, fmt.Sprintf("upstream error: %s", string(bodyBytes)))
+	}
+
+	// 5. Copy relevant headers to the response (e.g. Content-Type, Content-Length).
+	contentType := resp.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	context.Response().Header().Set("Content-Type", contentType)
+
+	// 6. Stream the body directly to the client.
+	// If your framework supports returning a "stream" response, you can do that.
+	// Otherwise, manually copy the bytes to the Context's writer.
+
+	// Option A: Manually copy the stream:
+	_, copyErr := io.Copy(context.Response().Writer, resp.Body)
+	if copyErr != nil && !strings.Contains(copyErr.Error(), "broken pipe") {
+		// Log or handle partial writes if needed
+		context.App.Logger.Error("error streaming media to client", copyErr.Error(), nil)
+	}
+
+	return nil
+}
+
+func markConversationAsRead(context interfaces.ContextWithSession) error {
+	conversationId := context.Param("id")
+	if conversationId == "" {
+		return context.JSON(http.StatusBadRequest, "conversation id is required")
+	}
+	conversationUuid, err := uuid.Parse(conversationId)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "invalid conversation id")
+	}
+
+	updateQuery := table.Message.UPDATE(table.Message.Status).
+		SET(utils.EnumExpression(model.MessageStatusEnum_Read.String())).
+		WHERE(
+			table.Message.ConversationId.EQ(UUID(conversationUuid)).AND(
+				table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_InBound.String())),
+			).AND(
+				table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Sent.String())),
+			),
+		)
+
+	_, err = updateQuery.ExecContext(context.Request().Context(), context.App.Db)
+
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return context.JSON(http.StatusOK, api_types.MarkConversationAsReadResponseSchema{
+		IsRead: true,
+	})
 }

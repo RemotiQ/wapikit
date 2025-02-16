@@ -465,7 +465,7 @@ export interface GetContactListResponseSchema {
 }
 
 export interface GetTemplateByIdResponseSchema {
-	template: TemplateSchema
+	template: MessageTemplateSchema
 }
 
 export interface GetContactsResponseSchema {
@@ -692,22 +692,6 @@ export interface UpdateOrganizationMemberSchema {
 	accessLevel?: UserPermissionLevelEnum
 }
 
-export type TemplateSchemaHeader = {
-	headerType?: string
-	content?: string
-}
-
-export type TemplateSchemaFooter = { [key: string]: unknown }
-
-export interface TemplateSchema {
-	templateId: string
-	bodyText: string
-	header: TemplateSchemaHeader
-	footer?: TemplateSchemaFooter
-	content: string
-	createdAt: string
-}
-
 export type CampaignSchemaProgress = {
 	totalMessages: number
 	sent: number
@@ -822,6 +806,7 @@ export interface ConversationSchema {
 	messages: MessageSchema[]
 	createdAt: string
 	numberOfUnreadMessages: number
+	totalMessages?: number
 	status: ConversationStatusEnum
 	assignedTo?: OrganizationMemberSchema
 	tags: TagSchema[]
@@ -857,24 +842,493 @@ export interface DeleteContactByIdResponseSchema {
 	data: boolean
 }
 
-export type MessageSchemaMessageData = { [key: string]: unknown }
+/**
+ * The base message object that contains common properties for all message types.
 
-export interface MessageSchema {
+ */
+export interface BaseMessage {
+	/** Unique identifier of the message. */
 	uniqueId: string
+	/** ID of the conversation. */
 	conversationId: string
+	/** Direction of the message – whether it was received (inbound) or sent (outbound).
+	 */
 	direction: MessageDirectionEnum
+	/** Message status. */
 	status: MessageStatusEnum
-	message_type: MessageTypeEnum
+	/** Discriminator field used to determine the concrete message type. */
+	messageType: string
+	/** Time when the message was created. */
 	createdAt: string
-	messageData?: MessageSchemaMessageData
 }
 
-export type NewMessageSchemaMessageData = { [key: string]: unknown }
+export type TextMessageDataMessageType =
+	(typeof TextMessageDataMessageType)[keyof typeof TextMessageDataMessageType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TextMessageDataMessageType = {
+	Text: 'Text'
+} as const
+
+export interface TextMessageData {
+	/** The actual text message. */
+	text: string
+	messageType: TextMessageDataMessageType
+}
+
+export type TextMessageAllOfMessageType =
+	(typeof TextMessageAllOfMessageType)[keyof typeof TextMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TextMessageAllOfMessageType = {
+	Text: 'Text'
+} as const
+
+export type TextMessageAllOf = {
+	messageType?: TextMessageAllOfMessageType
+	messageData: TextMessageData
+}
+
+export type TextMessageMessageType =
+	(typeof TextMessageMessageType)[keyof typeof TextMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TextMessageMessageType = {
+	Text: 'Text'
+} as const
+
+export type TextMessage = BaseMessage &
+	TextMessageAllOf & {
+		messageType: TextMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				TextMessageAllOf & {
+					messageType: TextMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type AudioMessageDataMessageType =
+	(typeof AudioMessageDataMessageType)[keyof typeof AudioMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AudioMessageDataMessageType = {
+	Audio: 'Audio'
+} as const
+
+export interface AudioMessageData {
+	/** Audio file identifier. */
+	id: string
+	/** URL for the audio file. */
+	link?: string
+	messageType: AudioMessageDataMessageType
+}
+
+export type AudioMessageAllOfMessageType =
+	(typeof AudioMessageAllOfMessageType)[keyof typeof AudioMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AudioMessageAllOfMessageType = {
+	Audio: 'Audio'
+} as const
+
+export type AudioMessageAllOf = {
+	messageType?: AudioMessageAllOfMessageType
+	messageData: AudioMessageData
+}
+
+export type AudioMessageMessageType =
+	(typeof AudioMessageMessageType)[keyof typeof AudioMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AudioMessageMessageType = {
+	Audio: 'Audio'
+} as const
+
+export type AudioMessage = BaseMessage &
+	AudioMessageAllOf & {
+		messageType: AudioMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				AudioMessageAllOf & {
+					messageType: AudioMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type VideoMessageDataMessageType =
+	(typeof VideoMessageDataMessageType)[keyof typeof VideoMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VideoMessageDataMessageType = {
+	Video: 'Video'
+} as const
+
+export interface VideoMessageData {
+	/** Video file identifier. */
+	id: string
+	/** URL for the video file. */
+	link?: string
+	caption?: string
+	messageType: VideoMessageDataMessageType
+}
+
+export type VideoMessageAllOfMessageType =
+	(typeof VideoMessageAllOfMessageType)[keyof typeof VideoMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VideoMessageAllOfMessageType = {
+	Video: 'Video'
+} as const
+
+export type VideoMessageAllOf = {
+	messageType?: VideoMessageAllOfMessageType
+	messageData: VideoMessageData
+}
+
+export type VideoMessageMessageType =
+	(typeof VideoMessageMessageType)[keyof typeof VideoMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VideoMessageMessageType = {
+	Video: 'Video'
+} as const
+
+export type VideoMessage = BaseMessage &
+	VideoMessageAllOf & {
+		messageType: VideoMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				VideoMessageAllOf & {
+					messageType: VideoMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type ImageMessageDataMessageType =
+	(typeof ImageMessageDataMessageType)[keyof typeof ImageMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ImageMessageDataMessageType = {
+	Image: 'Image'
+} as const
+
+export interface ImageMessageData {
+	/** Image file identifier. */
+	id: string
+	/** URL for the image file. */
+	link?: string
+	caption?: string
+	messageType: ImageMessageDataMessageType
+}
+
+export type ImageMessageAllOfMessageType =
+	(typeof ImageMessageAllOfMessageType)[keyof typeof ImageMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ImageMessageAllOfMessageType = {
+	Image: 'Image'
+} as const
+
+export type ImageMessageAllOf = {
+	messageType?: ImageMessageAllOfMessageType
+	messageData: ImageMessageData
+}
+
+export type ImageMessageMessageType =
+	(typeof ImageMessageMessageType)[keyof typeof ImageMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ImageMessageMessageType = {
+	Image: 'Image'
+} as const
+
+export type ImageMessage = BaseMessage &
+	ImageMessageAllOf & {
+		messageType: ImageMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				ImageMessageAllOf & {
+					messageType: ImageMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type DocumentMessageDataMessageType =
+	(typeof DocumentMessageDataMessageType)[keyof typeof DocumentMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DocumentMessageDataMessageType = {
+	Document: 'Document'
+} as const
+
+export interface DocumentMessageData {
+	/** Document file identifier. */
+	id: string
+	/** URL for the document file. */
+	link?: string
+	/** Name of the document file. */
+	fileName: string
+	/** (Optional) Caption for the document. */
+	caption?: string
+	messageType: DocumentMessageDataMessageType
+}
+
+export type DocumentMessageAllOfMessageType =
+	(typeof DocumentMessageAllOfMessageType)[keyof typeof DocumentMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DocumentMessageAllOfMessageType = {
+	Document: 'Document'
+} as const
+
+export type DocumentMessageAllOf = {
+	messageType?: DocumentMessageAllOfMessageType
+	messageData: DocumentMessageData
+}
+
+export type DocumentMessageMessageType =
+	(typeof DocumentMessageMessageType)[keyof typeof DocumentMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DocumentMessageMessageType = {
+	Document: 'Document'
+} as const
+
+export type DocumentMessage = BaseMessage &
+	DocumentMessageAllOf & {
+		messageType: DocumentMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				DocumentMessageAllOf & {
+					messageType: DocumentMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type StickerMessageDataMessageType =
+	(typeof StickerMessageDataMessageType)[keyof typeof StickerMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StickerMessageDataMessageType = {
+	Sticker: 'Sticker'
+} as const
+
+export interface StickerMessageData {
+	/** Sticker identifier. */
+	id: string
+	/** URL for the sticker file. */
+	link?: string
+	messageType: StickerMessageDataMessageType
+}
+
+export type StickerMessageAllOfMessageType =
+	(typeof StickerMessageAllOfMessageType)[keyof typeof StickerMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StickerMessageAllOfMessageType = {
+	Sticker: 'Sticker'
+} as const
+
+export type StickerMessageAllOf = {
+	messageType?: StickerMessageAllOfMessageType
+	messageData: StickerMessageData
+}
+
+export type StickerMessageMessageType =
+	(typeof StickerMessageMessageType)[keyof typeof StickerMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StickerMessageMessageType = {
+	Sticker: 'Sticker'
+} as const
+
+export type StickerMessage = BaseMessage &
+	StickerMessageAllOf & {
+		messageType: StickerMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				StickerMessageAllOf & {
+					messageType: StickerMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type ReactionMessageDataMessageType =
+	(typeof ReactionMessageDataMessageType)[keyof typeof ReactionMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReactionMessageDataMessageType = {
+	Reaction: 'Reaction'
+} as const
+
+export interface ReactionMessageData {
+	/** Reaction emoji. */
+	reaction: string
+	/** ID of the message to which the reaction was added. */
+	messageId?: string
+	messageType: ReactionMessageDataMessageType
+}
+
+export type ReactionMessageAllOfMessageType =
+	(typeof ReactionMessageAllOfMessageType)[keyof typeof ReactionMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReactionMessageAllOfMessageType = {
+	Reaction: 'Reaction'
+} as const
+
+export type ReactionMessageAllOf = {
+	messageType?: ReactionMessageAllOfMessageType
+	messageData: ReactionMessageData
+}
+
+export type ReactionMessageMessageType =
+	(typeof ReactionMessageMessageType)[keyof typeof ReactionMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReactionMessageMessageType = {
+	Reaction: 'Reaction'
+} as const
+
+export type ReactionMessage = BaseMessage &
+	ReactionMessageAllOf & {
+		messageType: ReactionMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				ReactionMessageAllOf & {
+					messageType: ReactionMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+export type LocationMessageDataMessageType =
+	(typeof LocationMessageDataMessageType)[keyof typeof LocationMessageDataMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const LocationMessageDataMessageType = {
+	Location: 'Location'
+} as const
+
+export interface LocationMessageData {
+	/** Latitude of the location. */
+	latitude: number
+	/** Longitude of the location. */
+	longitude: number
+	/** (Optional) Address of the location. */
+	address?: string
+	/** (Optional) Name of the location. */
+	name?: string
+	messageType: LocationMessageDataMessageType
+}
+
+export type LocationMessageAllOfMessageType =
+	(typeof LocationMessageAllOfMessageType)[keyof typeof LocationMessageAllOfMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const LocationMessageAllOfMessageType = {
+	Location: 'Location'
+} as const
+
+export type LocationMessageAllOf = {
+	messageType?: LocationMessageAllOfMessageType
+	messageData: LocationMessageData
+}
+
+export type LocationMessageMessageType =
+	(typeof LocationMessageMessageType)[keyof typeof LocationMessageMessageType]
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const LocationMessageMessageType = {
+	Location: 'Location'
+} as const
+
+export type LocationMessage = BaseMessage &
+	LocationMessageAllOf & {
+		messageType: LocationMessageMessageType
+	} & Required<
+		Pick<
+			BaseMessage &
+				LocationMessageAllOf & {
+					messageType: LocationMessageMessageType
+				},
+			'messageType' | 'messageData' | 'messageData'
+		>
+	>
+
+/**
+ * The message object returned from the API (or retrieved from the database) with a discriminator to determine the concrete type.
+
+ */
+export type MessageSchema =
+	| TextMessage
+	| AudioMessage
+	| LocationMessage
+	| VideoMessage
+	| ImageMessage
+	| DocumentMessage
+	| StickerMessage
+	| ReactionMessage
+
+/**
+ * OneOf-based union for new message data, distinguished by `messageType`.
+
+ */
+export type NewMessageDataSchema =
+	| (TextMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (AudioMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (VideoMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (ImageMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (DocumentMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (StickerMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (ReactionMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+	| (LocationMessageData & {
+			/** The type for this new message data. */
+			messageType: string
+	  })
+
+/**
+ * Request payload for sending a new message. The payload includes the messageType, createdAt date, and a messageData field whose structure depends on the messageType.
+
+ */
 export interface NewMessageSchema {
-	messageType?: MessageTypeEnum
-	createdAt?: string
-	messageData?: NewMessageSchemaMessageData
+	createdAt: string
+	messageData: NewMessageDataSchema
 }
 
 export interface SendMessageInConversationResponseSchema {
@@ -1350,6 +1804,15 @@ export interface ResetPasswordCompleteResponseBodySchema {
 	isPasswordReset: boolean
 }
 
+export interface UploadFileInConversationResponseSchema {
+	mediaId: string
+	mediaUrl: string
+}
+
+export interface MarkConversationAsReadResponseSchema {
+	isRead: boolean
+}
+
 export type GetHealthCheck200 = {
 	data?: boolean
 }
@@ -1595,6 +2058,11 @@ export type GetConversationMessagesParams = {
 	 * order by asc or desc
 	 */
 	order?: OrderEnum
+}
+
+export type UploadFileInConversationBody = {
+	/** The file to be uploaded */
+	file?: Blob
 }
 
 export type GetMessagesParams = {
@@ -8995,6 +9463,187 @@ export const useSendMessageInConversation = <
 	TContext
 > => {
 	const mutationOptions = getSendMessageInConversationMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * upload a file in a conversation
+ */
+export const uploadFileInConversation = (
+	id: string,
+	uploadFileInConversationBody: UploadFileInConversationBody,
+	signal?: AbortSignal
+) => {
+	const formData = new FormData()
+	if (uploadFileInConversationBody.file !== undefined) {
+		formData.append('file', uploadFileInConversationBody.file)
+	}
+
+	return customInstance<UploadFileInConversationResponseSchema>({
+		url: `/conversation/${id}/upload`,
+		method: 'POST',
+		headers: { 'Content-Type': 'multipart/form-data' },
+		data: formData,
+		signal
+	})
+}
+
+export const getUploadFileInConversationMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof uploadFileInConversation>>,
+		TError,
+		{ id: string; data: UploadFileInConversationBody },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof uploadFileInConversation>>,
+	TError,
+	{ id: string; data: UploadFileInConversationBody },
+	TContext
+> => {
+	const mutationKey = ['uploadFileInConversation']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof uploadFileInConversation>>,
+		{ id: string; data: UploadFileInConversationBody }
+	> = props => {
+		const { id, data } = props ?? {}
+
+		return uploadFileInConversation(id, data)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type UploadFileInConversationMutationResult = NonNullable<
+	Awaited<ReturnType<typeof uploadFileInConversation>>
+>
+export type UploadFileInConversationMutationBody = UploadFileInConversationBody
+export type UploadFileInConversationMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useUploadFileInConversation = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof uploadFileInConversation>>,
+		TError,
+		{ id: string; data: UploadFileInConversationBody },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof uploadFileInConversation>>,
+	TError,
+	{ id: string; data: UploadFileInConversationBody },
+	TContext
+> => {
+	const mutationOptions = getUploadFileInConversationMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * mark a conversation as read
+ */
+export const markConversationAsRead = (id: string, signal?: AbortSignal) => {
+	return customInstance<MarkConversationAsReadResponseSchema>({
+		url: `/conversation/${id}/read`,
+		method: 'POST',
+		signal
+	})
+}
+
+export const getMarkConversationAsReadMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof markConversationAsRead>>,
+		TError,
+		{ id: string },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof markConversationAsRead>>,
+	TError,
+	{ id: string },
+	TContext
+> => {
+	const mutationKey = ['markConversationAsRead']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof markConversationAsRead>>,
+		{ id: string }
+	> = props => {
+		const { id } = props ?? {}
+
+		return markConversationAsRead(id)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type MarkConversationAsReadMutationResult = NonNullable<
+	Awaited<ReturnType<typeof markConversationAsRead>>
+>
+
+export type MarkConversationAsReadMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useMarkConversationAsRead = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof markConversationAsRead>>,
+		TError,
+		{ id: string },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof markConversationAsRead>>,
+	TError,
+	{ id: string },
+	TContext
+> => {
+	const mutationOptions = getMarkConversationAsReadMutationOptions(options)
 
 	return useMutation(mutationOptions)
 }

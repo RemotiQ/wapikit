@@ -1,15 +1,21 @@
 import { v4 } from 'uuid'
 import { toast } from 'sonner'
-import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons'
 import { createRoot } from 'react-dom/client'
 import { AlertModal } from './components/modal/alert-modal'
-import { type TemplateComponentParameters, type MessageTemplateSchema } from 'root/.generated'
+import {
+	MessageTypeEnum,
+	type MessageTemplateSchema,
+	type MessageSchema,
+	type TemplateComponentParameters
+} from 'root/.generated'
 import { Icons } from './components/icons'
 import { APP_BASE_DOMAIN } from './constants'
 import { type UtmTags } from './types'
 import { type PricingPlan } from 'root/cloud_generated'
 import { type z } from 'zod'
 import { type TemplateComponentParametersSchema } from './schema'
+import { lookup } from 'mime-types'
+import dayjs from 'dayjs'
 
 export function generateUniqueId() {
 	return v4()
@@ -18,7 +24,7 @@ export function generateUniqueId() {
 export function infoNotification(params: { message: string; darkMode?: true; duration?: string }) {
 	return toast.error(
 		<div className="flex flex-row items-center justify-start gap-2">
-			<InfoCircledIcon className="h-5 w-5" color="#3b82f6" />
+			<Icons.infoCircle className="h-5 w-5" color="#3b82f6" />
 			<span>{params.message}</span>
 		</div>
 	)
@@ -40,7 +46,7 @@ export function successNotification(params: {
 }) {
 	return toast.success(
 		<div className="flex flex-row items-center justify-start gap-2">
-			<CheckCircledIcon className="h-5 w-5" color="#22c55e" />
+			<Icons.checkCircle className="h-5 w-5" color="#22c55e" />
 			<span>{params.message}</span>
 		</div>
 	)
@@ -139,8 +145,6 @@ export function parseTemplateComponents(
 	const headerParams: TemplateParameterInputType[] = []
 	const bodyParams: TemplateParameterInputType[] = []
 	const buttonParams: TemplateParameterInputType[] = []
-
-	console.log({ template, defaults })
 
 	if (defaults) {
 		headerParams.push(...defaults.header)
@@ -367,4 +371,109 @@ export async function displayRazorpayCheckoutModal(params: {
 	// @ts-ignore - Razorpay is loaded in the global scope
 	const paymentObject = new window.Razorpay(options)
 	paymentObject.open()
+}
+
+/**
+ * Determines the message type based on the file's MIME type, extension, and size.
+ *
+ * @param file The File object selected by the user.
+ * @returns A string representing the message type.
+ */
+export function determineMessageType(file: File): MessageTypeEnum {
+	// Use file.type if provided, otherwise fall back to looking it up by extension.
+	const mimeTypeFromFile = file.type || (lookup(file.name) as string) || ''
+	const mimeType = mimeTypeFromFile.toLowerCase()
+	const fileName = file.name.toLowerCase()
+
+	// Check for audio types.
+	if (mimeType.startsWith('audio/')) {
+		return MessageTypeEnum.Audio
+	}
+
+	// Check for video types.
+	if (mimeType.startsWith('video/')) {
+		return MessageTypeEnum.Video
+	}
+
+	// Check for image types.
+	if (mimeType.startsWith('image/')) {
+		// For WebP images, decide whether to treat them as stickers based on file size.
+		if (mimeType === 'image/webp' || fileName.endsWith('.webp')) {
+			// If the file size is small (e.g., ≤ 100KB), treat it as a sticker.
+			if (file.size <= 100 * 1024) {
+				return MessageTypeEnum.Sticker
+			}
+			// Otherwise, treat as a normal image.
+			return MessageTypeEnum.Image
+		}
+		return MessageTypeEnum.Image
+	}
+
+	// Check for common document types.
+	const documentMimeTypes = [
+		'application/pdf',
+		'application/msword',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.ms-excel',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/vnd.ms-powerpoint',
+		'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+		'text/plain'
+	]
+
+	if (documentMimeTypes.includes(mimeType)) {
+		return MessageTypeEnum.Document
+	}
+
+	throw new Error('Unsupported file type')
+}
+
+type GroupedMessages = {
+	date: dayjs.Dayjs
+	messages: MessageSchema[]
+}
+
+/**
+ * Group an array of messages by their date (ignoring time).
+ */
+export function groupMessagesByDate(messages: MessageSchema[]): GroupedMessages[] {
+	const groups: GroupedMessages[] = []
+	let currentDay: dayjs.Dayjs = dayjs()
+	let currentGroup: MessageSchema[] = []
+
+	for (const msg of messages) {
+		const msgDay = dayjs(msg.createdAt).startOf('day')
+		if (!currentDay || !msgDay.isSame(currentDay)) {
+			// If we already have a current group, push it.
+			if (currentGroup.length > 0) {
+				groups.push({ date: currentDay, messages: currentGroup })
+			}
+			// Start a new group for this day.
+			currentDay = msgDay
+			currentGroup = [msg]
+		} else {
+			// Same day, keep adding messages to the current group.
+			currentGroup.push(msg)
+		}
+	}
+
+	// Push the final group if it exists.
+	if (currentGroup.length > 0 && currentDay) {
+		groups.push({ date: currentDay, messages: currentGroup })
+	}
+
+	return groups
+}
+
+/**
+ * Return a label for the given date, such as "Today", "Yesterday", or "DD MMM".
+ */
+export function getDayLabel(date: dayjs.Dayjs): string {
+	if (date.isSame(dayjs(), 'day')) {
+		return 'Today'
+	}
+	if (date.isSame(dayjs().subtract(1, 'day'), 'day')) {
+		return 'Yesterday'
+	}
+	return date.format('DD MMM')
 }

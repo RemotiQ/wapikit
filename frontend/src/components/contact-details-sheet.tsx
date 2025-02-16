@@ -9,10 +9,11 @@ import { Badge } from './ui/badge'
 import dayjs from 'dayjs'
 import { Button } from '~/components/ui/button'
 import { errorNotification, materialConfirm, successNotification } from '~/reusable-functions'
-import { useDeleteContactById, useGetContactById } from 'root/.generated'
+import { type ConversationSchema, useDeleteContactById, useGetContactById } from 'root/.generated'
 import { Card, CardContent, CardTitle } from './ui/card'
 import Link from 'next/link'
 import LoadingSpinner from './loader'
+import LastMessagePreview from './chat/last-message-preview'
 
 const ContactDetailsSheet = () => {
 	const { writeProperty, contactSheetContactId } = useLayoutStore()
@@ -99,7 +100,7 @@ const ContactDetailsSheet = () => {
 													k as keyof typeof contactData
 
 												if (key === 'conversations') return null
-												let IconToRender: any = Icons.user
+												let IconToRender: any = Icons.messageChatSquare
 
 												if (key === 'createdAt') {
 													IconToRender = Icons.calendar
@@ -216,10 +217,11 @@ const ContactDetailsSheet = () => {
 												<div className="flex flex-row items-center gap-2">
 													<Icons.messageTextSquare className="size-4 text-gray-500" />
 													<span className="max-w-[300px] truncate text-sm text-gray-700">
-														{conversation.messages?.length
-															? conversation.messages[0]?.messageData
-																	?.text + '...'
-															: 'No messages yet'}
+														<LastMessagePreview
+															conversation={
+																conversation as ConversationSchema
+															}
+														/>
 													</span>
 												</div>
 

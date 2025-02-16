@@ -1,7 +1,7 @@
 <div align="center">
 <br />
 <p align="center">
-<a href="https://wapijs.co"><img src="https://mintlify.s3-us-west-1.amazonaws.com/wapikit/logo/dark.svg" alt="@wapijs/wapi.js" height="100" /></a>
+<a href="https://wapikit.com"><img src="https://mintlify.s3-us-west-1.amazonaws.com/wapikit/logo/dark.svg" alt="wapikit - ai automated whatsapp marketing and customer engagement platform" height="100" /></a>
 </p>
 <br />
 </div>
@@ -20,7 +20,7 @@
 
 ## The AI Automated WhatsApp Marketing & Customer Engagement Platform
 
-![Dashboard view](https://res.cloudinary.com/dm4zlrwhs/image/upload/v1736856619/image_uospgn.png)
+![Dashboard view](./home.png)
 
 Watch the Demo Video [here](https://www.youtube.com/watch?v=wcUCGuGe2LY)
 

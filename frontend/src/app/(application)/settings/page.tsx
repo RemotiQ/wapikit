@@ -20,7 +20,6 @@ import {
 } from '~/components/ui/select'
 import { Heading } from '~/components/ui/heading'
 import { Separator } from '~/components/ui/separator'
-import { EyeIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts'
 import {
 	RolePermissionEnum,
@@ -2121,7 +2120,6 @@ export default function SettingsPage() {
 																								) : (
 																									<Icons.eye className="size-5" />
 																								)}
-																								<EyeIcon className="size-5" />
 																							</Button>
 																						</span>
 																					</div>

@@ -1,6 +1,6 @@
 'use client'
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons'
 import { useTheme } from 'next-themes'
+import { Icons } from '~/components/icons'
 import { Button } from '~/components/ui/button'
 import {
 	DropdownMenu,
@@ -15,18 +15,18 @@ export default function ThemeToggle() {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="icon">
-					<SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-					<MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+					<Icons.sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+					<Icons.moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
 					<span className="sr-only">Toggle theme</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
 				<DropdownMenuItem onClick={() => setTheme(() => 'light')} className="flex gap-2">
-					<SunIcon />
+					<Icons.sun />
 					Light
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={() => setTheme(() => 'dark')} className="flex gap-2">
-					<MoonIcon />
+					<Icons.moon />
 					Dark
 				</DropdownMenuItem>
 			</DropdownMenuContent>

@@ -4,8 +4,12 @@
 package api_types
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
 
+	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -47,6 +51,11 @@ const (
 	Mistral     AiModelEnum = "Mistral"
 )
 
+// Defines values for AudioMessageMessageType.
+const (
+	Audio AudioMessageMessageType = "Audio"
+)
+
 // Defines values for CampaignStatusEnum.
 const (
 	Cancelled CampaignStatusEnum = "Cancelled"
@@ -77,6 +86,16 @@ const (
 	ConversationStatusEnumDeleted ConversationStatusEnum = "Deleted"
 )
 
+// Defines values for DocumentMessageMessageType.
+const (
+	Document DocumentMessageMessageType = "Document"
+)
+
+// Defines values for ImageMessageMessageType.
+const (
+	Image ImageMessageMessageType = "Image"
+)
+
 // Defines values for IntegrationStatusEnum.
 const (
 	IntegrationStatusEnumActive   IntegrationStatusEnum = "Active"
@@ -87,6 +106,11 @@ const (
 const (
 	Pending  InviteStatusEnum = "Pending"
 	Redeemed InviteStatusEnum = "Redeemed"
+)
+
+// Defines values for LocationMessageMessageType.
+const (
+	Location LocationMessageMessageType = "Location"
 )
 
 // Defines values for MessageDirectionEnum.
@@ -139,24 +163,15 @@ const (
 	REJECTED MessageTemplateStatus = "REJECTED"
 )
 
-// Defines values for MessageTypeEnum.
-const (
-	Address  MessageTypeEnum = "Address"
-	Audio    MessageTypeEnum = "Audio"
-	Contacts MessageTypeEnum = "Contacts"
-	Document MessageTypeEnum = "Document"
-	Image    MessageTypeEnum = "Image"
-	Location MessageTypeEnum = "Location"
-	Reaction MessageTypeEnum = "Reaction"
-	Sticker  MessageTypeEnum = "Sticker"
-	Text     MessageTypeEnum = "Text"
-	Video    MessageTypeEnum = "Video"
-)
-
 // Defines values for OrderEnum.
 const (
 	Asc  OrderEnum = "asc"
 	Desc OrderEnum = "desc"
+)
+
+// Defines values for ReactionMessageMessageType.
+const (
+	Reaction ReactionMessageMessageType = "Reaction"
 )
 
 // Defines values for RolePermissionEnum.
@@ -204,6 +219,11 @@ const (
 	UpdateTag                 RolePermissionEnum = "Update:Tag"
 )
 
+// Defines values for StickerMessageMessageType.
+const (
+	Sticker StickerMessageMessageType = "Sticker"
+)
+
 // Defines values for TemplateMessageButtonType.
 const (
 	COPYCODE    TemplateMessageButtonType = "COPY_CODE"
@@ -218,10 +238,20 @@ const (
 	Static  TemplateParameterInputParameterType = "static"
 )
 
+// Defines values for TextMessageMessageType.
+const (
+	Text TextMessageMessageType = "Text"
+)
+
 // Defines values for UserPermissionLevelEnum.
 const (
 	Member UserPermissionLevelEnum = "Member"
 	Owner  UserPermissionLevelEnum = "Owner"
+)
+
+// Defines values for VideoMessageMessageType.
+const (
+	Video VideoMessageMessageType = "Video"
 )
 
 // Defines values for GetMessagesParamsStatus.
@@ -355,9 +385,54 @@ type AssignConversationSchema struct {
 	OrganizationMemberId string `json:"organizationMemberId"`
 }
 
+// AudioMessage defines model for AudioMessage.
+type AudioMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time               `json:"createdAt"`
+	Direction   MessageDirectionEnum    `json:"direction"`
+	MessageData AudioMessageData        `json:"messageData"`
+	MessageType AudioMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum       `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// AudioMessageMessageType defines model for AudioMessage.MessageType.
+type AudioMessageMessageType string
+
+// AudioMessageData defines model for AudioMessageData.
+type AudioMessageData struct {
+	// Id Audio file identifier.
+	Id string `json:"id"`
+
+	// Link URL for the audio file.
+	Link *string `json:"link,omitempty"`
+}
+
 // BadRequestErrorResponseSchema defines model for BadRequestErrorResponseSchema.
 type BadRequestErrorResponseSchema struct {
 	Message string `json:"message"`
+}
+
+// BaseMessage The base message object that contains common properties for all message types.
+type BaseMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt time.Time            `json:"createdAt"`
+	Direction MessageDirectionEnum `json:"direction"`
+
+	// MessageType Discriminator field used to determine the concrete message type.
+	MessageType string            `json:"messageType"`
+	Status      MessageStatusEnum `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
 }
 
 // BulkImportResponseSchema defines model for BulkImportResponseSchema.
@@ -489,6 +564,7 @@ type ConversationSchema struct {
 	OrganizationId         string                           `json:"organizationId"`
 	Status                 ConversationStatusEnum           `json:"status"`
 	Tags                   []TagSchema                      `json:"tags"`
+	TotalMessages          *int                             `json:"totalMessages,omitempty"`
 	UniqueId               string                           `json:"uniqueId"`
 }
 
@@ -583,6 +659,40 @@ type DeleteOrganizationMemberByIdResponseSchema struct {
 // DeleteRoleByIdResponseSchema defines model for DeleteRoleByIdResponseSchema.
 type DeleteRoleByIdResponseSchema struct {
 	Data bool `json:"data"`
+}
+
+// DocumentMessage defines model for DocumentMessage.
+type DocumentMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time                  `json:"createdAt"`
+	Direction   MessageDirectionEnum       `json:"direction"`
+	MessageData DocumentMessageData        `json:"messageData"`
+	MessageType DocumentMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum          `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// DocumentMessageMessageType defines model for DocumentMessage.MessageType.
+type DocumentMessageMessageType string
+
+// DocumentMessageData defines model for DocumentMessageData.
+type DocumentMessageData struct {
+	// Caption (Optional) Caption for the document.
+	Caption *string `json:"caption,omitempty"`
+
+	// FileName Name of the document file.
+	FileName string `json:"fileName"`
+
+	// Id Document file identifier.
+	Id string `json:"id"`
+
+	// Link URL for the document file.
+	Link *string `json:"link,omitempty"`
 }
 
 // EmailNotificationConfigurationSchema defines model for EmailNotificationConfigurationSchema.
@@ -787,7 +897,7 @@ type GetSegmentationRecommendationsResponse struct {
 
 // GetTemplateByIdResponseSchema defines model for GetTemplateByIdResponseSchema.
 type GetTemplateByIdResponseSchema struct {
-	Template TemplateSchema `json:"template"`
+	Template MessageTemplateSchema `json:"template"`
 }
 
 // GetUserNotificationsResponseSchema defines model for GetUserNotificationsResponseSchema.
@@ -800,6 +910,36 @@ type GetUserNotificationsResponseSchema struct {
 // GetUserResponseSchema defines model for GetUserResponseSchema.
 type GetUserResponseSchema struct {
 	User UserSchema `json:"user"`
+}
+
+// ImageMessage defines model for ImageMessage.
+type ImageMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time               `json:"createdAt"`
+	Direction   MessageDirectionEnum    `json:"direction"`
+	MessageData ImageMessageData        `json:"messageData"`
+	MessageType ImageMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum       `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// ImageMessageMessageType defines model for ImageMessage.MessageType.
+type ImageMessageMessageType string
+
+// ImageMessageData defines model for ImageMessageData.
+type ImageMessageData struct {
+	Caption *string `json:"caption,omitempty"`
+
+	// Id Image file identifier.
+	Id string `json:"id"`
+
+	// Link URL for the image file.
+	Link *string `json:"link,omitempty"`
 }
 
 // IntegrationSchema defines model for IntegrationSchema.
@@ -831,6 +971,40 @@ type JoinOrganizationResponseBodySchema struct {
 	Token string `json:"token"`
 }
 
+// LocationMessage defines model for LocationMessage.
+type LocationMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time                  `json:"createdAt"`
+	Direction   MessageDirectionEnum       `json:"direction"`
+	MessageData LocationMessageData        `json:"messageData"`
+	MessageType LocationMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum          `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// LocationMessageMessageType defines model for LocationMessage.MessageType.
+type LocationMessageMessageType string
+
+// LocationMessageData defines model for LocationMessageData.
+type LocationMessageData struct {
+	// Address (Optional) Address of the location.
+	Address *string `json:"address,omitempty"`
+
+	// Latitude Latitude of the location.
+	Latitude float64 `json:"latitude"`
+
+	// Longitude Longitude of the location.
+	Longitude float64 `json:"longitude"`
+
+	// Name (Optional) Name of the location.
+	Name *string `json:"name,omitempty"`
+}
+
 // LoginRequestBodySchema defines model for LoginRequestBodySchema.
 type LoginRequestBodySchema struct {
 	Password string `json:"password"`
@@ -841,6 +1015,11 @@ type LoginRequestBodySchema struct {
 type LoginResponseBodySchema struct {
 	IsOnboardingCompleted bool   `json:"isOnboardingCompleted"`
 	Token                 string `json:"token"`
+}
+
+// MarkConversationAsReadResponseSchema defines model for MarkConversationAsReadResponseSchema.
+type MarkConversationAsReadResponseSchema struct {
+	IsRead bool `json:"isRead"`
 }
 
 // MessageAnalyticGraphDataPointSchema defines model for MessageAnalyticGraphDataPointSchema.
@@ -856,15 +1035,9 @@ type MessageAnalyticGraphDataPointSchema struct {
 // MessageDirectionEnum defines model for MessageDirectionEnum.
 type MessageDirectionEnum string
 
-// MessageSchema defines model for MessageSchema.
+// MessageSchema The message object returned from the API (or retrieved from the database) with a discriminator to determine the concrete type.
 type MessageSchema struct {
-	ConversationId string                  `json:"conversationId"`
-	CreatedAt      time.Time               `json:"createdAt"`
-	Direction      MessageDirectionEnum    `json:"direction"`
-	MessageData    *map[string]interface{} `json:"messageData,omitempty"`
-	MessageType    MessageTypeEnum         `json:"message_type"`
-	Status         MessageStatusEnum       `json:"status"`
-	UniqueId       string                  `json:"uniqueId"`
+	union json.RawMessage
 }
 
 // MessageStatusEnum defines model for MessageStatusEnum.
@@ -906,9 +1079,6 @@ type MessageTypeDistributionGraphDataPointSchema struct {
 	Type     string `json:"type"`
 }
 
-// MessageTypeEnum defines model for MessageTypeEnum.
-type MessageTypeEnum string
-
 // NewCampaignSchema defines model for NewCampaignSchema.
 type NewCampaignSchema struct {
 	Description           *string    `json:"description,omitempty"`
@@ -938,11 +1108,19 @@ type NewContactSchema struct {
 	Status     ContactStatusEnum      `json:"status"`
 }
 
-// NewMessageSchema defines model for NewMessageSchema.
+// NewMessageDataSchema OneOf-based union for new message data, distinguished by `messageType`.
+type NewMessageDataSchema struct {
+	// MessageType The type for this new message data.
+	MessageType string `json:"messageType"`
+	union       json.RawMessage
+}
+
+// NewMessageSchema Request payload for sending a new message. The payload includes the messageType, createdAt date, and a messageData field whose structure depends on the messageType.
 type NewMessageSchema struct {
-	CreatedAt   *time.Time              `json:"createdAt,omitempty"`
-	MessageData *map[string]interface{} `json:"messageData,omitempty"`
-	MessageType *MessageTypeEnum        `json:"messageType,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+
+	// MessageData OneOf-based union for new message data, distinguished by `messageType`.
+	MessageData NewMessageDataSchema `json:"messageData"`
 }
 
 // NewOrganizationRoleSchema defines model for NewOrganizationRoleSchema.
@@ -1053,6 +1231,34 @@ type RateLimitErrorResponseSchema struct {
 	Reset     int    `json:"reset"`
 }
 
+// ReactionMessage defines model for ReactionMessage.
+type ReactionMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time                  `json:"createdAt"`
+	Direction   MessageDirectionEnum       `json:"direction"`
+	MessageData ReactionMessageData        `json:"messageData"`
+	MessageType ReactionMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum          `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// ReactionMessageMessageType defines model for ReactionMessage.MessageType.
+type ReactionMessageMessageType string
+
+// ReactionMessageData defines model for ReactionMessageData.
+type ReactionMessageData struct {
+	// MessageId ID of the message to which the reaction was added.
+	MessageId *string `json:"messageId,omitempty"`
+
+	// Reaction Reaction emoji.
+	Reaction string `json:"reaction"`
+}
+
 // RegenerateApiKeyResponseSchema defines model for RegenerateApiKeyResponseSchema.
 type RegenerateApiKeyResponseSchema struct {
 	ApiKey *ApiKeySchema `json:"apiKey,omitempty"`
@@ -1105,6 +1311,7 @@ type SegmentationRecommendation struct {
 
 // SendMessageInConversationResponseSchema defines model for SendMessageInConversationResponseSchema.
 type SendMessageInConversationResponseSchema struct {
+	// Message The message object returned from the API (or retrieved from the database) with a discriminator to determine the concrete type.
 	Message MessageSchema `json:"message"`
 }
 
@@ -1112,6 +1319,34 @@ type SendMessageInConversationResponseSchema struct {
 type SlackNotificationConfigurationSchema struct {
 	SlackChannel    string `json:"slackChannel"`
 	SlackWebhookUrl string `json:"slackWebhookUrl"`
+}
+
+// StickerMessage defines model for StickerMessage.
+type StickerMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time                 `json:"createdAt"`
+	Direction   MessageDirectionEnum      `json:"direction"`
+	MessageData StickerMessageData        `json:"messageData"`
+	MessageType StickerMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum         `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// StickerMessageMessageType defines model for StickerMessage.MessageType.
+type StickerMessageMessageType string
+
+// StickerMessageData defines model for StickerMessageData.
+type StickerMessageData struct {
+	// Id Sticker identifier.
+	Id string `json:"id"`
+
+	// Link URL for the sticker file.
+	Link *string `json:"link,omitempty"`
 }
 
 // SwitchOrganizationResponseSchema defines model for SwitchOrganizationResponseSchema.
@@ -1224,17 +1459,29 @@ type TemplateParameterInput struct {
 // TemplateParameterInputParameterType Specifies whether the parameter is static or dynamic.
 type TemplateParameterInputParameterType string
 
-// TemplateSchema defines model for TemplateSchema.
-type TemplateSchema struct {
-	BodyText  string                  `json:"bodyText"`
-	Content   string                  `json:"content"`
-	CreatedAt time.Time               `json:"createdAt"`
-	Footer    *map[string]interface{} `json:"footer,omitempty"`
-	Header    struct {
-		Content    *string `json:"content,omitempty"`
-		HeaderType *string `json:"headerType,omitempty"`
-	} `json:"header"`
-	TemplateId string `json:"templateId"`
+// TextMessage defines model for TextMessage.
+type TextMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time              `json:"createdAt"`
+	Direction   MessageDirectionEnum   `json:"direction"`
+	MessageData TextMessageData        `json:"messageData"`
+	MessageType TextMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum      `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// TextMessageMessageType defines model for TextMessage.MessageType.
+type TextMessageMessageType string
+
+// TextMessageData defines model for TextMessageData.
+type TextMessageData struct {
+	// Text The actual text message.
+	Text string `json:"text"`
 }
 
 // TransferOrganizationOwnershipResponseSchema defines model for TransferOrganizationOwnershipResponseSchema.
@@ -1382,6 +1629,12 @@ type UpdateWhatsAppBusinessAccountDetailsSchema struct {
 	BusinessAccountId string `json:"businessAccountId"`
 }
 
+// UploadFileInConversationResponseSchema defines model for UploadFileInConversationResponseSchema.
+type UploadFileInConversationResponseSchema struct {
+	MediaId  string `json:"mediaId"`
+	MediaUrl string `json:"mediaUrl"`
+}
+
 // UserPermissionLevelEnum defines model for UserPermissionLevelEnum.
 type UserPermissionLevelEnum string
 
@@ -1412,6 +1665,36 @@ type VerifyOtpRequestBodySchema struct {
 // VerifyOtpResponseBodySchema defines model for VerifyOtpResponseBodySchema.
 type VerifyOtpResponseBodySchema struct {
 	Token string `json:"token"`
+}
+
+// VideoMessage defines model for VideoMessage.
+type VideoMessage struct {
+	// ConversationId ID of the conversation.
+	ConversationId string `json:"conversationId"`
+
+	// CreatedAt Time when the message was created.
+	CreatedAt   time.Time               `json:"createdAt"`
+	Direction   MessageDirectionEnum    `json:"direction"`
+	MessageData VideoMessageData        `json:"messageData"`
+	MessageType VideoMessageMessageType `json:"messageType"`
+	Status      MessageStatusEnum       `json:"status"`
+
+	// UniqueId Unique identifier of the message.
+	UniqueId string `json:"uniqueId"`
+}
+
+// VideoMessageMessageType defines model for VideoMessage.MessageType.
+type VideoMessageMessageType string
+
+// VideoMessageData defines model for VideoMessageData.
+type VideoMessageData struct {
+	Caption *string `json:"caption,omitempty"`
+
+	// Id Video file identifier.
+	Id string `json:"id"`
+
+	// Link URL for the video file.
+	Link *string `json:"link,omitempty"`
 }
 
 // WhatsAppBusinessAccountDetailsSchema defines model for WhatsAppBusinessAccountDetailsSchema.
@@ -1594,6 +1877,12 @@ type GetConversationMessagesParams struct {
 
 	// Order order by asc or desc
 	Order *OrderEnum `form:"order,omitempty" json:"order,omitempty"`
+}
+
+// UploadFileInConversationMultipartBody defines parameters for UploadFileInConversation.
+type UploadFileInConversationMultipartBody struct {
+	// File The file to be uploaded
+	File *openapi_types.File `json:"file,omitempty"`
 }
 
 // GetConversationsParams defines parameters for GetConversations.
@@ -1815,6 +2104,9 @@ type SendMessageInConversationJSONRequestBody = NewMessageSchema
 // UnassignConversationJSONRequestBody defines body for UnassignConversation for application/json ContentType.
 type UnassignConversationJSONRequestBody = UnassignConversationSchema
 
+// UploadFileInConversationMultipartRequestBody defines body for UploadFileInConversation for multipart/form-data ContentType.
+type UploadFileInConversationMultipartRequestBody UploadFileInConversationMultipartBody
+
 // CreateListJSONRequestBody defines body for CreateList for application/json ContentType.
 type CreateListJSONRequestBody = NewContactListSchema
 
@@ -1853,3 +2145,590 @@ type UpdateOrganizationRoleByIdJSONRequestBody = RoleUpdateSchema
 
 // UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
 type UpdateUserJSONRequestBody = UpdateUserSchema
+
+// AsTextMessage returns the union data inside the MessageSchema as a TextMessage
+func (t MessageSchema) AsTextMessage() (TextMessage, error) {
+	var body TextMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromTextMessage overwrites any union data inside the MessageSchema as the provided TextMessage
+func (t *MessageSchema) FromTextMessage(v TextMessage) error {
+	v.MessageType = "Text"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeTextMessage performs a merge with any union data inside the MessageSchema, using the provided TextMessage
+func (t *MessageSchema) MergeTextMessage(v TextMessage) error {
+	v.MessageType = "Text"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAudioMessage returns the union data inside the MessageSchema as a AudioMessage
+func (t MessageSchema) AsAudioMessage() (AudioMessage, error) {
+	var body AudioMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAudioMessage overwrites any union data inside the MessageSchema as the provided AudioMessage
+func (t *MessageSchema) FromAudioMessage(v AudioMessage) error {
+	v.MessageType = "Audio"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAudioMessage performs a merge with any union data inside the MessageSchema, using the provided AudioMessage
+func (t *MessageSchema) MergeAudioMessage(v AudioMessage) error {
+	v.MessageType = "Audio"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsLocationMessage returns the union data inside the MessageSchema as a LocationMessage
+func (t MessageSchema) AsLocationMessage() (LocationMessage, error) {
+	var body LocationMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromLocationMessage overwrites any union data inside the MessageSchema as the provided LocationMessage
+func (t *MessageSchema) FromLocationMessage(v LocationMessage) error {
+	v.MessageType = "Location"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeLocationMessage performs a merge with any union data inside the MessageSchema, using the provided LocationMessage
+func (t *MessageSchema) MergeLocationMessage(v LocationMessage) error {
+	v.MessageType = "Location"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsVideoMessage returns the union data inside the MessageSchema as a VideoMessage
+func (t MessageSchema) AsVideoMessage() (VideoMessage, error) {
+	var body VideoMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromVideoMessage overwrites any union data inside the MessageSchema as the provided VideoMessage
+func (t *MessageSchema) FromVideoMessage(v VideoMessage) error {
+	v.MessageType = "Video"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeVideoMessage performs a merge with any union data inside the MessageSchema, using the provided VideoMessage
+func (t *MessageSchema) MergeVideoMessage(v VideoMessage) error {
+	v.MessageType = "Video"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsImageMessage returns the union data inside the MessageSchema as a ImageMessage
+func (t MessageSchema) AsImageMessage() (ImageMessage, error) {
+	var body ImageMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromImageMessage overwrites any union data inside the MessageSchema as the provided ImageMessage
+func (t *MessageSchema) FromImageMessage(v ImageMessage) error {
+	v.MessageType = "Image"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeImageMessage performs a merge with any union data inside the MessageSchema, using the provided ImageMessage
+func (t *MessageSchema) MergeImageMessage(v ImageMessage) error {
+	v.MessageType = "Image"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDocumentMessage returns the union data inside the MessageSchema as a DocumentMessage
+func (t MessageSchema) AsDocumentMessage() (DocumentMessage, error) {
+	var body DocumentMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDocumentMessage overwrites any union data inside the MessageSchema as the provided DocumentMessage
+func (t *MessageSchema) FromDocumentMessage(v DocumentMessage) error {
+	v.MessageType = "Document"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDocumentMessage performs a merge with any union data inside the MessageSchema, using the provided DocumentMessage
+func (t *MessageSchema) MergeDocumentMessage(v DocumentMessage) error {
+	v.MessageType = "Document"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsStickerMessage returns the union data inside the MessageSchema as a StickerMessage
+func (t MessageSchema) AsStickerMessage() (StickerMessage, error) {
+	var body StickerMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromStickerMessage overwrites any union data inside the MessageSchema as the provided StickerMessage
+func (t *MessageSchema) FromStickerMessage(v StickerMessage) error {
+	v.MessageType = "Sticker"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeStickerMessage performs a merge with any union data inside the MessageSchema, using the provided StickerMessage
+func (t *MessageSchema) MergeStickerMessage(v StickerMessage) error {
+	v.MessageType = "Sticker"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsReactionMessage returns the union data inside the MessageSchema as a ReactionMessage
+func (t MessageSchema) AsReactionMessage() (ReactionMessage, error) {
+	var body ReactionMessage
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromReactionMessage overwrites any union data inside the MessageSchema as the provided ReactionMessage
+func (t *MessageSchema) FromReactionMessage(v ReactionMessage) error {
+	v.MessageType = "Reaction"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeReactionMessage performs a merge with any union data inside the MessageSchema, using the provided ReactionMessage
+func (t *MessageSchema) MergeReactionMessage(v ReactionMessage) error {
+	v.MessageType = "Reaction"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t MessageSchema) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"messageType"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t MessageSchema) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "Audio":
+		return t.AsAudioMessage()
+	case "Document":
+		return t.AsDocumentMessage()
+	case "Image":
+		return t.AsImageMessage()
+	case "Location":
+		return t.AsLocationMessage()
+	case "Reaction":
+		return t.AsReactionMessage()
+	case "Sticker":
+		return t.AsStickerMessage()
+	case "Text":
+		return t.AsTextMessage()
+	case "Video":
+		return t.AsVideoMessage()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t MessageSchema) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *MessageSchema) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsTextMessageData returns the union data inside the NewMessageDataSchema as a TextMessageData
+func (t NewMessageDataSchema) AsTextMessageData() (TextMessageData, error) {
+	var body TextMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromTextMessageData overwrites any union data inside the NewMessageDataSchema as the provided TextMessageData
+func (t *NewMessageDataSchema) FromTextMessageData(v TextMessageData) error {
+	t.MessageType = "Text"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeTextMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided TextMessageData
+func (t *NewMessageDataSchema) MergeTextMessageData(v TextMessageData) error {
+	t.MessageType = "Text"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAudioMessageData returns the union data inside the NewMessageDataSchema as a AudioMessageData
+func (t NewMessageDataSchema) AsAudioMessageData() (AudioMessageData, error) {
+	var body AudioMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAudioMessageData overwrites any union data inside the NewMessageDataSchema as the provided AudioMessageData
+func (t *NewMessageDataSchema) FromAudioMessageData(v AudioMessageData) error {
+	t.MessageType = "Audio"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAudioMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided AudioMessageData
+func (t *NewMessageDataSchema) MergeAudioMessageData(v AudioMessageData) error {
+	t.MessageType = "Audio"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsVideoMessageData returns the union data inside the NewMessageDataSchema as a VideoMessageData
+func (t NewMessageDataSchema) AsVideoMessageData() (VideoMessageData, error) {
+	var body VideoMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromVideoMessageData overwrites any union data inside the NewMessageDataSchema as the provided VideoMessageData
+func (t *NewMessageDataSchema) FromVideoMessageData(v VideoMessageData) error {
+	t.MessageType = "Video"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeVideoMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided VideoMessageData
+func (t *NewMessageDataSchema) MergeVideoMessageData(v VideoMessageData) error {
+	t.MessageType = "Video"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsImageMessageData returns the union data inside the NewMessageDataSchema as a ImageMessageData
+func (t NewMessageDataSchema) AsImageMessageData() (ImageMessageData, error) {
+	var body ImageMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromImageMessageData overwrites any union data inside the NewMessageDataSchema as the provided ImageMessageData
+func (t *NewMessageDataSchema) FromImageMessageData(v ImageMessageData) error {
+	t.MessageType = "Image"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeImageMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided ImageMessageData
+func (t *NewMessageDataSchema) MergeImageMessageData(v ImageMessageData) error {
+	t.MessageType = "Image"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDocumentMessageData returns the union data inside the NewMessageDataSchema as a DocumentMessageData
+func (t NewMessageDataSchema) AsDocumentMessageData() (DocumentMessageData, error) {
+	var body DocumentMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDocumentMessageData overwrites any union data inside the NewMessageDataSchema as the provided DocumentMessageData
+func (t *NewMessageDataSchema) FromDocumentMessageData(v DocumentMessageData) error {
+	t.MessageType = "Document"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDocumentMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided DocumentMessageData
+func (t *NewMessageDataSchema) MergeDocumentMessageData(v DocumentMessageData) error {
+	t.MessageType = "Document"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsStickerMessageData returns the union data inside the NewMessageDataSchema as a StickerMessageData
+func (t NewMessageDataSchema) AsStickerMessageData() (StickerMessageData, error) {
+	var body StickerMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromStickerMessageData overwrites any union data inside the NewMessageDataSchema as the provided StickerMessageData
+func (t *NewMessageDataSchema) FromStickerMessageData(v StickerMessageData) error {
+	t.MessageType = "Sticker"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeStickerMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided StickerMessageData
+func (t *NewMessageDataSchema) MergeStickerMessageData(v StickerMessageData) error {
+	t.MessageType = "Sticker"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsReactionMessageData returns the union data inside the NewMessageDataSchema as a ReactionMessageData
+func (t NewMessageDataSchema) AsReactionMessageData() (ReactionMessageData, error) {
+	var body ReactionMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromReactionMessageData overwrites any union data inside the NewMessageDataSchema as the provided ReactionMessageData
+func (t *NewMessageDataSchema) FromReactionMessageData(v ReactionMessageData) error {
+	t.MessageType = "Reaction"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeReactionMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided ReactionMessageData
+func (t *NewMessageDataSchema) MergeReactionMessageData(v ReactionMessageData) error {
+	t.MessageType = "Reaction"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsLocationMessageData returns the union data inside the NewMessageDataSchema as a LocationMessageData
+func (t NewMessageDataSchema) AsLocationMessageData() (LocationMessageData, error) {
+	var body LocationMessageData
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromLocationMessageData overwrites any union data inside the NewMessageDataSchema as the provided LocationMessageData
+func (t *NewMessageDataSchema) FromLocationMessageData(v LocationMessageData) error {
+	t.MessageType = "Location"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeLocationMessageData performs a merge with any union data inside the NewMessageDataSchema, using the provided LocationMessageData
+func (t *NewMessageDataSchema) MergeLocationMessageData(v LocationMessageData) error {
+	t.MessageType = "Location"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t NewMessageDataSchema) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"messageType"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t NewMessageDataSchema) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "Audio":
+		return t.AsAudioMessageData()
+	case "Document":
+		return t.AsDocumentMessageData()
+	case "Image":
+		return t.AsImageMessageData()
+	case "Location":
+		return t.AsLocationMessageData()
+	case "Reaction":
+		return t.AsReactionMessageData()
+	case "Sticker":
+		return t.AsStickerMessageData()
+	case "Text":
+		return t.AsTextMessageData()
+	case "Video":
+		return t.AsVideoMessageData()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t NewMessageDataSchema) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	object := make(map[string]json.RawMessage)
+	if t.union != nil {
+		err = json.Unmarshal(b, &object)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	object["messageType"], err = json.Marshal(t.MessageType)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'messageType': %w", err)
+	}
+
+	b, err = json.Marshal(object)
+	return b, err
+}
+
+func (t *NewMessageDataSchema) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	if err != nil {
+		return err
+	}
+	object := make(map[string]json.RawMessage)
+	err = json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["messageType"]; found {
+		err = json.Unmarshal(raw, &t.MessageType)
+		if err != nil {
+			return fmt.Errorf("error reading 'messageType': %w", err)
+		}
+	}
+
+	return err
+}

@@ -3197,6 +3197,108 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
+  /conversation/{id}/upload:
+    post:
+      tags:
+        - Conversations
+      description: upload a file in a conversation
+      operationId: uploadFileInConversation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id value of the conversation you want to upload a file to.
+          schema:
+            type: string
+      requestBody:
+        description: new file info
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to be uploaded
+
+      responses:
+        "200":
+          description: file object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadFileInConversationResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
+  /conversation/{id}/read:
+    post:
+      tags:
+        - Conversations
+      description: mark a conversation as read
+      operationId: markConversationAsRead
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id value of the conversation you want to mark as read.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarkConversationAsReadResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
   /messages:
     get:
       tags:
@@ -4709,7 +4811,7 @@ components:
       type: object
       properties:
         template:
-          $ref: "#/components/schemas/TemplateSchema"
+          $ref: "#/components/schemas/MessageTemplateSchema"
       required:
         - template
 
@@ -5222,34 +5324,6 @@ components:
       required:
         - email
 
-    TemplateSchema:
-      type: object
-      properties:
-        templateId:
-          type: string
-        bodyText:
-          type: string
-        header:
-          type: object
-          properties:
-            headerType:
-              type: string
-            content:
-              type: string
-        footer:
-          type: object
-        content:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - templateId
-        - bodyText
-        - header
-        - content
-        - createdAt
-
     CampaignSchema:
       type: object
       properties:
@@ -5481,6 +5555,8 @@ components:
           format: date-time
         numberOfUnreadMessages:
           type: integer
+        totalMessages:
+          type: integer
         status:
           $ref: "#/components/schemas/ConversationStatusEnum"
         assignedTo:
@@ -5567,44 +5643,339 @@ components:
       required:
         - data
 
-    MessageSchema:
+    BaseMessage:
       type: object
+      description: >
+        The base message object that contains common properties for all message types.
       properties:
         uniqueId:
           type: string
+          description: Unique identifier of the message.
         conversationId:
           type: string
+          description: ID of the conversation.
         direction:
           $ref: "#/components/schemas/MessageDirectionEnum"
+          description: >
+            Direction of the message – whether it was received (inbound) or sent (outbound).
         status:
           $ref: "#/components/schemas/MessageStatusEnum"
-        message_type:
-          $ref: "#/components/schemas/MessageTypeEnum"
+          description: Message status.
+        messageType:
+          type: string
+          description: Discriminator field used to determine the concrete message type.
         createdAt:
           type: string
           format: date-time
-        messageData:
-          type: object
-          properties: {} # Define object structure if needed
+          description: Time when the message was created.
       required:
         - uniqueId
         - conversationId
-        - message
         - direction
         - status
-        - message_type
+        - messageType
         - createdAt
 
-    NewMessageSchema:
+    TextMessageData:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The actual text message.
+      required:
+        - text
+
+    TextMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Text
+            messageData:
+              $ref: "#/components/schemas/TextMessageData"
+          required:
+            - messageData
+
+    AudioMessageData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Audio file identifier.
+        link:
+          type: string
+          format: uri
+          description: URL for the audio file.
+      required:
+        - id
+
+    AudioMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Audio
+            messageData:
+              $ref: "#/components/schemas/AudioMessageData"
+          required:
+            - messageData
+
+    VideoMessageData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Video file identifier.
+        link:
+          type: string
+          format: uri
+          description: URL for the video file.
+        caption:
+          type: string
+      required:
+        - id
+
+    VideoMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Video
+            messageData:
+              $ref: "#/components/schemas/VideoMessageData"
+          required:
+            - messageData
+
+    ImageMessageData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Image file identifier.
+        link:
+          type: string
+          format: uri
+          description: URL for the image file.
+        caption:
+          type: string
+      required:
+        - id
+
+    ImageMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Image
+            messageData:
+              $ref: "#/components/schemas/ImageMessageData"
+          required:
+            - messageData
+
+    DocumentMessageData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Document file identifier.
+        link:
+          type: string
+          format: uri
+          description: URL for the document file.
+        fileName:
+          type: string
+          description: Name of the document file.
+        caption:
+          type: string
+          description: (Optional) Caption for the document.
+      required:
+        - id
+        - fileName
+
+    DocumentMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Document
+            messageData:
+              $ref: "#/components/schemas/DocumentMessageData"
+          required:
+            - messageData
+
+    StickerMessageData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Sticker identifier.
+        link:
+          type: string
+          format: uri
+          description: URL for the sticker file.
+      required:
+        - id
+
+    StickerMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Sticker
+            messageData:
+              $ref: "#/components/schemas/StickerMessageData"
+          required:
+            - messageData
+
+    ReactionMessageData:
+      type: object
+      properties:
+        reaction:
+          type: string
+          description: Reaction emoji.
+        messageId:
+          type: string
+          description: ID of the message to which the reaction was added.
+      required:
+        - reaction
+
+    ReactionMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Reaction
+            messageData:
+              $ref: "#/components/schemas/ReactionMessageData"
+          required:
+            - messageData
+
+    LocationMessageData:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: Latitude of the location.
+        longitude:
+          type: number
+          format: double
+          description: Longitude of the location.
+        address:
+          type: string
+          description: (Optional) Address of the location.
+        name:
+          type: string
+          description: (Optional) Name of the location.
+      required:
+        - latitude
+        - longitude
+
+    LocationMessage:
+      allOf:
+        - $ref: "#/components/schemas/BaseMessage"
+        - type: object
+          properties:
+            messageType:
+              type: string
+              enum:
+                - Location
+            messageData:
+              $ref: "#/components/schemas/LocationMessageData"
+          required:
+            - messageData
+
+    MessageSchema:
+      description: >
+        The message object returned from the API (or retrieved from the database) with
+        a discriminator to determine the concrete type.
+      oneOf:
+        - $ref: "#/components/schemas/TextMessage"
+        - $ref: "#/components/schemas/AudioMessage"
+        - $ref: "#/components/schemas/LocationMessage"
+        - $ref: "#/components/schemas/VideoMessage"
+        - $ref: "#/components/schemas/ImageMessage"
+        - $ref: "#/components/schemas/DocumentMessage"
+        - $ref: "#/components/schemas/StickerMessage"
+        - $ref: "#/components/schemas/ReactionMessage"
+      discriminator:
+        propertyName: messageType
+        mapping:
+          Text: "#/components/schemas/TextMessage"
+          Audio: "#/components/schemas/AudioMessage"
+          Location: "#/components/schemas/LocationMessage"
+          Video: "#/components/schemas/VideoMessage"
+          Image: "#/components/schemas/ImageMessage"
+          Document: "#/components/schemas/DocumentMessage"
+          Sticker: "#/components/schemas/StickerMessage"
+          Reaction: "#/components/schemas/ReactionMessage"
+
+    NewMessageDataSchema:
+      type: object
+      description: >
+        OneOf-based union for new message data, distinguished by `messageType`.
+      discriminator:
+        propertyName: messageType
+        mapping:
+          Text: "#/components/schemas/TextMessageData"
+          Audio: "#/components/schemas/AudioMessageData"
+          Video: "#/components/schemas/VideoMessageData"
+          Image: "#/components/schemas/ImageMessageData"
+          Document: "#/components/schemas/DocumentMessageData"
+          Sticker: "#/components/schemas/StickerMessageData"
+          Reaction: "#/components/schemas/ReactionMessageData"
+          Location: "#/components/schemas/LocationMessageData"
+      required:
+        - messageType
       properties:
         messageType:
-          $ref: "#/components/schemas/MessageTypeEnum"
+          type: string
+          description: The type for this new message data.
+      oneOf:
+        - $ref: "#/components/schemas/TextMessageData"
+        - $ref: "#/components/schemas/AudioMessageData"
+        - $ref: "#/components/schemas/VideoMessageData"
+        - $ref: "#/components/schemas/ImageMessageData"
+        - $ref: "#/components/schemas/DocumentMessageData"
+        - $ref: "#/components/schemas/StickerMessageData"
+        - $ref: "#/components/schemas/ReactionMessageData"
+        - $ref: "#/components/schemas/LocationMessageData"
+
+    NewMessageSchema:
+      description: >
+        Request payload for sending a new message. The payload includes the messageType,
+        createdAt date, and a messageData field whose structure depends on the messageType.
+      type: object
+      required:
+        - createdAt
+        - messageData
+      properties:
         createdAt:
           type: string
           format: date-time
         messageData:
-          type: object
-          properties: {} # Define object structure if needed
+          $ref: "#/components/schemas/NewMessageDataSchema"
 
     SendMessageInConversationResponseSchema:
       type: object
@@ -6591,3 +6962,22 @@ components:
           type: boolean
       required:
         - isPasswordReset
+
+    UploadFileInConversationResponseSchema:
+      type: object
+      properties:
+        mediaId:
+          type: string
+        mediaUrl:
+          type: string
+      required:
+        - mediaId
+        - mediaUrl
+
+    MarkConversationAsReadResponseSchema:
+      type: object
+      properties:
+        isRead:
+          type: boolean
+      required:
+        - isRead

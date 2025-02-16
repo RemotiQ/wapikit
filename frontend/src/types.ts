@@ -1,3 +1,4 @@
+import { type MessageTypeEnum } from 'root/.generated'
 import type { Icons } from '~/components/icons'
 
 export interface NavItem {
@@ -50,6 +51,7 @@ export type TipCardPropType = {
 	title: string
 	description: string
 	href: string
+	ctaText: string
 }
 
 export const UtmTags = [
@@ -60,3 +62,10 @@ export const UtmTags = [
 	'utm_content',
 	'ref'
 ] as const
+
+export type ConversationFileAttachmentType = {
+	file: File
+	isUploading: boolean
+	mediaType: MessageTypeEnum
+	fileName: string
+}

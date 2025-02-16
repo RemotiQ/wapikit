@@ -207,7 +207,7 @@ const CampaignsPage = () => {
 											campaignData.campaign.status === 'Cancelled' ||
 											campaignData.campaign.status === 'Finished'
 										}
-										className="flex flex-row gap-2"
+										className="flex flex-row gap-1"
 									>
 										<Icons.edit className="size-4" />
 										Edit
@@ -685,7 +685,7 @@ const CampaignsPage = () => {
 									})
 								} else if (campaign.status === 'Draft') {
 									actions.push({
-										icon: 'arrowRight',
+										icon: 'send',
 										label: 'Send',
 										disabled: isBusy,
 										onClick: () => {
