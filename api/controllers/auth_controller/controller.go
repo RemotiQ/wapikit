@@ -929,7 +929,8 @@ func resetPasswordVerify(context interfaces.ContextWithoutSession) error {
 	userQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
 
 	if user.UniqueId == uuid.Nil {
-		return context.JSON(http.StatusNotFound, "User not found")
+		// * user not found, but do not reveal this to the user
+		return context.JSON(http.StatusNotFound, "Invalid OTP")
 	}
 
 	cacheKey := context.App.Redis.ComputeCacheKey("otp", payload.Email, "reset-password")

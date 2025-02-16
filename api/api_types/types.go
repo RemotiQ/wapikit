@@ -890,7 +890,7 @@ type GetSegmentationRecommendationsResponse struct {
 
 // GetTemplateByIdResponseSchema defines model for GetTemplateByIdResponseSchema.
 type GetTemplateByIdResponseSchema struct {
-	Template TemplateSchema `json:"template"`
+	Template MessageTemplateSchema `json:"template"`
 }
 
 // GetUserNotificationsResponseSchema defines model for GetUserNotificationsResponseSchema.
@@ -1446,19 +1446,6 @@ type TemplateParameterInput struct {
 
 // TemplateParameterInputParameterType Specifies whether the parameter is static or dynamic.
 type TemplateParameterInputParameterType string
-
-// TemplateSchema defines model for TemplateSchema.
-type TemplateSchema struct {
-	BodyText  string                  `json:"bodyText"`
-	Content   string                  `json:"content"`
-	CreatedAt time.Time               `json:"createdAt"`
-	Footer    *map[string]interface{} `json:"footer,omitempty"`
-	Header    struct {
-		Content    *string `json:"content,omitempty"`
-		HeaderType *string `json:"headerType,omitempty"`
-	} `json:"header"`
-	TemplateId string `json:"templateId"`
-}
 
 // TextMessage defines model for TextMessage.
 type TextMessage struct {

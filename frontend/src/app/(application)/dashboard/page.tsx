@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Divider } from '@tremor/react'
 import { Toaster } from '~/components/ui/sonner'
-import { useGetAggregateCounts, useGetCampaigns } from 'root/.generated'
+import { CampaignStatusEnum, useGetAggregateCounts, useGetCampaigns } from 'root/.generated'
 import React from 'react'
 import dayjs from 'dayjs'
 import { useAuthState } from '~/hooks/use-auth-state'
@@ -19,6 +19,7 @@ import { Separator } from '~/components/ui/separator'
 import { Callout } from '~/components/ui/callout'
 import { createHref } from '~/reusable-functions'
 import { OFFICIAL_DOCUMENTATION_URL } from '~/constants'
+import Image from 'next/image'
 
 export default function Page() {
 	const { authState } = useAuthState()
@@ -116,7 +117,7 @@ export default function Page() {
 					</p>
 				</div>
 
-				<div className="flex h-full flex-1 flex-col gap-6 rounded-lg">
+				<div className="flex h-full flex-1 flex-col gap-2 rounded-lg">
 					<Callout variant="success" title="Important" icon={Icons.infoCircle}>
 						<div className="flex max-w-6xl flex-col gap-2 rounded-lg">
 							<p className="font-medium">
@@ -355,28 +356,79 @@ export default function Page() {
 							</div>
 
 							<div className="grid h-full w-full flex-1 grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-								{campaigns?.campaigns.map((campaign, index) => {
-									return <DashboardCampaignCard campaign={campaign} key={index} />
-								})}
+								{campaigns?.campaigns
+									.sort((a, b) => {
+										const statusOrder = {
+											[CampaignStatusEnum.Running]: 2,
+											[CampaignStatusEnum.Scheduled]: 1,
+											[CampaignStatusEnum.Draft]: 0,
+											[CampaignStatusEnum.Paused]: -1,
+											[CampaignStatusEnum.Finished]: -2,
+											[CampaignStatusEnum.Cancelled]: -3
+										}
+
+										return statusOrder[b.status] - statusOrder[a.status]
+									})
+									.map((campaign, index) => {
+										return (
+											<DashboardCampaignCard
+												campaign={campaign}
+												key={index}
+											/>
+										)
+									})}
 
 								{campaigns?.campaigns.length && campaigns?.campaigns.length < 3 ? (
 									<Card
 										key={'send_more_cta'}
-										className="min-w-md flex w-full max-w-lg flex-col items-center justify-center gap-6 p-4"
+										className="min-w-md flex w-full max-w-md flex-col items-center justify-center gap-3 p-3"
 									>
-										<p className="max-w-xs text-center text-lg text-muted-foreground">
-											Send more campaigns to your contacts to keep them
-											engaged.
-										</p>
-										<Link href={'/campaigns/new-or-edit'}>
-											<Button
-												variant={'secondary'}
-												className="flex items-center gap-2"
+										<div className="flex flex-1 flex-col gap-2">
+											<div className="flex flex-row gap-2">
+												<div
+													className={`flex h-fit rounded-lg bg-accent p-3`}
+												>
+													<Icons.announcement className="size-6" />
+												</div>
+												<div className="gap-.5 flex flex-col">
+													<h3 className="font-semibold">
+														Send More Campaigns
+													</h3>
+													<p className="max-w-xs text-left text-sm text-muted-foreground">
+														Send more campaigns to your contacts to keep
+														them engaged.
+													</p>
+												</div>
+											</div>
+
+											<div className="object-fit h-full w-full flex items-center justify-center rounded-lg bg-accent">
+												<Image
+													src={'/assets/dashboard/campaign.svg'}
+													height={200}
+													width={250}
+													alt="campaigns"
+													className='opacity-75'
+												/>
+											</div>
+										</div>
+										<div className='flex flex-col w-full'>
+											<Separator orientation="horizontal" className="" />
+											<Link
+												key={'send_more_cta'}
+												href={'/campaigns/new-or-edit'}
+												className="pl-3 hover:cursor-pointer mt-2"
 											>
-												<Icons.announcement className="size-4" />
-												Send Campaign
-											</Button>
-										</Link>
+												<Button
+													variant={'link'}
+													className="!p-0 hover:underline"
+												>
+													<Icons.arrowCircleRight className="size-4" />
+													<span className="text-sm">
+														Create a new Campaign
+													</span>
+												</Button>
+											</Link>
+										</div>
 									</Card>
 								) : null}
 							</div>

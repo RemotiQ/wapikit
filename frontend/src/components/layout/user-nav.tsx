@@ -14,16 +14,24 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { useAuthState } from '~/hooks/use-auth-state'
 import { Icons } from '../icons'
+import { useLayoutStore } from '~/store/layout.store'
+import { clsx } from 'clsx'
 
 export function UserNav() {
 	const router = useRouter()
 	const { authState } = useAuthState()
+	const { subscriptionDetails } = useLayoutStore()
 	if (authState.isAuthenticated) {
 		return (
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" size={'icon'} className="relative">
-						<Avatar className="h-7 w-7">
+						<Avatar
+							className={clsx(
+								'h-7 w-7',
+								subscriptionDetails ? 'ring-2 ring-primary' : ''
+							)}
+						>
 							<AvatarImage
 								src={'/assets/empty-pfp.png'}
 								alt={authState.data.user.name}

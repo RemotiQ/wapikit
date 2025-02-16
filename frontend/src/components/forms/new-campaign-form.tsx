@@ -206,7 +206,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 					if (data.templateId) {
 						// fetch the template here and show the modal
 
-						const templateInuse = await getTemplateById(data.templateId)
+						const templateInuse = (await getTemplateById(data.templateId)).template
 						if (!templateInuse) {
 							errorNotification({
 								message:
@@ -215,6 +215,12 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 						}
 
 						setIsTemplateComponentsInputModalOpen(true)
+
+						const parameterCount = countParameterCountInTemplateComponent(templateInuse)
+
+						if (parameterCount === 0) {
+							router.push(`/campaigns`)
+						}
 					} else {
 						router.push(`/campaigns`)
 					}

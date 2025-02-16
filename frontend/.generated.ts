@@ -465,7 +465,7 @@ export interface GetContactListResponseSchema {
 }
 
 export interface GetTemplateByIdResponseSchema {
-	template: TemplateSchema
+	template: MessageTemplateSchema
 }
 
 export interface GetContactsResponseSchema {
@@ -690,22 +690,6 @@ export interface PaginationMeta {
 
 export interface UpdateOrganizationMemberSchema {
 	accessLevel?: UserPermissionLevelEnum
-}
-
-export type TemplateSchemaHeader = {
-	headerType?: string
-	content?: string
-}
-
-export type TemplateSchemaFooter = { [key: string]: unknown }
-
-export interface TemplateSchema {
-	templateId: string
-	bodyText: string
-	header: TemplateSchemaHeader
-	footer?: TemplateSchemaFooter
-	content: string
-	createdAt: string
 }
 
 export type CampaignSchemaProgress = {
