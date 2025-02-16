@@ -251,12 +251,14 @@ func (service *ConversationService) BuildSendMessagePayload(messageType string, 
 		return imageMsg, nil
 
 	case string(api_types.Document):
-		// documentData, err := utils.ConvertMapToStruct[api_types.DocumentMessageData](dataMap)
+		documentData, err := utils.ConvertMapToStruct[api_types.DocumentMessageData](dataMap)
 		if err != nil {
 			return nil, err
 		}
 		documentMsg, err := components.NewDocumentMessage(components.DocumentMessageConfigs{
-			// ! TODO: Add document configs
+			Id:       documentData.Id,
+			Caption:  documentData.Caption,
+			FileName: documentData.FileName,
 		})
 		if err != nil {
 			return nil, err

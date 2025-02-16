@@ -13,7 +13,7 @@ import {
 	DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 import { Icons } from '../icons'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
 	type ConversationSchema,
 	type MessageSchema,
@@ -22,6 +22,7 @@ import {
 	useAssignConversation,
 	useGetConversationResponseSuggestions,
 	useGetOrganizationMembers,
+	useMarkConversationAsRead,
 	useSendMessageInConversation,
 	useUnassignConversation
 } from 'root/.generated'
@@ -78,6 +79,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const assignConversationMutation = useAssignConversation()
 	const unassignConversationMutation = useUnassignConversation()
 	const sendMessageInConversation = useSendMessageInConversation()
+	const { mutateAsync: markAsRead, isPending } = useMarkConversationAsRead()
 
 	const assignConversationForm = useForm<z.infer<typeof AssignConversationForm>>({
 		resolver: zodResolver(AssignConversationForm)
@@ -192,6 +194,35 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 
 	const [messageContent, setMessageContent] = useState<string | null>(null)
 
+	useEffect(() => {
+		if (!isPending && currentConversation && currentConversation.numberOfUnreadMessages > 0) {
+			markAsRead({
+				id: currentConversation.uniqueId
+			})
+				.then(data => {
+					if (data.isRead) {
+						writeConversationInboxStoreProperty({
+							conversations: conversations.map(convo =>
+								convo.uniqueId === currentConversation.uniqueId
+									? {
+											...convo,
+											numberOfUnreadMessages: 0
+										}
+									: convo
+							)
+						})
+					}
+				})
+				.catch(error => console.error(error))
+		}
+	}, [
+		conversations,
+		currentConversation,
+		isPending,
+		markAsRead,
+		writeConversationInboxStoreProperty
+	])
+
 	const {
 		data: suggestions,
 		refetch: refetchSuggestions,
@@ -299,7 +330,9 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 								messageData = {
 									messageType: MessageTypeEnum.Document,
 									id: mediaId,
-									link: mediaUrl
+									link: mediaUrl,
+									fileName: file.fileName,
+									caption: textInputRef.current?.value
 								}
 								break
 
@@ -387,21 +420,6 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 			pushMessageToConversation
 		]
 	)
-
-	// useEffect(() => {
-	// 	// check if input is focussed, on enter sendMessage function should be called
-	// 	const handleKeyDown = (event: KeyboardEvent) => {
-	// 		if (
-	// 			document.activeElement === textInputRef.current &&
-	// 			event.key === 'Enter' &&
-	// 			messageContent
-	// 		) {
-	// 			sendMessage(messageContent).catch(error => console.error(error))
-	// 		}
-	// 	}
-
-	// 	textInputRef.current?.addEventListener('keydown', handleKeyDown)
-	// }, [messageContent, sendMessage])
 
 	const groupedMessages = groupMessagesByDate(currentConversation?.messages || [])
 
@@ -655,7 +673,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 						) : null}
 						<CardFooter className="flex w-full flex-col items-center gap-2 bg-white dark:bg-[#202c33]">
 							<Separator />
-							<div className="flex w-full items-center justify-start gap-2 px-2 mt-2 overflow-visible">
+							<div className="mt-2 flex w-full items-center justify-start gap-2 overflow-visible px-2">
 								{attachedFiles.length > 0 && (
 									<div className="flex flex-row items-end gap-2 overflow-x-scroll">
 										{attachedFiles.map(file => (

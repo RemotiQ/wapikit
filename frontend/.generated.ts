@@ -1074,6 +1074,10 @@ export interface DocumentMessageData {
 	id: string
 	/** URL for the document file. */
 	link?: string
+	/** Name of the document file. */
+	fileName: string
+	/** (Optional) Caption for the document. */
+	caption?: string
 	messageType: DocumentMessageDataMessageType
 }
 
@@ -1802,6 +1806,10 @@ export interface ResetPasswordCompleteResponseBodySchema {
 export interface UploadFileInConversationResponseSchema {
 	mediaId: string
 	mediaUrl: string
+}
+
+export interface MarkConversationAsReadResponseSchema {
+	isRead: boolean
 }
 
 export type GetHealthCheck200 = {
@@ -9550,6 +9558,91 @@ export const useUploadFileInConversation = <
 	TContext
 > => {
 	const mutationOptions = getUploadFileInConversationMutationOptions(options)
+
+	return useMutation(mutationOptions)
+}
+
+/**
+ * mark a conversation as read
+ */
+export const markConversationAsRead = (id: string, signal?: AbortSignal) => {
+	return customInstance<MarkConversationAsReadResponseSchema>({
+		url: `/conversation/${id}/read`,
+		method: 'POST',
+		signal
+	})
+}
+
+export const getMarkConversationAsReadMutationOptions = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof markConversationAsRead>>,
+		TError,
+		{ id: string },
+		TContext
+	>
+}): UseMutationOptions<
+	Awaited<ReturnType<typeof markConversationAsRead>>,
+	TError,
+	{ id: string },
+	TContext
+> => {
+	const mutationKey = ['markConversationAsRead']
+	const { mutation: mutationOptions } = options
+		? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey } }
+
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof markConversationAsRead>>,
+		{ id: string }
+	> = props => {
+		const { id } = props ?? {}
+
+		return markConversationAsRead(id)
+	}
+
+	return { mutationFn, ...mutationOptions }
+}
+
+export type MarkConversationAsReadMutationResult = NonNullable<
+	Awaited<ReturnType<typeof markConversationAsRead>>
+>
+
+export type MarkConversationAsReadMutationError =
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
+
+export const useMarkConversationAsRead = <
+	TError =
+		| BadRequestErrorResponseSchema
+		| UnauthorizedErrorResponseSchema
+		| NotFoundErrorResponseSchema
+		| RateLimitErrorResponseSchema,
+	TContext = unknown
+>(options?: {
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof markConversationAsRead>>,
+		TError,
+		{ id: string },
+		TContext
+	>
+}): UseMutationResult<
+	Awaited<ReturnType<typeof markConversationAsRead>>,
+	TError,
+	{ id: string },
+	TContext
+> => {
+	const mutationOptions = getMarkConversationAsReadMutationOptions(options)
 
 	return useMutation(mutationOptions)
 }

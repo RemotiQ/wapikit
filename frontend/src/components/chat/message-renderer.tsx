@@ -17,11 +17,21 @@ import {
 } from '../ui/dropdown-menu'
 import { Icons } from '../icons'
 import { useCopyToClipboard } from 'usehooks-ts'
-import { successNotification } from '~/reusable-functions'
+import { infoNotification, successNotification } from '~/reusable-functions'
 import { getBackendUrl } from '~/constants'
 import React, { useEffect, useState } from 'react'
 import { useAuthState } from '~/hooks/use-auth-state'
 import { Skeleton } from '../ui/skeleton'
+
+function downloadDocument(params: { url: string; fileName?: string }) {
+	const { url, fileName } = params
+	const a = document.createElement('a')
+	a.href = url
+	a.download = fileName || 'Document'
+	document.body.appendChild(a)
+	a.click()
+	a.remove()
+}
 
 const TextMessage = (message: TextMessage) => {
 	return <p className="text-wrap text-sm">{message.messageData.text}</p>
@@ -77,10 +87,12 @@ function LoadMedia({
 			<Skeleton
 				className={
 					mediaType === MessageTypeEnum.Video
-						? 'aspect-video'
+						? 'aspect-video size-72'
 						: mediaType === MessageTypeEnum.Image
 							? 'aspect-square size-72'
-							: ''
+							: mediaType === MessageTypeEnum.Audio
+								? 'aspect-video h-20 w-72'
+								: ''
 				}
 			/>
 		)
@@ -88,6 +100,7 @@ function LoadMedia({
 
 	if (mediaType === MessageTypeEnum.Image) {
 		return (
+			// eslint-disable-next-line @next/next/no-img-element
 			<img
 				src={blobUrl}
 				className="h-auto max-w-72  rounded-md object-contain"
@@ -117,11 +130,104 @@ function LoadMedia({
 	}
 }
 
-const DocumentMessage = (message: DocumentMessage) => {
+const DocumentMessageComponent: React.FC<{ message: DocumentMessage }> = ({ message }) => {
+	const { authState } = useAuthState()
+	const { fileName } = message.messageData
+	const [blobUrl, setBlobUrl] = useState<string | null>(null)
+
+	const documentLink = `${getBackendUrl()}/conversation/${message.conversationId}/media/${message.messageData.id}`
+
+	const onViewClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		try {
+			if (!authState.isAuthenticated) return
+			infoNotification({
+				message: 'Viewing document'
+			})
+			if (blobUrl) {
+				window.open(blobUrl, '_blank')
+				return
+			}
+			// Fetch the document with the auth header
+			const response = await fetch(documentLink, {
+				headers: {
+					'x-access-token': authState.data.token
+				},
+				credentials: 'include',
+				mode: 'cors',
+				cache: 'no-cache'
+			})
+			if (!response.ok) {
+				console.error('Failed to fetch document for viewing:', response.statusText)
+				return
+			}
+			const blob = await response.blob()
+			setBlobUrl(URL.createObjectURL(blob))
+			const url = window.URL.createObjectURL(blob)
+			window.open(url, '_blank')
+			// Optionally revoke the blob URL after a minute
+			setTimeout(() => window.URL.revokeObjectURL(url), 60000)
+		} catch (error) {
+			console.error('Error viewing document:', error)
+		}
+	}
+	// Download the document when user clicks "Download"
+	const onDownloadClick = async (e: React.MouseEvent<HTMLSpanElement>) => {
+		e.preventDefault()
+
+		try {
+			if (!authState.isAuthenticated) return
+
+			infoNotification({
+				message: 'Downloading document'
+			})
+
+			if (blobUrl) {
+				downloadDocument({ url: blobUrl, fileName })
+				return
+			}
+
+			const response = await fetch(documentLink, {
+				headers: {
+					'x-access-token': `${authState.data.token}`
+				},
+				credentials: 'include',
+				mode: 'cors',
+				cache: 'no-cache'
+			})
+			const blob = await response.blob()
+			const url = window.URL.createObjectURL(blob)
+			setBlobUrl(url)
+			downloadDocument({ url: url, fileName })
+		} catch (error) {
+			console.error('Error downloading document:', error)
+		}
+	}
+
 	return (
-		<a href={message.messageData.link} download>
-			{message.messageData.link}
-		</a>
+		<div
+			className="group relative flex cursor-pointer flex-row items-center gap-3 rounded-md p-3"
+			onClick={e => {
+				onViewClick(e).catch(error => console.error(error))
+			}}
+		>
+			<div className="flex flex-row gap-2 py-3">
+				<Icons.file className="h-8 w-8 text-primary" />
+				<div className="flex flex-col truncate">
+					<p className="w-48 truncate text-sm font-medium text-muted-foreground">
+						{fileName || 'Document'}
+					</p>
+				</div>
+			</div>
+
+			{/* Download link */}
+			<span
+				onClick={onDownloadClick}
+				className="cursor-pointer rounded-full border border-muted-foreground text-xs text-muted-foreground group-hover:underline"
+			>
+				<Icons.arrowDown className="size-5 font-bold" />
+			</span>
+		</div>
 	)
 }
 
@@ -194,7 +300,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 	return (
 		<div
 			className={clsx(
-				'group relative w-fit gap-1 overflow-hidden rounded-md max-w-[45%] md:max-w-[55%] 2xl:max-w-[75%]',
+				'group relative w-fit max-w-[45%] gap-1 overflow-hidden rounded-md md:max-w-[55%] 2xl:max-w-[75%]',
 				message.messageType === MessageTypeEnum.Text
 					? 'pb-2 pl-[9px] pr-[7px] pt-[6px]'
 					: message.messageType === MessageTypeEnum.Location
@@ -216,9 +322,12 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 			}}
 		>
 			{isActionsEnabled ? (
-				<div className="absolute top-0 right-2 z-50 h-fit">
+				<div className="absolute right-2 top-0 z-50 h-fit">
 					<DropdownMenu modal={false}>
-						<DropdownMenuTrigger asChild className='invisible group-hover:visible inline-block'>
+						<DropdownMenuTrigger
+							asChild
+							className="invisible inline-block group-hover:visible"
+						>
 							<Icons.chevronDown
 								className={clsx(
 									'h-[22px] w-[22px] font-bold',
@@ -265,7 +374,7 @@ const MessageRenderer: React.FC<{ message: MessageSchema; isActionsEnabled: bool
 							showControls={showControls}
 						/>
 					) : message.messageType === MessageTypeEnum.Document ? (
-						DocumentMessage(message)
+						<DocumentMessageComponent message={message} />
 					) : message.messageType === MessageTypeEnum.Image ? (
 						<LoadMedia
 							conversationId={message.conversationId}

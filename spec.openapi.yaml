@@ -3254,6 +3254,51 @@ paths:
               schema:
                 $ref: "#/components/schemas/RateLimitErrorResponseSchema"
 
+  /conversation/{id}/read:
+    post:
+      tags:
+        - Conversations
+      description: mark a conversation as read
+      operationId: markConversationAsRead
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id value of the conversation you want to mark as read.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarkConversationAsReadResponseSchema"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseSchema"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestErrorResponseSchema"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponseSchema"
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitErrorResponseSchema"
+
   /messages:
     get:
       tags:
@@ -5747,8 +5792,15 @@ components:
           type: string
           format: uri
           description: URL for the document file.
+        fileName:
+          type: string
+          description: Name of the document file.
+        caption:
+          type: string
+          description: (Optional) Caption for the document.
       required:
         - id
+        - fileName
 
     DocumentMessage:
       allOf:
@@ -6919,3 +6971,11 @@ components:
       required:
         - mediaId
         - mediaUrl
+
+    MarkConversationAsReadResponseSchema:
+      type: object
+      properties:
+        isRead:
+          type: boolean
+      required:
+        - isRead

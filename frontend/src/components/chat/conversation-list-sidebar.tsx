@@ -10,6 +10,7 @@ import { listStringEnumMembers } from 'ts-enum-utils'
 import { useRouter } from 'next/navigation'
 import LastMessagePreview from './last-message-preview'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
+import { Fragment } from 'react'
 
 enum ConversationListSidebarTab {
 	All = 'All',
@@ -26,7 +27,7 @@ const RenderConversations = ({
 }) => {
 	const router = useRouter()
 	return (
-		<div key={tab} className="">
+		<Fragment key={tab}>
 			{conversations.length === 0 && (
 				<div className="flex h-full flex-col items-center justify-center">
 					<Icons.messageChatSquare className="size-6 font-normal text-muted-foreground" />
@@ -38,7 +39,7 @@ const RenderConversations = ({
 
 			{conversations.map((conversation, index) => {
 				return (
-					<>
+					<Fragment key={conversation.uniqueId}>
 						<div
 							key={index}
 							className="my-auto mb-2 flex cursor-pointer flex-row items-center gap-4 rounded-md px-3 py-2 hover:bg-gray-100 hover:dark:bg-gray-800"
@@ -62,7 +63,7 @@ const RenderConversations = ({
 								</div>
 								<div className="flex items-center justify-center">
 									{conversation.numberOfUnreadMessages > 0 && (
-										<div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">
+										<div className="flex size-7 items-center justify-center rounded-full bg-primaryShades-50 !p-2 text-xs font-bold text-primaryShades-700">
 											{conversation.numberOfUnreadMessages}
 										</div>
 									)}
@@ -70,10 +71,10 @@ const RenderConversations = ({
 							</div>
 						</div>
 						<Separator className="mx-1" />
-					</>
+					</Fragment>
 				)
 			})}
-		</div>
+		</Fragment>
 	)
 }
 
@@ -107,21 +108,25 @@ const ConversationsSidebar = () => {
 									<p className='hidden xl:flex'>{tab}</p> */}
 									<TooltipProvider delayDuration={200}>
 										<Tooltip>
-											<TooltipTrigger className="flex items-center gap-1">
-												{
+											<TooltipTrigger asChild>
+												<span className="flex items-center gap-1">
 													{
-														All: (
-															<Icons.messageChatSquare className="size-4" />
-														),
-														Unread: <Icons.bell className="size-4" />,
-														Unresolved: (
-															<Icons.messageQuestionSquare className="size-4" />
-														)
-													}[tab]
-												}
-												<p className="hidden 2xl:flex">{tab}</p>
+														{
+															All: (
+																<Icons.messageChatSquare className="size-4" />
+															),
+															Unread: (
+																<Icons.bell className="size-4" />
+															),
+															Unresolved: (
+																<Icons.messageQuestionSquare className="size-4" />
+															)
+														}[tab]
+													}
+													<p className="hidden 2xl:flex">{tab}</p>
+												</span>
 											</TooltipTrigger>
-											<TooltipContent  className="xl:hidden">
+											<TooltipContent className="xl:hidden">
 												{tab}
 											</TooltipContent>
 										</Tooltip>
@@ -136,6 +141,7 @@ const ConversationsSidebar = () => {
 					<RenderConversations
 						conversations={conversations}
 						tab={ConversationListSidebarTab.All}
+						key={`${ConversationListSidebarTab.All}`}
 					/>
 				</TabsContent>
 				<TabsContent value={ConversationListSidebarTab.Unread} className="space-y-4">
@@ -143,6 +149,7 @@ const ConversationsSidebar = () => {
 					<RenderConversations
 						conversations={conversations.filter(c => c.numberOfUnreadMessages > 0)}
 						tab={ConversationListSidebarTab.Unread}
+						key={`${ConversationListSidebarTab.Unread}`}
 					/>
 				</TabsContent>
 				<TabsContent value={ConversationListSidebarTab.Unresolved} className="space-y-4">
@@ -152,6 +159,7 @@ const ConversationsSidebar = () => {
 							c => c.status === ConversationStatusEnum.Active
 						)}
 						tab={ConversationListSidebarTab.Unresolved}
+						key={`${ConversationListSidebarTab.Unresolved}`}
 					/>
 				</TabsContent>
 			</Tabs>

@@ -350,3 +350,22 @@ func NewMessageFailedEvent(messageId string, orgId *string) *MessageFailedEvent 
 		},
 	}
 }
+
+type ConversationReadEvent struct {
+	BaseApiServerEvent
+}
+
+func NewConversationReadEvent(conversationId string, orgId *string) *ConversationReadEvent {
+	return &ConversationReadEvent{
+		BaseApiServerEvent: BaseApiServerEvent{
+			EventType:      ApiServerMessageErroredEvent,
+			UserId:         nil,
+			OrganizationId: orgId,
+			Data: struct {
+				ConversationId string `json:"conversationId"`
+			}{
+				ConversationId: conversationId,
+			},
+		},
+	}
+}

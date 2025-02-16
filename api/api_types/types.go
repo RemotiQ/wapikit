@@ -681,6 +681,12 @@ type DocumentMessageMessageType string
 
 // DocumentMessageData defines model for DocumentMessageData.
 type DocumentMessageData struct {
+	// Caption (Optional) Caption for the document.
+	Caption *string `json:"caption,omitempty"`
+
+	// FileName Name of the document file.
+	FileName string `json:"fileName"`
+
 	// Id Document file identifier.
 	Id string `json:"id"`
 
@@ -1008,6 +1014,11 @@ type LoginRequestBodySchema struct {
 type LoginResponseBodySchema struct {
 	IsOnboardingCompleted bool   `json:"isOnboardingCompleted"`
 	Token                 string `json:"token"`
+}
+
+// MarkConversationAsReadResponseSchema defines model for MarkConversationAsReadResponseSchema.
+type MarkConversationAsReadResponseSchema struct {
+	IsRead bool `json:"isRead"`
 }
 
 // MessageAnalyticGraphDataPointSchema defines model for MessageAnalyticGraphDataPointSchema.

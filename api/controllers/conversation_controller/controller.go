@@ -182,6 +182,12 @@ func NewConversationController() *ConversationController {
 					Handler:                 interfaces.HandlerWithSession(handleProxyWhatsAppMedia),
 					IsAuthorizationRequired: true,
 				},
+				{
+					Path:                    "/api/conversation/:id/read",
+					Method:                  http.MethodPost,
+					Handler:                 interfaces.HandlerWithSession(markConversationAsRead),
+					IsAuthorizationRequired: true,
+				},
 			},
 		},
 	}
@@ -250,36 +256,77 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 		conversationWhereQuery = conversationWhereQuery.AND(table.Conversation.InitiatedByCampaignId.EQ(UUID(uuid.MustParse(*campaignId))))
 	}
 
-	conversationQuery := SELECT(
-		table.Conversation.AllColumns,
-		table.Contact.AllColumns,
-		table.ContactListContact.AllColumns,
-		table.ContactList.AllColumns,
-		table.ConversationAssignment.AllColumns,
-		table.OrganizationMember.AllColumns,
-		table.User.AllColumns,
-		table.Message.AllColumns,
-		table.Tag.AllColumns,
-		table.ConversationTag.AllColumns,
-	).FROM(table.Conversation.
-		LEFT_JOIN(table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId)).
-		LEFT_JOIN(table.ContactListContact, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
-		LEFT_JOIN(table.ContactList, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
-		LEFT_JOIN(table.ConversationAssignment, table.Conversation.UniqueId.EQ(table.ConversationAssignment.ConversationId)).
-		LEFT_JOIN(table.OrganizationMember, table.ConversationAssignment.AssignedToOrganizationMemberId.EQ(table.OrganizationMember.UniqueId)).
-		LEFT_JOIN(table.User, table.OrganizationMember.UserId.EQ(table.User.UniqueId)).
-		LEFT_JOIN(table.Message, table.Conversation.UniqueId.EQ(table.Message.ConversationId)).
-		LEFT_JOIN(table.ConversationTag, table.Conversation.UniqueId.EQ(table.ConversationTag.ConversationId)).
-		LEFT_JOIN(table.Tag, table.ConversationTag.TagId.EQ(table.Tag.UniqueId)),
-	).
-		WHERE(conversationWhereQuery).
-		ORDER_BY(
-			Raw(` MAX("Message"."CreatedAt") OVER (PARTITION BY "Conversation"."UniqueId") DESC,
-			     "Message"."CreatedAt" ASC`,
+	conversationCte := CTE("conversations")
+	messagesCte := CTE("messages")
+	unreadCountCte := CTE("numberOfUnreadMessages")
+
+	conversationIdColumn := table.Conversation.UniqueId.From(conversationCte)
+	createdAtMessageColumn := table.Message.CreatedAt.From(messagesCte)
+
+	conversationQuery := WITH(
+		conversationCte.AS(
+			SELECT(
+				table.Conversation.AllColumns,
+				table.Contact.AllColumns,
+				table.ContactListContact.AllColumns,
+				table.ContactList.AllColumns,
+				table.ConversationAssignment.AllColumns,
+				table.OrganizationMember.AllColumns,
+				table.User.AllColumns,
+				table.Tag.AllColumns,
+				table.ConversationTag.AllColumns,
+			).FROM(table.Conversation.
+				LEFT_JOIN(table.Contact, table.Conversation.ContactId.EQ(table.Contact.UniqueId)).
+				LEFT_JOIN(table.ContactListContact, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
+				LEFT_JOIN(table.ContactList, table.Contact.UniqueId.EQ(table.ContactListContact.ContactId)).
+				LEFT_JOIN(table.ConversationAssignment, table.Conversation.UniqueId.EQ(table.ConversationAssignment.ConversationId)).
+				LEFT_JOIN(table.OrganizationMember, table.ConversationAssignment.AssignedToOrganizationMemberId.EQ(table.OrganizationMember.UniqueId)).
+				LEFT_JOIN(table.User, table.OrganizationMember.UserId.EQ(table.User.UniqueId)).
+				LEFT_JOIN(table.ConversationTag, table.Conversation.UniqueId.EQ(table.ConversationTag.ConversationId)).
+				LEFT_JOIN(table.Tag, table.ConversationTag.TagId.EQ(table.Tag.UniqueId)),
+			).
+				WHERE(conversationWhereQuery).
+				LIMIT(limit).
+				OFFSET((page-1)*limit),
+		),
+		unreadCountCte.AS(
+			SELECT(
+				COALESCE(
+					SUM(CASE().
+						WHEN(
+							table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Sent.String())).
+								AND(table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_InBound.String()))),
+						).
+						THEN(CAST(Int(1)).AS_INTEGER()).
+						ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("numberOfUnreadMessages"),
+			).FROM(
+				table.Message,
+				conversationCte,
+			).WHERE(
+				table.Message.ConversationId.EQ(conversationIdColumn),
 			),
-		).
-		LIMIT(limit).
-		OFFSET((page - 1) * limit)
+		),
+		messagesCte.AS(
+			SELECT(
+				table.Message.AllColumns,
+			).FROM(table.Message, conversationCte).
+				WHERE(
+					table.Message.ConversationId.EQ(conversationIdColumn),
+				).
+				ORDER_BY(
+					table.Message.CreatedAt.DESC(),
+				).
+				LIMIT(100)),
+	)(
+		SELECT(
+			conversationCte.AllColumns(),
+			messagesCte.AllColumns(),
+			unreadCountCte.AllColumns().As("FetchedConversation"),
+		).FROM(conversationCte, messagesCte, unreadCountCte).
+			ORDER_BY(
+				createdAtMessageColumn.ASC(),
+			),
+	)
 
 	err := conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &fetchedConversations)
 
@@ -1019,6 +1066,11 @@ func handleMediaUpload(context interfaces.ContextWithSession) error {
 
 	// Extract MIME type from header; fallback if needed.
 	mimeType := fileHeader.Header.Get("Content-Type")
+
+	if mimeType == "image/gif" {
+		mimeType = "video/mp4"
+	}
+
 	if mimeType == "" {
 		mimeType = "application/octet-stream"
 	}
@@ -1167,4 +1219,35 @@ func handleProxyWhatsAppMedia(context interfaces.ContextWithSession) error {
 	}
 
 	return nil
+}
+
+func markConversationAsRead(context interfaces.ContextWithSession) error {
+	conversationId := context.Param("id")
+	if conversationId == "" {
+		return context.JSON(http.StatusBadRequest, "conversation id is required")
+	}
+	conversationUuid, err := uuid.Parse(conversationId)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, "invalid conversation id")
+	}
+
+	updateQuery := table.Message.UPDATE(table.Message.Status).
+		SET(utils.EnumExpression(model.MessageStatusEnum_Read.String())).
+		WHERE(
+			table.Message.ConversationId.EQ(UUID(conversationUuid)).AND(
+				table.Message.Direction.EQ(utils.EnumExpression(model.MessageDirectionEnum_InBound.String())),
+			).AND(
+				table.Message.Status.EQ(utils.EnumExpression(model.MessageStatusEnum_Sent.String())),
+			),
+		)
+
+	_, err = updateQuery.ExecContext(context.Request().Context(), context.App.Db)
+
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return context.JSON(http.StatusOK, api_types.MarkConversationAsReadResponseSchema{
+		IsRead: true,
+	})
 }
