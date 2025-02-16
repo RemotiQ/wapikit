@@ -127,9 +127,7 @@ func main() {
 	)
 
 	app.ConversationService = conversation_service.NewConversationService(dbInstance, logger, redisClient)
-
 	app.EventService = event_service.NewEventService(dbInstance, logger, redisClient, app.Constants.RedisApiServerEventChannelName)
-
 	app.CampaignManager = campaign_manager.NewCampaignManager(dbInstance, *logger, redisClient, nil, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
 
 	MountServices(app)
