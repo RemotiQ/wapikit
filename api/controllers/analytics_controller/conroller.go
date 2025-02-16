@@ -2,7 +2,6 @@ package analytics_controller
 
 import (
 	"database/sql"
-	"fmt"
 	"math"
 	"net/http"
 	"strings"
@@ -106,7 +105,6 @@ func getDashboardAggregateAnalytics(context interfaces.ContextWithSession) error
 	ok, _ := context.App.Redis.GetCachedData(cacheKey, &responseToReturn)
 
 	if ok {
-		fmt.Println("Returning cached data")
 		return context.JSON(http.StatusOK, responseToReturn)
 	}
 
@@ -252,9 +250,7 @@ func getDashboardAggregateAnalytics(context interfaces.ContextWithSession) error
 	err = aggregateStatsQuery.QueryContext(context.Request().Context(), context.App.Db, &aggregateAnalyticsData)
 
 	if err != nil {
-		fmt.Println("error is", err.Error())
 		if err.Error() == qrm.ErrNoRows.Error() {
-			fmt.Println("No aggregate stats found")
 			// do nothing keep the empty response as defined above in the controller
 		} else {
 			return context.JSON(http.StatusInternalServerError, "Error getting aggregate stats")
@@ -330,7 +326,7 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 	var responseToReturn *api_types.GetAggregateCampaignAnalyticsResponseSchema
 	ok, _ := context.App.Redis.GetCachedData(cacheKey, &responseToReturn)
 	if ok {
-		// return context.JSON(http.StatusOK, responseToReturn)
+		return context.JSON(http.StatusOK, responseToReturn)
 	}
 
 	// Query daily link click data.
@@ -395,13 +391,10 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 		GROUP_BY(CAST(table.Message.CreatedAt).AS_DATE()).
 		ORDER_BY(CAST(table.Message.CreatedAt).AS_DATE())
 
-	debugSql := messageDataSeriesQuery.DebugSql()
-	fmt.Println("debugSql", debugSql)
-
 	var linkDataSeries []api_types.DateToCountGraphDataPointSchema
 	err = linkClickDataQuery.QueryContext(context.Request().Context(), context.App.Db, &linkDataSeries)
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println("error is", err.Error())
+		logger.Error("error in linkClickDataQuery", err.Error(), nil)
 		return context.JSON(http.StatusInternalServerError, "Error getting link click data")
 	}
 
@@ -412,7 +405,7 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 		logger.Error("error in messageDataSeriesQuery", err.Error(), nil)
 	}
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println("error is", err.Error())
+		logger.Error("error in messageDataSeriesQuery", err.Error(), nil)
 		return context.JSON(http.StatusInternalServerError, "Error getting message data")
 	}
 
@@ -461,7 +454,6 @@ func handleAggregateCampaignAnalytics(context interfaces.ContextWithSession) err
 }
 
 func handleAggregateConversationAnalytics(context interfaces.ContextWithSession) error {
-	logger := context.App.Logger
 	// Compute conversation analytics:
 	// - Average response time (seconds)
 	// - Total active conversations
@@ -469,9 +461,34 @@ func handleAggregateConversationAnalytics(context interfaces.ContextWithSession)
 	// - Inbound/outbound message ratio
 	// - Message type distribution
 
+	logger := context.App.Logger
+	params := new(api_types.GetConversationAnalyticsParams)
+	err := utils.BindQueryParams(context, params)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	minDateRange := params.From
+	maxDateRange := params.To
+	if minDateRange.IsZero() || maxDateRange.IsZero() {
+		return context.JSON(http.StatusBadRequest, "Invalid date range")
+	}
+
 	orgUuid, err := uuid.Parse(context.Session.User.OrganizationId)
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, "Invalid organization id")
+	}
+
+	cacheKey := context.App.Redis.ComputeCacheKey(
+		"handleAggregateConversationAnalytics",
+		strings.Join([]string{orgUuid.String(), minDateRange.String(), maxDateRange.String()}, ":"),
+		"conversation_analytics",
+	)
+
+	var responseToReturn *api_types.GetConversationAnalyticsResponseSchema
+	ok, _ := context.App.Redis.GetCachedData(cacheKey, &responseToReturn)
+	if ok {
+		return context.JSON(http.StatusOK, responseToReturn)
 	}
 
 	// Raw SQL query for average response time:
@@ -587,7 +604,7 @@ FROM (
 		return context.JSON(http.StatusInternalServerError, "Error getting message type distribution")
 	}
 
-	responseToReturn := api_types.GetConversationAnalyticsResponseSchema{
+	responseToReturn = &api_types.GetConversationAnalyticsResponseSchema{
 		Analytics: api_types.ConversationAggregateAnalytics{
 			ConversationsActive:                     activeCountDest.ActiveCount,
 			ConversationsClosed:                     0,
@@ -600,6 +617,9 @@ FROM (
 			MessageTypeTrafficDistributionAnalytics: messageTypeDistribution,
 		},
 	}
+
+	// cache the data for 10 minutes
+	context.App.Redis.CacheData(cacheKey, responseToReturn, 10*time.Minute)
 
 	return context.JSON(http.StatusOK, responseToReturn)
 }
@@ -704,14 +724,9 @@ func handleGetCampaignAnalyticsById(context interfaces.ContextWithSession) error
 		conversationCountCte,
 	))
 
-	sql := campaignAnalyticsQuery.DebugSql()
-
-	fmt.Println("SQL", sql)
-
 	err := campaignAnalyticsQuery.QueryContext(context.Request().Context(), context.App.Db, &campaignAnalyticsData)
 
 	if err != nil {
-		fmt.Println("error is", err.Error())
 		if err.Error() == qrm.ErrNoRows.Error() {
 			context.App.Logger.Info("No campaign analytics found")
 			responseToReturn := api_types.CampaignAnalyticsResponseSchema{
