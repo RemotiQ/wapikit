@@ -840,7 +840,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 							/>
 
 							<div className="flex items-center gap-6">
-								<FormField
+								{/* <FormField
 									control={campaignForm.control}
 									name="isLinkTrackingEnabled"
 									render={({ field }) => (
@@ -856,7 +856,7 @@ const NewCampaignForm: React.FC<FormProps> = ({ initialData }) => {
 											<FormMessage />
 										</FormItem>
 									)}
-								/>
+								/> */}
 								<div className="">
 									<FormItem className="flex items-center gap-2">
 										<Checkbox

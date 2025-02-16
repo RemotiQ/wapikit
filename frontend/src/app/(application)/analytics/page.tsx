@@ -175,6 +175,7 @@ export default function Page() {
 																	?.analytics.messageAnalytics ||
 																[]
 															}
+															key="aggregateCampaignAnalytics"
 														/>
 													</CardContent>
 												</Card>
@@ -198,7 +199,7 @@ export default function Page() {
 											<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
 												{[
 													{
-														title: 'Avg. Response Time',
+														title: 'Avg. Response Time (in minutes)',
 														value:
 															aggregateConversationAnalytics
 																?.analytics
@@ -238,7 +239,7 @@ export default function Page() {
 																</CardTitle>
 															</CardHeader>
 															<CardContent className="pl-5">
-																<div className="flex items-center gap-1 text-3xl font-bold">
+																<div className="ml-2 flex items-center gap-1 text-3xl font-bold">
 																	{item.value}
 																	<span className="text-xl text-muted-foreground">
 																		{item.isPercentage

@@ -51,9 +51,17 @@ export default function RootLayout({
 					<span className="stroke-red-500"></span>
 					<span className="stroke-blue-500"></span>
 					<span className="stroke-yellow-500"></span>
+					<span className="stroke-indigo-500"></span>
+					<span className="stroke-pink-500"></span>
+					<span className="stroke-emerald-500"></span>
+					<span className="fill-blue-500"></span>
 					<span className="fill-green-500"></span>
 					<span className="fill-indigo-500 "></span>
 					<span className="fill-red-500 "></span>
+					<span className="fill-pink-500 "></span>
+					<span className="fill-emerald-500 "></span>
+					<span className="fill-yellow-500 "></span>
+
 					{/* Add other colors as needed */}
 				</div>
 			</body>
