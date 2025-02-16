@@ -306,3 +306,10 @@ func (service *ConversationService) GetUnreadMessagesCountByConversationId(conve
 
 	return 0, nil
 }
+
+// this function will called on layout to show the unread messages dot to the user
+// this is not just specific to organization but specific to user as well
+func (service *ConversationService) DoOrgHasUnreadMessages(ordId string, userId string) (bool, error) {
+
+	return false, nil
+}

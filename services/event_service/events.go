@@ -19,6 +19,10 @@ const (
 	ApiServerConversationClosedEvent ApiServerEventType = "ConversationClosed"
 	ApiServerNewConversationEvent    ApiServerEventType = "NewConversation"
 	ApiServerCampaignProgressEvent   ApiServerEventType = "CampaignProgress"
+	ApiServerMessageReadEvent        ApiServerEventType = "MessageRead"
+	ApiServerMessageDeliveredEvent   ApiServerEventType = "MessageDelivered"
+	ApiServerMessageSentEvent        ApiServerEventType = "MessageSent"
+	ApiServerMessageErroredEvent     ApiServerEventType = "MessageErrored"
 )
 
 type EventAuthDetails struct {
@@ -245,6 +249,103 @@ func NewCampaignProgressEvent(campaignId string, messagesSent, messagesErrored i
 				MessagesSent:    messagesSent,
 				MessagesErrored: messagesErrored,
 				Status:          status,
+			},
+		},
+	}
+}
+
+type MessageReadEvent struct {
+	BaseApiServerEvent
+}
+
+func NewMessageReadEvent(messageId string, orgId *string) *MessageReadEvent {
+	return &MessageReadEvent{
+		BaseApiServerEvent: BaseApiServerEvent{
+			EventType:      ApiServerMessageReadEvent,
+			UserId:         nil,
+			OrganizationId: orgId,
+			Data: struct {
+				MessageId string `json:"messageId"`
+			}{
+				MessageId: messageId,
+			},
+		},
+	}
+}
+
+type MessageDeliveredEvent struct {
+	BaseApiServerEvent
+}
+
+func NewMessageDeliveredEvent(messageId string, orgId *string) *MessageDeliveredEvent {
+	return &MessageDeliveredEvent{
+		BaseApiServerEvent: BaseApiServerEvent{
+			EventType:      ApiServerMessageDeliveredEvent,
+			UserId:         nil,
+			OrganizationId: orgId,
+			Data: struct {
+				MessageId string `json:"messageId"`
+			}{
+				MessageId: messageId,
+			},
+		},
+	}
+}
+
+type MessageSentEvent struct {
+	BaseApiServerEvent
+}
+
+func NewMessageSentEvent(messageId string, orgId *string) *MessageSentEvent {
+	return &MessageSentEvent{
+		BaseApiServerEvent: BaseApiServerEvent{
+			EventType:      ApiServerMessageSentEvent,
+			UserId:         nil,
+			OrganizationId: orgId,
+			Data: struct {
+				MessageId string `json:"messageId"`
+			}{
+				MessageId: messageId,
+			},
+		},
+	}
+}
+
+type MessageErroredEvent struct {
+	BaseApiServerEvent
+}
+
+func NewMessageErroredEvent(messageId, errorMsg string, userId, orgId *string) *MessageErroredEvent {
+	return &MessageErroredEvent{
+		BaseApiServerEvent: BaseApiServerEvent{
+			EventType:      ApiServerMessageErroredEvent,
+			UserId:         userId,
+			OrganizationId: orgId,
+			Data: struct {
+				MessageId string `json:"messageId"`
+				Error     string `json:"error"`
+			}{
+				MessageId: messageId,
+				Error:     errorMsg,
+			},
+		},
+	}
+}
+
+type MessageFailedEvent struct {
+	BaseApiServerEvent
+}
+
+func NewMessageFailedEvent(messageId string, orgId *string) *MessageFailedEvent {
+	return &MessageFailedEvent{
+		BaseApiServerEvent: BaseApiServerEvent{
+			EventType:      ApiServerMessageErroredEvent,
+			UserId:         nil,
+			OrganizationId: orgId,
+			Data: struct {
+				MessageId string `json:"messageId"`
+			}{
+				MessageId: messageId,
 			},
 		},
 	}

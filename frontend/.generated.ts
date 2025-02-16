@@ -937,7 +937,7 @@ export interface AudioMessageData {
 	/** Audio file identifier. */
 	id: string
 	/** URL for the audio file. */
-	link: string
+	link?: string
 	messageType: AudioMessageDataMessageType
 }
 
@@ -987,7 +987,8 @@ export interface VideoMessageData {
 	/** Video file identifier. */
 	id: string
 	/** URL for the video file. */
-	link: string
+	link?: string
+	caption?: string
 	messageType: VideoMessageDataMessageType
 }
 
@@ -1037,7 +1038,7 @@ export interface ImageMessageData {
 	/** Image file identifier. */
 	id: string
 	/** URL for the image file. */
-	link: string
+	link?: string
 	caption?: string
 	messageType: ImageMessageDataMessageType
 }
@@ -1088,7 +1089,7 @@ export interface DocumentMessageData {
 	/** Document file identifier. */
 	id: string
 	/** URL for the document file. */
-	link: string
+	link?: string
 	messageType: DocumentMessageDataMessageType
 }
 
@@ -1138,7 +1139,7 @@ export interface StickerMessageData {
 	/** Sticker identifier. */
 	id: string
 	/** URL for the sticker file. */
-	link: string
+	link?: string
 	messageType: StickerMessageDataMessageType
 }
 

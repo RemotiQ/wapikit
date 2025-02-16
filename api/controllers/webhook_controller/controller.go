@@ -27,7 +27,7 @@ import (
 
 type WebhookController struct {
 	controller.BaseController `json:"-,inline"`
-	handlerMap                map[events.EventType]func(events.BaseEvent, interfaces.App)
+	handlerMap                map[events.EventType]func(events.BaseEvent, interfaces.App) error
 }
 
 func NewWhatsappWebhookWebhookController(wapiClient *wapi.Client) *WebhookController {
@@ -54,7 +54,7 @@ func NewWhatsappWebhookWebhookController(wapiClient *wapi.Client) *WebhookContro
 		},
 	}
 
-	service.handlerMap = map[events.EventType]func(event events.BaseEvent, app interfaces.App){
+	service.handlerMap = map[events.EventType]func(event events.BaseEvent, app interfaces.App) error{
 		events.TextMessageEventType:                  handleTextMessage,
 		events.VideoMessageEventType:                 handleVideoMessageEvent,
 		events.ImageMessageEventType:                 handleImageMessageEvent,
@@ -83,10 +83,8 @@ func NewWhatsappWebhookWebhookController(wapiClient *wapi.Client) *WebhookContro
 		events.StickerMessageEventType:               handleStickerMessageEvent,
 		events.MessageUndeliveredEventType:           handleMessageUndeliveredEvent,
 		events.CustomerIdentityChangedEventType:      handleCustomerIdentityChangedEvent,
-		events.MessageSentEventType:                  handleMessageSentEvent,
 		events.UnknownEventType:                      handleUnknownEvent,
 		events.WarnEventType:                         handleWarnEvent,
-		events.ReadyEventType:                        handleReadyEvent,
 		events.MessageTemplateStatusUpdateEventType:  handleMessageTemplateUpdateEvent,
 		events.MessageTemplateQualityUpdateEventType: handleMessageTemplateQualityUpdateEvent,
 		events.PhoneNumberNameUpdateEventType:        handlePhoneNumberNameUpdateEvent,
@@ -98,7 +96,6 @@ func NewWhatsappWebhookWebhookController(wapiClient *wapi.Client) *WebhookContro
 }
 
 func (service *WebhookController) handleWebhookGetRequest(context interfaces.ContextWithoutSession) error {
-
 	decrypter := context.App.EncryptionService
 	logger := context.App.Logger
 	webhookVerificationToken := context.QueryParam("hub.verify_token")
@@ -107,18 +104,12 @@ func (service *WebhookController) handleWebhookGetRequest(context interfaces.Con
 	var decryptedDetails utils.WebhookSecretData
 
 	err := decrypter.DecryptData(webhookVerificationToken, &decryptedDetails)
-	logger.Info("decrypted details", decryptedDetails, nil)
 	if err != nil {
 		logger.Error("error decrypting webhook verification token", err.Error(), nil)
 		return context.JSON(http.StatusBadRequest, "Invalid verification token")
 	}
 
-	if &decryptedDetails == nil {
-		logger.Error("decrypted details are nil", "", nil)
-		return context.JSON(http.StatusBadRequest, "Invalid verification token")
-	}
-
-	// ! FETCH THE BUSINESS ACCOUNT DETAILS FROM THE DATABASE
+	// * FETCH THE BUSINESS ACCOUNT DETAILS FROM THE DATABASE
 	orgUuid, err := uuid.Parse(decryptedDetails.OrganizationId)
 
 	if err != nil {
@@ -145,9 +136,7 @@ func (service *WebhookController) handleWebhookGetRequest(context interfaces.Con
 			logger.Error("business account not found", err.Error(), nil)
 			return context.JSON(http.StatusNotFound, "Business account not found")
 		}
-
 		logger.Error("error fetching business account details", err.Error(), nil)
-
 		return context.JSON(http.StatusInternalServerError, "Internal server error")
 	}
 
@@ -510,7 +499,7 @@ func (service *WebhookController) handleWebhookPostRequest(context interfaces.Co
 	return context.JSON(http.StatusOK, "Success")
 }
 
-func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber events.BusinessPhoneNumber, sentByContactNumber, sentByName string) (*event_service.ConversationWithAllDetails, error) {
+func _preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber events.BusinessPhoneNumber, sentByContactNumber, sentByName string) (*event_service.ConversationWithAllDetails, error) {
 	conversationDetailsToReturn := &event_service.ConversationWithAllDetails{}
 	businessAccount, err := fetchBusinessAccountDetails(businessAccountId, app)
 	if err != nil {
@@ -647,56 +636,50 @@ func preHandlerHook(app interfaces.App, businessAccountId string, phoneNumber ev
 	return fetchedConversation, nil
 }
 
-func handleTextMessage(event events.BaseEvent, app interfaces.App) {
-	textMessageEvent := event.(*events.TextMessageEvent)
-	businessAccountId := textMessageEvent.BusinessAccountId
-	phoneNumber := textMessageEvent.PhoneNumber
-	sentAt := textMessageEvent.BaseMessageEvent.Timestamp // this is unix timestamp in string, convert this to time.Time
-	unixTimestamp, err := strconv.ParseInt(sentAt, 10, 64)
+func _processIncomingMessage(
+	app interfaces.App,
+	businessAccountId string,
+	phoneNumber events.BusinessPhoneNumber,
+	messageId string,
+	baseEvent events.BaseMessageEvent,
+	messageData interface{},
+	msgType model.MessageTypeEnum,
+) error {
+	// 1. Convert timestamp from string to time.Time.
+	unixTimestamp, err := strconv.ParseInt(baseEvent.Timestamp, 10, 64)
 	if err != nil {
 		app.Logger.Error("error parsing timestamp", err.Error(), nil)
-		return
+		return err
 	}
-
 	sentAtTime := time.Unix(unixTimestamp, 0)
-	sentByContactNumber := textMessageEvent.BaseMessageEvent.From
+	sentByContactNumber := baseEvent.From
+	sentByName := baseEvent.SenderName
 
-	app.Logger.Debug("details", "SenderName", textMessageEvent.BaseMessageEvent.SenderName)
-	sentByName := textMessageEvent.BaseMessageEvent.SenderName
-
-	app.Logger.Debug("details", "businessAccountId", businessAccountId, "phoneNumber", phoneNumber, "sentByContactNumber", sentByContactNumber)
-
-	conversationDetails, err := preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber, sentByName)
-
+	// 2. Get conversation details via preHandlerHook.
+	conversationDetails, err := _preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber, sentByName)
 	if err != nil {
 		app.Logger.Error("error fetching conversation details", err.Error(), nil)
-		return
+		return err
 	}
 
-	conversationDetailsString, _ := json.Marshal(conversationDetails)
-	app.Logger.Info("conversation details", string(conversationDetailsString), nil)
-
-	messageData := map[string]interface{}{
-		"text": textMessageEvent.Text,
+	// 3. Marshal the message-specific data into JSON.
+	jsonMessageData, err := json.Marshal(messageData)
+	if err != nil {
+		return err
 	}
-
-	jsonMessageData, _ := json.Marshal(messageData)
 	stringMessageData := string(jsonMessageData)
 
-	var insertedMessage model.Message
-
+	// 4. Build the model.Message record.
 	conversationUuid := uuid.MustParse(conversationDetails.UniqueId)
 	contactUuid := uuid.MustParse(conversationDetails.Contact.UniqueId)
 
-	// ! TODO: handle the reply to message here
-
 	messageToInsert := model.Message{
-		WhatsAppMessageId:         &textMessageEvent.MessageId,
+		WhatsAppMessageId:         &messageId,
 		WhatsappBusinessAccountId: &businessAccountId,
 		ConversationId:            &conversationUuid,
-		CampaignId:                nil, // this will be only defined in case of outgoing campaign messages
+		CampaignId:                nil, // For incoming messages, campaign is nil.
 		ContactId:                 contactUuid,
-		MessageType:               model.MessageTypeEnum_Text,
+		MessageType:               msgType,
 		Status:                    model.MessageStatusEnum_Sent,
 		Direction:                 model.MessageDirectionEnum_InBound,
 		MessageData:               &stringMessageData,
@@ -706,192 +689,463 @@ func handleTextMessage(event events.BaseEvent, app interfaces.App) {
 		UpdatedAt:                 time.Now(),
 	}
 
-	// * insert this message in DB and get the unique id, then send it to the websocket server, so it can broadcast it to the frontend
+	var insertedMessage model.Message
 	insertQuery := table.Message.
 		INSERT(table.Message.MutableColumns).
 		MODEL(messageToInsert).
 		RETURNING(table.Message.AllColumns)
-
 	err = insertQuery.Query(app.Db, &insertedMessage)
-
 	if err != nil {
 		app.Logger.Error("error inserting message in the database", err.Error(), nil)
+		return err
 	}
 
-	message := app.ConversationService.ParseDbMessageToApiMessage(insertedMessage)
-	messageEvent := event_service.NewNewMessageEvent(*conversationDetails, message, nil, &conversationDetails.OrganizationId)
+	// 5. Parse DB record to API message and publish event.
+	messageParsed := app.ConversationService.ParseDbMessageToApiMessage(insertedMessage)
+	messageEvent := event_service.NewNewMessageEvent(*conversationDetails, messageParsed, nil, &conversationDetails.OrganizationId)
 	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisApiServerEventChannelName, messageEvent.ToJson())
-
 	if err != nil {
 		app.Logger.Error("error sending api server event", err)
+		return err
 	}
+
+	return nil
+}
+
+// _processMessageStatusUpdate unifies the logic for updating message status
+// - newStatus: The new status to set (e.g., model.MessageStatusEnum_Read, Delivered, Failed).
+func _processMessageStatusUpdate(messageId string, app interfaces.App, newStatus model.MessageStatusEnum) error {
+	// Query the message from the DB using WhatsAppMessageId.
+	messageQuery := SELECT(
+		table.Message.AllColumns,
+		table.Organization.AllColumns,
+		table.Conversation.AllColumns,
+	).FROM(
+		table.Message.
+			LEFT_JOIN(table.Organization, table.Organization.UniqueId.EQ(table.Message.OrganizationId)).
+			LEFT_JOIN(table.Conversation, table.Conversation.UniqueId.EQ(table.Message.ConversationId)),
+	).WHERE(
+		table.Message.WhatsAppMessageId.EQ(String(messageId)),
+	)
+
+	var message struct {
+		model.Message
+		Organization model.Organization
+		Conversation model.Conversation
+	}
+
+	err := messageQuery.Query(app.Db, &message)
+	if err != nil {
+		app.Logger.Error("error fetching message from the database", err.Error(), nil)
+		// We ignore the event if the message is not found.
+		return nil
+	}
+
+	// Update the message status in the database.
+	updateQuery := table.Message.UPDATE(table.Message.Status).
+		SET(newStatus).
+		WHERE(table.Message.WhatsAppMessageId.EQ(String(messageId)))
+
+	_, err = updateQuery.Exec(app.Db)
+	if err != nil {
+		app.Logger.Error("error updating message status", err.Error(), nil)
+		// Continue processing even if status update fails.
+	}
+
+	orgId := message.Organization.UniqueId.String()
+
+	var sse event_service.ApiServerEventInterface
+
+	switch newStatus {
+	case model.MessageStatusEnum_Read:
+		{
+			sse = event_service.NewMessageReadEvent(message.UniqueId.String(), &orgId)
+			break
+		}
+
+	case model.MessageStatusEnum_Delivered:
+		{
+
+			sse = event_service.NewMessageDeliveredEvent(message.UniqueId.String(), &orgId)
+			break
+		}
+
+	case model.MessageStatusEnum_Failed:
+		{
+			sse = event_service.NewMessageFailedEvent(message.UniqueId.String(), &orgId)
+			break
+		}
+
+	default:
+
+	}
+
+	err = app.Redis.PublishMessageToRedisChannel(app.Constants.RedisApiServerEventChannelName, sse.ToJson())
+	if err != nil {
+		app.Logger.Error("error sending api server event", err)
+		return err
+	}
+
+	return nil
+}
+
+func handleTextMessage(event events.BaseEvent, app interfaces.App) error {
+	textMessageEvent := event.(*events.TextMessageEvent)
+
+	err := _processIncomingMessage(
+		app,
+		textMessageEvent.BusinessAccountId,
+		textMessageEvent.PhoneNumber,
+		textMessageEvent.MessageId,
+		textMessageEvent.BaseMessageEvent,
+		api_types.TextMessageData{Text: textMessageEvent.Text},
+		model.MessageTypeEnum_Text,
+	)
+
+	if err != nil {
+		app.Logger.Error("error processing incoming text message", err.Error(), nil)
+		return err
+	}
+
+	return nil
 
 	// ! TODO: quick actions, AI automation replies and other stuff will be added in the future version here
 	// ! check for quick action, now feature flag must be checked here
 	// ! if quick action keywords are enabled then send a quick reply
 }
 
-func handleVideoMessageEvent(event events.BaseEvent, app interfaces.App) {
+func handleVideoMessageEvent(event events.BaseEvent, app interfaces.App) error {
 	videoMessageEvent := event.(*events.VideoMessageEvent)
-	businessAccountId := videoMessageEvent.BusinessAccountId
-	phoneNumber := videoMessageEvent.PhoneNumber
-	sentByContactNumber := videoMessageEvent.BaseMessageEvent.From
-	sentByName := videoMessageEvent.BaseMessageEvent.SenderName
-
-	conversationDetails, err := preHandlerHook(app, businessAccountId, phoneNumber, sentByContactNumber, sentByName)
+	err := _processIncomingMessage(
+		app,
+		videoMessageEvent.BusinessAccountId,
+		videoMessageEvent.PhoneNumber,
+		videoMessageEvent.MessageId,
+		videoMessageEvent.BaseMessageEvent,
+		api_types.VideoMessageData{
+			Id:      videoMessageEvent.Video.Id,
+			Link:    &videoMessageEvent.Video.Link,
+			Caption: &videoMessageEvent.Video.Caption,
+		},
+		model.MessageTypeEnum_Video,
+	)
 
 	if err != nil {
-		app.Logger.Error("error fetching conversation details", err.Error(), nil)
-		return
+		app.Logger.Error("error processing incoming video message", err.Error(), nil)
+		return err
 	}
 
-	conversationDetailsString, _ := json.Marshal(conversationDetails)
-	app.Logger.Info("conversation details", string(conversationDetailsString), nil)
-
+	return nil
 }
 
-func handleImageMessageEvent(event events.BaseEvent, app interfaces.App) {
+func handleImageMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	imageMessageEvent := event.(*events.ImageMessageEvent)
 
+	err := _processIncomingMessage(
+		app,
+		imageMessageEvent.BusinessAccountId,
+		imageMessageEvent.PhoneNumber,
+		imageMessageEvent.MessageId,
+		imageMessageEvent.BaseMessageEvent,
+		api_types.ImageMessageData{
+			Id:      imageMessageEvent.Image.Id,
+			Link:    &imageMessageEvent.Image.Link,
+			Caption: &imageMessageEvent.Image.Caption,
+		},
+		model.MessageTypeEnum_Image,
+	)
+
+	if err != nil {
+		app.Logger.Error("error processing incoming image message", err.Error(), nil)
+		return err
+	}
+
+	return nil
 }
 
-func handleDocumentMessageEvent(event events.BaseEvent, app interfaces.App) {
+func handleDocumentMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	documentMessageEvent := event.(*events.DocumentMessageEvent)
+	err := _processIncomingMessage(
+		app,
+		documentMessageEvent.BusinessAccountId,
+		documentMessageEvent.PhoneNumber,
+		documentMessageEvent.MessageId,
+		documentMessageEvent.BaseMessageEvent,
+		api_types.DocumentMessageData{},
+		model.MessageTypeEnum_Document,
+	)
 
+	if err != nil {
+		app.Logger.Error("error processing incoming document message", err.Error(), nil)
+		return err
+	}
+
+	return nil
 }
 
-func handleAudioMessageEvent(event events.BaseEvent, app interfaces.App) {
+func handleAudioMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	audioMessageEvent := event.(*events.AudioMessageEvent)
+	err := _processIncomingMessage(
+		app,
+		audioMessageEvent.BusinessAccountId,
+		audioMessageEvent.PhoneNumber,
+		audioMessageEvent.MessageId,
+		audioMessageEvent.BaseMessageEvent,
+		api_types.AudioMessageData{
+			Id:   audioMessageEvent.Audio.Id,
+			Link: &audioMessageEvent.Audio.Link,
+		},
+		model.MessageTypeEnum_Audio,
+	)
 
+	if err != nil {
+		app.Logger.Error("error processing incoming audio message", err.Error(), nil)
+		return err
+	}
+
+	return nil
 }
 
-func handleMessageReadEvent(event events.BaseEvent, app interfaces.App) {
+func handleStickerMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	stickerMessageEvent := event.(*events.StickerMessageEvent)
 
-	// ! TODO: mark the message as read in the database
+	err := _processIncomingMessage(
+		app,
+		stickerMessageEvent.BusinessAccountId,
+		stickerMessageEvent.PhoneNumber,
+		stickerMessageEvent.MessageId,
+		stickerMessageEvent.BaseMessageEvent,
+		api_types.StickerMessageData{
+			Id:   stickerMessageEvent.MediaId,
+			Link: nil,
+		},
+		model.MessageTypeEnum_Sticker,
+	)
 
-	// ! send an api_server_event to webhook
+	if err != nil {
+		app.Logger.Error("error processing incoming sticker message", err.Error(), nil)
+		return err
+	}
 
+	return nil
 }
 
-func handlePhoneNumberChangeEvent(event events.BaseEvent, app interfaces.App) {
+func handleLocationMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	locationMessageEvent := event.(*events.LocationMessageEvent)
+	err := _processIncomingMessage(
+		app,
+		locationMessageEvent.BusinessAccountId,
+		locationMessageEvent.PhoneNumber,
+		locationMessageEvent.MessageId,
+		locationMessageEvent.BaseMessageEvent,
+		api_types.LocationMessageData{
+			Address:   &locationMessageEvent.Location.Address,
+			Latitude:  locationMessageEvent.Location.Latitude,
+			Longitude: locationMessageEvent.Location.Longitude,
+			Name:      &locationMessageEvent.Location.Name,
+		},
+		model.MessageTypeEnum_Sticker,
+	)
+
+	if err != nil {
+		app.Logger.Error("error processing incoming location message", err.Error(), nil)
+		return err
+	}
+
+	return nil
+}
+
+func handleReactionMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	reactionMessageEvent := event.(*events.ReactionMessageEvent)
+	err := _processIncomingMessage(
+		app,
+		reactionMessageEvent.BusinessAccountId,
+		reactionMessageEvent.PhoneNumber,
+		reactionMessageEvent.MessageId,
+		reactionMessageEvent.BaseMessageEvent,
+		api_types.ReactionMessageData{
+			Reaction:  reactionMessageEvent.Reaction.Emoji,
+			MessageId: &reactionMessageEvent.Reaction.MessageId,
+		},
+		model.MessageTypeEnum_Sticker,
+	)
+
+	if err != nil {
+		app.Logger.Error("error processing incoming reaction message", err.Error(), nil)
+		return err
+	}
+
+	return nil
+}
+
+func handleQuickReplyMessageEvent(event events.BaseEvent, app interfaces.App) error {
+
+	return nil
+}
+
+func handleContactMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
+}
+
+func handleMessageReadEvent(event events.BaseEvent, app interfaces.App) error {
+	messageReadEvent := event.(*events.MessageReadEvent)
+	messageId := messageReadEvent.MessageId
+
+	err := _processMessageStatusUpdate(messageId, app, model.MessageStatusEnum_Read)
+
+	if err != nil {
+		app.Logger.Error("error sending api server event", "error", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func handleMessageDeliveredEvent(event events.BaseEvent, app interfaces.App) error {
+	messageDelivered := event.(*events.MessageDeliveredEvent)
+	messageId := messageDelivered.MessageId
+
+	err := _processMessageStatusUpdate(messageId, app, model.MessageStatusEnum_Delivered)
+
+	if err != nil {
+		app.Logger.Error("error sending api server event", err)
+		return err
+	}
+
+	return nil
+}
+
+func handleMessageFailedEvent(event events.BaseEvent, app interfaces.App) error {
+	messageFailedEvent := event.(*events.MessageFailedEvent)
+	messageId := messageFailedEvent.MessageId
+
+	err := _processMessageStatusUpdate(messageId, app, model.MessageStatusEnum_Failed)
+	if err != nil {
+		app.Logger.Error("error sending api server event", err)
+		return err
+	}
+	return nil
+}
+
+func handleMessageUndeliveredEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
+}
+
+func handlePhoneNumberChangeEvent(event events.BaseEvent, app interfaces.App) error {
 
 	// ! check for the contact in the database
 
 	// ! change the phone number
 	// send an api_server_event to webhook
 
+	return nil
+
 }
 
-func handleSecurityEvent(event events.BaseEvent, app interfaces.App) {
+func handleSecurityEvent(event events.BaseEvent, app interfaces.App) error {
 	// send an api_server_event to webhook
 
+	return nil
+
 }
 
-func handleAccountAlerts(event events.BaseEvent, app interfaces.App) {
+func handleAccountAlerts(event events.BaseEvent, app interfaces.App) error {
 	// send an api_server_event to webhook
 
+	return nil
+
 }
 
-func handleAdInteractionEvent(event events.BaseEvent, app interfaces.App) {
+func handleAdInteractionEvent(event events.BaseEvent, app interfaces.App) error {
 	// send an api_server_event to webhook
 
+	return nil
+
 }
 
-func handleErrorEvent(event events.BaseEvent, app interfaces.App) {
+func handleErrorEvent(event events.BaseEvent, app interfaces.App) error {
 	// send an api_server_event to webhook
 
-}
-
-func handleAccountReviewUpdateEvent(event events.BaseEvent, app interfaces.App) {
+	return nil
 
 }
 
-func handleAccountUpdateEvent(event events.BaseEvent, app interfaces.App) {
+func handleAccountReviewUpdateEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
 
 }
 
-func handleTemplateMessageEvent(event events.BaseEvent, app interfaces.App) {
+func handleAccountUpdateEvent(event events.BaseEvent, app interfaces.App) error {
+
+	return nil
 
 }
 
-func handleContactMessageEvent(event events.BaseEvent, app interfaces.App) {
+func handleTemplateMessageEvent(event events.BaseEvent, app interfaces.App) error {
+
+	return nil
 
 }
 
-func handleListInteractionMessageEvent(event events.BaseEvent, app interfaces.App) {
-
+func handleListInteractionMessageEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
 }
 
-func handleLocationMessageEvent(event events.BaseEvent, app interfaces.App) {
-
+func handleReplyButtonInteractionEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
 }
 
-func handleMessageDeliveredEvent(event events.BaseEvent, app interfaces.App) {
-
+func handleBusinessCapabilityUpdateEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
 }
 
-func handleMessageFailedEvent(event events.BaseEvent, app interfaces.App) {
-
+func handleProductInquiryEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
 }
 
-func handleQuickReplyMessageEvent(event events.BaseEvent, app interfaces.App) {
-
+func handleOrderReceivedEvent(event events.BaseEvent, app interfaces.App) error {
+	return nil
 }
 
-func handleReplyButtonInteractionEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleReactionMessageEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleBusinessCapabilityUpdateEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleProductInquiryEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleOrderReceivedEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleStickerMessageEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleMessageUndeliveredEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleCustomerIdentityChangedEvent(event events.BaseEvent, app interfaces.App) {
+func handleCustomerIdentityChangedEvent(event events.BaseEvent, app interfaces.App) error {
 	// ! TODO:
 	// ! 1. check if the customer exists in the database
 	// ! 2. update the customer identity
 	// ! 3. send an api_server_event to websocket server to logout the user if connected, else send a notification to the user to login again
+	return nil
 }
 
-func handleMessageSentEvent(event events.BaseEvent, app interfaces.App) {
-
-}
-
-func handleUnknownEvent(event events.BaseEvent, app interfaces.App) {
+func handleUnknownEvent(event events.BaseEvent, app interfaces.App) error {
 	// ! TODO: in this handle we need to save the log in the database
+
+	return nil
+
 }
 
-func handleWarnEvent(event events.BaseEvent, app interfaces.App) {
+func handleWarnEvent(event events.BaseEvent, app interfaces.App) error {
+	app.NotificationService.SendSlackNotification(notification_service.SlackNotificationParams{
+		Title:   "🟡🟡 Warning in webhook controller 🟡🟡",
+		Message: fmt.Sprintf("Warning in webhook controller: %s"),
+	})
+	return nil
 }
 
-func handleReadyEvent(event events.BaseEvent, app interfaces.App) {
+func handleMessageTemplateUpdateEvent(event events.BaseEvent, app interfaces.App) error {
+
+	return nil
 }
 
-func handleMessageTemplateUpdateEvent(event events.BaseEvent, app interfaces.App) {
+func handleMessageTemplateQualityUpdateEvent(event events.BaseEvent, app interfaces.App) error {
+
+	return nil
 }
 
-func handleMessageTemplateQualityUpdateEvent(event events.BaseEvent, app interfaces.App) {
+func handlePhoneNumberNameUpdateEvent(event events.BaseEvent, app interfaces.App) error {
+
+	return nil
 }
 
-func handlePhoneNumberNameUpdateEvent(event events.BaseEvent, app interfaces.App) {
-}
+func handlePhoneNumberQualityUpdateEvent(event events.BaseEvent, app interfaces.App) error {
 
-func handlePhoneNumberQualityUpdateEvent(event events.BaseEvent, app interfaces.App) {
+	return nil
 }

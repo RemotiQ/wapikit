@@ -5692,7 +5692,6 @@ components:
           description: URL for the audio file.
       required:
         - id
-        - link
 
     AudioMessage:
       allOf:
@@ -5718,10 +5717,11 @@ components:
           type: string
           format: uri
           description: URL for the video file.
+        caption:
+          type: string
       required:
         - id
-        - link
-
+      
     VideoMessage:
       allOf:
         - $ref: "#/components/schemas/BaseMessage"
@@ -5750,7 +5750,6 @@ components:
           type: string
       required:
         - id
-        - link
 
     ImageMessage:
       allOf:
@@ -5778,7 +5777,6 @@ components:
           description: URL for the document file.
       required:
         - id
-        - link
 
     DocumentMessage:
       allOf:
@@ -5806,7 +5804,6 @@ components:
           description: URL for the sticker file.
       required:
         - id
-        - link
 
     StickerMessage:
       allOf:
@@ -5853,11 +5850,11 @@ components:
       properties:
         latitude:
           type: number
-          format: float
+          format: double
           description: Latitude of the location.
         longitude:
           type: number
-          format: float
+          format: double
           description: Longitude of the location.
         address:
           type: string

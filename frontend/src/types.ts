@@ -62,7 +62,6 @@ export const UtmTags = [
 	'ref'
 ] as const
 
-
 export type ConversationFileAttachmentType = {
 	file: File
 	isUploading: boolean

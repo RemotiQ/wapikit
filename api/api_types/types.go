@@ -410,7 +410,7 @@ type AudioMessageData struct {
 	Id string `json:"id"`
 
 	// Link URL for the audio file.
-	Link string `json:"link"`
+	Link *string `json:"link,omitempty"`
 }
 
 // BadRequestErrorResponseSchema defines model for BadRequestErrorResponseSchema.
@@ -685,7 +685,7 @@ type DocumentMessageData struct {
 	Id string `json:"id"`
 
 	// Link URL for the document file.
-	Link string `json:"link"`
+	Link *string `json:"link,omitempty"`
 }
 
 // EmailNotificationConfigurationSchema defines model for EmailNotificationConfigurationSchema.
@@ -932,7 +932,7 @@ type ImageMessageData struct {
 	Id string `json:"id"`
 
 	// Link URL for the image file.
-	Link string `json:"link"`
+	Link *string `json:"link,omitempty"`
 }
 
 // IntegrationSchema defines model for IntegrationSchema.
@@ -989,10 +989,10 @@ type LocationMessageData struct {
 	Address *string `json:"address,omitempty"`
 
 	// Latitude Latitude of the location.
-	Latitude float32 `json:"latitude"`
+	Latitude float64 `json:"latitude"`
 
 	// Longitude Longitude of the location.
-	Longitude float32 `json:"longitude"`
+	Longitude float64 `json:"longitude"`
 
 	// Name (Optional) Name of the location.
 	Name *string `json:"name,omitempty"`
@@ -1334,7 +1334,7 @@ type StickerMessageData struct {
 	Id string `json:"id"`
 
 	// Link URL for the sticker file.
-	Link string `json:"link"`
+	Link *string `json:"link,omitempty"`
 }
 
 // SwitchOrganizationResponseSchema defines model for SwitchOrganizationResponseSchema.
@@ -1689,11 +1689,13 @@ type VideoMessageMessageType string
 
 // VideoMessageData defines model for VideoMessageData.
 type VideoMessageData struct {
+	Caption *string `json:"caption,omitempty"`
+
 	// Id Video file identifier.
 	Id string `json:"id"`
 
 	// Link URL for the video file.
-	Link string `json:"link"`
+	Link *string `json:"link,omitempty"`
 }
 
 // WhatsAppBusinessAccountDetailsSchema defines model for WhatsAppBusinessAccountDetailsSchema.
