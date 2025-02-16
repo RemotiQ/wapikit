@@ -438,7 +438,7 @@ export default function Page() {
 					<div className="flex w-full flex-col gap-3">
 						<Separator />
 						<div className="flex flex-row items-center gap-1">
-							<Icons.arrowUp className="size-5" />
+							<Icons.intersectSquare className="size-5" />
 							<h3 className="pl-2 text-lg font-semibold text-foreground">
 								Quick Start
 							</h3>
