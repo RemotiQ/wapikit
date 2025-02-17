@@ -13,8 +13,8 @@ before:
 builds:
   - binary: wapikit
     main: ./cmd
-    tags:
-      - community-edition
+    flags:
+      - -tags=community_edition
     goos:
       - linux
       - windows
