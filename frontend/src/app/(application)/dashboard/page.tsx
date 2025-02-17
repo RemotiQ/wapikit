@@ -379,59 +379,55 @@ export default function Page() {
 										)
 									})}
 
-								{campaigns?.campaigns.length && campaigns?.campaigns.length < 3 ? (
-									<Card
-										key={'send_more_cta'}
-										className="min-w-md flex w-full max-w-md flex-col items-center justify-center gap-3 p-3"
-									>
-										<div className="flex flex-1 flex-col gap-2">
-											<div className="flex flex-row gap-2">
-												<div
-													className={`flex h-fit rounded-lg bg-accent p-3`}
-												>
-													<Icons.announcement className="size-6" />
-												</div>
-												<div className="gap-.5 flex flex-col">
-													<h3 className="font-semibold">
-														Send More Campaigns
-													</h3>
-													<p className="max-w-xs text-left text-sm text-muted-foreground">
-														Send more campaigns to your contacts to keep
-														them engaged.
-													</p>
-												</div>
+								<Card
+									key={'send_more_cta'}
+									className="min-w-md flex w-full max-w-md flex-col items-center justify-center gap-3 p-3"
+								>
+									<div className="flex flex-1 flex-col gap-2">
+										<div className="flex flex-row gap-2">
+											<div className={`flex h-fit rounded-lg bg-accent p-3`}>
+												<Icons.announcement className="size-6" />
 											</div>
+											<div className="gap-.5 flex flex-col">
+												<h3 className="font-semibold">
+													Send More Campaigns
+												</h3>
+												<p className="max-w-xs text-left text-sm text-muted-foreground">
+													Send more campaigns to your contacts to keep
+													them engaged.
+												</p>
+											</div>
+										</div>
 
-											<div className="object-fit flex h-full w-full items-center justify-center rounded-lg bg-accent">
-												<Image
-													src={'/assets/dashboard/campaign.svg'}
-													height={200}
-													width={250}
-													alt="campaigns"
-													className="opacity-75"
-												/>
-											</div>
+										<div className="object-fit flex h-full w-full items-center justify-center rounded-lg bg-accent">
+											<Image
+												src={'/assets/dashboard/campaign.svg'}
+												height={200}
+												width={250}
+												alt="campaigns"
+												className="opacity-75"
+											/>
 										</div>
-										<div className="flex w-full flex-col">
-											<Separator orientation="horizontal" className="" />
-											<Link
-												key={'send_more_cta'}
-												href={'/campaigns/new-or-edit'}
-												className="mt-2 pl-3 hover:cursor-pointer"
+									</div>
+									<div className="flex w-full flex-col">
+										<Separator orientation="horizontal" className="" />
+										<Link
+											key={'send_more_cta'}
+											href={'/campaigns/new-or-edit'}
+											className="mt-2 pl-3 hover:cursor-pointer"
+										>
+											<Button
+												variant={'link'}
+												className="!p-0 hover:underline"
 											>
-												<Button
-													variant={'link'}
-													className="!p-0 hover:underline"
-												>
-													<Icons.arrowCircleRight className="size-4" />
-													<span className="text-sm">
-														Create a new Campaign
-													</span>
-												</Button>
-											</Link>
-										</div>
-									</Card>
-								) : null}
+												<Icons.arrowCircleRight className="size-4" />
+												<span className="text-sm">
+													Create a new Campaign
+												</span>
+											</Button>
+										</Link>
+									</div>
+								</Card>
 							</div>
 						</div>
 					)}
