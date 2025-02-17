@@ -253,12 +253,52 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 	}
 
 	conversationCte := CTE("conversations")
-	messagesCte := CTE("messages")
 	unreadCountCte := CTE("numberOfUnreadMessages")
 	paginationMetaCte := CTE("paginationMeta")
 
 	conversationIdColumn := table.Conversation.UniqueId.From(conversationCte)
-	createdAtMessageColumn := table.Message.CreatedAt.From(messagesCte)
+
+	// ! TODO: there are complications with including the messages in the conversation query because of unsupported features in the jet library like ARRAY_AGG et. WE WILL NEED TO REVISIT THIS LATER.
+
+	// messagesCte.AS(
+	// 	SELECT(
+	// 		table.Message.ConversationId,
+	// 		Func("array_agg", CustomExpression(
+	// 			ROW(
+	// 				table.Message.UniqueId,
+	// 				table.Message.WhatsAppMessageId,
+	// 				table.Message.WhatsappBusinessAccountId,
+	// 				table.Message.CreatedAt,
+	// 				table.Message.UpdatedAt,
+	// 				table.Message.CampaignId,
+	// 				table.Message.ContactId,
+	// 				table.Message.PhoneNumberUsed,
+	// 				table.Message.Direction,
+	// 				table.Message.MessageData,
+	// 				table.Message.OrganizationId,
+	// 				table.Message.Status,
+	// 				table.Message.MessageType,
+	// 				table.Message.RepliedTo,
+	// 			),
+	// 			Token("ORDER BY"),
+	// 			table.Message.CreatedAt,
+	// 		)).AS("messages"),
+	// 	).FROM(
+	// 		table.Message,
+	// 		table.Conversation,
+	// 	).WHERE(
+	// 		table.Message.ConversationId.IN(
+	// 			SELECT(
+	// 				table.Conversation.UniqueId,
+	// 			).FROM(
+	// 				conversationCte,
+	// 			),
+	// 		),
+	// 	).GROUP_BY(
+	// 		table.Message.ConversationId,
+	// 	).
+	// 		LIMIT(50),
+	// ),
 
 	conversationQuery := WITH(
 		conversationCte.AS(
@@ -288,6 +328,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 		),
 		unreadCountCte.AS(
 			SELECT(
+				table.Message.ConversationId,
 				COALESCE(
 					SUM(CASE().
 						WHEN(
@@ -296,42 +337,35 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 						).
 						THEN(CAST(Int(1)).AS_INTEGER()).
 						ELSE(CAST(Int(0)).AS_INTEGER())), CAST(Int(0)).AS_INTEGER()).AS("numberOfUnreadMessages"),
-			).FROM(
-				table.Message,
-				conversationCte,
-			).WHERE(
-				table.Message.ConversationId.EQ(conversationIdColumn),
+			).
+				FROM(
+					table.Message,
+				).GROUP_BY(
+				table.Message.ConversationId,
 			),
 		),
 		paginationMetaCte.AS(
 			SELECT(
+				table.Message.ConversationId,
 				COUNT(table.Message.UniqueId).AS("totalMessages"),
-			).FROM(table.Message, conversationCte).
-				WHERE(
-					table.Message.ConversationId.EQ(conversationIdColumn),
-				),
+			).FROM(
+				table.Message,
+			).
+				GROUP_BY(table.Message.ConversationId),
 		),
-		messagesCte.AS(
-			SELECT(
-				table.Message.AllColumns,
-			).FROM(table.Message, conversationCte).
-				WHERE(
-					table.Message.ConversationId.EQ(conversationIdColumn),
-				).
-				ORDER_BY(
-					table.Message.CreatedAt.DESC(),
-				).
-				LIMIT(50)),
 	)(
 		SELECT(
 			conversationCte.AllColumns(),
-			messagesCte.AllColumns(),
 			unreadCountCte.AllColumns().As("FetchedConversation"),
 			paginationMetaCte.AllColumns().As("FetchedConversation"),
-		).FROM(conversationCte, messagesCte, unreadCountCte, paginationMetaCte).
-			ORDER_BY(
-				createdAtMessageColumn.ASC(),
+		).FROM(
+			conversationCte.
+				LEFT_JOIN(
+					unreadCountCte, conversationIdColumn.EQ(table.Message.ConversationId.From(unreadCountCte)),
+				).LEFT_JOIN(
+				paginationMetaCte, conversationIdColumn.EQ(table.Message.ConversationId.From(paginationMetaCte)),
 			),
+		),
 	)
 
 	err := conversationQuery.QueryContext(context.Request().Context(), context.App.Db, &fetchedConversations)

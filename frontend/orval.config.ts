@@ -12,14 +12,23 @@ export default defineConfig({
       target: './.generated.ts',
       headers: false,
       override: {
+        operations: {
+          getConversationMessages: {
+            query: {
+              useInfiniteQueryParam: 'page',
+              useInfinite: true,
+              useQuery: true,
+              signal: true,
+            }
+          }
+        },
         mutator: {
           path: './src/utils/api-client.ts',
           name: 'customInstance',
         },
         query: {
           useQuery: true,
-          signal: true,
-          useInfinite: true,
+          signal: true
         }
       },
     },

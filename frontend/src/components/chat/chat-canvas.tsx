@@ -83,15 +83,19 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	)
 
 	const pageSize = 50
-	const [page, setPage] = useState(1)
 
-	const { isLoading: isFetchingMoreMessages, fetchNextPage } = useGetConversationMessagesInfinite(
+	const {
+		data: conversationMessagesData,
+		isLoading: isFetchingMoreMessages,
+		hasNextPage,
+		isFetchingNextPage,
+		fetchNextPage
+	} = useGetConversationMessagesInfinite(
 		currentConversation?.uniqueId || '',
-		// ! we start with page 2 because first page has already returned in the conversations fetch call
-		{ page: 2, per_page: pageSize },
+		{ page: 1, per_page: pageSize },
 		{
 			query: {
-				enabled: !!currentConversation && page > 1,
+				enabled: !!currentConversation,
 				getNextPageParam: lastPage => {
 					const currentPage = lastPage.paginationMeta.page
 					const totalPages = Math.ceil(
@@ -103,35 +107,49 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		}
 	)
 
-	const handleLoadMore = async () => {
-		if (!currentConversation || isFetchingMoreMessages) return
-
-		// Check if we need to load more
-		const hasMore =
-			currentConversation.messages.length < (currentConversation.totalMessages || 0)
-		if (!hasMore) return
-
-		try {
-			setPage(page + 1)
-			const response = await fetchNextPage()
-
-			const pages = response.data?.pages || []
-
-			// Update store with new messages
-			if (pages.length) {
-				const allMessages = pages.reverse().flatMap(p => p.messages)
-				writeConversationInboxStoreProperty({
-					conversations: conversations.map(convo =>
-						convo.uniqueId === currentConversation.uniqueId
-							? { ...convo, messages: [...allMessages, ...convo.messages] }
-							: convo
-					)
-				})
-			}
-		} catch (error) {
-			console.error('Failed to load more messages:', error)
+	useEffect(() => {
+		if (!conversationMessagesData || !currentConversation) return
+		const pages = conversationMessagesData.pages.reverse() || []
+		const allFetchedMessages = pages.flatMap(page => page.messages)
+		if (allFetchedMessages.length > currentConversation.messages.length) {
+			writeConversationInboxStoreProperty({
+				conversations: conversations.map(convo =>
+					convo.uniqueId === currentConversation.uniqueId
+						? { ...convo, messages: allFetchedMessages }
+						: convo
+				)
+			})
 		}
-	}
+	}, [
+		currentConversation,
+		conversations,
+		writeConversationInboxStoreProperty,
+		conversationMessagesData
+	])
+
+	// Optionally, auto-load next page if the current conversation's messages are less than the total.
+	useEffect(() => {
+		if (!currentConversation) return
+		const alreadyFetched = currentConversation.messages.length
+		const totalMessages = currentConversation.totalMessages || 0
+		// If there are more messages available and we aren't currently fetching, trigger a fetch.
+		if (alreadyFetched < totalMessages && hasNextPage && !isFetchingNextPage) {
+			// Optionally, you could auto-fetch next page here
+			// fetchNextPage();
+		}
+	}, [currentConversation, hasNextPage, isFetchingNextPage])
+
+	const handleLoadMore = useCallback(async () => {
+		if (!currentConversation || isFetchingNextPage) return
+		if (currentConversation.messages.length < (currentConversation.totalMessages || 0)) {
+			try {
+				await fetchNextPage()
+			} catch (error) {
+				console.error('Failed to load more messages:', error)
+				errorNotification({ message: 'Failed to load more messages' })
+			}
+		}
+	}, [currentConversation, isFetchingNextPage, fetchNextPage])
 
 	const assignConversationForm = useForm<z.infer<typeof AssignConversationForm>>({
 		resolver: zodResolver(AssignConversationForm)

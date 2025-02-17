@@ -253,3 +253,7 @@ func SortByDateField(slice interface{}, dateField string, ascending bool) error 
 
 	return nil
 }
+
+func ARRAY_AGG_ORDER_BY(a ColumnList, b Expression) Expression {
+	return Func("json_agg", CustomExpression(a, Token("ORDER BY"), b))
+}

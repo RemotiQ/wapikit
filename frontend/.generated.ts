@@ -907,9 +907,9 @@ export type TextMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				TextMessageAllOf & {
-					messageType: TextMessageMessageType
-				},
+			TextMessageAllOf & {
+				messageType: TextMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -957,9 +957,9 @@ export type AudioMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				AudioMessageAllOf & {
-					messageType: AudioMessageMessageType
-				},
+			AudioMessageAllOf & {
+				messageType: AudioMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1008,9 +1008,9 @@ export type VideoMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				VideoMessageAllOf & {
-					messageType: VideoMessageMessageType
-				},
+			VideoMessageAllOf & {
+				messageType: VideoMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1059,9 +1059,9 @@ export type ImageMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				ImageMessageAllOf & {
-					messageType: ImageMessageMessageType
-				},
+			ImageMessageAllOf & {
+				messageType: ImageMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1113,9 +1113,9 @@ export type DocumentMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				DocumentMessageAllOf & {
-					messageType: DocumentMessageMessageType
-				},
+			DocumentMessageAllOf & {
+				messageType: DocumentMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1163,9 +1163,9 @@ export type StickerMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				StickerMessageAllOf & {
-					messageType: StickerMessageMessageType
-				},
+			StickerMessageAllOf & {
+				messageType: StickerMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1213,9 +1213,9 @@ export type ReactionMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				ReactionMessageAllOf & {
-					messageType: ReactionMessageMessageType
-				},
+			ReactionMessageAllOf & {
+				messageType: ReactionMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1267,9 +1267,9 @@ export type LocationMessage = BaseMessage &
 	} & Required<
 		Pick<
 			BaseMessage &
-				LocationMessageAllOf & {
-					messageType: LocationMessageMessageType
-				},
+			LocationMessageAllOf & {
+				messageType: LocationMessageMessageType
+			},
 			'messageType' | 'messageData' | 'messageData'
 		>
 	>
@@ -1294,37 +1294,37 @@ export type MessageSchema =
  */
 export type NewMessageDataSchema =
 	| (TextMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (AudioMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (VideoMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (ImageMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (DocumentMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (StickerMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (ReactionMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 	| (LocationMessageData & {
-			/** The type for this new message data. */
-			messageType: string
-	  })
+		/** The type for this new message data. */
+		messageType: string
+	})
 
 /**
  * Request payload for sending a new message. The payload includes the messageType, createdAt date, and a messageData field whose structure depends on the messageType.
@@ -2249,93 +2249,6 @@ export const getGetHealthCheckQueryKey = () => {
 	return [`/health-check`] as const
 }
 
-export const getGetHealthCheckInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getHealthCheck>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetHealthCheckQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getHealthCheck>>> = ({ signal }) =>
-		getHealthCheck(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getHealthCheck>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetHealthCheckInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getHealthCheck>>
->
-export type GetHealthCheckInfiniteQueryError = unknown
-
-export function useGetHealthCheckInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getHealthCheck>>>,
-	TError = unknown
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getHealthCheck>>,
-				TError,
-				Awaited<ReturnType<typeof getHealthCheck>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetHealthCheckInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getHealthCheck>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getHealthCheck>>,
-				TError,
-				Awaited<ReturnType<typeof getHealthCheck>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetHealthCheckInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getHealthCheck>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetHealthCheckInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getHealthCheck>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetHealthCheckInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
 export const getGetHealthCheckQueryOptions = <
 	TData = Awaited<ReturnType<typeof getHealthCheck>>,
 	TError = unknown
@@ -2364,28 +2277,28 @@ export function useGetHealthCheck<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getHealthCheck>>,
-				TError,
-				Awaited<ReturnType<typeof getHealthCheck>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getHealthCheck>>,
+			TError,
+			Awaited<ReturnType<typeof getHealthCheck>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetHealthCheck<
 	TData = Awaited<ReturnType<typeof getHealthCheck>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getHealthCheck>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getHealthCheck>>,
-				TError,
-				Awaited<ReturnType<typeof getHealthCheck>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getHealthCheck>>,
+			TError,
+			Awaited<ReturnType<typeof getHealthCheck>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetHealthCheck<
 	TData = Awaited<ReturnType<typeof getHealthCheck>>,
@@ -2422,85 +2335,6 @@ export const getGetMetaDataQueryKey = () => {
 	return [`/meta-data`] as const
 }
 
-export const getGetMetaDataInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getMetaData>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetMetaDataQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getMetaData>>> = ({ signal }) =>
-		getMetaData(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getMetaData>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetMetaDataInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getMetaData>>>
-export type GetMetaDataInfiniteQueryError = unknown
-
-export function useGetMetaDataInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMetaData>>>,
-	TError = unknown
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getMetaData>>,
-				TError,
-				Awaited<ReturnType<typeof getMetaData>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetMetaDataInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMetaData>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getMetaData>>,
-				TError,
-				Awaited<ReturnType<typeof getMetaData>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetMetaDataInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMetaData>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetMetaDataInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMetaData>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetMetaDataInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
 export const getGetMetaDataQueryOptions = <
 	TData = Awaited<ReturnType<typeof getMetaData>>,
 	TError = unknown
@@ -2529,28 +2363,28 @@ export function useGetMetaData<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getMetaData>>,
-				TError,
-				Awaited<ReturnType<typeof getMetaData>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getMetaData>>,
+			TError,
+			Awaited<ReturnType<typeof getMetaData>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMetaData<
 	TData = Awaited<ReturnType<typeof getMetaData>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMetaData>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getMetaData>>,
-				TError,
-				Awaited<ReturnType<typeof getMetaData>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getMetaData>>,
+			TError,
+			Awaited<ReturnType<typeof getMetaData>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMetaData<
 	TData = Awaited<ReturnType<typeof getMetaData>>,
@@ -2590,96 +2424,6 @@ export const getGetSSEUpdatesQueryKey = () => {
 	return [`/events`] as const
 }
 
-export const getGetSSEUpdatesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getSSEUpdates>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetSSEUpdatesQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getSSEUpdates>>> = ({ signal }) =>
-		getSSEUpdates(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getSSEUpdates>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetSSEUpdatesInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getSSEUpdates>>
->
-export type GetSSEUpdatesInfiniteQueryError = unknown
-
-export function useGetSSEUpdatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getSSEUpdates>>>,
-	TError = unknown
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getSSEUpdates>>,
-				TError,
-				Awaited<ReturnType<typeof getSSEUpdates>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetSSEUpdatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getSSEUpdates>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getSSEUpdates>>,
-				TError,
-				Awaited<ReturnType<typeof getSSEUpdates>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetSSEUpdatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getSSEUpdates>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-/**
- * @summary Subscribe to real-time events
- */
-
-export function useGetSSEUpdatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getSSEUpdates>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetSSEUpdatesInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
 export const getGetSSEUpdatesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getSSEUpdates>>,
 	TError = unknown
@@ -2708,28 +2452,28 @@ export function useGetSSEUpdates<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getSSEUpdates>>,
-				TError,
-				Awaited<ReturnType<typeof getSSEUpdates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getSSEUpdates>>,
+			TError,
+			Awaited<ReturnType<typeof getSSEUpdates>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetSSEUpdates<
 	TData = Awaited<ReturnType<typeof getSSEUpdates>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSSEUpdates>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getSSEUpdates>>,
-				TError,
-				Awaited<ReturnType<typeof getSSEUpdates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getSSEUpdates>>,
+			TError,
+			Awaited<ReturnType<typeof getSSEUpdates>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetSSEUpdates<
 	TData = Awaited<ReturnType<typeof getSSEUpdates>>,
@@ -2980,93 +2724,6 @@ export const getRegenerateApiKeyQueryKey = () => {
 	return [`/auth/api-keys/regenerate`] as const
 }
 
-export const getRegenerateApiKeyInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof regenerateApiKey>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getRegenerateApiKeyQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof regenerateApiKey>>> = ({ signal }) =>
-		regenerateApiKey(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof regenerateApiKey>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type RegenerateApiKeyInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof regenerateApiKey>>
->
-export type RegenerateApiKeyInfiniteQueryError = unknown
-
-export function useRegenerateApiKeyInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof regenerateApiKey>>>,
-	TError = unknown
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof regenerateApiKey>>,
-				TError,
-				Awaited<ReturnType<typeof regenerateApiKey>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useRegenerateApiKeyInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof regenerateApiKey>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof regenerateApiKey>>,
-				TError,
-				Awaited<ReturnType<typeof regenerateApiKey>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useRegenerateApiKeyInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof regenerateApiKey>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useRegenerateApiKeyInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof regenerateApiKey>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getRegenerateApiKeyInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
 export const getRegenerateApiKeyQueryOptions = <
 	TData = Awaited<ReturnType<typeof regenerateApiKey>>,
 	TError = unknown
@@ -3095,28 +2752,28 @@ export function useRegenerateApiKey<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof regenerateApiKey>>,
-				TError,
-				Awaited<ReturnType<typeof regenerateApiKey>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof regenerateApiKey>>,
+			TError,
+			Awaited<ReturnType<typeof regenerateApiKey>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useRegenerateApiKey<
 	TData = Awaited<ReturnType<typeof regenerateApiKey>>,
 	TError = unknown
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof regenerateApiKey>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof regenerateApiKey>>,
-				TError,
-				Awaited<ReturnType<typeof regenerateApiKey>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof regenerateApiKey>>,
+			TError,
+			Awaited<ReturnType<typeof regenerateApiKey>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useRegenerateApiKey<
 	TData = Awaited<ReturnType<typeof regenerateApiKey>>,
@@ -3160,10 +2817,10 @@ export const joinOrganization = (
 
 export const getJoinOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3209,10 +2866,10 @@ export type JoinOrganizationMutationError =
 
 export const useJoinOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3250,10 +2907,10 @@ export const resetPasswordInit = (
 
 export const getResetPasswordInitMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3299,10 +2956,10 @@ export type ResetPasswordInitMutationError =
 
 export const useResetPasswordInit = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3340,10 +2997,10 @@ export const resetPasswordVerify = (
 
 export const getResetPasswordVerifyMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3389,10 +3046,10 @@ export type ResetPasswordVerifyMutationError =
 
 export const useResetPasswordVerify = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3430,10 +3087,10 @@ export const resetPasswordComplete = (
 
 export const getResetPasswordCompleteMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3479,10 +3136,10 @@ export type ResetPasswordCompleteMutationError =
 
 export const useResetPasswordComplete = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3513,112 +3170,13 @@ export const getGetUserQueryKey = () => {
 	return [`/user`] as const
 }
 
-export const getGetUserInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getUser>>>,
+export const getGetUserQueryOptions = <
+	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetUserQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) =>
-		getUser(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getUser>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetUserInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>>
-export type GetUserInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetUserInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUser>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options: {
-	query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUser>>,
-				TError,
-				Awaited<ReturnType<typeof getUser>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUser>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUser>>,
-				TError,
-				Awaited<ReturnType<typeof getUser>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUser>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetUserInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUser>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetUserInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetUserQueryOptions = <
-	TData = Awaited<ReturnType<typeof getUser>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
 }) => {
@@ -3646,46 +3204,46 @@ export type GetUserQueryError =
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUser>>,
-				TError,
-				Awaited<ReturnType<typeof getUser>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUser>>,
+			TError,
+			Awaited<ReturnType<typeof getUser>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUser>>,
-				TError,
-				Awaited<ReturnType<typeof getUser>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUser>>,
+			TError,
+			Awaited<ReturnType<typeof getUser>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -3693,10 +3251,10 @@ export function useGetUser<
 export function useGetUser<
 	TData = Awaited<ReturnType<typeof getUser>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -3726,10 +3284,10 @@ export const updateUser = (updateUserSchema: UpdateUserSchema, signal?: AbortSig
 
 export const getUpdateUserMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3773,10 +3331,10 @@ export type UpdateUserMutationError =
 
 export const useUpdateUser = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -3812,139 +3370,13 @@ export const getGetUserNotificationsQueryKey = (params: GetUserNotificationsPara
 	return [`/user/notifications`, ...(params ? [params] : [])] as const
 }
 
-export const getGetUserNotificationsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserNotifications>>>,
+export const getGetUserNotificationsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserNotificationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetUserNotificationsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserNotifications>>> = ({ signal }) =>
-		getUserNotifications(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getUserNotifications>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetUserNotificationsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getUserNotifications>>
->
-export type GetUserNotificationsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetUserNotificationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserNotifications>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserNotificationsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserNotifications>>,
-					TError,
-					Awaited<ReturnType<typeof getUserNotifications>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserNotificationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserNotifications>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserNotificationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserNotifications>>,
-					TError,
-					Awaited<ReturnType<typeof getUserNotifications>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserNotificationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserNotifications>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserNotificationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetUserNotificationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserNotifications>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserNotificationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetUserNotificationsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetUserNotificationsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getUserNotifications>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
@@ -3979,56 +3411,56 @@ export type GetUserNotificationsQueryError =
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserNotifications>>,
-					TError,
-					Awaited<ReturnType<typeof getUserNotifications>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserNotifications>>,
+				TError,
+				Awaited<ReturnType<typeof getUserNotifications>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserNotifications>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserNotifications>>,
-					TError,
-					Awaited<ReturnType<typeof getUserNotifications>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserNotifications>>,
+				TError,
+				Awaited<ReturnType<typeof getUserNotifications>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
@@ -4041,10 +3473,10 @@ export function useGetUserNotifications<
 export function useGetUserNotifications<
 	TData = Awaited<ReturnType<typeof getUserNotifications>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserNotificationsParams,
 	options?: {
@@ -4079,124 +3511,13 @@ export const getGetUserFeatureFlagsQueryKey = () => {
 	return [`/system/feature-flags`] as const
 }
 
-export const getGetUserFeatureFlagsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserFeatureFlags>>>,
+export const getGetUserFeatureFlagsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetUserFeatureFlagsQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserFeatureFlags>>> = ({ signal }) =>
-		getUserFeatureFlags(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getUserFeatureFlags>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetUserFeatureFlagsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getUserFeatureFlags>>
->
-export type GetUserFeatureFlagsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetUserFeatureFlagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserFeatureFlags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUserFeatureFlags>>,
-				TError,
-				Awaited<ReturnType<typeof getUserFeatureFlags>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserFeatureFlagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserFeatureFlags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUserFeatureFlags>>,
-				TError,
-				Awaited<ReturnType<typeof getUserFeatureFlags>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserFeatureFlagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserFeatureFlags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetUserFeatureFlagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserFeatureFlags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetUserFeatureFlagsInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetUserFeatureFlagsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>>
 }) => {
@@ -4226,50 +3547,50 @@ export type GetUserFeatureFlagsQueryError =
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
 	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUserFeatureFlags>>,
-				TError,
-				Awaited<ReturnType<typeof getUserFeatureFlags>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUserFeatureFlags>>,
+			TError,
+			Awaited<ReturnType<typeof getUserFeatureFlags>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>
 	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getUserFeatureFlags>>,
-				TError,
-				Awaited<ReturnType<typeof getUserFeatureFlags>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getUserFeatureFlags>>,
+			TError,
+			Awaited<ReturnType<typeof getUserFeatureFlags>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -4277,10 +3598,10 @@ export function useGetUserFeatureFlags<
 export function useGetUserFeatureFlags<
 	TData = Awaited<ReturnType<typeof getUserFeatureFlags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserFeatureFlags>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -4310,114 +3631,13 @@ export const getGetApiKeysQueryKey = () => {
 	return [`/auth/api-keys`] as const
 }
 
-export const getGetApiKeysInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
+export const getGetApiKeysQueryOptions = <
+	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetApiKeysQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiKeys>>> = ({ signal }) =>
-		getApiKeys(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getApiKeys>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetApiKeysInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getApiKeys>>>
-export type GetApiKeysInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetApiKeysInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options: {
-	query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getApiKeys>>,
-				TError,
-				Awaited<ReturnType<typeof getApiKeys>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetApiKeysInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getApiKeys>>,
-				TError,
-				Awaited<ReturnType<typeof getApiKeys>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetApiKeysInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetApiKeysInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetApiKeysInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetApiKeysQueryOptions = <
-	TData = Awaited<ReturnType<typeof getApiKeys>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
 }) => {
@@ -4445,46 +3665,46 @@ export type GetApiKeysQueryError =
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getApiKeys>>,
-				TError,
-				Awaited<ReturnType<typeof getApiKeys>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getApiKeys>>,
+			TError,
+			Awaited<ReturnType<typeof getApiKeys>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getApiKeys>>,
-				TError,
-				Awaited<ReturnType<typeof getApiKeys>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getApiKeys>>,
+			TError,
+			Awaited<ReturnType<typeof getApiKeys>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -4492,10 +3712,10 @@ export function useGetApiKeys<
 export function useGetApiKeys<
 	TData = Awaited<ReturnType<typeof getApiKeys>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -4528,10 +3748,10 @@ export const switchOrganization = (
 
 export const getSwitchOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4577,10 +3797,10 @@ export type SwitchOrganizationMutationError =
 
 export const useSwitchOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4618,10 +3838,10 @@ export const createOrganization = (
 
 export const getCreateOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4667,10 +3887,10 @@ export type CreateOrganizationMutationError =
 
 export const useCreateOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -4706,139 +3926,13 @@ export const getGetUserOrganizationsQueryKey = (params: GetUserOrganizationsPara
 	return [`/organization`, ...(params ? [params] : [])] as const
 }
 
-export const getGetUserOrganizationsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserOrganizations>>>,
+export const getGetUserOrganizationsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserOrganizationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetUserOrganizationsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserOrganizations>>> = ({ signal }) =>
-		getUserOrganizations(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getUserOrganizations>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetUserOrganizationsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getUserOrganizations>>
->
-export type GetUserOrganizationsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetUserOrganizationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserOrganizations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserOrganizationsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserOrganizations>>,
-					TError,
-					Awaited<ReturnType<typeof getUserOrganizations>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserOrganizationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserOrganizations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserOrganizationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserOrganizations>>,
-					TError,
-					Awaited<ReturnType<typeof getUserOrganizations>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetUserOrganizationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserOrganizations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserOrganizationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetUserOrganizationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getUserOrganizations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetUserOrganizationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetUserOrganizationsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetUserOrganizationsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
@@ -4873,56 +3967,56 @@ export type GetUserOrganizationsQueryError =
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserOrganizations>>,
-					TError,
-					Awaited<ReturnType<typeof getUserOrganizations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserOrganizations>>,
+				TError,
+				Awaited<ReturnType<typeof getUserOrganizations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getUserOrganizations>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getUserOrganizations>>,
-					TError,
-					Awaited<ReturnType<typeof getUserOrganizations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getUserOrganizations>>,
+				TError,
+				Awaited<ReturnType<typeof getUserOrganizations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
@@ -4935,10 +4029,10 @@ export function useGetUserOrganizations<
 export function useGetUserOrganizations<
 	TData = Awaited<ReturnType<typeof getUserOrganizations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetUserOrganizationsParams,
 	options?: {
@@ -4973,139 +4067,13 @@ export const getGetOrganizationByIdQueryKey = (id: string) => {
 	return [`/organization/${id}`] as const
 }
 
-export const getGetOrganizationByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationById>>>,
+export const getGetOrganizationByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationById>>> = ({ signal }) =>
-		getOrganizationById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationById>>
->
-export type GetOrganizationByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -5140,56 +4108,56 @@ export type GetOrganizationByIdQueryError =
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -5202,10 +4170,10 @@ export function useGetOrganizationById<
 export function useGetOrganizationById<
 	TData = Awaited<ReturnType<typeof getOrganizationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -5244,10 +4212,10 @@ export const updateOrganization = (
 
 export const getUpdateOrganizationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5293,10 +4261,10 @@ export type UpdateOrganizationMutationError =
 
 export const useUpdateOrganization = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5331,124 +4299,13 @@ export const getGetAIConfigurationQueryKey = () => {
 	return [`/organization/ai-configuration`] as const
 }
 
-export const getGetAIConfigurationInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAIConfiguration>>>,
+export const getGetAIConfigurationQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAIConfigurationQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAIConfiguration>>> = ({ signal }) =>
-		getAIConfiguration(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAIConfiguration>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAIConfigurationInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAIConfiguration>>
->
-export type GetAIConfigurationInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAIConfigurationInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAIConfiguration>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAIConfiguration>>,
-				TError,
-				Awaited<ReturnType<typeof getAIConfiguration>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAIConfigurationInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAIConfiguration>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAIConfiguration>>,
-				TError,
-				Awaited<ReturnType<typeof getAIConfiguration>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAIConfigurationInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAIConfiguration>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAIConfigurationInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAIConfiguration>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAIConfigurationInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAIConfigurationQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>>
 }) => {
@@ -5478,48 +4335,48 @@ export type GetAIConfigurationQueryError =
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAIConfiguration>>,
-				TError,
-				Awaited<ReturnType<typeof getAIConfiguration>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAIConfiguration>>,
+			TError,
+			Awaited<ReturnType<typeof getAIConfiguration>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>
 	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAIConfiguration>>,
-				TError,
-				Awaited<ReturnType<typeof getAIConfiguration>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAIConfiguration>>,
+			TError,
+			Awaited<ReturnType<typeof getAIConfiguration>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -5527,10 +4384,10 @@ export function useGetAIConfiguration<
 export function useGetAIConfiguration<
 	TData = Awaited<ReturnType<typeof getAIConfiguration>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAIConfiguration>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -5561,139 +4418,13 @@ export const getGetOrganizationRolesQueryKey = (params: GetOrganizationRolesPara
 	return [`/rbac/roles`, ...(params ? [params] : [])] as const
 }
 
-export const getGetOrganizationRolesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoles>>>,
+export const getGetOrganizationRolesQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationRolesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationRolesQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationRoles>>> = ({ signal }) =>
-		getOrganizationRoles(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationRoles>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationRolesInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationRoles>>
->
-export type GetOrganizationRolesInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationRolesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoles>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationRolesParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoles>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoles>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationRolesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoles>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationRolesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoles>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoles>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationRolesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoles>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationRolesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationRolesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoles>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationRolesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationRolesInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationRolesQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
@@ -5728,56 +4459,56 @@ export type GetOrganizationRolesQueryError =
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoles>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoles>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoles>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoles>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoles>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoles>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoles>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoles>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoles>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
@@ -5790,10 +4521,10 @@ export function useGetOrganizationRoles<
 export function useGetOrganizationRoles<
 	TData = Awaited<ReturnType<typeof getOrganizationRoles>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationRolesParams,
 	options?: {
@@ -5831,10 +4562,10 @@ export const createOrganizationRole = (
 
 export const getCreateOrganizationRoleMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5880,10 +4611,10 @@ export type CreateOrganizationRoleMutationError =
 
 export const useCreateOrganizationRole = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -5918,160 +4649,13 @@ export const getGetOrganizationRoleByIdQueryKey = (id: string) => {
 	return [`/rbac/roles/${id}`] as const
 }
 
-export const getGetOrganizationRoleByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoleById>>>,
+export const getGetOrganizationRoleByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationRoleById>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationRoleByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationRoleById>>> = ({
-		signal
-	}) => getOrganizationRoleById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationRoleById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationRoleByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationRoleById>>
->
-export type GetOrganizationRoleByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationRoleByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoleById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationRoleById>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoleById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoleById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationRoleByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoleById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationRoleById>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoleById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoleById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationRoleByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoleById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationRoleById>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationRoleByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationRoleById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationRoleById>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationRoleByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationRoleByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6107,56 +4691,56 @@ export type GetOrganizationRoleByIdQueryError =
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoleById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoleById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoleById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoleById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoleById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationRoleById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationRoleById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationRoleById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationRoleById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationRoleById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6169,10 +4753,10 @@ export function useGetOrganizationRoleById<
 export function useGetOrganizationRoleById<
 	TData = Awaited<ReturnType<typeof getOrganizationRoleById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -6211,10 +4795,10 @@ export const updateOrganizationRoleById = (
 
 export const getUpdateOrganizationRoleByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6260,10 +4844,10 @@ export type UpdateOrganizationRoleByIdMutationError =
 
 export const useUpdateOrganizationRoleById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6295,10 +4879,10 @@ export const deleteOrganizationRoleById = (id: string) => {
 
 export const getDeleteOrganizationRoleByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6344,10 +4928,10 @@ export type DeleteOrganizationRoleByIdMutationError =
 
 export const useDeleteOrganizationRoleById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6383,139 +4967,13 @@ export const getGetOrganizationTagsQueryKey = (params: GetOrganizationTagsParams
 	return [`/organization/tags`, ...(params ? [params] : [])] as const
 }
 
-export const getGetOrganizationTagsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationTags>>>,
+export const getGetOrganizationTagsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationTagsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationTagsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationTags>>> = ({ signal }) =>
-		getOrganizationTags(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationTags>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationTagsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationTags>>
->
-export type GetOrganizationTagsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationTagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationTags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationTagsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationTags>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationTags>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationTagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationTags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationTagsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationTags>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationTags>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationTagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationTags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationTagsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationTagsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationTags>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationTagsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationTagsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationTagsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
@@ -6550,56 +5008,56 @@ export type GetOrganizationTagsQueryError =
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationTags>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationTags>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationTags>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationTags>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationTags>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationTags>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationTags>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationTags>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationTags>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
@@ -6612,10 +5070,10 @@ export function useGetOrganizationTags<
 export function useGetOrganizationTags<
 	TData = Awaited<ReturnType<typeof getOrganizationTags>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationTagsParams,
 	options?: {
@@ -6653,10 +5111,10 @@ export const createOrganizationTag = (
 
 export const getCreateOrganizationTagMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6702,10 +5160,10 @@ export type CreateOrganizationTagMutationError =
 
 export const useCreateOrganizationTag = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -6744,160 +5202,13 @@ export const getGetOrganizationInvitesQueryKey = (params: GetOrganizationInvites
 	return [`/organization/invites`, ...(params ? [params] : [])] as const
 }
 
-export const getGetOrganizationInvitesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInvites>>>,
+export const getGetOrganizationInvitesQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationInvitesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInvites>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationInvitesQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationInvites>>> = ({
-		signal
-	}) => getOrganizationInvites(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationInvites>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationInvitesInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationInvites>>
->
-export type GetOrganizationInvitesInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationInvitesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInvites>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationInvitesParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInvites>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInvites>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInvites>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationInvitesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInvites>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationInvitesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInvites>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInvites>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInvites>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationInvitesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInvites>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationInvitesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInvites>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationInvitesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInvites>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationInvitesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInvites>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationInvitesInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationInvitesQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
@@ -6933,56 +5244,56 @@ export type GetOrganizationInvitesQueryError =
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInvites>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInvites>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInvites>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInvites>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInvites>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInvites>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInvites>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInvites>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInvites>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInvites>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
@@ -6995,10 +5306,10 @@ export function useGetOrganizationInvites<
 export function useGetOrganizationInvites<
 	TData = Awaited<ReturnType<typeof getOrganizationInvites>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationInvitesParams,
 	options?: {
@@ -7036,10 +5347,10 @@ export const createOrganizationInvite = (
 
 export const getCreateOrganizationInviteMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7085,10 +5396,10 @@ export type CreateOrganizationInviteMutationError =
 
 export const useCreateOrganizationInvite = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7123,160 +5434,13 @@ export const getGetOrganizationInviteBySlugQueryKey = (slug: string) => {
 	return [`/organization/invite/${slug}`] as const
 }
 
-export const getGetOrganizationInviteBySlugInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>>,
+export const getGetOrganizationInviteBySlugQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	slug: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationInviteBySlugQueryKey(slug)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>> = ({
-		signal
-	}) => getOrganizationInviteBySlug(slug, signal)
-
-	return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationInviteBySlugInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
->
-export type GetOrganizationInviteBySlugInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationInviteBySlugInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	slug: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationInviteBySlugInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	slug: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationInviteBySlugInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	slug: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationInviteBySlugInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	slug: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationInviteBySlugInfiniteQueryOptions(slug, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationInviteBySlugQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
@@ -7312,56 +5476,56 @@ export type GetOrganizationInviteBySlugQueryError =
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationInviteBySlug>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationInviteBySlug>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
@@ -7374,10 +5538,10 @@ export function useGetOrganizationInviteBySlug<
 export function useGetOrganizationInviteBySlug<
 	TData = Awaited<ReturnType<typeof getOrganizationInviteBySlug>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	slug: string,
 	options?: {
@@ -7410,10 +5574,10 @@ export const acceptOrganizationInvite = (slug: string, signal?: AbortSignal) => 
 
 export const getAcceptOrganizationInviteMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7459,10 +5623,10 @@ export type AcceptOrganizationInviteMutationError =
 
 export const useAcceptOrganizationInvite = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -7501,160 +5665,13 @@ export const getGetOrganizationMembersQueryKey = (params: GetOrganizationMembers
 	return [`/organization/members`, ...(params ? [params] : [])] as const
 }
 
-export const getGetOrganizationMembersInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMembers>>>,
+export const getGetOrganizationMembersQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationMembersParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMembers>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationMembersQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationMembers>>> = ({
-		signal
-	}) => getOrganizationMembers(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationMembers>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationMembersInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationMembers>>
->
-export type GetOrganizationMembersInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationMembersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMembers>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationMembersParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMembers>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMembers>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMembers>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationMembersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMembers>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationMembersParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMembers>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMembers>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMembers>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationMembersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMembers>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationMembersParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMembers>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationMembersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMembers>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetOrganizationMembersParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMembers>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationMembersInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationMembersQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
@@ -7690,56 +5707,56 @@ export type GetOrganizationMembersQueryError =
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMembers>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMembers>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMembers>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMembers>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMembers>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMembers>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMembers>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMembers>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMembers>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMembers>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
@@ -7752,10 +5769,10 @@ export function useGetOrganizationMembers<
 export function useGetOrganizationMembers<
 	TData = Awaited<ReturnType<typeof getOrganizationMembers>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetOrganizationMembersParams,
 	options?: {
@@ -7790,160 +5807,13 @@ export const getGetOrganizationMemberByIdQueryKey = (id: string) => {
 	return [`/organization/members/${id}`] as const
 }
 
-export const getGetOrganizationMemberByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMemberById>>>,
+export const getGetOrganizationMemberByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMemberById>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetOrganizationMemberByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationMemberById>>> = ({
-		signal
-	}) => getOrganizationMemberById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getOrganizationMemberById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetOrganizationMemberByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getOrganizationMemberById>>
->
-export type GetOrganizationMemberByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetOrganizationMemberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMemberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMemberById>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMemberById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMemberById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationMemberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMemberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMemberById>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMemberById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMemberById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetOrganizationMemberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMemberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMemberById>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetOrganizationMemberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getOrganizationMemberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getOrganizationMemberById>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetOrganizationMemberByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetOrganizationMemberByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -7979,56 +5849,56 @@ export type GetOrganizationMemberByIdQueryError =
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMemberById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMemberById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMemberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMemberById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMemberById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getOrganizationMemberById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getOrganizationMemberById>>,
-					TError,
-					Awaited<ReturnType<typeof getOrganizationMemberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getOrganizationMemberById>>,
+				TError,
+				Awaited<ReturnType<typeof getOrganizationMemberById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8041,10 +5911,10 @@ export function useGetOrganizationMemberById<
 export function useGetOrganizationMemberById<
 	TData = Awaited<ReturnType<typeof getOrganizationMemberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8083,10 +5953,10 @@ export const updateOrganizationMemberById = (
 
 export const getUpdateOrganizationMemberByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8132,10 +6002,10 @@ export type UpdateOrganizationMemberByIdMutationError =
 
 export const useUpdateOrganizationMemberById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8167,10 +6037,10 @@ export const deleteOrganizationMemberById = (id: string) => {
 
 export const getDeleteOrganizationMemberByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8216,10 +6086,10 @@ export type DeleteOrganizationMemberByIdMutationError =
 
 export const useDeleteOrganizationMemberById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8258,10 +6128,10 @@ export const updateOrganizationMemberRoleById = (
 
 export const getUpdateOrganizationMemberRoleByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8307,10 +6177,10 @@ export type UpdateOrganizationMemberRoleByIdMutationError =
 
 export const useUpdateOrganizationMemberRoleById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8349,10 +6219,10 @@ export const transferOrganizationOwnership = (
 
 export const getTransferOrganizationOwnershipMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8398,10 +6268,10 @@ export type TransferOrganizationOwnershipMutationError =
 
 export const useTransferOrganizationOwnership = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -8436,124 +6306,13 @@ export const getGetAllTemplatesQueryKey = () => {
 	return [`/organization/templates`] as const
 }
 
-export const getGetAllTemplatesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllTemplates>>>,
+export const getGetAllTemplatesQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAllTemplatesQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllTemplates>>> = ({ signal }) =>
-		getAllTemplates(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAllTemplates>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAllTemplatesInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAllTemplates>>
->
-export type GetAllTemplatesInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAllTemplatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllTemplates>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllTemplates>>,
-				TError,
-				Awaited<ReturnType<typeof getAllTemplates>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAllTemplatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllTemplates>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllTemplates>>,
-				TError,
-				Awaited<ReturnType<typeof getAllTemplates>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAllTemplatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllTemplates>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAllTemplatesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllTemplates>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAllTemplatesInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAllTemplatesQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAllTemplates>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>>
 }) => {
@@ -8581,46 +6340,46 @@ export type GetAllTemplatesQueryError =
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllTemplates>>,
-				TError,
-				Awaited<ReturnType<typeof getAllTemplates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllTemplates>>,
+			TError,
+			Awaited<ReturnType<typeof getAllTemplates>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllTemplates>>,
-				TError,
-				Awaited<ReturnType<typeof getAllTemplates>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllTemplates>>,
+			TError,
+			Awaited<ReturnType<typeof getAllTemplates>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -8628,10 +6387,10 @@ export function useGetAllTemplates<
 export function useGetAllTemplates<
 	TData = Awaited<ReturnType<typeof getAllTemplates>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(options?: {
 	query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllTemplates>>, TError, TData>>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
@@ -8661,139 +6420,13 @@ export const getGetTemplateByIdQueryKey = (id: string) => {
 	return [`/organization/templates/${id}`] as const
 }
 
-export const getGetTemplateByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getTemplateById>>>,
+export const getGetTemplateByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetTemplateByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getTemplateById>>> = ({ signal }) =>
-		getTemplateById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getTemplateById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetTemplateByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getTemplateById>>
->
-export type GetTemplateByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetTemplateByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getTemplateById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getTemplateById>>,
-					TError,
-					Awaited<ReturnType<typeof getTemplateById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetTemplateByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getTemplateById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getTemplateById>>,
-					TError,
-					Awaited<ReturnType<typeof getTemplateById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetTemplateByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getTemplateById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetTemplateByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getTemplateById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetTemplateByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetTemplateByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getTemplateById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8824,56 +6457,56 @@ export type GetTemplateByIdQueryError =
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getTemplateById>>,
-					TError,
-					Awaited<ReturnType<typeof getTemplateById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getTemplateById>>,
+				TError,
+				Awaited<ReturnType<typeof getTemplateById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getTemplateById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getTemplateById>>,
-					TError,
-					Awaited<ReturnType<typeof getTemplateById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getTemplateById>>,
+				TError,
+				Awaited<ReturnType<typeof getTemplateById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8884,10 +6517,10 @@ export function useGetTemplateById<
 export function useGetTemplateById<
 	TData = Awaited<ReturnType<typeof getTemplateById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -8920,93 +6553,6 @@ export const getGetAllPhoneNumbersQueryKey = () => {
 	return [`/organization/phone-numbers`] as const
 }
 
-export const getGetAllPhoneNumbersInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllPhoneNumbers>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
-	>
-}) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAllPhoneNumbersQueryKey()
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllPhoneNumbers>>> = ({ signal }) =>
-		getAllPhoneNumbers(signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAllPhoneNumbersInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAllPhoneNumbers>>
->
-export type GetAllPhoneNumbersInfiniteQueryError = unknown
-
-export function useGetAllPhoneNumbersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllPhoneNumbers>>>,
-	TError = unknown
->(options: {
-	query: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
-	> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-				TError,
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>
-			>,
-			'initialData'
-		>
-}): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAllPhoneNumbersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllPhoneNumbers>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
-	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-				TError,
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>
-			>,
-			'initialData'
-		>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAllPhoneNumbersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllPhoneNumbers>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAllPhoneNumbersInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAllPhoneNumbers>>>,
-	TError = unknown
->(options?: {
-	query?: Partial<
-		UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
-	>
-}): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAllPhoneNumbersInfiniteQueryOptions(options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
 export const getGetAllPhoneNumbersQueryOptions = <
 	TData = Awaited<ReturnType<typeof getAllPhoneNumbers>>,
 	TError = unknown
@@ -9037,14 +6583,14 @@ export function useGetAllPhoneNumbers<
 	TError = unknown
 >(options: {
 	query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>> &
-		Pick<
-			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-				TError,
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>
-			>,
-			'initialData'
-		>
+	Pick<
+		DefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>,
+			TError,
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>
+		>,
+		'initialData'
+	>
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllPhoneNumbers<
 	TData = Awaited<ReturnType<typeof getAllPhoneNumbers>>,
@@ -9053,14 +6599,14 @@ export function useGetAllPhoneNumbers<
 	query?: Partial<
 		UseQueryOptions<Awaited<ReturnType<typeof getAllPhoneNumbers>>, TError, TData>
 	> &
-		Pick<
-			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>,
-				TError,
-				Awaited<ReturnType<typeof getAllPhoneNumbers>>
-			>,
-			'initialData'
-		>
+	Pick<
+		UndefinedInitialDataOptions<
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>,
+			TError,
+			Awaited<ReturnType<typeof getAllPhoneNumbers>>
+		>,
+		'initialData'
+	>
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAllPhoneNumbers<
 	TData = Awaited<ReturnType<typeof getAllPhoneNumbers>>,
@@ -9101,139 +6647,13 @@ export const getGetPhoneNumberByIdQueryKey = (id: string) => {
 	return [`/organization/phone-numbers/${id}`] as const
 }
 
-export const getGetPhoneNumberByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getPhoneNumberById>>>,
+export const getGetPhoneNumberByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetPhoneNumberByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getPhoneNumberById>>> = ({ signal }) =>
-		getPhoneNumberById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getPhoneNumberById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetPhoneNumberByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getPhoneNumberById>>
->
-export type GetPhoneNumberByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetPhoneNumberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getPhoneNumberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPhoneNumberById>>,
-					TError,
-					Awaited<ReturnType<typeof getPhoneNumberById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetPhoneNumberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getPhoneNumberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPhoneNumberById>>,
-					TError,
-					Awaited<ReturnType<typeof getPhoneNumberById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetPhoneNumberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getPhoneNumberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetPhoneNumberByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getPhoneNumberById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetPhoneNumberByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetPhoneNumberByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -9268,56 +6688,56 @@ export type GetPhoneNumberByIdQueryError =
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPhoneNumberById>>,
-					TError,
-					Awaited<ReturnType<typeof getPhoneNumberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getPhoneNumberById>>,
+				TError,
+				Awaited<ReturnType<typeof getPhoneNumberById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getPhoneNumberById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getPhoneNumberById>>,
-					TError,
-					Awaited<ReturnType<typeof getPhoneNumberById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getPhoneNumberById>>,
+				TError,
+				Awaited<ReturnType<typeof getPhoneNumberById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -9330,10 +6750,10 @@ export function useGetPhoneNumberById<
 export function useGetPhoneNumberById<
 	TData = Awaited<ReturnType<typeof getPhoneNumberById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -9371,10 +6791,10 @@ export const updateWhatsappBusinessAccountDetails = (
 
 export const getUpdateWhatsappBusinessAccountDetailsMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9421,10 +6841,10 @@ export type UpdateWhatsappBusinessAccountDetailsMutationError =
 
 export const useUpdateWhatsappBusinessAccountDetails = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9460,137 +6880,13 @@ export const getGetContactsQueryKey = (params: GetContactsParams) => {
 	return [`/contacts`, ...(params ? [params] : [])] as const
 }
 
-export const getGetContactsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
+export const getGetContactsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetContactsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getContacts>>> = ({ signal }) =>
-		getContacts(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getContacts>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetContactsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getContacts>>>
-export type GetContactsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetContactsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContacts>>,
-					TError,
-					Awaited<ReturnType<typeof getContacts>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetContactsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContacts>>,
-					TError,
-					Awaited<ReturnType<typeof getContacts>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetContactsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetContactsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetContactsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetContactsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getContacts>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
@@ -9621,52 +6917,52 @@ export type GetContactsQueryError =
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContacts>>,
-					TError,
-					Awaited<ReturnType<typeof getContacts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContacts>>,
+				TError,
+				Awaited<ReturnType<typeof getContacts>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContacts>>,
-					TError,
-					Awaited<ReturnType<typeof getContacts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContacts>>,
+				TError,
+				Awaited<ReturnType<typeof getContacts>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
@@ -9677,10 +6973,10 @@ export function useGetContacts<
 export function useGetContacts<
 	TData = Awaited<ReturnType<typeof getContacts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactsParams,
 	options?: {
@@ -9713,10 +7009,10 @@ export const createContacts = (newContactSchema: NewContactSchema[], signal?: Ab
 
 export const getCreateContactsMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9760,10 +7056,10 @@ export type CreateContactsMutationError =
 
 export const useCreateContacts = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9792,10 +7088,10 @@ export const deleteContactsByList = (params: DeleteContactsByListParams) => {
 
 export const getDeleteContactsByListMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9841,10 +7137,10 @@ export type DeleteContactsByListMutationError =
 
 export const useDeleteContactsByList = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9881,10 +7177,10 @@ export const bulkImportContacts = (
 
 export const getBulkImportContactsMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9930,10 +7226,10 @@ export type BulkImportContactsMutationError =
 
 export const useBulkImportContacts = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -9968,139 +7264,13 @@ export const getGetContactByIdQueryKey = (id: string) => {
 	return [`/contacts/${id}`] as const
 }
 
-export const getGetContactByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactById>>>,
+export const getGetContactByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetContactByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getContactById>>> = ({ signal }) =>
-		getContactById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getContactById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetContactByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getContactById>>
->
-export type GetContactByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetContactByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactById>>,
-					TError,
-					Awaited<ReturnType<typeof getContactById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetContactByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactById>>,
-					TError,
-					Awaited<ReturnType<typeof getContactById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetContactByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetContactByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetContactByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetContactByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getContactById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10131,54 +7301,54 @@ export type GetContactByIdQueryError =
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactById>>,
-					TError,
-					Awaited<ReturnType<typeof getContactById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactById>>,
+				TError,
+				Awaited<ReturnType<typeof getContactById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getContactById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactById>>,
-					TError,
-					Awaited<ReturnType<typeof getContactById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactById>>,
+				TError,
+				Awaited<ReturnType<typeof getContactById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10189,10 +7359,10 @@ export function useGetContactById<
 export function useGetContactById<
 	TData = Awaited<ReturnType<typeof getContactById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10229,10 +7399,10 @@ export const updateContactById = (
 
 export const getUpdateContactByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10278,10 +7448,10 @@ export type UpdateContactByIdMutationError =
 
 export const useUpdateContactById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10313,10 +7483,10 @@ export const deleteContactById = (id: string) => {
 
 export const getDeleteContactByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10362,10 +7532,10 @@ export type DeleteContactByIdMutationError =
 
 export const useDeleteContactById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10401,139 +7571,13 @@ export const getGetContactListsQueryKey = (params: GetContactListsParams) => {
 	return [`/lists`, ...(params ? [params] : [])] as const
 }
 
-export const getGetContactListsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactLists>>>,
+export const getGetContactListsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactListsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetContactListsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getContactLists>>> = ({ signal }) =>
-		getContactLists(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getContactLists>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetContactListsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getContactLists>>
->
-export type GetContactListsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetContactListsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactLists>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactListsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactLists>>,
-					TError,
-					Awaited<ReturnType<typeof getContactLists>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetContactListsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactLists>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactListsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactLists>>,
-					TError,
-					Awaited<ReturnType<typeof getContactLists>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetContactListsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactLists>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactListsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetContactListsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getContactLists>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetContactListsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetContactListsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetContactListsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getContactLists>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
@@ -10564,56 +7608,56 @@ export type GetContactListsQueryError =
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactLists>>,
-					TError,
-					Awaited<ReturnType<typeof getContactLists>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactLists>>,
+				TError,
+				Awaited<ReturnType<typeof getContactLists>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getContactLists>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getContactLists>>,
-					TError,
-					Awaited<ReturnType<typeof getContactLists>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getContactLists>>,
+				TError,
+				Awaited<ReturnType<typeof getContactLists>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
@@ -10624,10 +7668,10 @@ export function useGetContactLists<
 export function useGetContactLists<
 	TData = Awaited<ReturnType<typeof getContactLists>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetContactListsParams,
 	options?: {
@@ -10660,10 +7704,10 @@ export const createList = (newContactListSchema: NewContactListSchema, signal?: 
 
 export const getCreateListMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10707,10 +7751,10 @@ export type CreateListMutationError =
 
 export const useCreateList = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -10741,137 +7785,13 @@ export const getGetListByIdQueryKey = (id: string) => {
 	return [`/lists/${id}`] as const
 }
 
-export const getGetListByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getListById>>>,
+export const getGetListByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetListByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getListById>>> = ({ signal }) =>
-		getListById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getListById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetListByIdInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getListById>>>
-export type GetListByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetListByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getListById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getListById>>,
-					TError,
-					Awaited<ReturnType<typeof getListById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetListByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getListById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getListById>>,
-					TError,
-					Awaited<ReturnType<typeof getListById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetListByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getListById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetListByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getListById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetListByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetListByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getListById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10902,52 +7822,52 @@ export type GetListByIdQueryError =
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getListById>>,
-					TError,
-					Awaited<ReturnType<typeof getListById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getListById>>,
+				TError,
+				Awaited<ReturnType<typeof getListById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getListById>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getListById>>,
-					TError,
-					Awaited<ReturnType<typeof getListById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getListById>>,
+				TError,
+				Awaited<ReturnType<typeof getListById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10958,10 +7878,10 @@ export function useGetListById<
 export function useGetListById<
 	TData = Awaited<ReturnType<typeof getListById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -10998,10 +7918,10 @@ export const updateListById = (
 
 export const getUpdateListByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11045,10 +7965,10 @@ export type UpdateListByIdMutationError =
 
 export const useUpdateListById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11077,10 +7997,10 @@ export const deleteListById = (id: string) => {
 
 export const getDeleteListByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11124,10 +8044,10 @@ export type DeleteListByIdMutationError =
 
 export const useDeleteListById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11163,137 +8083,13 @@ export const getGetCampaignsQueryKey = (params: GetCampaignsParams) => {
 	return [`/campaigns`, ...(params ? [params] : [])] as const
 }
 
-export const getGetCampaignsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaigns>>>,
+export const getGetCampaignsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetCampaignsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetCampaignsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getCampaigns>>> = ({ signal }) =>
-		getCampaigns(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getCampaigns>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetCampaignsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getCampaigns>>>
-export type GetCampaignsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetCampaignsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaigns>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetCampaignsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaigns>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaigns>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaigns>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetCampaignsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaigns>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaigns>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaigns>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetCampaignsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetCampaignsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaigns>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetCampaignsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetCampaignsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetCampaignsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getCampaigns>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
@@ -11324,52 +8120,52 @@ export type GetCampaignsQueryError =
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaigns>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaigns>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaigns>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaigns>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCampaigns>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaigns>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaigns>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaigns>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaigns>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
@@ -11380,10 +8176,10 @@ export function useGetCampaigns<
 export function useGetCampaigns<
 	TData = Awaited<ReturnType<typeof getCampaigns>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetCampaignsParams,
 	options?: {
@@ -11416,10 +8212,10 @@ export const createCampaign = (newCampaignSchema: NewCampaignSchema, signal?: Ab
 
 export const getCreateCampaignMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11463,10 +8259,10 @@ export type CreateCampaignMutationError =
 
 export const useCreateCampaign = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11501,139 +8297,13 @@ export const getGetCampaignByIdQueryKey = (id: string) => {
 	return [`/campaigns/${id}`] as const
 }
 
-export const getGetCampaignByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignById>>>,
+export const getGetCampaignByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetCampaignByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getCampaignById>>> = ({ signal }) =>
-		getCampaignById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getCampaignById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetCampaignByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getCampaignById>>
->
-export type GetCampaignByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetCampaignByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetCampaignByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetCampaignByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetCampaignByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getCampaignById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -11664,56 +8334,56 @@ export type GetCampaignByIdQueryError =
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -11724,10 +8394,10 @@ export function useGetCampaignById<
 export function useGetCampaignById<
 	TData = Awaited<ReturnType<typeof getCampaignById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -11764,10 +8434,10 @@ export const updateCampaignById = (
 
 export const getUpdateCampaignByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11813,10 +8483,10 @@ export type UpdateCampaignByIdMutationError =
 
 export const useUpdateCampaignById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11845,10 +8515,10 @@ export const deleteCampaignById = (id: string) => {
 
 export const getDeleteCampaignByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11894,10 +8564,10 @@ export type DeleteCampaignByIdMutationError =
 
 export const useDeleteCampaignById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -11933,139 +8603,13 @@ export const getGetConversationsQueryKey = (params: GetConversationsParams) => {
 	return [`/conversations`, ...(params ? [params] : [])] as const
 }
 
-export const getGetConversationsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversations>>>,
+export const getGetConversationsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetConversationsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getConversations>>> = ({ signal }) =>
-		getConversations(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getConversations>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetConversationsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getConversations>>
->
-export type GetConversationsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetConversationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversations>>,
-					TError,
-					Awaited<ReturnType<typeof getConversations>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversations>>,
-					TError,
-					Awaited<ReturnType<typeof getConversations>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetConversationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetConversationsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetConversationsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getConversations>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
@@ -12098,56 +8642,56 @@ export type GetConversationsQueryError =
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversations>>,
-					TError,
-					Awaited<ReturnType<typeof getConversations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversations>>,
+				TError,
+				Awaited<ReturnType<typeof getConversations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversations>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversations>>,
-					TError,
-					Awaited<ReturnType<typeof getConversations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversations>>,
+				TError,
+				Awaited<ReturnType<typeof getConversations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
@@ -12160,10 +8704,10 @@ export function useGetConversations<
 export function useGetConversations<
 	TData = Awaited<ReturnType<typeof getConversations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationsParams,
 	options?: {
@@ -12198,139 +8742,13 @@ export const getGetConversationByIdQueryKey = (id: string) => {
 	return [`/conversation/${id}`] as const
 }
 
-export const getGetConversationByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationById>>>,
+export const getGetConversationByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetConversationByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getConversationById>>> = ({ signal }) =>
-		getConversationById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getConversationById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetConversationByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getConversationById>>
->
-export type GetConversationByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetConversationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationById>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationById>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetConversationByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetConversationByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetConversationByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getConversationById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -12365,56 +8783,56 @@ export type GetConversationByIdQueryError =
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationById>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationById>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationById>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationById>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -12427,10 +8845,10 @@ export function useGetConversationById<
 export function useGetConversationById<
 	TData = Awaited<ReturnType<typeof getConversationById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -12469,10 +8887,10 @@ export const updateConversationById = (
 
 export const getUpdateConversationByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12518,10 +8936,10 @@ export type UpdateConversationByIdMutationError =
 
 export const useUpdateConversationById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12553,10 +8971,10 @@ export const deleteConversationById = (id: string) => {
 
 export const getDeleteConversationByIdMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12602,10 +9020,10 @@ export type DeleteConversationByIdMutationError =
 
 export const useDeleteConversationById = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12644,10 +9062,10 @@ export const assignConversation = (
 
 export const getAssignConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12693,10 +9111,10 @@ export type AssignConversationMutationError =
 
 export const useAssignConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12735,10 +9153,10 @@ export const unassignConversation = (
 
 export const getUnassignConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12784,10 +9202,10 @@ export type UnassignConversationMutationError =
 
 export const useUnassignConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -12831,12 +9249,15 @@ export const getGetConversationMessagesQueryKey = (
 }
 
 export const getGetConversationMessagesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationMessages>>>,
+	TData = InfiniteData<
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		GetConversationMessagesParams['page']
+	>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -12845,7 +9266,10 @@ export const getGetConversationMessagesInfiniteQueryOptions = <
 			UseInfiniteQueryOptions<
 				Awaited<ReturnType<typeof getConversationMessages>>,
 				TError,
-				TData
+				TData,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey,
+				GetConversationMessagesParams['page']
 			>
 		>
 	}
@@ -12854,14 +9278,20 @@ export const getGetConversationMessagesInfiniteQueryOptions = <
 
 	const queryKey = queryOptions?.queryKey ?? getGetConversationMessagesQueryKey(id, params)
 
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getConversationMessages>>> = ({
-		signal
-	}) => getConversationMessages(id, params, signal)
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		QueryKey,
+		GetConversationMessagesParams['page']
+	> = ({ signal, pageParam }) =>
+			getConversationMessages(id, { ...params, page: pageParam || params?.['page'] }, signal)
 
 	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
 		Awaited<ReturnType<typeof getConversationMessages>>,
 		TError,
-		TData
+		TData,
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		QueryKey,
+		GetConversationMessagesParams['page']
 	> & { queryKey: DataTag<QueryKey, TData> }
 }
 
@@ -12875,12 +9305,15 @@ export type GetConversationMessagesInfiniteQueryError =
 	| RateLimitErrorResponseSchema
 
 export function useGetConversationMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationMessages>>>,
+	TData = InfiniteData<
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		GetConversationMessagesParams['page']
+	>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -12889,26 +9322,33 @@ export function useGetConversationMessagesInfinite<
 			UseInfiniteQueryOptions<
 				Awaited<ReturnType<typeof getConversationMessages>>,
 				TError,
-				TData
+				TData,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey,
+				GetConversationMessagesParams['page']
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationMessages>>>,
+	TData = InfiniteData<
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		GetConversationMessagesParams['page']
+	>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -12917,26 +9357,33 @@ export function useGetConversationMessagesInfinite<
 			UseInfiniteQueryOptions<
 				Awaited<ReturnType<typeof getConversationMessages>>,
 				TError,
-				TData
+				TData,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey,
+				GetConversationMessagesParams['page']
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey
+			>,
+			'initialData'
+		>
 	}
 ): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationMessages>>>,
+	TData = InfiniteData<
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		GetConversationMessagesParams['page']
+	>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -12945,19 +9392,25 @@ export function useGetConversationMessagesInfinite<
 			UseInfiniteQueryOptions<
 				Awaited<ReturnType<typeof getConversationMessages>>,
 				TError,
-				TData
+				TData,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey,
+				GetConversationMessagesParams['page']
 			>
 		>
 	}
 ): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 
 export function useGetConversationMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationMessages>>>,
+	TData = InfiniteData<
+		Awaited<ReturnType<typeof getConversationMessages>>,
+		GetConversationMessagesParams['page']
+	>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -12966,7 +9419,10 @@ export function useGetConversationMessagesInfinite<
 			UseInfiniteQueryOptions<
 				Awaited<ReturnType<typeof getConversationMessages>>,
 				TError,
-				TData
+				TData,
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				QueryKey,
+				GetConversationMessagesParams['page']
 			>
 		>
 	}
@@ -12985,10 +9441,10 @@ export function useGetConversationMessagesInfinite<
 export const getGetConversationMessagesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -13025,10 +9481,10 @@ export type GetConversationMessagesQueryError =
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -13036,23 +9492,23 @@ export function useGetConversationMessages<
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationMessages>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -13060,23 +9516,23 @@ export function useGetConversationMessages<
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationMessages>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -13090,10 +9546,10 @@ export function useGetConversationMessages<
 export function useGetConversationMessages<
 	TData = Awaited<ReturnType<typeof getConversationMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetConversationMessagesParams,
@@ -13133,10 +9589,10 @@ export const sendMessageInConversation = (
 
 export const getSendMessageInConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -13182,10 +9638,10 @@ export type SendMessageInConversationMutationError =
 
 export const useSendMessageInConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -13229,10 +9685,10 @@ export const uploadFileInConversation = (
 
 export const getUploadFileInConversationMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -13278,10 +9734,10 @@ export type UploadFileInConversationMutationError =
 
 export const useUploadFileInConversation = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -13314,10 +9770,10 @@ export const markConversationAsRead = (id: string, signal?: AbortSignal) => {
 
 export const getMarkConversationAsReadMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -13363,10 +9819,10 @@ export type MarkConversationAsReadMutationError =
 
 export const useMarkConversationAsRead = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -13397,137 +9853,13 @@ export const getGetMessagesQueryKey = (params?: GetMessagesParams) => {
 	return [`/messages`, ...(params ? [params] : [])] as const
 }
 
-export const getGetMessagesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getMessages>>>,
+export const getGetMessagesQueryOptions = <
+	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetMessagesQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getMessages>>> = ({ signal }) =>
-		getMessages(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getMessages>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetMessagesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getMessages>>>
-export type GetMessagesInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: undefined | GetMessagesParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getMessages>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getMessages>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetMessagesInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetMessagesQueryOptions = <
-	TData = Awaited<ReturnType<typeof getMessages>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
@@ -13558,52 +9890,52 @@ export type GetMessagesQueryError =
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetMessagesParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMessages>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
@@ -13614,10 +9946,10 @@ export function useGetMessages<
 export function useGetMessages<
 	TData = Awaited<ReturnType<typeof getMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetMessagesParams,
 	options?: {
@@ -13651,139 +9983,13 @@ export const getGetIntegrationsQueryKey = (params?: GetIntegrationsParams) => {
 	return [`/integrations`, ...(params ? [params] : [])] as const
 }
 
-export const getGetIntegrationsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getIntegrations>>>,
+export const getGetIntegrationsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetIntegrationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetIntegrationsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegrations>>> = ({ signal }) =>
-		getIntegrations(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getIntegrations>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetIntegrationsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getIntegrations>>
->
-export type GetIntegrationsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetIntegrationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getIntegrations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: undefined | GetIntegrationsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getIntegrations>>,
-					TError,
-					Awaited<ReturnType<typeof getIntegrations>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetIntegrationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getIntegrations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetIntegrationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getIntegrations>>,
-					TError,
-					Awaited<ReturnType<typeof getIntegrations>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetIntegrationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getIntegrations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetIntegrationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetIntegrationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getIntegrations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetIntegrationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetIntegrationsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetIntegrationsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getIntegrations>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
@@ -13814,56 +10020,56 @@ export type GetIntegrationsQueryError =
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetIntegrationsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getIntegrations>>,
-					TError,
-					Awaited<ReturnType<typeof getIntegrations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getIntegrations>>,
+				TError,
+				Awaited<ReturnType<typeof getIntegrations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getIntegrations>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getIntegrations>>,
-					TError,
-					Awaited<ReturnType<typeof getIntegrations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getIntegrations>>,
+				TError,
+				Awaited<ReturnType<typeof getIntegrations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
@@ -13874,10 +10080,10 @@ export function useGetIntegrations<
 export function useGetIntegrations<
 	TData = Awaited<ReturnType<typeof getIntegrations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetIntegrationsParams,
 	options?: {
@@ -13911,139 +10117,13 @@ export const getGetAggregateCountsQueryKey = (params: GetAggregateCountsParams) 
 	return [`/analytics/aggregate-counts`, ...(params ? [params] : [])] as const
 }
 
-export const getGetAggregateCountsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCounts>>>,
+export const getGetAggregateCountsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCountsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAggregateCountsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAggregateCounts>>> = ({ signal }) =>
-		getAggregateCounts(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAggregateCounts>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAggregateCountsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAggregateCounts>>
->
-export type GetAggregateCountsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAggregateCountsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCounts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCountsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCounts>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCounts>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAggregateCountsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCounts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCountsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCounts>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCounts>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAggregateCountsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCounts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCountsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAggregateCountsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCounts>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCountsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAggregateCountsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAggregateCountsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
@@ -14078,56 +10158,56 @@ export type GetAggregateCountsQueryError =
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCounts>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCounts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCounts>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCounts>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAggregateCounts>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCounts>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCounts>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCounts>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCounts>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
@@ -14140,10 +10220,10 @@ export function useGetAggregateCounts<
 export function useGetAggregateCounts<
 	TData = Awaited<ReturnType<typeof getAggregateCounts>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCountsParams,
 	options?: {
@@ -14184,160 +10264,13 @@ export const getGetAggregateCampaignAnalyticsQueryKey = (
 	return [`/analytics/campaigns`, ...(params ? [params] : [])] as const
 }
 
-export const getGetAggregateCampaignAnalyticsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>>,
+export const getGetAggregateCampaignAnalyticsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCampaignAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAggregateCampaignAnalyticsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>> = ({
-		signal
-	}) => getAggregateCampaignAnalytics(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAggregateCampaignAnalyticsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
->
-export type GetAggregateCampaignAnalyticsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAggregateCampaignAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCampaignAnalyticsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAggregateCampaignAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCampaignAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAggregateCampaignAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCampaignAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAggregateCampaignAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetAggregateCampaignAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAggregateCampaignAnalyticsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAggregateCampaignAnalyticsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -14377,10 +10310,10 @@ export type GetAggregateCampaignAnalyticsQueryError =
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options: {
@@ -14391,23 +10324,23 @@ export function useGetAggregateCampaignAnalytics<
 				TData
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -14418,23 +10351,23 @@ export function useGetAggregateCampaignAnalytics<
 				TData
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -14451,10 +10384,10 @@ export function useGetAggregateCampaignAnalytics<
 export function useGetAggregateCampaignAnalytics<
 	TData = Awaited<ReturnType<typeof getAggregateCampaignAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetAggregateCampaignAnalyticsParams,
 	options?: {
@@ -14497,160 +10430,13 @@ export const getGetConversationAnalyticsQueryKey = (params?: GetConversationAnal
 	return [`/analytics/conversations`, ...(params ? [params] : [])] as const
 }
 
-export const getGetConversationAnalyticsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationAnalytics>>>,
+export const getGetConversationAnalyticsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetConversationAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationAnalytics>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetConversationAnalyticsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getConversationAnalytics>>> = ({
-		signal
-	}) => getConversationAnalytics(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getConversationAnalytics>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetConversationAnalyticsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getConversationAnalytics>>
->
-export type GetConversationAnalyticsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetConversationAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: undefined | GetConversationAnalyticsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationAnalytics>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationAnalytics>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetConversationAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationAnalytics>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationAnalytics>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetConversationAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationAnalytics>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetConversationAnalyticsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationAnalytics>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetConversationAnalyticsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationAnalytics>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetConversationAnalyticsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetConversationAnalyticsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
@@ -14686,56 +10472,56 @@ export type GetConversationAnalyticsQueryError =
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetConversationAnalyticsParams,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getConversationAnalytics>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationAnalytics>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationAnalytics>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationAnalytics>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationAnalytics>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
@@ -14748,10 +10534,10 @@ export function useGetConversationAnalytics<
 export function useGetConversationAnalytics<
 	TData = Awaited<ReturnType<typeof getConversationAnalytics>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetConversationAnalyticsParams,
 	options?: {
@@ -14786,160 +10572,13 @@ export const getGetCampaignAnalyticsByIdQueryKey = (campaignId: string) => {
 	return [`/analytics/campaign/${campaignId}`] as const
 }
 
-export const getGetCampaignAnalyticsByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignAnalyticsById>>>,
+export const getGetCampaignAnalyticsByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	campaignId: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetCampaignAnalyticsByIdQueryKey(campaignId)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getCampaignAnalyticsById>>> = ({
-		signal
-	}) => getCampaignAnalyticsById(campaignId, signal)
-
-	return { queryKey, queryFn, enabled: !!campaignId, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetCampaignAnalyticsByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getCampaignAnalyticsById>>
->
-export type GetCampaignAnalyticsByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetCampaignAnalyticsByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignAnalyticsById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	campaignId: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignAnalyticsByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignAnalyticsById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	campaignId: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetCampaignAnalyticsByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignAnalyticsById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	campaignId: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetCampaignAnalyticsByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getCampaignAnalyticsById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	campaignId: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetCampaignAnalyticsByIdInfiniteQueryOptions(campaignId, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetCampaignAnalyticsByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
@@ -14975,56 +10614,56 @@ export type GetCampaignAnalyticsByIdQueryError =
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options: {
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignAnalyticsById>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getCampaignAnalyticsById>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
-					TError,
-					Awaited<ReturnType<typeof getCampaignAnalyticsById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
+				TError,
+				Awaited<ReturnType<typeof getCampaignAnalyticsById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
@@ -15037,10 +10676,10 @@ export function useGetCampaignAnalyticsById<
 export function useGetCampaignAnalyticsById<
 	TData = Awaited<ReturnType<typeof getCampaignAnalyticsById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	campaignId: string,
 	options?: {
@@ -15076,137 +10715,13 @@ export const getGetAiChatsQueryKey = (params?: GetAiChatsParams) => {
 	return [`/ai/chats`, ...(params ? [params] : [])] as const
 }
 
-export const getGetAiChatsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChats>>>,
+export const getGetAiChatsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAiChatsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiChats>>> = ({ signal }) =>
-		getAiChats(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAiChats>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAiChatsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getAiChats>>>
-export type GetAiChatsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAiChatsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChats>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: undefined | GetAiChatsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChats>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChats>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChats>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChats>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChats>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChats>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAiChatsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChats>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAiChatsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAiChatsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAiChats>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
@@ -15237,52 +10752,52 @@ export type GetAiChatsQueryError =
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetAiChatsParams,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChats>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChats>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChats>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChats>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChats>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChats>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChats>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChats>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChats>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
@@ -15293,10 +10808,10 @@ export function useGetAiChats<
 export function useGetAiChats<
 	TData = Awaited<ReturnType<typeof getAiChats>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatsParams,
 	options?: {
@@ -15329,139 +10844,13 @@ export const getGetAiChatByIdQueryKey = (id: string) => {
 	return [`/ai/chat/${id}`] as const
 }
 
-export const getGetAiChatByIdInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatById>>>,
+export const getGetAiChatByIdQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAiChatByIdQueryKey(id)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiChatById>>> = ({ signal }) =>
-		getAiChatById(id, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAiChatById>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAiChatByIdInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAiChatById>>
->
-export type GetAiChatByIdInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAiChatByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatById>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatById>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatById>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatById>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAiChatByIdInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatById>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAiChatByIdInfiniteQueryOptions(id, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAiChatByIdQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAiChatById>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -15492,52 +10881,52 @@ export type GetAiChatByIdQueryError =
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options: {
 		query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatById>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatById>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatById>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
 		query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiChatById>>, TError, TData>> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatById>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatById>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatById>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatById>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -15548,10 +10937,10 @@ export function useGetAiChatById<
 export function useGetAiChatById<
 	TData = Awaited<ReturnType<typeof getAiChatById>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	options?: {
@@ -15589,144 +10978,13 @@ export const getGetAiChatMessagesQueryKey = (id: string, params: GetAiChatMessag
 	return [`/ai/chat/${id}/messages`, ...(params ? [params] : [])] as const
 }
 
-export const getGetAiChatMessagesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessages>>>,
+export const getGetAiChatMessagesQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAiChatMessagesQueryKey(id, params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiChatMessages>>> = ({ signal }) =>
-		getAiChatMessages(id, params, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAiChatMessages>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAiChatMessagesInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAiChatMessages>>
->
-export type GetAiChatMessagesInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAiChatMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessagesParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessages>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessages>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAiChatMessagesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessages>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessagesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAiChatMessagesInfiniteQueryOptions(id, params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAiChatMessagesQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -15762,10 +11020,10 @@ export type GetAiChatMessagesQueryError =
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -15773,23 +11031,23 @@ export function useGetAiChatMessages<
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -15797,23 +11055,23 @@ export function useGetAiChatMessages<
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessages>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessages>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessages>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessages>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessages>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -15827,10 +11085,10 @@ export function useGetAiChatMessages<
 export function useGetAiChatMessages<
 	TData = Awaited<ReturnType<typeof getAiChatMessages>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessagesParams,
@@ -15871,10 +11129,10 @@ export const sendMessageInAiChat = (
 
 export const getSendMessageInAiChatMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -15920,10 +11178,10 @@ export type SendMessageInAiChatMutationError =
 
 export const useSendMessageInAiChat = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -15966,165 +11224,13 @@ export const getGetAiChatMessageVotesQueryKey = (
 	return [`/ai/chat/${id}/vote`, ...(params ? [params] : [])] as const
 }
 
-export const getGetAiChatMessageVotesInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessageVotes>>>,
+export const getGetAiChatMessageVotesQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessageVotesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAiChatMessageVotesQueryKey(id, params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiChatMessageVotes>>> = ({
-		signal
-	}) => getAiChatMessageVotes(id, params, signal)
-
-	return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAiChatMessageVotesInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAiChatMessageVotes>>
->
-export type GetAiChatMessageVotesInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAiChatMessageVotesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessageVotes>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessageVotesParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatMessageVotesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessageVotes>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessageVotesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatMessageVotesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessageVotes>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessageVotesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAiChatMessageVotesInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatMessageVotes>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	id: string,
-	params: GetAiChatMessageVotesParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAiChatMessageVotesInfiniteQueryOptions(id, params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAiChatMessageVotesQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -16161,10 +11267,10 @@ export type GetAiChatMessageVotesQueryError =
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -16172,23 +11278,23 @@ export function useGetAiChatMessageVotes<
 		query: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessageVotes>>, TError, TData>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -16196,23 +11302,23 @@ export function useGetAiChatMessageVotes<
 		query?: Partial<
 			UseQueryOptions<Awaited<ReturnType<typeof getAiChatMessageVotes>>, TError, TData>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatMessageVotes>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatMessageVotes>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -16226,10 +11332,10 @@ export function useGetAiChatMessageVotes<
 export function useGetAiChatMessageVotes<
 	TData = Awaited<ReturnType<typeof getAiChatMessageVotes>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	id: string,
 	params: GetAiChatMessageVotesParams,
@@ -16269,10 +11375,10 @@ export const voteOnAiChatMessage = (
 
 export const getVoteOnAiChatMessageMutationOptions = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -16318,10 +11424,10 @@ export type VoteOnAiChatMessageMutationError =
 
 export const useVoteOnAiChatMessage = <
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema,
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema,
 	TContext = unknown
 >(options?: {
 	mutation?: UseMutationOptions<
@@ -16362,160 +11468,13 @@ export const getGetAiChatSegmentRecommendationsQueryKey = (
 	return [`/ai/segment-recommendations`, ...(params ? [params] : [])] as const
 }
 
-export const getGetAiChatSegmentRecommendationsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>>,
+export const getGetAiChatSegmentRecommendationsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatSegmentRecommendationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetAiChatSegmentRecommendationsQueryKey(params)
-
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>> = ({
-		signal
-	}) => getAiChatSegmentRecommendations(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetAiChatSegmentRecommendationsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
->
-export type GetAiChatSegmentRecommendationsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetAiChatSegmentRecommendationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: undefined | GetAiChatSegmentRecommendationsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatSegmentRecommendationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatSegmentRecommendationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetAiChatSegmentRecommendationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatSegmentRecommendationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetAiChatSegmentRecommendationsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params?: GetAiChatSegmentRecommendationsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetAiChatSegmentRecommendationsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetAiChatSegmentRecommendationsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -16555,10 +11514,10 @@ export type GetAiChatSegmentRecommendationsQueryError =
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: undefined | GetAiChatSegmentRecommendationsParams,
 	options: {
@@ -16569,23 +11528,23 @@ export function useGetAiChatSegmentRecommendations<
 				TData
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -16596,23 +11555,23 @@ export function useGetAiChatSegmentRecommendations<
 				TData
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
-					TError,
-					Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
+				TError,
+				Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -16629,10 +11588,10 @@ export function useGetAiChatSegmentRecommendations<
 export function useGetAiChatSegmentRecommendations<
 	TData = Awaited<ReturnType<typeof getAiChatSegmentRecommendations>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params?: GetAiChatSegmentRecommendationsParams,
 	options?: {
@@ -16677,160 +11636,13 @@ export const getGetConversationResponseSuggestionsQueryKey = (
 	return [`/ai/response-suggestions`, ...(params ? [params] : [])] as const
 }
 
-export const getGetConversationResponseSuggestionsInfiniteQueryOptions = <
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationResponseSuggestions>>>,
+export const getGetConversationResponseSuggestionsQueryOptions = <
+	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationResponseSuggestionsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-				TError,
-				TData
-			>
-		>
-	}
-) => {
-	const { query: queryOptions } = options ?? {}
-
-	const queryKey = queryOptions?.queryKey ?? getGetConversationResponseSuggestionsQueryKey(params)
-
-	const queryFn: QueryFunction<
-		Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-	> = ({ signal }) => getConversationResponseSuggestions(params, signal)
-
-	return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
-		Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-		TError,
-		TData
-	> & { queryKey: DataTag<QueryKey, TData> }
-}
-
-export type GetConversationResponseSuggestionsInfiniteQueryResult = NonNullable<
-	Awaited<ReturnType<typeof getConversationResponseSuggestions>>
->
-export type GetConversationResponseSuggestionsInfiniteQueryError =
 	| BadRequestErrorResponseSchema
 	| UnauthorizedErrorResponseSchema
 	| NotFoundErrorResponseSchema
 	| RateLimitErrorResponseSchema
-
-export function useGetConversationResponseSuggestionsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationResponseSuggestions>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationResponseSuggestionsParams,
-	options: {
-		query: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-				>,
-				'initialData'
-			>
-	}
-): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationResponseSuggestionsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationResponseSuggestions>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationResponseSuggestionsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-				TError,
-				TData
-			>
-		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-				>,
-				'initialData'
-			>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useGetConversationResponseSuggestionsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationResponseSuggestions>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationResponseSuggestionsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-
-export function useGetConversationResponseSuggestionsInfinite<
-	TData = InfiniteData<Awaited<ReturnType<typeof getConversationResponseSuggestions>>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
->(
-	params: GetConversationResponseSuggestionsParams,
-	options?: {
-		query?: Partial<
-			UseInfiniteQueryOptions<
-				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-				TError,
-				TData
-			>
-		>
-	}
-): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-	const queryOptions = getGetConversationResponseSuggestionsInfiniteQueryOptions(params, options)
-
-	const query = useInfiniteQuery(queryOptions) as UseInfiniteQueryResult<TData, TError> & {
-		queryKey: DataTag<QueryKey, TData>
-	}
-
-	query.queryKey = queryOptions.queryKey
-
-	return query
-}
-
-export const getGetConversationResponseSuggestionsQueryOptions = <
-	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
@@ -16870,10 +11682,10 @@ export type GetConversationResponseSuggestionsQueryError =
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options: {
@@ -16884,23 +11696,23 @@ export function useGetConversationResponseSuggestions<
 				TData
 			>
 		> &
-			Pick<
-				DefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-				>,
-				'initialData'
-			>
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>
+			>,
+			'initialData'
+		>
 	}
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
@@ -16911,23 +11723,23 @@ export function useGetConversationResponseSuggestions<
 				TData
 			>
 		> &
-			Pick<
-				UndefinedInitialDataOptions<
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
-					TError,
-					Awaited<ReturnType<typeof getConversationResponseSuggestions>>
-				>,
-				'initialData'
-			>
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
+				TError,
+				Awaited<ReturnType<typeof getConversationResponseSuggestions>>
+			>,
+			'initialData'
+		>
 	}
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
@@ -16944,10 +11756,10 @@ export function useGetConversationResponseSuggestions<
 export function useGetConversationResponseSuggestions<
 	TData = Awaited<ReturnType<typeof getConversationResponseSuggestions>>,
 	TError =
-		| BadRequestErrorResponseSchema
-		| UnauthorizedErrorResponseSchema
-		| NotFoundErrorResponseSchema
-		| RateLimitErrorResponseSchema
+	| BadRequestErrorResponseSchema
+	| UnauthorizedErrorResponseSchema
+	| NotFoundErrorResponseSchema
+	| RateLimitErrorResponseSchema
 >(
 	params: GetConversationResponseSuggestionsParams,
 	options?: {
