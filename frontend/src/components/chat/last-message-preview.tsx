@@ -14,7 +14,13 @@ const LastMessagePreview: React.FC<LastMessagePreviewProps> = ({ conversation })
 
 	switch (lastMessage.messageType) {
 		case MessageTypeEnum.Text:
-			return <p className="text-xs text-gray-500">{lastMessage.messageData?.text || ''}</p>
+			return (
+				<p className="whitespace-normal text-xs text-gray-500">
+					{lastMessage.messageData.text.length > 40
+						? `${lastMessage.messageData.text.slice(0, 40)}...`
+						: lastMessage.messageData.text}
+				</p>
+			)
 
 		case MessageTypeEnum.Image:
 			return (

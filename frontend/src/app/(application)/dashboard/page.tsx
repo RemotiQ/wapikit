@@ -369,6 +369,7 @@ export default function Page() {
 
 										return statusOrder[b.status] - statusOrder[a.status]
 									})
+									.slice(0, 2)
 									.map((campaign, index) => {
 										return (
 											<DashboardCampaignCard

@@ -321,7 +321,7 @@ func handleGetConversations(context interfaces.ContextWithSession) error {
 				ORDER_BY(
 					table.Message.CreatedAt.DESC(),
 				).
-				LIMIT(10)),
+				LIMIT(50)),
 	)(
 		SELECT(
 			conversationCte.AllColumns(),
