@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import LastMessagePreview from './last-message-preview'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { Fragment } from 'react'
+import { clsx } from 'clsx'
 
 enum ConversationListSidebarTab {
 	All = 'All',
@@ -20,12 +21,15 @@ enum ConversationListSidebarTab {
 
 const RenderConversations = ({
 	conversations,
-	tab
+	tab,
+	currentConversationId
 }: {
 	conversations: ConversationSchema[]
 	tab: ConversationListSidebarTab
+	currentConversationId?: string
 }) => {
 	const router = useRouter()
+
 	return (
 		<Fragment key={tab}>
 			{conversations.length === 0 && (
@@ -42,7 +46,10 @@ const RenderConversations = ({
 					<Fragment key={conversation.uniqueId}>
 						<div
 							key={index}
-							className="my-auto mb-2 flex cursor-pointer flex-row items-center gap-4 rounded-md px-3 py-2 hover:bg-gray-100 hover:dark:bg-gray-800"
+							className={clsx(
+								'my-auto mb-2 flex cursor-pointer flex-row items-center gap-4 rounded-md px-3 py-2 hover:bg-gray-100 hover:dark:bg-gray-800',
+								currentConversationId === conversation.uniqueId ? 'bg-gray-100' : ''
+							)}
 							onClick={() => {
 								router.push(`/conversations?id=${conversation.uniqueId}`)
 							}}
@@ -78,7 +85,7 @@ const RenderConversations = ({
 	)
 }
 
-const ConversationsSidebar = () => {
+const ConversationsSidebar = (props: { currentConversationId?: string }) => {
 	const { conversations } = useConversationInboxStore()
 
 	return (
@@ -96,16 +103,6 @@ const ConversationsSidebar = () => {
 									className="flex flex-1 items-center gap-1"
 									key={index}
 								>
-									{/* {
-										{
-											All: <Icons.messageChatSquare className="size-4" />,
-											Unread: <Icons.bell className="size-4" />,
-											Unresolved: (
-												<Icons.messageQuestionSquare className="size-4" />
-											)
-										}[tab]
-									}
-									<p className='hidden xl:flex'>{tab}</p> */}
 									<TooltipProvider delayDuration={200}>
 										<Tooltip>
 											<TooltipTrigger asChild>
@@ -142,6 +139,7 @@ const ConversationsSidebar = () => {
 						conversations={conversations}
 						tab={ConversationListSidebarTab.All}
 						key={`${ConversationListSidebarTab.All}`}
+						currentConversationId={props.currentConversationId}
 					/>
 				</TabsContent>
 				<TabsContent value={ConversationListSidebarTab.Unread} className="space-y-4">
@@ -150,6 +148,7 @@ const ConversationsSidebar = () => {
 						conversations={conversations.filter(c => c.numberOfUnreadMessages > 0)}
 						tab={ConversationListSidebarTab.Unread}
 						key={`${ConversationListSidebarTab.Unread}`}
+						currentConversationId={props.currentConversationId}
 					/>
 				</TabsContent>
 				<TabsContent value={ConversationListSidebarTab.Unresolved} className="space-y-4">
@@ -160,6 +159,7 @@ const ConversationsSidebar = () => {
 						)}
 						tab={ConversationListSidebarTab.Unresolved}
 						key={`${ConversationListSidebarTab.Unresolved}`}
+						currentConversationId={props.currentConversationId}
 					/>
 				</TabsContent>
 			</Tabs>

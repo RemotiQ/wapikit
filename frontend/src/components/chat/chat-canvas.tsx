@@ -20,7 +20,7 @@ import {
 	MessageTypeEnum,
 	type NewMessageDataSchema,
 	useAssignConversation,
-	useGetConversationMessages,
+	useGetConversationMessagesInfinite,
 	useGetConversationResponseSuggestions,
 	useGetOrganizationMembers,
 	useMarkConversationAsRead,
@@ -67,40 +67,6 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 
 	const [attachedFiles, setAttachedFiles] = useState<ConversationFileAttachmentType[]>([])
 
-	const currentConversation = conversations.find(
-		conversation => conversation.uniqueId === conversationId
-	)
-
-	const pageSize = 100
-
-	const [page, setPage] = useState(1)
-	const [messages, setMessages] = useState<MessageSchema[]>([])
-
-	useEffect(() => {
-		setPage(1)
-		setMessages([])
-	}, [currentConversation?.uniqueId])
-
-	const { data: conversationMessages, isLoading } = useGetConversationMessages(
-		currentConversation?.uniqueId || '',
-		{ page, per_page: pageSize },
-		{ query: { enabled: !!currentConversation } }
-	)
-
-	useEffect(() => {
-		if (conversationMessages && conversationMessages.messages) {
-			if (page === 1) {
-				setMessages(conversationMessages.messages)
-			} else {
-				setMessages(prev => [...conversationMessages.messages, ...prev])
-			}
-		}
-	}, [conversationMessages, page])
-
-	const loadMore = () => {
-		setPage(prev => prev + 1)
-	}
-
 	const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>()
 
 	const router = useRouter()
@@ -111,6 +77,61 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 	const unassignConversationMutation = useUnassignConversation()
 	const sendMessageInConversation = useSendMessageInConversation()
 	const { mutateAsync: markAsRead, isPending } = useMarkConversationAsRead()
+
+	const currentConversation = conversations.find(
+		conversation => conversation.uniqueId === conversationId
+	)
+
+	const pageSize = 50
+	const [page, setPage] = useState(1)
+
+	const { isLoading: isFetchingMoreMessages, fetchNextPage } = useGetConversationMessagesInfinite(
+		currentConversation?.uniqueId || '',
+		// ! we start with page 2 because first page has already returned in the conversations fetch call
+		{ page: 2, per_page: pageSize },
+		{
+			query: {
+				enabled: !!currentConversation && page > 1,
+				getNextPageParam: lastPage => {
+					const currentPage = lastPage.paginationMeta.page
+					const totalPages = Math.ceil(
+						lastPage.paginationMeta.total / lastPage.paginationMeta.per_page
+					)
+					return currentPage < totalPages ? currentPage + 1 : undefined
+				}
+			}
+		}
+	)
+
+	const handleLoadMore = async () => {
+		if (!currentConversation || isFetchingMoreMessages) return
+
+		// Check if we need to load more
+		const hasMore =
+			currentConversation.messages.length < (currentConversation.totalMessages || 0)
+		if (!hasMore) return
+
+		try {
+			setPage(page + 1)
+			const response = await fetchNextPage()
+
+			const pages = response.data?.pages || []
+
+			// Update store with new messages
+			if (pages.length) {
+				const allMessages = pages.reverse().flatMap(p => p.messages)
+				writeConversationInboxStoreProperty({
+					conversations: conversations.map(convo =>
+						convo.uniqueId === currentConversation.uniqueId
+							? { ...convo, messages: [...allMessages, ...convo.messages] }
+							: convo
+					)
+				})
+			}
+		} catch (error) {
+			console.error('Failed to load more messages:', error)
+		}
+	}
 
 	const assignConversationForm = useForm<z.infer<typeof AssignConversationForm>>({
 		resolver: zodResolver(AssignConversationForm)
@@ -329,8 +350,6 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 
 						const { mediaId, mediaUrl } = response
 
-						console.log('mediaUrl', mediaUrl)
-
 						// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 						let messageData: NewMessageDataSchema | null = null
 
@@ -447,7 +466,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 		]
 	)
 
-	const groupedMessages = groupMessagesByDate(messages)
+	const groupedMessages = groupMessagesByDate(currentConversation?.messages || [])
 
 	return (
 		<div className="relative flex h-full flex-col justify-between">
@@ -627,16 +646,17 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 							ref={messagesContainerRef}
 						>
 							{currentConversation.totalMessages &&
-							messages.length < currentConversation.totalMessages ? (
+							currentConversation.messages.length <
+								currentConversation.totalMessages ? (
 								<div className="my-2 flex w-full justify-center">
 									<span
 										className="z-50 cursor-pointer rounded bg-gray-200 px-2 py-0.5 text-sm text-gray-700 dark:bg-[#2a3942] dark:text-gray-300"
 										onClick={() => {
-											if (isLoading) return
-											loadMore()
+											if (isFetchingMoreMessages) return
+											handleLoadMore().catch(error => console.error(error))
 										}}
 									>
-										{isLoading ? (
+										{isFetchingMoreMessages ? (
 											<div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-l-primary" />
 										) : (
 											<> Load More</>
@@ -760,6 +780,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									ref={fileInputRef}
 									multiple={true}
 									className="hidden"
+									disabled={isBusy || isFetchingMoreMessages}
 									onChange={e => {
 										const files = e.target.files
 											? Array.from(e.target.files)
@@ -782,6 +803,7 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									placeholder="Type Message here"
 									className="w-full"
 									ref={textInputRef}
+									disabled={isBusy || isFetchingMoreMessages}
 									type="text"
 									// defaultValue={messageContent || undefined}
 									value={messageContent || ''}
@@ -796,6 +818,12 @@ const ChatCanvas = ({ conversationId }: { conversationId?: string }) => {
 									<div
 										className="flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-background ring-1 ring-border"
 										onClick={() => {
+											if (
+												isBusy ||
+												isFetchingMoreMessages ||
+												isFetchingSuggestions
+											)
+												return
 											refetchSuggestions().catch(error =>
 												console.error(error)
 											)
