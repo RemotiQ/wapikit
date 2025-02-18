@@ -40,8 +40,8 @@ func ParseUlid(id string) uint64 {
 	return parsedUlid.Time()
 }
 
-func GenerateOtp(isProduction bool) string {
-	if !isProduction {
+func GenerateOtp(isProduction bool, isCommunityEdition bool) string {
+	if !isProduction || isCommunityEdition {
 		return "123456"
 	}
 	mathRandom.Seed(time.Now().UnixNano())

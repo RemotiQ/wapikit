@@ -24,15 +24,20 @@ jwt_secret = "wdliahdsoihodjpkpeohifghqoew86e981u2ihn"
 
 # redis
 [redis]
-url = "redis:6379"
-
-[whatsapp]
-businessAccountId = ""
-apiKey = ""
-webhookSecret = ""
+url = "redis://localhost:6379"
 
 
 # Database configuration
-
 [database]
 url = "postgres://wapikit-dev:wapikit-dev@database:5432/wapikit-dev?sslmode=disable"
+
+
+[slack]
+webhook_url = ""
+channel = ""
+
+[email]
+host = ""
+port = 587
+username = ""
+password = ""

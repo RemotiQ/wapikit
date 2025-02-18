@@ -164,37 +164,6 @@ func authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 						routeMetadata = meta
 					}
 
-					if app.Constants.IsCommunityEdition {
-						if org.SlackWebhookUrl != nil && org.SlackChannel != nil {
-							var slackConfig *notification_service.SlackConfig
-							var emailConfig *notification_service.EmailConfig
-
-							if app.Koa.String("slack.webhook_url") != "" && app.Koa.String("slack.channel") != "" {
-								slackConfig = &notification_service.SlackConfig{
-									SlackWebhookUrl: *org.SlackWebhookUrl,
-									SlackChannel:    *org.SlackChannel,
-								}
-							}
-
-							if org.SmtpClientHost != nil && org.SmtpClientPort != nil && org.SmtpClientUsername != nil && org.SmtpClientPassword != nil {
-								emailConfig = &notification_service.EmailConfig{
-									Host:     *org.SmtpClientHost,
-									Port:     *org.SmtpClientPort,
-									Username: *org.SmtpClientUsername,
-									Password: *org.SmtpClientPassword,
-								}
-							}
-
-							app.NotificationService = &notification_service.NotificationService{
-								Logger:      &app.Logger,
-								SlackConfig: slackConfig,
-								EmailConfig: emailConfig,
-								Redis:       app.Redis,
-								Db:          app.Db,
-							}
-						}
-					}
-
 					var wapiClient *wapi.Client
 
 					if org.WhatsappBusinessAccount != nil {

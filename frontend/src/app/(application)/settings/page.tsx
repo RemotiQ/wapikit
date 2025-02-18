@@ -38,11 +38,9 @@ import {
 } from 'root/.generated'
 import { Modal } from '~/components/ui/modal'
 import {
-	EmailNotificationConfigurationFormSchema,
 	NewRoleFormSchema,
 	OrganizationAiModelConfigurationSchema,
 	OrganizationUpdateFormSchema,
-	SlackNotificationConfigurationFormSchema,
 	UserUpdateFormSchema,
 	WhatsappBusinessAccountDetailsFormSchema
 } from '~/schema'
@@ -79,7 +77,6 @@ export default function SettingsPage() {
 		WhatsAppBusinessAccount = 'whatsapp-business-account',
 		ApiKey = 'api-access',
 		Rbac = 'rbac',
-		Notifications = 'notifications',
 		AiSettings = 'ai-settings'
 	}
 
@@ -115,14 +112,6 @@ export default function SettingsPage() {
 					{
 						slug: SettingTabEnum.AiSettings,
 						title: 'AI Settings'
-					}
-				]
-			: []),
-		...(!featureFlags?.SystemFeatureFlags.isCloudEdition
-			? [
-					{
-						slug: SettingTabEnum.Notifications,
-						title: 'Notifications'
 					}
 				]
 			: [])
@@ -229,32 +218,6 @@ export default function SettingsPage() {
 		defaultValues: {
 			whatsappBusinessAccountId: currentOrganization?.businessAccountId || undefined,
 			apiToken: currentOrganization?.whatsappBusinessAccountDetails?.accessToken || undefined
-		}
-	})
-
-	const slackNotificationConfigurationForm = useForm<
-		z.infer<typeof SlackNotificationConfigurationFormSchema>
-	>({
-		resolver: zodResolver(SlackNotificationConfigurationFormSchema),
-		defaultValues: {
-			slackChannel:
-				currentOrganization?.slackNotificationConfiguration?.slackChannel || undefined,
-			slackWebhookUrl:
-				currentOrganization?.slackNotificationConfiguration?.slackWebhookUrl || undefined
-		}
-	})
-
-	const emailNotificationConfigurationForm = useForm<
-		z.infer<typeof EmailNotificationConfigurationFormSchema>
-	>({
-		resolver: zodResolver(EmailNotificationConfigurationFormSchema),
-		defaultValues: {
-			smtpHost: currentOrganization?.emailNotificationConfiguration?.smtpHost || undefined,
-			smtpPort: currentOrganization?.emailNotificationConfiguration?.smtpPort || undefined,
-			smtpUsername:
-				currentOrganization?.emailNotificationConfiguration?.smtpUsername || undefined,
-			smtpPassword:
-				currentOrganization?.emailNotificationConfiguration?.smtpPassword || undefined
 		}
 	})
 
@@ -700,106 +663,6 @@ export default function SettingsPage() {
 			})
 		} finally {
 			setIsBusy(false)
-		}
-	}
-
-	async function updateSlackNotificationConfiguration(
-		data: z.infer<typeof SlackNotificationConfigurationFormSchema>
-	) {
-		try {
-			if (isBusy || !currentOrganization) return
-
-			setIsBusy(() => true)
-
-			const response = await updateOrganizationMutation.mutateAsync({
-				data: {
-					...currentOrganization,
-					aiConfiguration: undefined,
-					slackNotificationConfiguration: {
-						slackChannel: data.slackChannel,
-						slackWebhookUrl: data.slackWebhookUrl
-					}
-				},
-				id: currentOrganization.uniqueId
-			})
-
-			if (response.isUpdated) {
-				writeProperty({
-					currentOrganization: {
-						...currentOrganization,
-						slackNotificationConfiguration: {
-							slackChannel: data.slackChannel,
-							slackWebhookUrl: data.slackWebhookUrl
-						}
-					}
-				})
-				successNotification({
-					message: 'Slack notification configuration updated successfully'
-				})
-			} else {
-				errorNotification({
-					message: 'Error updating slack notification configuration'
-				})
-			}
-		} catch (error) {
-			console.error(error)
-			errorNotification({
-				message: 'Error updating slack notification configuration'
-			})
-		} finally {
-			setIsBusy(() => false)
-		}
-	}
-
-	async function updateEmailNotificationConfiguration(
-		data: z.infer<typeof EmailNotificationConfigurationFormSchema>
-	) {
-		try {
-			if (isBusy || !currentOrganization) return
-
-			setIsBusy(() => true)
-
-			const response = await updateOrganizationMutation.mutateAsync({
-				data: {
-					...currentOrganization,
-					aiConfiguration: undefined,
-					emailNotificationConfiguration: {
-						smtpHost: data.smtpHost,
-						smtpPort: data.smtpPort,
-						smtpUsername: data.smtpUsername,
-						smtpPassword: data.smtpPassword
-					}
-				},
-				id: currentOrganization.uniqueId
-			})
-
-			if (response.isUpdated) {
-				writeProperty({
-					currentOrganization: {
-						...currentOrganization,
-						emailNotificationConfiguration: {
-							smtpHost: data.smtpHost,
-							smtpPort: data.smtpPort,
-							smtpUsername: data.smtpUsername,
-							smtpPassword: data.smtpPassword
-						}
-					}
-				})
-				successNotification({
-					message: 'Email notification configuration updated successfully'
-				})
-			} else {
-				errorNotification({
-					message: 'Error updating email notification configuration'
-				})
-			}
-		} catch (error) {
-			console.error(error)
-			errorNotification({
-				message: 'Error updating email notification configuration'
-			})
-		} finally {
-			setIsBusy(() => false)
 		}
 	}
 
@@ -1719,206 +1582,6 @@ export default function SettingsPage() {
 											</Card>
 										</div>
 									</div>
-								) : tab.slug === SettingTabEnum.Notifications ? (
-									<>
-										<div className="mr-auto flex max-w-4xl flex-col gap-5">
-											{/* slack configuration */}
-
-											<Form {...slackNotificationConfigurationForm}>
-												<form
-													onSubmit={slackNotificationConfigurationForm.handleSubmit(
-														updateSlackNotificationConfiguration
-													)}
-													className="w-full space-y-8"
-												>
-													<Card className="flex flex-col p-2">
-														<div className="flex flex-col">
-															<div>
-																<CardHeader>
-																	<CardTitle>
-																		Slack Notification
-																		Configuration
-																	</CardTitle>
-																</CardHeader>
-																<CardContent className="flex flex-col gap-3">
-																	<FormField
-																		control={
-																			slackNotificationConfigurationForm.control
-																		}
-																		name="slackWebhookUrl"
-																		render={({ field }) => (
-																			<FormItem>
-																				<FormLabel>
-																					Webhook URL
-																				</FormLabel>
-																				<FormControl>
-																					<Input
-																						placeholder="https://hooks.slack.com/services/..."
-																						{...field}
-																					/>
-																				</FormControl>
-																				<FormMessage />
-																			</FormItem>
-																		)}
-																	/>
-																	<FormField
-																		control={
-																			slackNotificationConfigurationForm.control
-																		}
-																		name="slackChannel"
-																		render={({ field }) => (
-																			<FormItem>
-																				<FormLabel>
-																					Webhook Channel
-																				</FormLabel>
-																				<FormControl>
-																					<Input
-																						placeholder="#wapikit-notifications"
-																						{...field}
-																					/>
-																				</FormControl>
-																				<FormMessage />
-																			</FormItem>
-																		)}
-																	/>
-																</CardContent>
-															</div>
-														</div>
-
-														<Button
-															disabled={
-																isBusy ||
-																!slackNotificationConfigurationForm
-																	.formState.isDirty
-															}
-															className="ml-auto mr-6 w-fit "
-														>
-															Save
-														</Button>
-													</Card>
-												</form>
-											</Form>
-										</div>
-
-										{/* email configuration */}
-										<div className="mr-auto flex max-w-4xl flex-col gap-5">
-											<Form {...emailNotificationConfigurationForm}>
-												<form
-													onSubmit={emailNotificationConfigurationForm.handleSubmit(
-														updateEmailNotificationConfiguration
-													)}
-													className="w-full space-y-8"
-												>
-													<Card className="flex flex-col p-2">
-														<div className="flex flex-col">
-															<div>
-																<CardHeader>
-																	<CardTitle>
-																		Email Notification
-																		Configuration (SMTP)
-																	</CardTitle>
-																</CardHeader>
-																<CardContent className="flex flex-col gap-3">
-																	<FormField
-																		control={
-																			emailNotificationConfigurationForm.control
-																		}
-																		name="smtpHost"
-																		render={({ field }) => (
-																			<FormItem>
-																				<FormLabel>
-																					host
-																				</FormLabel>
-																				<FormControl>
-																					<Input
-																						placeholder="smtp.yoursite.com"
-																						{...field}
-																					/>
-																				</FormControl>
-																				<FormMessage />
-																			</FormItem>
-																		)}
-																	/>
-																	<FormField
-																		control={
-																			emailNotificationConfigurationForm.control
-																		}
-																		name="smtpUsername"
-																		render={({ field }) => (
-																			<FormItem>
-																				<FormLabel>
-																					Username
-																				</FormLabel>
-																				<FormControl>
-																					<Input
-																						placeholder="SMTP Username"
-																						{...field}
-																					/>
-																				</FormControl>
-																				<FormMessage />
-																			</FormItem>
-																		)}
-																	/>
-																	<FormField
-																		control={
-																			emailNotificationConfigurationForm.control
-																		}
-																		name="smtpPassword"
-																		render={({ field }) => (
-																			<FormItem>
-																				<FormLabel>
-																					Password
-																				</FormLabel>
-																				<FormControl>
-																					<Input
-																						type="SMTP Password"
-																						placeholder="********"
-																						{...field}
-																					/>
-																				</FormControl>
-																				<FormMessage />
-																			</FormItem>
-																		)}
-																	/>
-																	<FormField
-																		control={
-																			emailNotificationConfigurationForm.control
-																		}
-																		name="smtpPort"
-																		render={({ field }) => (
-																			<FormItem>
-																				<FormLabel>
-																					Port
-																				</FormLabel>
-																				<FormControl>
-																					<Input
-																						placeholder="587"
-																						{...field}
-																					/>
-																				</FormControl>
-																				<FormMessage />
-																			</FormItem>
-																		)}
-																	/>
-																</CardContent>
-															</div>
-														</div>
-
-														<Button
-															disabled={
-																isBusy ||
-																!organizationUpdateForm.formState
-																	.isDirty
-															}
-															className="ml-auto mr-6 w-fit "
-														>
-															Save
-														</Button>
-													</Card>
-												</form>
-											</Form>
-										</div>
-									</>
 								) : tab.slug === SettingTabEnum.AiSettings ? (
 									<>
 										<div className="mr-auto flex max-w-4xl flex-col gap-5">

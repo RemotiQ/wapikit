@@ -17,6 +17,7 @@ import (
 	"github.com/wapikit/wapikit/services/conversation_service"
 	"github.com/wapikit/wapikit/services/encryption_service"
 	"github.com/wapikit/wapikit/services/event_service"
+	"github.com/wapikit/wapikit/services/notification_service"
 	cache_service "github.com/wapikit/wapikit/services/redis_service"
 )
 
@@ -67,6 +68,7 @@ func init() {
 
 	if koa.Bool("version") {
 		logger.Info("current version of the application")
+		os.Exit(0)
 	}
 
 	if koa.Bool("debug") {
@@ -81,14 +83,15 @@ func init() {
 		loadEnvVariables()
 		loadConfigFiles(koa.Strings("config"), koa)
 	} else {
-		fs = initFS(appDir, "")
-		loadConfigFiles(koa.Strings("config"), koa)
-		loadEnvVariables()
+		fs = initFS(appDir, frontendDir)
 
 		// Generate new config.
 		if koa.Bool("new-config") {
 			generateNewConfigFile()
 		}
+
+		loadConfigFiles(koa.Strings("config"), koa)
+		loadEnvVariables()
 
 		if koa.Bool("install") {
 			logger.Info("Installing the application")
@@ -101,15 +104,12 @@ func init() {
 func main() {
 	logger.Info("Starting the application")
 	redisUrl := koa.String("redis.url")
-	redisPassword := koa.String("redis.password") // this will be defined in case of cloud edition
 	if redisUrl == "" {
 		logger.Error("Redis URL not provided")
 		os.Exit(1)
 	}
-
 	constants := initConstants()
-
-	redisClient := cache_service.NewRedisClient(redisUrl, &redisPassword, constants.IsProduction, constants.IsCloudEdition, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
+	redisClient := cache_service.NewRedisClient(redisUrl, constants.IsProduction, constants.IsCloudEdition, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
 	dbInstance := database.GetDbInstance(koa.String("database.url"))
 
 	app := &interfaces.App{
@@ -121,17 +121,53 @@ func main() {
 		Constants: constants,
 	}
 
+	// ==== INIT ENCRYPTION SERVICE ======
 	app.EncryptionService = encryption_service.NewEncryptionService(
 		logger,
 		koa.String("app.encryption_key"),
 	)
 
+	// ===== INIT NOTIFICATION SERVICE =====
+	slackWebhookUrl := koa.String("slack.webhook_url")
+	slackChannel := koa.String("slack.channel")
+
+	emailHost := koa.String("email.host")
+	emailPort := koa.String("email.port")
+	emailPassword := koa.String("email.password")
+	emailUsername := koa.String("email.username")
+
+	var slackConfig *notification_service.SlackConfig
+	if slackWebhookUrl != "" && slackChannel != "" {
+		slackConfig = &notification_service.SlackConfig{
+			SlackWebhookUrl: slackWebhookUrl,
+			SlackChannel:    slackChannel,
+		}
+	}
+
+	var emailConfig *notification_service.EmailConfig
+	if emailHost != "" && emailPort != "" && emailPassword != "" && emailUsername != "" {
+		emailConfig = &notification_service.EmailConfig{
+			Host:     emailHost,
+			Port:     emailPort,
+			Password: emailPassword,
+			Username: emailUsername,
+		}
+	}
+
+	app.NotificationService = &notification_service.NotificationService{
+		Logger:      &app.Logger,
+		SlackConfig: slackConfig,
+		EmailConfig: emailConfig,
+		Redis:       redisClient,
+		Db:          dbInstance,
+	}
+
 	app.ConversationService = conversation_service.NewConversationService(dbInstance, logger, redisClient)
 	app.EventService = event_service.NewEventService(dbInstance, logger, redisClient, app.Constants.RedisApiServerEventChannelName)
 	app.CampaignManager = campaign_manager.NewCampaignManager(dbInstance, *logger, redisClient, nil, constants.RedisApiServerEventChannelName, constants.RedisCampaignManagerChannelName)
+	app.CampaignManager.NotificationService = app.NotificationService
 
 	MountServices(app)
-
 	var wg sync.WaitGroup
 	wg.Add(3)
 

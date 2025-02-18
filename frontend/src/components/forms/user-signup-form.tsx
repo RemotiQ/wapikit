@@ -108,9 +108,6 @@ export default function UserSignupForm() {
 			}
 		} catch (error) {
 			console.error(error)
-			errorNotification({
-				message: 'Something went wrong while creating your account'
-			})
 		} finally {
 			setIsBusy(false)
 		}
@@ -146,15 +143,9 @@ export default function UserSignupForm() {
 				}
 			} else {
 				// something went wrong show error token not found
-				errorNotification({
-					message: 'Something went wrong while creating your account'
-				})
 			}
 		} catch (error) {
 			console.error(error)
-			errorNotification({
-				message: 'Something went wrong while creating your account'
-			})
 		} finally {
 			setIsBusy(false)
 		}

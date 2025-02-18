@@ -59,7 +59,7 @@ func (ns *NotificationService) SendEmail(sendToEmail string, subject string, bod
 	}
 
 	if ns.EmailConfig == nil {
-		return fmt.Errorf("email configuration is not set")
+		return nil
 	}
 
 	// Compose the email message
@@ -89,6 +89,10 @@ func (ns *NotificationService) SendEmail(sendToEmail string, subject string, bod
 
 func (ns *NotificationService) SendSlackNotification(params SlackNotificationParams) {
 	log.Printf("Sending slack alert for %s", params.Title)
+
+	if ns.SlackConfig == nil {
+		return
+	}
 
 	payload := SlackPayload{
 		Channel: ns.SlackConfig.SlackChannel,

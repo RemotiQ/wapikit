@@ -421,9 +421,33 @@ func handleUserRegistration(context interfaces.ContextWithoutSession) error {
 		return context.JSON(http.StatusBadRequest, "Username, Email and Password are required")
 	}
 
-	otp := utils.GenerateOtp(context.App.Constants.IsProduction)
+	// check if user already exists
+	userQuery := SELECT(table.User.AllColumns).
+		FROM(table.User).
+		WHERE(table.User.Email.EQ(String(payload.Email)).OR(
+			table.User.Username.EQ(String(payload.Username)),
+		)).
+		LIMIT(1)
+
+	var user model.User
+	err := userQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
+
+	if err != nil {
+		if err.Error() == qrm.ErrNoRows.Error() {
+			// do nothing
+		} else {
+			context.App.Logger.Error("database query error", err.Error())
+			return context.JSON(http.StatusInternalServerError, "Something went wrong while processing your request.")
+		}
+	}
+
+	if user.UniqueId.String() != uuid.Nil.String() {
+		return context.JSON(http.StatusBadRequest, "Email or username already exists")
+	}
+
+	otp := utils.GenerateOtp(context.App.Constants.IsProduction, context.App.Constants.IsCommunityEdition)
 	cacheKey := redis.ComputeCacheKey("otp", payload.Email, "registration")
-	err := redis.CacheData(cacheKey, otp, time.Minute*5)
+	err = redis.CacheData(cacheKey, otp, time.Minute*5)
 
 	if err != nil {
 		context.App.Logger.Error("error caching otp", err.Error(), nil)
@@ -431,7 +455,6 @@ func handleUserRegistration(context interfaces.ContextWithoutSession) error {
 	}
 
 	err = context.App.NotificationService.SendEmail(payload.Email, "Wapikit Registration OTP", fmt.Sprintf("Your OTP is %s", otp), context.App.Constants.IsProduction)
-
 	if err != nil {
 		context.App.Logger.Error("error sending email", err.Error(), nil)
 		return context.JSON(http.StatusInternalServerError, "Something went wrong while processing your request.")
@@ -460,7 +483,7 @@ func verifyEmailAndCreateAccount(context interfaces.ContextWithoutSession) error
 	ok, err := redis.GetCachedData(cacheKey, &cachedOtp)
 
 	if !ok || cachedOtp != payload.Otp {
-		return context.JSON(http.StatusInternalServerError, "Invalid OTP.")
+		return context.JSON(http.StatusBadRequest, "Invalid OTP.")
 	}
 
 	if err != nil {
@@ -884,7 +907,7 @@ func resetPasswordInit(context interfaces.ContextWithoutSession) error {
 	userQuery.QueryContext(context.Request().Context(), context.App.Db, &user)
 
 	if user.UniqueId != uuid.Nil {
-		otp := utils.GenerateOtp(context.App.Constants.IsProduction)
+		otp := utils.GenerateOtp(context.App.Constants.IsProduction, context.App.Constants.IsCommunityEdition)
 		cacheKey := context.App.Redis.ComputeCacheKey("otp", payload.Email, "reset-password")
 		err := context.App.Redis.CacheData(cacheKey, otp, time.Minute*5)
 

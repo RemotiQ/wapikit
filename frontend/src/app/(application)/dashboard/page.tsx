@@ -24,10 +24,17 @@ import Image from 'next/image'
 export default function Page() {
 	const { authState } = useAuthState()
 
-	const { data: aggregateCount } = useGetAggregateCounts({
-		from: dayjs().subtract(7, 'day').startOf('day').toISOString(),
-		to: dayjs().endOf('day').toISOString()
-	})
+	const { data: aggregateCount } = useGetAggregateCounts(
+		{
+			from: dayjs().subtract(7, 'day').startOf('day').toISOString(),
+			to: dayjs().endOf('day').toISOString()
+		},
+		{
+			query: {
+				enabled: !!(authState.isAuthenticated && authState.data.user.organizationId)
+			}
+		}
+	)
 
 	const { data: campaigns, isFetching: isFetchingCampaigns } = useGetCampaigns({
 		page: 1,

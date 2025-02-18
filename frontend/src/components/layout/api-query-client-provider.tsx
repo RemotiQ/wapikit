@@ -10,6 +10,11 @@ export default function ApiQueryClientProvider({ children }: { children: React.R
 
 	function showErrorNotification(code: number, message?: string) {
 		switch (code) {
+			case 400:
+				errorNotification({
+					message: message || 'Bad request. Please check your input and try again.'
+				})
+				break
 			case 401:
 				errorNotification({
 					message: message || 'You are not authorized to perform this action.'
@@ -45,9 +50,6 @@ export default function ApiQueryClientProvider({ children }: { children: React.R
 				})
 				break
 			default:
-				errorNotification({
-					message: message || 'An error occurred. Please try again later.'
-				})
 				break
 		}
 	}

@@ -31,3 +31,15 @@ url = ""
 
 [database]
 url = ""
+
+
+[slack]
+webhook_url = ""
+channel = ""
+
+
+[email]
+host = ""
+port = 
+username = ""
+password = ""

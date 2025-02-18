@@ -363,7 +363,9 @@ func (cm *CampaignManager) runScheduledCampaigns() {
 
 			campaignsQuery := SELECT(table.Campaign.AllColumns).
 				FROM(table.Campaign).
-				WHERE(table.Campaign.Status.EQ(utils.EnumExpression(model.CampaignStatusEnum_Scheduled.String())))
+				WHERE(table.Campaign.Status.EQ(utils.EnumExpression(model.CampaignStatusEnum_Scheduled.String())).AND(
+					table.Campaign.ScheduledAt.LT(TimestampzT(time.Now()))),
+				)
 
 			context := context.Background()
 			err := campaignsQuery.QueryContext(context, cm.Db, &scheduledCampaigns)

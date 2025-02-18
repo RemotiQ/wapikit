@@ -22,7 +22,6 @@ type RedisClient struct {
 
 func NewRedisClient(
 	url string,
-	password *string,
 	IsProduction,
 	IsCloudEdition bool,
 	RedisApiServerEventChannelName string,
@@ -39,6 +38,8 @@ func NewRedisClient(
 	if err != nil {
 		fmt.Println("Error connecting to Redis: ", err)
 		panic(err)
+	} else {
+		fmt.Println("Connected to Redis")
 	}
 
 	pool := redisPoolLib.NewPool(redisClient)

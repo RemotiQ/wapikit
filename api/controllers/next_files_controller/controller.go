@@ -61,7 +61,7 @@ func ServerHtmlAndNonJsAndCssFiles(c interfaces.ContextWithoutSession) error {
 		app.Logger.Info("serving static files: %v", routePath, nil)
 		b, err := app.Fs.Read(routePath)
 		if err != nil {
-			app.Logger.Error("error reading static file: %v", err)
+			app.Logger.Debug("error reading static file: %v", err)
 			if err.Error() == "file does not exist" {
 				_404File, err := app.Fs.Read(path.Join("", "/404.html"))
 				if err != nil {

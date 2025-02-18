@@ -4,18 +4,12 @@
 package main
 
 import (
-	"fmt"
-
 	ai_service "github.com/wapikit/wapikit-enterprise/services/ai"
 	"github.com/wapikit/wapikit/api/api_types"
 	"github.com/wapikit/wapikit/interfaces"
-	"github.com/wapikit/wapikit/services/notification_service"
 )
 
 func MountServices(app *interfaces.App) {
-
-	fmt.Println("Mounting services")
-
 	logger := app.Logger
 	redis := app.Redis
 	db := app.Db
@@ -28,22 +22,4 @@ func MountServices(app *interfaces.App) {
 		api_types.Gpt4o,
 		koa.String("ai.azure_endpoint"),
 	)
-
-	app.NotificationService = &notification_service.NotificationService{
-		Logger: &app.Logger,
-		SlackConfig: &notification_service.SlackConfig{
-			SlackWebhookUrl: koa.String("slack.webhook_url"),
-			SlackChannel:    koa.String("slack.channel"),
-		},
-		EmailConfig: &notification_service.EmailConfig{
-			Host:     koa.String("email.host"),
-			Port:     koa.String("email.port"),
-			Password: koa.String("email.password"),
-			Username: koa.String("email.username"),
-		},
-		Redis: redis,
-		Db:    db,
-	}
-
-	app.CampaignManager.NotificationService = app.NotificationService
 }
