@@ -30,6 +30,7 @@ require (
 	github.com/tmc/langchaingo v0.1.13-pre.0.0.20250202074804-0672790bb23a
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/wapikit/wapi.go v0.1.3
+	github.com/wapikit/wapikit-enterprise v0.0.0
 	golang.org/x/crypto v0.32.0
 )
 
@@ -107,3 +108,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/wapikit/wapikit-enterprise => ./.enterprise
