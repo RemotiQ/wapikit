@@ -4,9 +4,9 @@
 package main
 
 import (
-	ai_service "github.com/wapikit/wapikit-enterprise/services/ai"
 	"github.com/wapikit/wapikit/api/api_types"
 	"github.com/wapikit/wapikit/interfaces"
+	"github.com/wapikit/wapikit/services/ai_service"
 )
 
 func MountServices(app *interfaces.App) {

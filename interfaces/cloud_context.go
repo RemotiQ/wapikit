@@ -13,12 +13,9 @@ import (
 	"github.com/labstack/echo/v4"
 
 	wapi "github.com/wapikit/wapi.go/pkg/client"
-	enterprise_interfaces "github.com/wapikit/wapikit-enterprise/interfaces"
-	ai_service "github.com/wapikit/wapikit-enterprise/services/ai"
-	quota_service "github.com/wapikit/wapikit-enterprise/services/quota"
-	subscription_service "github.com/wapikit/wapikit-enterprise/services/subscription"
 	"github.com/wapikit/wapikit/api/api_types"
 	"github.com/wapikit/wapikit/internal/campaign_manager"
+	ai_service "github.com/wapikit/wapikit/services/ai_service"
 	"github.com/wapikit/wapikit/services/conversation_service"
 	"github.com/wapikit/wapikit/services/encryption_service"
 	"github.com/wapikit/wapikit/services/event_service"
@@ -26,8 +23,6 @@ import (
 	cache_service "github.com/wapikit/wapikit/services/redis_service"
 
 	. "github.com/go-jet/jet/v2/postgres"
-	"github.com/wapikit/wapikit-enterprise/.db-generated/model"
-	"github.com/wapikit/wapikit-enterprise/.db-generated/table"
 )
 
 type App struct {

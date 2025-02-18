@@ -25,12 +25,3 @@ jobs:
             echo "No [deploy] tag found. Skipping trigger."
             echo "should_trigger=false" >> $GITHUB_ENV
           fi
-
-      - name: Trigger Workflow in wapikit-enterprise
-        if: env.should_trigger == 'true'
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: your-org/wapikit-enterprise
-          event-type: deploy-enterprise
-          client-payload: '{"commit_message": "${{ github.event.head_commit.message }}"}'

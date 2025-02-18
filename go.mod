@@ -30,7 +30,6 @@ require (
 	github.com/tmc/langchaingo v0.1.13-pre.0.0.20250202074804-0672790bb23a
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/wapikit/wapi.go v0.1.3
-	github.com/wapikit/wapikit-enterprise v0.0.0
 	golang.org/x/crypto v0.32.0
 )
 
@@ -77,7 +76,6 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.7 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/razorpay/razorpay-go v1.3.2 // indirect
 	github.com/redis/rueidis v1.0.53 // indirect
 	github.com/redis/rueidis/rueidiscompat v1.0.53 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
@@ -108,5 +106,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/wapikit/wapikit-enterprise => ./.enterprise
