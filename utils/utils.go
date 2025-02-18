@@ -92,8 +92,9 @@ func IsValidEmail(email string) bool {
 
 func ValidatePhoneNumber(phoneNumber string) (*string, error) {
 	cleaned := strings.TrimSpace(phoneNumber)
+
 	if !strings.HasPrefix(cleaned, "+") {
-		return nil, fmt.Errorf("phone number must include a country code (e.g. +91, +1)")
+		cleaned = "+" + cleaned
 	}
 
 	parsed, err := phonenumbers.Parse(cleaned, "")
