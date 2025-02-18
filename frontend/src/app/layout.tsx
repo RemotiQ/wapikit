@@ -14,6 +14,8 @@ import CommandMenuProvider from '~/components/layout/command-menu-provider'
 import { clsx } from 'clsx'
 import { PricingModal } from '~/components/modal/pricing'
 import SubscriptionProvider from '~/components/layout/subscription-provider'
+import { GoogleTagManager } from '@next/third-parties/google'
+import { GTM_ID, IS_PRODUCTION } from '~/constants'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,6 +33,7 @@ export default function RootLayout({
 			<body className={clsx(inter.className, '!font-sans antialiased')}>
 				<NextTopLoader />
 				<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+					{IS_PRODUCTION && GTM_ID ? <GoogleTagManager gtmId={GTM_ID} /> : null}
 					<ApiQueryClientProvider>
 						<Toaster />
 						<AuthProvisioner>
