@@ -851,7 +851,8 @@ func handleCreateTag(context interfaces.ContextWithSession) error {
 
 	existingTagQuery := SELECT(table.Tag.AllColumns).
 		FROM(table.Tag).
-		WHERE(table.Tag.Label.EQ(String(payload.Label))).
+		WHERE(table.Tag.Label.EQ(String(payload.Label)).AND(
+			table.Tag.OrganizationId.EQ(UUID(orgUuid)))).
 		LIMIT(1)
 
 	var existingTag model.Tag

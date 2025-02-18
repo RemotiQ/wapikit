@@ -81,7 +81,6 @@ export const NewContactFormSchema = z.object({
 	name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
 	description: z
 		.string()
-		.min(3, { message: 'Description must be at least 3 characters' })
 		.optional(),
 	phone: z.string().min(10, { message: 'Phone number must be at least 10 characters' }),
 	lists: z.string().array().default([]),

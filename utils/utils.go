@@ -90,15 +90,25 @@ func IsValidEmail(email string) bool {
 	return matched
 }
 
-func ParsePhoneNumber(phoneNumber string) (*phonenumbers.PhoneNumber, error) {
-	parsedPhoneNumber := phonenumbers.PhoneNumber{}
-	err := phonenumbers.ParseAndKeepRawInputToNumber(phoneNumber, "IN", &parsedPhoneNumber)
-
-	if err != nil {
-		return nil, err
+func ValidatePhoneNumber(phoneNumber string) (*string, error) {
+	cleaned := strings.TrimSpace(phoneNumber)
+	if !strings.HasPrefix(cleaned, "+") {
+		return nil, fmt.Errorf("phone number must include a country code (e.g. +91, +1)")
 	}
 
-	return &parsedPhoneNumber, err
+	parsed, err := phonenumbers.Parse(cleaned, "")
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse phone number: %w", err)
+	}
+
+	// Validate the parsed phone number.
+	if !phonenumbers.IsValidNumber(parsed) {
+		return nil, fmt.Errorf("invalid phone number")
+	}
+
+	formatted := phonenumbers.Format(parsed, phonenumbers.E164)
+	sanitized := strings.TrimPrefix(formatted, "+")
+	return &sanitized, nil
 }
 
 func EnumExpression(value string) StringExpression {

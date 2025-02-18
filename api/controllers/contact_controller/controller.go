@@ -136,7 +136,6 @@ func NewContactController() *ContactController {
 }
 
 func getContacts(context interfaces.ContextWithSession) error {
-	logger := context.App.Logger
 	params := new(api_types.GetContactsParams)
 
 	err := utils.BindQueryParams(context, params)
@@ -170,7 +169,6 @@ func getContacts(context interfaces.ContextWithSession) error {
 	whereCondition := table.Contact.OrganizationId.EQ(UUID(orgUuid))
 
 	if listId != nil {
-		logger.Debug("List ID:", *listId, nil)
 		listUuid, err := uuid.Parse(*listId)
 		if err != nil {
 			// * skip the list if it is not a valid UUID
@@ -179,37 +177,92 @@ func getContacts(context interfaces.ContextWithSession) error {
 		}
 	}
 
-	contactsQuery := SELECT(
+	contactQuery := SELECT(
 		table.Contact.AllColumns,
 		table.ContactListContact.AllColumns,
 		table.ContactList.AllColumns,
-		COUNT(table.Contact.UniqueId).OVER().AS("totalContacts"),
 		table.Conversation.AllColumns,
-		table.Message.AllColumns,
-	).
-		FROM(table.Contact.
+	).FROM(
+		table.Contact.
 			LEFT_JOIN(table.ContactListContact, table.ContactListContact.ContactId.EQ(table.Contact.UniqueId)).
 			LEFT_JOIN(table.ContactList, table.ContactList.UniqueId.EQ(table.ContactListContact.ContactListId)).
-			LEFT_JOIN(table.Conversation, table.Conversation.ContactId.EQ(table.Contact.UniqueId).AND(table.Conversation.OrganizationId.EQ(UUID(orgUuid)))).
-			LEFT_JOIN(table.Message, table.Message.ConversationId.EQ(table.Conversation.UniqueId).AND(table.Message.OrganizationId.EQ(UUID(orgUuid)))),
-		).
-		WHERE(whereCondition).
+			LEFT_JOIN(table.Conversation, table.Conversation.ContactId.EQ(table.Contact.UniqueId).AND(table.Conversation.OrganizationId.EQ(UUID(orgUuid)))),
+	).WHERE(
+		whereCondition,
+	).
 		LIMIT(limit).
 		OFFSET((page - 1) * limit)
 
 	if order != nil {
 		if *order == api_types.Asc {
-			contactsQuery.ORDER_BY(table.Contact.CreatedAt.ASC())
+			contactQuery.ORDER_BY(table.Contact.CreatedAt.ASC())
 		} else {
-			contactsQuery.ORDER_BY(table.Contact.CreatedAt.DESC())
+			contactQuery.ORDER_BY(table.Contact.CreatedAt.DESC())
 		}
 	}
 
 	if status != nil {
-		whereCondition.AND(table.Contact.Status.EQ(String(*status)))
+		whereCondition.AND(table.Contact.Status.EQ(utils.EnumExpression(string(*status))))
 	}
 
-	err = contactsQuery.QueryContext(context.Request().Context(), context.App.Db, &dest)
+	contactsCte := CTE("contacts")
+	conversationsCte := CTE("conversations")
+	contactListsCte := CTE("contact_lists")
+	paginationMetaCte := CTE("pagination_meta")
+	messagesCte := CTE("messages")
+
+	cteQuery := WITH(
+		contactsCte.AS(contactQuery),
+		contactListsCte.AS(
+			SELECT(
+				table.ContactListContact.ContactId,
+				table.ContactList.AllColumns,
+			).FROM(
+				table.ContactList.INNER_JOIN(
+					table.ContactListContact, table.ContactListContact.ContactId.EQ(table.ContactListContact.ContactId),
+				),
+			).WHERE(
+				table.ContactList.OrganizationId.EQ(UUID(orgUuid)),
+			),
+		),
+		conversationsCte.AS(
+			SELECT(table.Conversation.AllColumns).
+				FROM(table.Conversation).
+				WHERE(table.Conversation.OrganizationId.EQ(UUID(orgUuid))).LIMIT(20),
+		),
+		messagesCte.AS(
+			SELECT(table.Message.AllColumns).FROM(table.Message).WHERE(table.Message.OrganizationId.EQ(UUID(orgUuid))).
+				LIMIT(20),
+		),
+		paginationMetaCte.AS(
+			SELECT(
+				COUNT(table.Contact.UniqueId).OVER().AS("totalContacts"),
+			).FROM(
+				table.Contact,
+			).WHERE(
+				whereCondition,
+			),
+		),
+	)(
+		SELECT(
+			contactsCte.AllColumns(),
+			contactListsCte.AllColumns(),
+			conversationsCte.AllColumns(),
+			messagesCte.AllColumns(),
+			paginationMetaCte.AllColumns(),
+		).FROM(
+			contactsCte.LEFT_JOIN(
+				contactListsCte, table.Contact.UniqueId.From(contactsCte).EQ(table.ContactListContact.ContactId.From(contactListsCte)),
+			).LEFT_JOIN(
+				conversationsCte, table.Contact.UniqueId.From(contactsCte).EQ(table.Conversation.ContactId.From(conversationsCte)),
+			).LEFT_JOIN(
+				messagesCte, table.Conversation.UniqueId.From(conversationsCte).EQ(table.Message.ConversationId.From(messagesCte)),
+			),
+			paginationMetaCte,
+		),
+	)
+
+	err = cteQuery.QueryContext(context.Request().Context(), context.App.Db, &dest)
 
 	if err != nil {
 		if err.Error() == qrm.ErrNoRows.Error() {
@@ -230,10 +283,8 @@ func getContacts(context interfaces.ContextWithSession) error {
 
 	contactsToReturn := []api_types.ContactSchema{}
 	totalContacts := 0
-
 	if len(dest) > 0 {
 		for _, contact := range dest {
-
 			conversations := []api_types.ConversationWithoutContactSchema{}
 
 			for _, conversation := range contact.Conversations {
@@ -291,7 +342,6 @@ func getContacts(context interfaces.ContextWithSession) error {
 		}
 
 		totalContacts = dest[0].TotalContacts
-
 	}
 
 	return context.JSON(http.StatusOK, api_types.GetContactsResponseSchema{
@@ -320,19 +370,24 @@ func createNewContacts(context interfaces.ContextWithSession) error {
 	contactsToInsert := []model.Contact{}
 	var insertedContacts []model.Contact
 
+	// parse phone number correctly
 	for _, contact := range *payload {
+		// * validate phone number
+		phoneNumber, err := utils.ValidatePhoneNumber(contact.Phone)
+		if err != nil {
+			return context.JSON(http.StatusBadRequest, err.Error())
+		}
 		jsonAttributes, _ := json.Marshal(contact.Attributes)
 		stringAttributes := string(jsonAttributes)
 		contactToInsert := model.Contact{
 			OrganizationId: orgUuid,
 			Name:           contact.Name,
-			PhoneNumber:    contact.Phone,
+			PhoneNumber:    *phoneNumber,
 			Attributes:     &stringAttributes,
 			Status:         model.ContactStatusEnum_Active,
 			CreatedAt:      time.Now(),
 			UpdatedAt:      time.Now(),
 		}
-
 		contactsToInsert = append(contactsToInsert, contactToInsert)
 	}
 

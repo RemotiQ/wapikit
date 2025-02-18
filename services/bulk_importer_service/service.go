@@ -14,6 +14,7 @@ import (
 	"github.com/wapikit/wapikit/.db-generated/model"
 	"github.com/wapikit/wapikit/.db-generated/table"
 	"github.com/wapikit/wapikit/interfaces"
+	"github.com/wapikit/wapikit/utils"
 )
 
 var (
@@ -48,7 +49,6 @@ func (importer *ImporterService) SendEvent(enc *json.Encoder, context *interface
 }
 
 func (importer *ImporterService) ProcessRecord(record []string, orgUuid uuid.UUID) (model.Contact, error) {
-	// Validate record length
 	if len(record) < 3 {
 		return model.Contact{}, fmt.Errorf("invalid record length, expected at least 3 columns")
 	}
@@ -61,6 +61,12 @@ func (importer *ImporterService) ProcessRecord(record []string, orgUuid uuid.UUI
 	// Validate required fields
 	if phone == "" {
 		return model.Contact{}, fmt.Errorf("phone number is required")
+	}
+
+	validatedPhone, err := utils.ValidatePhoneNumber(phone)
+
+	if err != nil {
+		return model.Contact{}, fmt.Errorf("invalid phone number: %v", err)
 	}
 
 	// Validate name length
@@ -79,11 +85,10 @@ func (importer *ImporterService) ProcessRecord(record []string, orgUuid uuid.UUI
 	// Prepare contact model
 	jsonAttributes, _ := json.Marshal(attrMap)
 	stringAttributes := string(jsonAttributes)
-
 	return model.Contact{
 		OrganizationId: orgUuid,
 		Name:           name,
-		PhoneNumber:    phone,
+		PhoneNumber:    *validatedPhone,
 		Attributes:     &stringAttributes,
 		Status:         model.ContactStatusEnum_Active,
 		CreatedAt:      time.Now(),
